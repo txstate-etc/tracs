@@ -121,6 +121,11 @@
                 <module>blogwow</module>
                 <module>irubric/irubric-core</module>
                 <module>irubric/irubric-tool</module>
+                <module>melete</module>
+
+                <!-- Contrib Dependencies -->
+                <module>lticontact</module>
+                <module>etudes-util</module>
 
                 <!-- TRACS specific
                 <module>roster_legacy</module>

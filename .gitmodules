@@ -8,3 +8,12 @@
 [submodule "irubric"]
 	path = irubric
 	url = https://github.com/txstate-etc/irubric
+[submodule "etudes-util"]
+	path = etudes-util
+	url = https://github.com/txstate-etc/etudes-util
+[submodule "lticontact"]
+	path = lticontact
+	url = https://github.com/txstate-etc/lticontact
+[submodule "melete"]
+	path = melete
+	url = https://github.com/txstate-etc/melete

@@ -128,7 +128,11 @@
     <reflectutils.version>0.9.20</reflectutils.version>
     <!-- Sakai modules that are versioned separately -->
     <!-- lessonbuilder tool pom depends on msgcntr ver prop. Need to add a profile to the LB tool pom to mark change between 10.x master and earlier versions -->
-    <sakai.msgcntr.version>${sakai.version}</sakai.msgcntr.version> 
+    <sakai.msgcntr.version>${sakai.version}</sakai.msgcntr.version>
+    <!-- contrib modules, JeffSnider 6/27/13 -->
+    <etudes.util.version>1.0.25</etudes.util.version>
+    <lticontact.version>1.2</lticontact.version>
+    <melete.version>2.9.9</melete.version>
     <!-- Set the source encoding to avoid maven warnings -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <sakai.jdk.version>1.8</sakai.jdk.version>
@@ -1595,7 +1599,32 @@
           <artifactId>mariadb-java-client</artifactId>
           <version>1.3.6</version>
       </dependency>
+      <!-- dependencies for melete -->
+      <dependency>
+        <groupId>org.etudes</groupId>
+        <artifactId>etudes-util-api</artifactId>
+        <version>${etudes.util.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.etudes</groupId>
+        <artifactId>etudes-util-util</artifactId>
+        <version>${etudes.util.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.etudes</groupId>
+        <artifactId>etudes-lticontact-util</artifactId>
+        <version>${lticontact.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.etudes</groupId>
+        <artifactId>etudes-melete-api</artifactId>
+        <version>${melete.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <!-- end dependencies for melete -->
     </dependencies>
+
   </dependencyManagement>
 
   <!-- unit tests are a global dependency -->

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sakaiproject</groupId>
+    <artifactId>master</artifactId>
+    <version>11.1</version>
+    <relativePath>../master/pom.xml</relativePath>
+  </parent>
+
+  <name>Sakai REST APIs</name>
+  <groupId>org.sakaiproject.rest</groupId>
+  <artifactId>sakai-rest</artifactId>
+  <packaging>pom</packaging>
+  <organization>
+      <name>Sakai Project</name>
+      <url>http://sakaiproject.org/</url>
+  </organization>
+  <inceptionYear>2016</inceptionYear>
+  <properties>
+    <jersey.version>2.22.2</jersey.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.ext</groupId>
+        <artifactId>jersey-spring3</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-json-jackson</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sakaiproject.rest</groupId>
+        <artifactId>sakai-rest-api</artifactId>
+        <version>${sakai.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <modules>
+    <!--<module>api</module>-->
+    <module>app</module>
+  </modules>
+</project>

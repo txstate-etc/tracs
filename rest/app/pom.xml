@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sakaiproject.rest</groupId>
+    <artifactId>sakai-rest</artifactId>
+    <version>11.1</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <name>Sakai REST Web Application</name>
+  <groupId>org.sakaiproject.rest</groupId>
+  <artifactId>rest</artifactId>
+  <organization>
+      <name>Sakai Project</name>
+      <url>http://sakaiproject.org/</url>
+  </organization>
+  <inceptionYear>2016</inceptionYear>
+  <packaging>war</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sakaiproject.kernel</groupId>
+      <artifactId>sakai-kernel-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sakaiproject.rest</groupId>
+      <artifactId>sakai-rest-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+    </dependency>
+  </dependencies>
+</project>

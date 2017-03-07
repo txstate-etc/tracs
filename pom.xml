@@ -93,6 +93,7 @@
                 <module>providers</module>
                 <module>reference</module>
                 <module>reset-pass</module>
+                <module>rest</module>
                 <module>rights</module>
                 <module>roster2</module>
                 <module>rsf</module>

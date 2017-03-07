@@ -55,4 +55,11 @@
                 "portalCDNQuery" : "$!{portalCDNQuery}"
             };
         </script>
+        <script src="/library/js/moment/2.17.1/moment.min.js"></script>
+        <script src="/library/js/headscripts.js"></script>
+        <script>
+            includeLatestJQuery("portal- sessionhistory")
+        </script>
+        <script src="/library/sessionhistory/js/sessionhistory.js"></script>
+        <link type="text/css" rel="stylesheet" href="/library/sessionhistory/css/sessionhistory.css">
     </head>

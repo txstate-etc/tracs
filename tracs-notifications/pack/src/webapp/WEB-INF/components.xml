@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  <bean class="edu.txstate.tracs.notifications.NotifyUtils" init-method="init">
+   	<property name="siteService" ref="org.sakaiproject.site.api.SiteService"/>
+   	<property name="serverConfigurationService" ref="org.sakaiproject.component.api.ServerConfigurationService"/>
+  </bean>
+  <bean class="edu.txstate.tracs.notifications.AnnouncementsNotifier" init-method="init">
+   	<property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService"/>
+   	<property name="entityManager" ref="org.sakaiproject.entity.api.EntityManager"/>
+   	<property name="announceService" ref="org.sakaiproject.announcement.api.AnnouncementService"/>
+   	<property name="notifyUtils" ref="edu.txstate.tracs.notifications.NotifyUtils"/>
+  </bean>
+</beans>

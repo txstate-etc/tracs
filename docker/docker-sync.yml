@@ -1,25 +1,22 @@
+version: 2
 syncs:
   components-sync:
     src: ./components
     dest: /sakai/components
     sync_host_port: 10872
     sync_user: webapps-sync-user
-    sync_group: webapps-sync-group
   lib-sync:
     src: ./lib
     dest: /sakai/lib
     sync_host_port: 10873
     sync_user: webapps-sync-user
-    sync_group: webapps-sync-group
   sakai-sync:
     src: ./sakai
     dest: /sakai/sakai
     sync_host_port: 10874
     sync_user: webapps-sync-user
-    sync_group: webapps-sync-group
   webapps-sync:
     src: ./webapps
     dest: /sakai/webapps
     sync_host_port: 10875
     sync_user: webapps-sync-user
-    sync_group: webapps-sync-group

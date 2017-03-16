@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <name>Tracs Notifications Component Package</name>
+  <parent>
+    <groupId>edu.txstate.tracs</groupId>
+    <artifactId>tracs-notifications-base</artifactId>
+    <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>edu.txstate.tracs</groupId>
+  <artifactId>tracs-notifications-pack</artifactId>
+  <organization>
+    <name>Texas State University</name>
+    <url>http://txstate.edu/</url>
+  </organization>
+  <inceptionYear>2009</inceptionYear>
+  <packaging>sakai-component</packaging>
+  <properties>
+    <deploy.target>components</deploy.target>
+  </properties>
+  <dependencies>
+  </dependencies>
+  <build>
+    <resources/>
+  </build>
+</project>

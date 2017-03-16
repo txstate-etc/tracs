@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <name>Tracs Notifications Base</name>
+  <groupId>edu.txstate.tracs</groupId>
+  <artifactId>tracs-notifications-base</artifactId>
+  
+  <organization>
+    <name>Texas State University</name>
+    <url>http://www.txstate.edu</url>
+  </organization>
+  <inceptionYear>2009</inceptionYear>
+    
+  <properties>
+    <tracsnotifyVersion>1.0</tracsnotifyVersion>
+  </properties>
+
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>org.sakaiproject</groupId>
+    <artifactId>master</artifactId>
+    <version>11.1</version><!--MATCH_CURRENT_SAKAI-->
+    <relativePath>../master/pom.xml</relativePath>
+  </parent>
+
+  <modules>
+    <module>announcements</module>
+    <module>pack</module>
+    <module>util</module>
+  </modules>
+</project>

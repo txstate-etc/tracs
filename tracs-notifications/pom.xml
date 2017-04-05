@@ -27,6 +27,7 @@
 
   <modules>
     <module>announcements</module>
+    <module>forums</module>
     <module>pack</module>
     <module>util</module>
   </modules>

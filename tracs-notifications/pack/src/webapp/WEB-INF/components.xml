@@ -12,4 +12,12 @@
    	<property name="announceService" ref="org.sakaiproject.announcement.api.AnnouncementService"/>
    	<property name="notifyUtils" ref="edu.txstate.tracs.notifications.NotifyUtils"/>
   </bean>
+  <bean class="edu.txstate.tracs.notifications.ForumsNotifier" init-method="init">
+    <property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService"/>
+    <property name="entityManager" ref="org.sakaiproject.entity.api.EntityManager"/>
+    <property name="forumsService" ref="org.sakaiproject.api.app.messageforums.DiscussionForumService"/>
+    <property name="notifyUtils" ref="edu.txstate.tracs.notifications.NotifyUtils"/>
+    <property name="messageManager" ref="org.sakaiproject.api.app.messageforums.MessageForumsMessageManager"/>
+    <property name="discussionForumManager" ref="org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager"/>
+  </bean>
 </beans>

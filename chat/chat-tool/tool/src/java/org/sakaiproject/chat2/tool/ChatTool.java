@@ -1727,5 +1727,9 @@ public class ChatTool implements RoomObserver, PresenceObserver {
 	   sb.append("</span>");
 	   return sb.toString();
    }
+
+  public int getMessagesMax(){
+    return getChatManager().getMessagesMax();
+  }
    
 }

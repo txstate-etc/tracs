@@ -41,7 +41,9 @@
 <!--jsp/discussionForum/topic/dfTopicSettings.jsp-->
 		<%--<sakai:tool_bar_message value="#{msgs.cdfm_delete_topic_title}"/>--%>
         
-		<h:outputText id="alert-delete" styleClass="messageAlert" style="display:block" value="#{msgs.cdfm_delete_topic}" rendered="#{ForumTool.selectedTopic.markForDeletion}"/>
+		<%--bugid:527 by -Qu 12/06/2011 --%>
+        <h:outputText styleClass="messageAlert" style="display:block" value="#{msgs.cdfm_delete_topic}" rendered="#{ForumTool.selectedTopic.markForDeletion && ForumTool.selectedTopic.topic.defaultAssignName == null}"/>
+        <h:outputText styleClass="messageAlert" style="display:block" value="#{msgs.cdfm_delete_topic_warning}" rendered="#{ForumTool.selectedTopic.markForDeletion && ForumTool.selectedTopic.topic.defaultAssignName != null}"/>
         <h:outputText styleClass="messageAlert" value="#{msgs.cdfm_duplicate_topic_confirm}" rendered="#{ForumTool.selectedTopic.markForDuplication}" style="display:block" />
 		<div class="topicBloc" style="padding:0 .5em"><h:messages styleClass="messageAlert" id="errorMessages" rendered="#{! empty facesContext.maximumSeverity}" />
 			<p>

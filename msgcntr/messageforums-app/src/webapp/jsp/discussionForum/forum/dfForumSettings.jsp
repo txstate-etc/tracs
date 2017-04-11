@@ -44,7 +44,9 @@ if (thisId == null)
 <!--jsp/discussionForum/forum/dfForumSettings.jsp-->
 		<%--<sakai:tool_bar_message value="#{msgs.cdfm_delete_forum_title}" />--%>
 		<%--//designNote: this just feels weird - presenting somehting that sort of looks like the form used to create the forum (with an editable permissions block!) to comfirm deletion --%>
-		<h:outputText id="alert-delete" styleClass="messageAlert" value="#{msgs.cdfm_delete_forum}" rendered="#{ForumTool.selectedForum.markForDeletion}" style="display:block" />	
+		<%--bugid:527 by -Qu 12/06/2011 --%>
+        <h:outputText styleClass="messageAlert" value="#{msgs.cdfm_delete_forum} " rendered="#{ForumTool.selectedForum.markForDeletion && ForumTool.selectedForum.forum.defaultAssignName==null}" style="display:block" />
+        <h:outputText styleClass="messageAlert" value="#{msgs.cdfm_delete_forum_warning}" rendered="#{ForumTool.selectedForum.markForDeletion && ForumTool.selectedForum.forum.defaultAssignName!=null}" style="display:block" />
         <h:outputText styleClass="messageAlert" value="#{msgs.cdfm_duplicate_forum_confirm}" rendered="#{ForumTool.selectedForum.markForDuplication}" style="display:block" />
 		<table class="forumHeader">
 			  <tr>

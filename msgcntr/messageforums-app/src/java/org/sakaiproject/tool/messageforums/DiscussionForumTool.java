@@ -283,6 +283,7 @@ public class DiscussionForumTool
   private static final String TOO_LARGE_GRADE = "cdfm_too_large_grade";
   private static final String NO_ASSGN = "cdfm_no_assign_for_grade";
   private static final String CONFIRM_DELETE_MESSAGE="cdfm_delete_msg";
+  private static final String CONFIRM_DELETE_MESSAGE_WARNING="cdfm_delete_msg_warning";
   private static final String INSUFFICIENT_PRIVILEGES_TO_DELETE = "cdfm_insufficient_privileges_delete_msg";
   private static final String END_DATE_BEFORE_OPEN_DATE = "endDateBeforeOpenDate";
   private static final String NO_GROUP_SELECTED ="cdfm_no_group_selected";
@@ -4612,7 +4613,13 @@ public class DiscussionForumTool
     }
 
     deleteMsg = true;
-    setErrorMessage(getResourceBundleString(CONFIRM_DELETE_MESSAGE));
+    //bugid:527 by -Qu 12/06/2011
+    //message could inherit grade item from its topic or forum
+    if(null != selectedMessage.getMessage().getGradeAssignmentName() || null != selectedTopic.getTopic().getGradebookAssignment() || null != selectedForum.getForum().getDefaultAssignName()){
+      setErrorMessage(getResourceBundleString(CONFIRM_DELETE_MESSAGE_WARNING));
+    }
+    else
+      setErrorMessage(getResourceBundleString(CONFIRM_DELETE_MESSAGE));
     return MESSAGE_VIEW;
   }
 

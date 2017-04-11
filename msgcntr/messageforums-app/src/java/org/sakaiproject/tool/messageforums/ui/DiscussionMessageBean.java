@@ -67,6 +67,8 @@ public class DiscussionMessageBean
   private boolean revise;
   private boolean userCanDelete;
   private boolean userCanEmail;
+  private boolean isGraded;  //Added for grade flag bugid:802 -Qu 12/9/2011 
+
   //Move Threads
   private boolean selected_move;
   private boolean moved;
@@ -602,4 +604,13 @@ LOG.debug("... before return getAuthorEmail(): userEmail = " + userEmail);
 	{
 		return ComponentManager.get(UIPermissionsManager.class);
 	}
+
+  //Added for grade flag bugid:802 -Qu 12/9/2011
+  public void setIsGraded (boolean isGraded){
+    this.isGraded = isGraded;
+  }
+
+  public boolean getIsGraded (){
+    return isGraded;
+  }
 }

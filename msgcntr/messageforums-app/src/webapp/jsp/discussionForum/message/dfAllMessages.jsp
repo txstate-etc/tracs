@@ -394,6 +394,8 @@
                      <%-- // display singular ('message') if total message is 0 or more than 1--%>                   
                      <h:outputText styleClass="textPanelFooter" id="topic_msg_count59" value="#{msgs.cdfm_of} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs}"
                                    rendered="#{message.depth == 0 && message.childCount >=1}"  />
+                    <%-- Added for bugid:4738 showing graded next to title  -Qu 1/12/2012 --%>
+                  <h:outputText  escape="false" styleClass="textPanelFooter" rendered="#{message.isGraded}" value=" #{msgs.cdfm_openb} #{msgs.cdfm_button_bar_graded} #{msgs.cdfm_closeb}" />
 				<%-- NOT moved--%>
 				</h:panelGroup>
 			</h:column>

@@ -131,9 +131,10 @@
                         </h:outputLink>
                     </h:panelGroup>
 					<%-- link to grade --%>
+					<%--//Added for grade flag bugid:802 -Qu 12/9/2011 --%>
 					<h:panelGroup rendered="#{ForumTool.selectedTopic.isPostToGradebook && ForumTool.gradebookExist}">
 						<h:outputLink value="/tool/#{ForumTool.currentToolId}/discussionForum/message/dfMsgGrade" target="dialogFrame" styleClass="button"
-							onclick="dialogLinkClick(this);">
+							onclick="dialogLinkClick(this);" style="#{message.isGraded?'color:green !important':''}">
 							<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
 							<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId"/>
 							<f:param value="#{message.message.id}" name="messageId"/>
@@ -141,7 +142,7 @@
 							<f:param value="dialogFrame" name="frameId"/>
 							<f:param value="gradesSavedDiv" name="gradesSavedDiv"/>
 							<f:param value="#{message.message.createdBy}" name="userId"/>
-							<h:outputText value=" #{msgs.cdfm_button_bar_grade}" />
+							<h:outputText value=" #{message.isGraded?msgs.cdfm_button_bar_graded:msgs.cdfm_button_bar_grade}" />
 						</h:outputLink>
 					</h:panelGroup>
 					<%-- Revise other action --%>

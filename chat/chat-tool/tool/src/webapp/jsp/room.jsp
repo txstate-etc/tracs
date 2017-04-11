@@ -48,7 +48,8 @@
 	   <div id="chatLeft">
 			<div id="chatListWrapper" class="chatListWrapper">
 				<div  class="chatListHeadWrapper">
-					<h:outputText value="#{msgs.lay_note}" rendered="#{ChatTool.canRenderAllMessages}" />
+                    <%--Add text for a better understanding for max messages bugid:5262 -Qu 2/4/2013--%>
+                    <h:outputText value="#{msgs.lay_note_1} #{ChatTool.messagesMax} #{msgs.lay_note_2}" rendered="#{ChatTool.canRenderAllMessages}" />
 					<h:outputFormat value="#{msgs.lay_restricted_note_days}" rendered="#{ChatTool.canRenderDateMessages}" >
 						<f:param value="#{ChatTool.currentChannel.chatChannel.timeParam}" />
 					</h:outputFormat>

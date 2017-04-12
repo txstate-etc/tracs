@@ -2,7 +2,7 @@ REPO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
 echo "Removing files from previous builds..."
 rm -r $REPO_ROOT/tracs-docker/components $REPO_ROOT/tracs-docker/lib $REPO_ROOT/tracs-docker/webapps
-mkdir $REPO_ROOT/tracs-apachedocker/lib
+mkdir $REPO_ROOT/tracs-docker/lib
 mkdir -p /tmp/tracs-apache
 echo "Copying core tomcat libraries..."
 wget -qO- http://archive.apache.org/dist/tomcat/tomcat-8/v8.0.36/bin/apache-tomcat-8.0.36.tar.gz | tar -xz --strip-component 1 -C /tmp/tracs-apache

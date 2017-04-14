@@ -68,6 +68,12 @@
         </jaxrs:serviceBeans>
     </jaxrs:server>
 
+    <jaxrs:server id="ValidateLogin" address="/rest/validatelogin">
+        <jaxrs:serviceBeans>
+            <ref bean="org.sakaiproject.webservices.ValidateLogin"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+
     <jaxrs:server id="SakaiReportRS" address="/rest/report">
         <jaxrs:serviceBeans>
             <ref bean="org.sakaiproject.webservices.SakaiReport"/>
@@ -194,5 +200,8 @@
      </bean>
     <bean id="org.sakaiproject.webservices.SakaiGradebook" class="org.sakaiproject.webservices.SakaiGradebook" init-method="init" parent="org.sakaiproject.webservices.AbstractWebService" >
         <property name="gradebookFrameworkService" ref="org.sakaiproject.service.gradebook.GradebookFrameworkService"/>
+    </bean>
+    <bean id="org.sakaiproject.webservices.ValidateLogin" class="org.sakaiproject.webservices.ValidateLogin" init-method="init" parent="org.sakaiproject.webservices.AbstractWebService">
+        <property name="authenticationManager" ref="org.sakaiproject.user.api.AuthenticationManager"/>
     </bean>
 </beans>

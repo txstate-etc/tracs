@@ -29,6 +29,14 @@
      </filter>
 
      <filter-mapping>
+        <filter-name>sakai.request</filter-name>
+        <url-pattern>/container</url-pattern>
+         <dispatcher>REQUEST</dispatcher>
+         <dispatcher>FORWARD</dispatcher>
+         <dispatcher>INCLUDE</dispatcher>
+     </filter-mapping>
+
+     <filter-mapping>
          <filter-name>springSecurityFilterChain</filter-name>
          <url-pattern>/container/*</url-pattern>
          <dispatcher>REQUEST</dispatcher>

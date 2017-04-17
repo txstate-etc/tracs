@@ -1,22 +1,27 @@
-[submodule "turningpoint"]
-	path = turningpoint
-	url = https://git.txstate.edu/its/turningpoint.git
+[submodule "tracs-docker"]
+	path = tracs-docker
+	url = git@git.txstate.edu:its/tracs-docker.git
+[submodule "irubric"]
+	path = irubric
+	url = https://github.com/txstate-etc/irubric.git
+	branch = tracs
 [submodule "blogwow"]
 	path = blogwow
 	url = https://github.com/txstate-etc/blogwow.git
-	branch = 11.x
-[submodule "irubric"]
-	path = irubric
-	url = https://github.com/txstate-etc/irubric
-[submodule "etudes-util"]
-	path = etudes-util
-	url = https://github.com/txstate-etc/etudes-util
-[submodule "lticontact"]
-	path = lticontact
-	url = https://github.com/txstate-etc/lticontact
+	branch = tracs
+[submodule "turningpoint"]
+	path = turningpoint
+	url = git@git.txstate.edu:its/turningpoint.git
+	branch = tracs
 [submodule "melete"]
 	path = melete
-	url = https://github.com/txstate-etc/melete
-[submodule "tracs-docker"]
-	path = tracs-docker
-	url = https://git.txstate.edu/its/tracs-docker.git
+	url = https://github.com/txstate-etc/melete.git
+	branch = tracs
+[submodule "etudes-util"]
+	path = etudes-util
+	url = https://github.com/txstate-etc/etudes-util.git
+	branch = tracs
+[submodule "lticontact"]
+	path = lticontact
+	url = https://github.com/txstate-etc/lticontact.git
+	branch = tracs

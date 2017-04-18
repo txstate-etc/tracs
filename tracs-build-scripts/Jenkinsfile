@@ -27,7 +27,7 @@ def buildTracsApp() {
             echo " ==================== "
             echo "Building TRACS from ${params.PERSON}"
             echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-            sh "sudo docker run ${REGISTRY_HOST}/tracs-build:11 -q | sudo docker build --no-cache -t tracs:nightly-test - "
+            sh "sudo docker run --rm ${REGISTRY_HOST}/tracs-build:11 -q | sudo docker build --no-cache -t tracs:nightly-test - "
   }
   stage ('Push') {
              echo " ==================== "

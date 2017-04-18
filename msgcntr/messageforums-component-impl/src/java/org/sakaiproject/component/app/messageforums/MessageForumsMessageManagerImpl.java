@@ -1536,7 +1536,15 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         
         Message message = (Message) getMessageById(messageId);
         message.setApproved(Boolean.valueOf(approved));
-        
+        String toolId = ToolManager.getCurrentPlacement().getTool().getId();
+        String userId = getCurrentUser();
+        String context = ToolManager.getCurrentPlacement().getContext();
+        if(approved){
+          eventTrackingService.post(eventTrackingService.newEvent(DiscussionForumService.EVENT_FORUMS_MESSAGE_APPROVE, getEventMessage(message, toolId, userId, context), false));
+        }
+        else{
+          eventTrackingService.post(eventTrackingService.newEvent(DiscussionForumService.EVENT_FORUMS_MESSAGE_DENY, getEventMessage(message, toolId, userId, context), false));
+        }
         getHibernateTemplate().saveOrUpdate(message);
     }
 

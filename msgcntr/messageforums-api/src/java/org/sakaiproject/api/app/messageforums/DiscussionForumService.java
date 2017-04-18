@@ -77,6 +77,10 @@ public interface DiscussionForumService extends EntityProducer
 
 	public static final String EVENT_FORUMS_MOVE_THREAD = "forums.movethread";
 
+	public static final String EVENT_FORUMS_MESSAGE_APPROVE = "forums.approve";
+
+	public static final String EVENT_FORUMS_MESSAGE_DENY = "forums.deny";
+
 	/** Used to determine if MessageCenter tool part of site */
 	public static final String MESSAGE_CENTER_ID = "sakai.messagecenter";
 	

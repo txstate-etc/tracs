@@ -1,0 +1,127 @@
+//Customization beyond what Sakai makes easy
+
+
+//variables used in this file should have default values because they
+//might not be defined in the custom variables file 
+$sites-nav-submenu-item-hover: $sites-nav-submenu-item-background !default;
+$sites-nav-submenu-item-border-top: none !default;
+$sites-nav-submenu-item-border-bottom: none !default;
+
+$tool-tab-color: #666 !default;
+
+$tool-title-nav-link-background: $tool-tab-background-color !default;
+$tool-title-nav-link-color: $primary-color !default;
+$tool-title-nav-link-border: $tool-border-color !default;
+$tool-title-nav-link-background-hover: $tool-background-color !default;
+$tool-title-nav-link-color-hover: $primary-color !default;
+
+$user-menu-background: $tool-tab-background-color !default;
+$user-menu-color: $primary-color !default;
+$user-menu-background-hover: $tool-tab-background-color !default;
+$user-menu-color-hover: lighten( $primary-color, 10% ) !default;
+$user-menu-userdata-separator: $tool-border-color !default;
+
+$small-action-button-color: $tool-tab-background-color !default;
+
+//mobile
+$mobile-background: none !default;
+$mobile-tools-and-sites-bar-background: $primary-color !default;
+$mobile-tools-and-sites-bar-color: #fff !default;
+$mobile-breadcrumbs-bar-background: $tool-menu-background-color !default;
+$mobile-breadcrumbs-bar-color: $tool-menu-color !default;
+
+.img_site_toolmenu{
+  display: none;
+}
+
+//instruction boxes: Sakai creates variables for these colors but doesn't use them.
+.instruction{
+   background: $info-background-color !important;
+   border-color: $info-color !important;
+   color: #000 !important;
+}
+
+
+//the variables provided for the submenu do not provide enough customization
+.Mrphs-sitesNav__submenuitem{
+    border-bottom: $sites-nav-submenu-item-border-bottom !important;
+    border-top: $sites-nav-submenu-item-border-top !important;
+    &:first-child{
+        border-top-color: transparent !important;
+    }
+    &:last-child{
+        border-bottom-color: transparent !important;
+    }
+}
+.Mrphs-sitesNav__submenuitem:hover{
+    background: $sites-nav-submenu-item-hover !important;
+    .Mrphs-sitesNav__submenuitem-icon{
+        background: $sites-nav-submenu-item-hover !important;
+    }
+    .Mrphs-sitesNav__submenuitem-title{
+        background: $sites-nav-submenu-item-hover !important;
+    }
+}
+
+.navIntraTool li span a{
+  color: $tool-tab-color;
+}
+
+//tool buttons (link and help, among others)
+.Mrphs-toolTitleNav .Mrphs-toolTitleNav__link{
+  background: $tool-title-nav-link-background;
+  color: $tool-title-nav-link-color;
+  border-color: $tool-title-nav-link-border;
+  &:hover{
+    background: $tool-title-nav-link-background-hover;
+    text-decoration: none;
+    color: $tool-title-nav-link-color-hover;
+  }
+}
+
+//user menu: sakai provided no variables for customizing this
+#mastLogin #loginLinks ul{
+    background-color: $user-menu-background;
+    a{
+        color: $user-menu-color;
+        &:hover{
+            background: $user-menu-background-hover;
+            color: $user-menu-color-hover;
+        }
+    }
+    .Mrphs-userData{
+        border-color: $user-menu-userdata-separator;
+    }
+}
+
+.btn.btn-default {
+    &#copy-button, &#delete-button, &#move-button, &#show-button{
+        color: $small-action-button-color !important;
+    }
+}
+
+//get rid of background gradient used on mobile
+body.Mrphs-portalBody{
+  @media (max-width: $break-small-end){
+     background: $mobile-background;
+  }
+}
+
+//Change default color of Tools and Sites bar on mobile
+.Mrphs-skipNav__menu{
+  @media (max-width: $break-small-end){
+     background: $mobile-tools-and-sites-bar-background;
+     margin-top: -1px;
+  }
+}
+
+//Change default color of Breadcrumbs bar on mobile
+.Mrphs-siteHierarchy{
+  @media (max-width: $break-small-end){
+    background: $mobile-breadcrumbs-bar-background;
+    a{
+      color: $mobile-breadcrumbs-bar-color;
+    }
+  }
+}
+

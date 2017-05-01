@@ -11,6 +11,10 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.hibernate.proxy.HibernateProxy;
 
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.component.api.ServerConfigurationService;
@@ -35,11 +39,14 @@ public class NotifyUtils {
     public void setServerConfigurationService(ServerConfigurationService serverConfigurationService) {
       this.serverConfigurationService = serverConfigurationService;
     }
+    protected ExecutorService executor;
+
 
     public void init() {
       log.info("init()");
       try {
         sha1 = MessageDigest.getInstance("SHA-1");
+        executor = Executors.newFixedThreadPool(2);
       } catch (Exception e) {
         // won't happen
       }
@@ -49,7 +56,7 @@ public class NotifyUtils {
       List<String> ret = new ArrayList<String>();
       Site site = siteService.getSite(siteid);
       for (Member m : site.getMembers()) {
-        if (!m.getUserId().equals(useridtoexclude)) ret.add(m.getUserId());
+        if (!m.getUserId().equals(useridtoexclude)) ret.add(m.getUserEid());
       }
       return ret;
     }
@@ -101,6 +108,9 @@ public class NotifyUtils {
       return StringUtils.join(pairs,"&");
     }
 
+    public void notificationThread(Runnable r) {
+      executor.execute(r);
+    }
     protected HttpURLConnection getConnection() throws Exception {
       return getConnection(null);
     }
@@ -112,7 +122,8 @@ public class NotifyUtils {
         t += "?"+mapToParams(params);
       URL url = new URL(t);
       HttpURLConnection http = (HttpURLConnection) url.openConnection();
-      http.setRequestProperty("Notification-Token", serverConfigurationService.getString("tracs.notifications.secret", ""));
+      http.setRequestProperty("X-Dispatch-Key", serverConfigurationService.getString("tracs.notifications.secret", ""));
+      http.setConnectTimeout(10000);
       return http;
     }
 
@@ -121,26 +132,45 @@ public class NotifyUtils {
       String contenthash) throws Exception {
       String after = dateToJson(notifyafter);
 
-      String jsonBody = "[{";
-      jsonBody += "\"notification_type\":\""+notifytype+"\",";
-      jsonBody += "\"object_type\":\""+objecttype+"\",";
-      jsonBody += "\"object_id\":\""+objectid+"\",";
-      jsonBody += "\"context_id\":\""+siteid+"\",";
-      jsonBody += "\"content_hash\":\""+contenthash+"\",";
-      jsonBody += "\"notify_after\":\""+after+"\",";
-      jsonBody += "\"user_ids\":[\""+StringUtils.join(userids, "\",\"")+"\"]";
-      jsonBody += "}]";
+      notificationThread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          List<String> notifications = new ArrayList<String>();
+          for (String userid : userids) {
+            String jsonBody = "{";
+            jsonBody += "\"keys\":{";
+            jsonBody += "\"provider_id\":\"tracs\",";
+            jsonBody += "\"notification_type\":\""+notifytype+"\",";
+            jsonBody += "\"object_type\":\""+objecttype+"\",";
+            jsonBody += "\"object_id\":\""+objectid+"\",";
+            jsonBody += "\"user_id\":\""+userid+"\"";
+            jsonBody += "},";
+            jsonBody += "\"other_keys\":{";
+            jsonBody += "\"site_id\":\""+siteid+"\",";
+            jsonBody += "},";
+            jsonBody += "\"content_hash\":\""+contenthash+"\",";
+            jsonBody += "\"notify_after\":\""+after+"\",";
+            jsonBody += "\"send_updates\":true";
+            jsonBody += "}";
+            notifications.add(jsonBody);
+          }
+          String finalBody = "["+StringUtils.join(notifications, ",")+"]";
 
-      HttpURLConnection http = getConnection();
-      http.setRequestMethod("POST");
-      http.setDoOutput(true);
-      http.setFixedLengthStreamingMode(jsonBody.getBytes().length);
-      http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-      try (OutputStream os = http.getOutputStream()) {
-        os.write(jsonBody.getBytes());
-      }
+          HttpURLConnection http = getConnection();
+          http.setRequestMethod("POST");
+          http.setDoOutput(true);
+          http.setFixedLengthStreamingMode(finalBody.getBytes().length);
+          http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+          try (OutputStream os = http.getOutputStream()) {
+            os.write(finalBody.getBytes());
+          }
 
-      System.out.println(jsonBody);
+          System.out.println(finalBody);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }});
 
     }
 
@@ -152,5 +182,12 @@ public class NotifyUtils {
     }
     public void deleteForObject(String objecttype, String objectid) {
 
+    }
+
+    public <T> T unproxy(Object maybeProxy, Class<T> baseClass) throws ClassCastException {
+       if (maybeProxy instanceof HibernateProxy) {
+          return baseClass.cast(((HibernateProxy) maybeProxy).getHibernateLazyInitializer().getImplementation());
+       } else
+          return baseClass.cast(maybeProxy);
     }
 }

@@ -175,11 +175,13 @@
 						<h:graphicImage value="/../../library/image/silk/email_edit.png" alt="#{msgs.cdfm_button_bar_revise}" />
 						<h:outputText value=" #{msgs.cdfm_button_bar_revise}" />
 					</h:commandLink>
-					
+					<%--//Added for grade flag bugid:802 -Qu 12/9/2011 --%>
 					<h:commandLink title="#{msgs.cdfm_button_bar_grade}" action="#{ForumTool.processDfMsgGrd}" 
 							rendered="#{ForumTool.selectedTopic.isPostToGradebook && ForumTool.gradebookExist}">
-						<h:graphicImage value="/../../library/image/silk/award_star_gold_1.png" alt="#{msgs.cdfm_button_bar_grade}" />
-						<h:outputText value=" #{msgs.cdfm_button_bar_grade}" />
+						<h:graphicImage value="/../../library/image/silk/award_star_gold_1.png" alt="#{msgs.cdfm_button_bar_grade}" rendered="#{!ForumTool.selectedMessage.isGraded}" />
+						<h:graphicImage value="/images/silk/check.png" alt="#{msgs.cdfm_button_bar_graded}" rendered="#{ForumTool.selectedMessage.isGraded}" />
+						<h:outputText value="#{msgs.cdfm_button_bar_graded}" rendered="#{ForumTool.selectedMessage.isGraded}"/>
+						<h:outputText value="#{msgs.cdfm_button_bar_grade}" rendered="#{!ForumTool.selectedMessage.isGraded}"/>
 					</h:commandLink>
 					<%-- Email --%>
 					<h:outputLink id="createEmail1" value="mailto:#{ForumTool.selectedMessage.authorEmail}" rendered="#{ForumTool.selectedMessage.userCanEmail && ForumTool.selectedMessage.authorEmail != '' && ForumTool.selectedMessage.authorEmail != null}"> 

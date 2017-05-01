@@ -283,6 +283,7 @@ public class DiscussionForumTool
   private static final String TOO_LARGE_GRADE = "cdfm_too_large_grade";
   private static final String NO_ASSGN = "cdfm_no_assign_for_grade";
   private static final String CONFIRM_DELETE_MESSAGE="cdfm_delete_msg";
+  private static final String CONFIRM_DELETE_MESSAGE_WARNING="cdfm_delete_msg_warning";
   private static final String INSUFFICIENT_PRIVILEGES_TO_DELETE = "cdfm_insufficient_privileges_delete_msg";
   private static final String END_DATE_BEFORE_OPEN_DATE = "endDateBeforeOpenDate";
   private static final String NO_GROUP_SELECTED ="cdfm_no_group_selected";
@@ -2375,7 +2376,9 @@ public class DiscussionForumTool
 	  {
 		 String messageBody= selectedMessage.getMessage().getBody();
 		 String messageBodyWithoutLastEmptyLine=formatStringByRemoveLastEmptyLine(messageBody);
-		 selectedMessage.getMessage().setBody(messageBodyWithoutLastEmptyLine); 		 
+		 selectedMessage.getMessage().setBody(messageBodyWithoutLastEmptyLine);
+     //Added for grade flag bugid:802 -Qu 12/9/2011
+     selectedMessage.setIsGraded(isGraded(selectedMessage));
 	  }
     return selectedMessage;
   }
@@ -2531,19 +2534,22 @@ public class DiscussionForumTool
 	    }
 	    
 	    for(int i=0; i<msgsList.size(); i++){
-	    	if(((DiscussionMessageBean)msgsList.get(i)).getMessage().getId().equals(selectedThreadHead.getMessage().getId())){
+        //Added for grade flag bugid:802 -Qu 12/9/2011
+        DiscussionMessageBean msgBean = (DiscussionMessageBean)msgsList.get(i);
+        msgBean.setIsGraded(isGraded(msgBean));
+        if(msgBean.getMessage().getId().equals(selectedThreadHead.getMessage().getId())){
 	    		((DiscussionMessageBean) msgsList.get(i)).setDepth(0);
-	    		selectedThread.add((DiscussionMessageBean)msgsList.get(i));
+          selectedThread.add(msgBean);
 	    		foundHead = true;
 	    	}
-	    	else if(((DiscussionMessageBean)msgsList.get(i)).getMessage().getInReplyTo() == null && foundHead && !foundAfterHead) {
+        else if(msgBean.getMessage().getInReplyTo() == null && foundHead && !foundAfterHead) {
 	    		selectedThreadHead.setHasNextThread(true);
-	    		selectedThreadHead.setNextThreadId(((DiscussionMessageBean)msgsList.get(i)).getMessage().getId());
+          selectedThreadHead.setNextThreadId(msgBean.getMessage().getId()); 
 	    		foundAfterHead = true;
 	    	} 
-	    	else if (((DiscussionMessageBean)msgsList.get(i)).getMessage().getInReplyTo() == null && !foundHead) {
+        else if (msgBean.getMessage().getInReplyTo() == null && !foundHead) {
 	    		selectedThreadHead.setHasPreThread(true);
-	    		selectedThreadHead.setPreThreadId(((DiscussionMessageBean)msgsList.get(i)).getMessage().getId());
+          selectedThreadHead.setPreThreadId(msgBean.getMessage().getId());
 	    	}
 	    }
 	    formatMessagesByRemovelastEmptyLines(msgsList);
@@ -3528,6 +3534,11 @@ public class DiscussionForumTool
 
 	        setSelectedForumForCurrentTopic(topic);
 	        selectedTopic = getDecoratedTopic(topic);
+
+          //Added for grade flag bugid:802 -Qu 12/9/2011
+          for( DiscussionMessageBean msg: (List<DiscussionMessageBean>)selectedTopic.getMessages()){
+            msg.setIsGraded(isGraded(msg));
+          }
 	      }
 	      else
 	      {
@@ -4602,7 +4613,13 @@ public class DiscussionForumTool
     }
 
     deleteMsg = true;
-    setErrorMessage(getResourceBundleString(CONFIRM_DELETE_MESSAGE));
+    //bugid:527 by -Qu 12/06/2011
+    //message could inherit grade item from its topic or forum
+    if(null != selectedMessage.getMessage().getGradeAssignmentName() || null != selectedTopic.getTopic().getGradebookAssignment() || null != selectedForum.getForum().getDefaultAssignName()){
+      setErrorMessage(getResourceBundleString(CONFIRM_DELETE_MESSAGE_WARNING));
+    }
+    else
+      setErrorMessage(getResourceBundleString(CONFIRM_DELETE_MESSAGE));
     return MESSAGE_VIEW;
   }
 
@@ -8402,6 +8419,15 @@ public class DiscussionForumTool
 		this.synopticMsgcntrManager = synopticMsgcntrManager;
 	}
 	
+  //Helper method
+  //Added for grade flag bugid:802 -Qu 12/9/2011
+  private boolean isGraded(DiscussionMessageBean msgBean) {
+    boolean isGraded = false;
+    if(null != getMessageGradePoint(msgBean))
+      isGraded = true ;
+    return isGraded;
+  }
+
 	public void setUserPreferencesManager(UserPreferencesManager userPreferencesManager) {
 		this.userPreferencesManager = userPreferencesManager;
 	}
@@ -8683,6 +8709,45 @@ public class DiscussionForumTool
 
     setNewTopicBeanAssign(selectedForum, thisDTB);
     return selectedTopic;
+  }
+
+  //Added another method for grade flag bugid: 802 to be sure not affect other sakai's implementation  -Qu 12/8/2012
+  private String getMessageGradePoint(DiscussionMessageBean msgBean){
+    resetGradeInfo();
+
+    try
+    {
+      String createdById = UserDirectoryService.getUser(msgBean.getMessage().getCreatedBy()).getId();
+      String gradebookUid = ToolManager.getCurrentPlacement().getContext();
+      String msgAssignmentName = msgBean.getMessage().getGradeAssignmentName();
+      String topicDefaultAssignment = selectedTopic.getTopic().getDefaultAssignName();
+      String forumDefaultAssignment = selectedForum.getForum().getDefaultAssignName();
+
+      String selAssignmentName = null;
+      if (msgAssignmentName !=null && msgAssignmentName.trim().length()>0) {
+        selAssignmentName = msgAssignmentName;
+      } else if (topicDefaultAssignment != null && topicDefaultAssignment.trim().length() > 0) {
+        selAssignmentName = topicDefaultAssignment;
+      } else if (forumDefaultAssignment != null && forumDefaultAssignment.trim().length() > 0) {
+        selAssignmentName = forumDefaultAssignment;
+      }
+
+      if (selAssignmentName != null) {
+        setUpGradeInformation(gradebookUid, selAssignmentName, createdById);
+      } else {
+        // this is the "Select a gradebook item" selection
+        allowedToGradeItem = false;
+        selGBItemRestricted = true;
+      }
+    }
+    catch(Exception e)
+    {
+      LOG.error("processDfMsgGrd in DiscussionFOrumTool - " + e);
+      e.printStackTrace();
+      return null;
+    }
+
+    return gbItemScore;
   }
 
   	private DBMembershipItem getMembershipItemCopy(DBMembershipItem itemToCopy) {

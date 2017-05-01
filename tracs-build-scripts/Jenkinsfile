@@ -1,0 +1,135 @@
+#!groovy​
+
+node {
+
+  currentBuild.result = "SUCCESS"
+  RESTY_PATH = "${env.SERVICE_URL} -H \"Content-type: application/json\""
+  REGISTRY_HOST = "${env.REGISTRY_HOST}"
+  try {
+    timestamps {
+        buildTracsApp();
+    }
+  } catch(err){
+    currentBuild.result = "FAILURE"
+    throw err
+  } finally {
+     // Success or failure, always send notifications
+     notifyBuild(currentBuild.result)
+  }
+
+}
+
+
+def buildTracsApp() {
+  stage ('Build') {
+            echo " ==================== "
+            echo ' BUILD '
+            echo " ==================== "
+            echo "Building TRACS from ${params.PERSON}"
+            echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+            sh "sudo docker run --rm ${REGISTRY_HOST}/tracs-build:11 -q | sudo docker build --no-cache -t tracs:nightly-test - "
+  }
+  stage ('Push') {
+             echo " ==================== "
+             echo '   PUSH  '
+             echo " ==================== "
+             echo 'Prepare for pushing docker image'
+             sh "sudo docker tag tracs:nightly-test ${REGISTRY_HOST}/tracs:nightly-test"
+             timeout(time: 120, unit: 'MINUTES') {
+                 retry(2) {
+                     sh "sudo docker push ${REGISTRY_HOST}/tracs:nightly-test"
+                 }
+             }
+  }
+  stage ('Clean') {
+             echo " ==================== "
+             echo ' CLEAN '
+             echo " ==================== "
+             echo '   Clean up previous deployment  '
+             def removeContainer = 'DELETE /services/tracstomcat/containers/bravo'
+             echo 'Stop and delete container'
+             restyCall(removeContainer)
+             echo 'Remove old docker image'
+             def removeImage = "DELETE /services/tracstomcat/images/${REGISTRY_HOST}/tracs:nightly-test"
+             restyCall(removeImage)
+             sleep 10
+  }
+  stage ('Deploy') {
+             echo " ==================== "
+             echo '   DEPLOY   '
+             echo " ==================== "
+             echo 'Getting new build from registry'
+             def pullImage = "POST /services/tracstomcat/images/pull '{\"image\":\"${REGISTRY_HOST}/tracs:nightly-test\"}'"
+            //  retry(5) {
+                 restyCall(pullImage)
+                //  sleep 3000
+            //  }
+
+             timeout(time:70, unit:'MINUTES') {
+                 sh 'echo taking too long'
+             }
+  }
+  stage ('Start') {
+            echo " ==================== "
+            echo '   START  '
+            echo " ==================== "
+            echo "Starting tracs container "
+            def createStartContainer = "POST /services/tracstomcat/containers '{\"name\": \"bravo\", \"config\": \"default\", \"image\": \"${REGISTRY_HOST}/tracs:nightly-test\", \"database\": \"sakaidb\"}'"
+            // retry(5) {
+                   echo 'Creating and starting a docker container'
+                   restyCall(createStartContainer)
+            // }
+
+            // timeout(time:3, unit:'MINUTES') {
+            //     sh 'echo taking too long, no image for tracs'
+            // }
+  }
+}
+
+def notifyBuild(String buildStatus = 'STARTED') {
+   // build status of null means successful
+   buildStatus =  buildStatus ?: 'SUCCESSFUL'
+
+   // Default values
+   def colorName = 'RED'
+   def colorCode = '#FF0000'
+   def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+   def summary = "${subject} (${env.BUILD_URL})"
+   def content = '${JELLY_SCRIPT,template="static-analysis"}'
+  //  def content = '${JELLY_SCRIPT,template="html"}'
+
+  //  def content ="""<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+  //  <p>Check console output at "<a href="${env.BUILD_URL}">${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>"</p>"""
+
+   // Override default values based on build status
+   if (buildStatus == 'STARTED') {
+     color = 'YELLOW'
+     colorCode = '#FFFF00'
+   } else if (buildStatus == 'SUCCESSFUL') {
+     color = 'GREEN'
+     colorCode = '#00FF00'
+   } else {
+     color = 'RED'
+     colorCode = '#FF0000'
+   }
+
+   // Send notifications
+   //slackSend (color: colorCode, message: summary)
+
+   // Send email
+   emailext (
+       subject: subject,
+       body: content,
+       mimeType: 'text/html',
+       attachLog: true,
+       recipientProviders: [[$class: 'DevelopersRecipientProvider'],[$class: 'RequesterRecipientProvider']]
+    )
+}
+
+def restyCall(String command) {
+  sh  """#!/bin/bash -l
+   resty ${RESTY_PATH}
+   echo ${command}
+   ${command}
+  """
+}

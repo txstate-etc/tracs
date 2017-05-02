@@ -42,6 +42,8 @@ import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
  * Sakai 10 does not have an event for 'New Topic,' but Sakai 11 does
  * 
  *
+ * TODO: Smarter logic for sending notifications.  Notify them if it is a new discussion,
+ * if they have previously commented in a discussion, or if the instructor makes a comment
  ***********************************************************************************/
 
 public class ForumsNotifier implements Observer {
@@ -98,30 +100,27 @@ public class ForumsNotifier implements Observer {
                         System.out.println("A conversation was added. " + "reference: " +  event.getResource());
                         long messageId = getMessageIdFromEvent(event);
                         Message m = messageManager.getMessageById(messageId);
-                        //In this case, the Topic comes back as type DiscussionTopicImpl (correct)
-                        System.out.println("***** Topic is of type " + m.getTopic().getClass().getName());
+
                         //get the message's topic
                         DiscussionTopic topic = (DiscussionTopic) m.getTopic();
                         //get the forum that contains the message
                         String forumIdForMessage = discussionForumManager.ForumIdForMessage(messageId);
                         DiscussionForum discussionForum = discussionForumManager.getForumById(Long.parseLong(forumIdForMessage));
                         Calendar releaseDate = getReleaseDate(discussionForum, topic);
-                        
+
                         //This will send a notification for every single message.  
                         //Should contenthash just contain "You have a new message in forums?"
                         String contenthash = notifyUtils.hashContent(m.getTitle(), m.getBody());
 
                         //Get list of users to notify
                         List<String> userids = getNotifyList(topic.getId(), event.getUserId());
-                        
+
                         //check if either topic or forum is a draft
                         Boolean forumIsDraft = discussionForum.getDraft();
                         Boolean topicIsDraft = topic.getDraft();
-                        System.out.println("Forum is draft: " + forumIsDraft + ", Topic is draft: " + topicIsDraft);
-                        System.out.println("Message is approved? " + m.getApproved());
+
                         Calendar now = Calendar.getInstance();
-                        System.out.println("Now: " + notifyUtils.dateToJson(Calendar.getInstance()));
-                        System.out.println("Release Date: " + notifyUtils.dateToJson(releaseDate));
+
                         if(forumIsDraft || topicIsDraft){
                             //delete any scheduled notifications for this message?  How?
                         }
@@ -135,7 +134,6 @@ public class ForumsNotifier implements Observer {
                         }
                         else if(releaseDate.after(now)){
                             //it's scheduled for the future
-                            System.out.println("This message will be available after " + notifyUtils.dateToJson(releaseDate));
                             //don't we still send it and Dispatch will push it out at the appropriate time?
                             notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash);
                         }
@@ -145,12 +143,9 @@ public class ForumsNotifier implements Observer {
                     }
                     break;
                 case DiscussionForumService.EVENT_FORUMS_MESSAGE_APPROVE:
-                    System.out.println("Message approved in moderation");
                     try{
                         long messageId = getMessageIdFromEvent(event);
                         Message m = messageManager.getMessageById(messageId);
-                        //In this case, the Topic comes back as type TopicImpl_$$_jvst23d_3d (or something like that) and that does not work
-                        System.out.println("***** Topic is of type " + m.getTopic().getClass().getName());
                         Topic topic = m.getTopic();
                         //If a non-admin wrote a message, the topic and forum must be visible already
                         //Admin messages in moderated forums are not held for moderation
@@ -158,15 +153,12 @@ public class ForumsNotifier implements Observer {
 
                         String contenthash = notifyUtils.hashContent(m.getTitle(), m.getBody());
 
-                        //This is failing because when it tries to get the topic, the object returned is not a
-                        //Topic or DiscussionTopic.  It's a org.sakaiproject.component.app.messageforums.dao.hibernate.TopicImpl_$$_jvst23d_3d
-                        //(a proxy?) and that can't be cast to a DiscussionTopic
-                        //The problem is that the Topic is lazy-loaded.  Setting lazy=false on the association
-                        //in the Message hbm file fixes it.
+                        //Note: In order to make this work, I had to set lazy loading to false on the Topic in
+                        //$TRACS_REPO_PATH/msgcntr/messageforums-hbm/src/java/org/sakaiproject/component/app/messageforums/dao/hibernate/MessageImpl.java
+                        //because a hibernate proxy was being returned for the Topic instead of a usable object
+                        List<String> userids = getNotifyList(topic.getId(), event.getUserId());
                         
-                        //List<String> userids = getNotifyList(topic.getId(), event.getUserId());
-                        
-                        //notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash);
+                        notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash);
                     }
                     catch(Exception e){
                         e.printStackTrace();
@@ -195,8 +187,6 @@ public class ForumsNotifier implements Observer {
 
     public Calendar getReleaseDate(DiscussionForum forum, DiscussionTopic topic){
         Calendar releaseDate = Calendar.getInstance(); 
-        System.out.println("forum open date: " + forum.getOpenDate());
-        System.out.println("topic open date: " + topic.getOpenDate());
         if(topic.getOpenDate() != null && forum.getOpenDate() != null){
             Date laterAvailability = forum.getOpenDate().after(topic.getOpenDate()) ? forum.getOpenDate() : topic.getOpenDate();
             Calendar available = Calendar.getInstance();

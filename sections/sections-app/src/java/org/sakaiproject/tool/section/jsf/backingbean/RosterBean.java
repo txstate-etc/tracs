@@ -78,6 +78,10 @@ public class RosterBean extends CourseDependentBean implements Serializable {
 	private List<EnrollmentRecord> siteStudents;
 	private List<EnrollmentDecorator> unpagedEnrollments;
 
+    //Added for ticket#314 -Qu
+    private List<CourseSection> availableSections;
+    private List<SelectItem> sectionFilterSelectItems;
+
     public void init() {
 		// Determine whether this course is externally managed
 		externallyManaged = getSectionManager().isExternallyManaged(getCourse().getUuid());
@@ -122,6 +126,29 @@ public class RosterBean extends CourseDependentBean implements Serializable {
 			assignedSections = findAssignedSections();
 		}
 
+        //Added for ticket #314 by -Qu 
+        //Adding Section filtering selections for instructors. -Qu
+        availableSections = getSectionManager().getSections(getSiteContext());
+        sectionFilterSelectItems = new ArrayList();
+
+        // The first choice is always "All available sections"  -Qu
+        sectionFilterSelectItems.add(new SelectItem("", JsfUtil.getLocalizedMessage("filter_all_sections")));
+
+        // Add the available sections.  -Qu
+        for (int i = 0; i < availableSections.size(); i++) {
+            CourseSection section = (CourseSection)availableSections.get(i);
+            if(isExternallyManaged()){
+                if (section.getEid() != null){
+                   sectionFilterSelectItems.add(new SelectItem(section.getEid(), section.getEid()));
+                }else{
+                   sectionFilterSelectItems.add(new SelectItem(section.getTitle(), section.getTitle()));
+                }
+            }
+            else sectionFilterSelectItems.add(new SelectItem(section.getTitle(), section.getTitle()));
+        }
+        
+        sectionFilterSelectItems.add(new SelectItem("NoSections", JsfUtil.getLocalizedMessage("filter_no_sections")));
+
 		// Construct the decorated enrollments for the UI
 		decorateEnrollments(siteStudents, sectionEnrollments, assignedSections);
 	}
@@ -141,6 +168,7 @@ public class RosterBean extends CourseDependentBean implements Serializable {
 
 			// Check to see whether this enrollment should be filtered out
 			boolean includeStudent = false;
+            int noSectionCount = 0;
 			if(StringUtils.trimToNull(getFilter()) == null) {
 				includeStudent = true;
 			} else {
@@ -158,6 +186,14 @@ public class RosterBean extends CourseDependentBean implements Serializable {
 						includeStudent = true;
 						break;
 					}
+                    //Added for ticket #314 by -Qu
+                    else if (section.getEid() != null && section.getEid().equals(getFilter())){
+                        includeStudent = true;
+                        break;
+                    }else if (section.getTitle()!= null && section.getTitle().equals(getFilter())){
+                        includeStudent = true;
+                        break;
+                    }//end - Qu
 				}
 			}
 
@@ -248,8 +284,15 @@ public class RosterBean extends CourseDependentBean implements Serializable {
 
 				HtmlOutputText contents = new HtmlOutputText();
 				contents.setId(CAT_COLUMN_PREFIX + "cell_" + colpos);
-				contents.setValueBinding("value",
-					app.createValueBinding("#{enrollment.categoryToSectionMap['" + category + "'].title}"));
+                if (isExternallyManaged() ){
+                    contents.setValueBinding("value",
+                    // Show the eid instead of the title here - YuanhuaQu,11/18/08
+                    app.createValueBinding("#{enrollment.categoryToSectionMap['" + category + "'].eid}"));
+                }else{
+                    contents.setValueBinding("value",
+                    // Show title for manually signed section - YuanhuaQu,11/18/08
+                    app.createValueBinding("#{enrollment.categoryToSectionMap['" + category + "'].title}"));
+                }
 				col.getChildren().add(contents);
 				rosterDataTable.getChildren().add(col);
 			}
@@ -304,6 +347,11 @@ public class RosterBean extends CourseDependentBean implements Serializable {
 
     public List getFilterItems() {
         return filterItems;
+    }
+
+    //Added for ticket#314 by -Qu
+    public List<SelectItem> getSectionFilterSelectItems() {
+        return sectionFilterSelectItems;
     }
 
     public void export(ActionEvent event){

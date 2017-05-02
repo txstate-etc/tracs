@@ -22,7 +22,10 @@
         <h:selectOneMenu value="#{rosterBean.filter}" onchange="this.form.submit()" rendered="#{rosterBean.sectionAssignable}">
             <f:selectItems value="#{rosterBean.filterItems}"/>
         </h:selectOneMenu>
-        <h:outputText value="#{msgs.filter_all_sections}" rendered="#{ ! rosterBean.sectionAssignable}"/>
+        <!--<h:outputText value="#{msgs.filter_all_sections}" rendered="#{ ! rosterBean.sectionAssignable}"/>-->
+        <h:selectOneMenu id="selectSectionFilter" value="#{rosterBean.filter}" onchange="this.form.submit()" rendered="#{ ! rosterBean.sectionAssignable}">
+            <f:selectItems value="#{rosterBean.sectionFilterSelectItems}" />
+        </h:selectOneMenu>
 	</t:div>
 	
     <h:panelGrid styleClass="sectionContainerNav" columns="1" columnClasses="sectionLeftNav,sectionRightNav">

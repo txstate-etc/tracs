@@ -147,7 +147,7 @@ public class NotifyUtils {
             jsonBody += "\"user_id\":\""+userid+"\"";
             jsonBody += "},";
             jsonBody += "\"other_keys\":{";
-            jsonBody += "\"site_id\":\""+siteid+"\",";
+            jsonBody += "\"site_id\":\""+siteid+"\"";
             jsonBody += "},";
             jsonBody += "\"content_hash\":\""+contenthash+"\",";
             jsonBody += "\"notify_after\":\""+after+"\",";

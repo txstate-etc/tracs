@@ -68,23 +68,20 @@ public class AnnouncementsNotifier implements Observer {
 
           Calendar releaseDate;
           String releaseDateStr = m.getProperties().getProperty(AnnouncementService.RELEASE_DATE);
-          System.out.println("release date = "+releaseDateStr);
           if (releaseDateStr != null)
             releaseDate = notifyUtils.translateDate(releaseDateStr);
           else releaseDate = Calendar.getInstance();
 
           String contenthash = notifyUtils.hashContent(m.getAnnouncementHeader().getSubject(), m.getBody());
-          System.out.println("content hash = "+contenthash);
 
           List<String> userids = notifyUtils.getAllUserIdsExcept(event.getContext(), event.getUserId());
           for (String uid : userids) System.out.println("userid: "+uid);
 
           if (announceService.isMessageViewable(m)) {
-            System.out.println("message is viewable, send notification immediately");
-            notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash);
+            notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);
           } else if (m.getHeader().getDraft()) System.out.println("message is in draft mode, delete any scheduled notification");
           else if (releaseDate.after(Calendar.getInstance())) System.out.println("message is scheduled for "+notifyUtils.dateToJson(releaseDate));
-          else System.out.println("message is scheduled for the past, delete any scheduled notification");
+          else notifyUtils.deleteForObject("announcement", ref.getId());
         } else if (deletes.contains(event.getEvent())) {
           Reference ref = entityManager.newReference(event.getResource());
           notifyUtils.deleteForObject("announcement", ref.getId());

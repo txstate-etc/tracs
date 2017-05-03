@@ -129,13 +129,13 @@ public class NotifyUtils {
 
     public void sendNotification(String objecttype, String notifytype,
       String objectid, String siteid, List<String> userids, Calendar notifyafter,
-      String contenthash) throws Exception {
-      String after = dateToJson(notifyafter);
+      String contenthash, boolean sendupdates) throws Exception {
 
       notificationThread(new Runnable() {
       @Override
       public void run() {
         try {
+          String after = dateToJson(notifyafter);
           List<String> notifications = new ArrayList<String>();
           for (String userid : userids) {
             String jsonBody = "{";
@@ -151,7 +151,7 @@ public class NotifyUtils {
             jsonBody += "},";
             jsonBody += "\"content_hash\":\""+contenthash+"\",";
             jsonBody += "\"notify_after\":\""+after+"\",";
-            jsonBody += "\"send_updates\":true";
+            jsonBody += "\"send_updates\":"+(sendupdates?"true":"false");
             jsonBody += "}";
             notifications.add(jsonBody);
           }
@@ -174,6 +174,25 @@ public class NotifyUtils {
 
     }
 
+    public void delete(String body) {
+      notificationThread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          HttpURLConnection http = getConnection();
+          http.setRequestMethod("DELETE");
+          http.setDoOutput(true);
+          http.setFixedLengthStreamingMode(body.getBytes().length);
+          http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+          try (OutputStream os = http.getOutputStream()) {
+            os.write(body.getBytes());
+          }
+          System.out.println(body);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }});
+    }
     public void deleteForSite(String siteid) {
 
     }
@@ -181,7 +200,13 @@ public class NotifyUtils {
 
     }
     public void deleteForObject(String objecttype, String objectid) {
-
+      String jsonBody = "{";
+      jsonBody += "\"keys\":{";
+      jsonBody += "\"provider_id\":\"tracs\",";
+      jsonBody += "\"object_type\":\""+objecttype+"\",";
+      jsonBody += "\"object_id\":\""+objectid+"\"";
+      jsonBody += "}}";
+      delete(jsonBody);
     }
 
     public <T> T unproxy(Object maybeProxy, Class<T> baseClass) throws ClassCastException {

@@ -40,7 +40,7 @@ import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
  * Students don't need to be notified when a new forum is created because they can't see it
  *     until a topic is added.
  * Sakai 10 does not have an event for 'New Topic,' but Sakai 11 does
- * 
+ *
  *
  * TODO: Smarter logic for sending notifications.  Notify them if it is a new discussion,
  * if they have previously commented in a discussion, or if the instructor makes a comment
@@ -108,7 +108,7 @@ public class ForumsNotifier implements Observer {
                         DiscussionForum discussionForum = discussionForumManager.getForumById(Long.parseLong(forumIdForMessage));
                         Calendar releaseDate = getReleaseDate(discussionForum, topic);
 
-                        //This will send a notification for every single message.  
+                        //This will send a notification for every single message.
                         //Should contenthash just contain "You have a new message in forums?"
                         String contenthash = notifyUtils.hashContent(m.getTitle(), m.getBody());
 
@@ -130,12 +130,12 @@ public class ForumsNotifier implements Observer {
                         }
                         else if(releaseDate.compareTo(now) <= 0){
                             //if the release date is now or in the past, send notification
-                            notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash);
+                            notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash, false);
                         }
                         else if(releaseDate.after(now)){
                             //it's scheduled for the future
                             //don't we still send it and Dispatch will push it out at the appropriate time?
-                            notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash);
+                            notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash, false);
                         }
                     }
                     catch(Exception e){
@@ -157,8 +157,8 @@ public class ForumsNotifier implements Observer {
                         //$TRACS_REPO_PATH/msgcntr/messageforums-hbm/src/java/org/sakaiproject/component/app/messageforums/dao/hibernate/MessageImpl.java
                         //because a hibernate proxy was being returned for the Topic instead of a usable object
                         List<String> userids = getNotifyList(topic.getId(), event.getUserId());
-                        
-                        notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash);
+
+                        notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash, false);
                     }
                     catch(Exception e){
                         e.printStackTrace();
@@ -166,7 +166,7 @@ public class ForumsNotifier implements Observer {
                     break;
                 case DiscussionForumService.EVENT_FORUMS_TOPIC_ADD:
                     System.out.println("new topic added");
-                    
+
                     break;
                 default:
                     //this shouldn't happen
@@ -186,7 +186,7 @@ public class ForumsNotifier implements Observer {
     }
 
     public Calendar getReleaseDate(DiscussionForum forum, DiscussionTopic topic){
-        Calendar releaseDate = Calendar.getInstance(); 
+        Calendar releaseDate = Calendar.getInstance();
         if(topic.getOpenDate() != null && forum.getOpenDate() != null){
             Date laterAvailability = forum.getOpenDate().after(topic.getOpenDate()) ? forum.getOpenDate() : topic.getOpenDate();
             Calendar available = Calendar.getInstance();
@@ -199,11 +199,11 @@ public class ForumsNotifier implements Observer {
     }
 
     public List<String> getNotifyList(long topicId, String author){
-        // get list of users to notify: a set of userIds for the site members who have 
+        // get list of users to notify: a set of userIds for the site members who have
         // "read" permission for the given topic
         Set allowedUsers = discussionForumManager.getUsersAllowedForTopic(topicId, true, false);
         Iterator<String> uit = allowedUsers.iterator();
-        //put the allowed users in a list, exclude the auther of the post because they don't 
+        //put the allowed users in a list, exclude the auther of the post because they don't
         //need to be notified
         List<String> userids = new ArrayList<String>();
         while(uit.hasNext()){

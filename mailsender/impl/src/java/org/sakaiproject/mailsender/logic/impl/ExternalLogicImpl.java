@@ -65,6 +65,7 @@ import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.util.Validator;
+import org.sakaiproject.util.api.FormattedText;
 
 /**
  * This is the implementation for logic which is external to our app logic
@@ -87,6 +88,7 @@ public class ExternalLogicImpl implements ExternalLogic
     private EventTrackingService eventService;
     private ContentHostingService contentHostingService;
     private EntityManager entityManager;
+    private FormattedText formattedText;
 
 	/**
 	 * Place any code that should run when this class is initialized by spring here
@@ -406,6 +408,7 @@ public class ExternalLogicImpl implements ExternalLogic
         }
 
 		EmailMessage msg = new EmailMessage();
+		EmailMessage msgCopy = new EmailMessage();
 
 		String replyToName = null;
 		String replyToEmail = null;
@@ -445,7 +448,41 @@ public class ExternalLogicImpl implements ExternalLogic
 		// send a copy
 		if (config.isSendMeACopy())
 		{
-			msg.addRecipient(RecipientType.CC, fromName, fromEmail);
+						//Send another copy with list of recipients attached to the message body, bugid:5540 -Qu 2014/1/30
+
+			msgCopy.setFrom(new EmailAddress(replyToEmail, replyToName));
+			msgCopy.setSubject(subject);
+			String contentCopy = null;
+			String recipientsList = "";
+			for (EmailAddress ea: tos){
+				if(recipientsList.isEmpty())
+					recipientsList = ea.toString();
+				else 
+					recipientsList = recipientsList + ";" + ea.toString() ;
+			}
+			
+			// set content type based on editor used
+			if (useRTE())
+			{
+				msgCopy.setContentType(ContentType.TEXT_HTML);
+				contentCopy = content + "<div>Above message is sent to following list: <div>&nbsp;</div>" + "<div>"+ formattedText.escapeHtml(recipientsList) + "</div></div>";
+			}
+			else
+			{
+				msgCopy.setContentType(ContentType.TEXT_PLAIN);
+				contentCopy = content + "\n\nAbove message is sent to following list:\n\n" + recipientsList;
+			}
+			msgCopy.setBody(contentCopy);
+			msgCopy.addRecipient(RecipientType.TO, fromName, fromEmail);
+			msgCopy.addHeader("X-Mailer", "sakai-mailsender");
+			msgCopy.addHeader("Content-Transfer-Encoding", "quoted-printable");
+
+			// Add attachments to sender's copy
+			if (attachments != null) {
+				for (Attachment attachment : attachments) {
+					msgCopy.addAttachment(attachment);
+				}
+			}
 		}
 
 		// add all recipients to the bcc field
@@ -459,6 +496,8 @@ public class ExternalLogicImpl implements ExternalLogic
 		{
 			List<EmailAddress> invalids = emailService.send(msg,true);
 			List<String> rets = EmailAddress.toStringList(invalids);
+			if(config.isSendMeACopy())
+				rets.add(emailService.send(msgCopy).toString());
 			Event event = eventService.newEvent(ExternalLogic.EVENT_EMAIL_SEND,
 					null, false);
 			eventService.post(event);
@@ -580,5 +619,9 @@ public class ExternalLogicImpl implements ExternalLogic
 
 	public void setEntityManager(EntityManager entityManager) {
 		this.entityManager = entityManager;
+	}
+
+	public void setFormattedText(FormattedText formattedText){
+		this.formattedText = formattedText;
 	}
 }

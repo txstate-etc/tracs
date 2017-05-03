@@ -197,6 +197,8 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
             CKEDITOR.plugins.addExternal('autosave',basePath+'autosave/', 'plugin.js');
             CKEDITOR.plugins.addExternal('notification',basePath+'notification/', 'plugin.js');
             CKEDITOR.plugins.addExternal('fontawesome',basePath+'fontawesome/', 'plugin.js');
+            CKEDITOR.plugins.addExternal('nopasteimg', basePath+'nopasteimg/', 'plugin.js');
+            CKEDITOR.plugins.addExternal('autolink', basePath+'autolink/', 'plugin.js');
             /*
                To enable after the deadline uncomment these two lines and add atd-ckeditor to toolbar
                and to extraPlugins. This also needs extra stylesheets.
@@ -213,7 +215,7 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
             //ckconfig.extraPlugins+="atd-ckeditor,";
             //ckconfig.contentsCss = basePath+'/atd-ckeditor/atd.css';
 
-            ckconfig.extraPlugins+="image2,audiorecorder,movieplayer,wordcount,fmath_formula,autosave,fontawesome,notification";
+            ckconfig.extraPlugins+="image2,audiorecorder,movieplayer,wordcount,fmath_formula,autosave,fontawesome,notification,nopasteimg,autolink";
 
             //SAK-29648
             ckconfig.contentsCss = basePath+'/fontawesome/font-awesome/css/font-awesome.min.css';

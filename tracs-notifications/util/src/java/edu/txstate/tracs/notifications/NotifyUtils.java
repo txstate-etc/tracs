@@ -174,7 +174,7 @@ public class NotifyUtils {
 
     }
 
-    public void delete(String body) {
+    public void delete(final String body) {
       notificationThread(new Runnable() {
       @Override
       public void run() {

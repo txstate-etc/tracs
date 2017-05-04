@@ -127,9 +127,9 @@ public class NotifyUtils {
       return http;
     }
 
-    public void sendNotification(String objecttype, String notifytype,
-      String objectid, String siteid, List<String> userids, Calendar notifyafter,
-      String contenthash, boolean sendupdates) throws Exception {
+    public void sendNotification(final String objecttype, final String notifytype,
+      final String objectid, final String siteid, final List<String> userids, final Calendar notifyafter,
+      final String contenthash, final boolean sendupdates) throws Exception {
 
       notificationThread(new Runnable() {
       @Override

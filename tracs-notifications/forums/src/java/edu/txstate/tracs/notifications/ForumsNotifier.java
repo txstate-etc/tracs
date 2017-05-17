@@ -94,6 +94,7 @@ public class ForumsNotifier implements Observer {
         //If the event pertains to forums
         if (updates.contains(event.getEvent())) {
             String eventType = event.getEvent();
+            String siteid = event.getContext();
             switch(eventType){
                 case DiscussionForumService.EVENT_FORUMS_ADD:
                     try{
@@ -113,7 +114,7 @@ public class ForumsNotifier implements Observer {
                         String contenthash = notifyUtils.hashContent(m.getTitle(), m.getBody());
 
                         //Get list of users to notify
-                        List<String> userids = getNotifyList(topic.getId(), event.getUserId());
+                        List<String> userids = getNotifyList(siteid, topic.getId(), event.getUserId());
 
                         //check if either topic or forum is a draft
                         Boolean forumIsDraft = discussionForum.getDraft();
@@ -156,7 +157,7 @@ public class ForumsNotifier implements Observer {
                         //Note: In order to make this work, I had to set lazy loading to false on the Topic in
                         //$TRACS_REPO_PATH/msgcntr/messageforums-hbm/src/java/org/sakaiproject/component/app/messageforums/dao/hibernate/MessageImpl.java
                         //because a hibernate proxy was being returned for the Topic instead of a usable object
-                        List<String> userids = getNotifyList(topic.getId(), event.getUserId());
+                        List<String> userids = getNotifyList(siteid, topic.getId(), event.getUserId());
 
                         notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash, false);
                     }
@@ -198,7 +199,7 @@ public class ForumsNotifier implements Observer {
         return releaseDate;
     }
 
-    public List<String> getNotifyList(long topicId, String author){
+    public List<String> getNotifyList(String siteid, long topicId, String author) throws Exception {
         // get list of users to notify: a set of userIds for the site members who have
         // "read" permission for the given topic
         Set allowedUsers = discussionForumManager.getUsersAllowedForTopic(topicId, true, false);
@@ -211,6 +212,6 @@ public class ForumsNotifier implements Observer {
             if(!userid.equals(author))
                 userids.add(userid);
         }
-        return userids;
+        return notifyUtils.convertUserIdsInSite(siteid, userids);
     }
 }

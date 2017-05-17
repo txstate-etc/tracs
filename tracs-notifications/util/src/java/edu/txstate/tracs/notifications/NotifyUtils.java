@@ -61,6 +61,20 @@ public class NotifyUtils {
       return ret;
     }
 
+    public List<String> convertUserIdsInSite(String siteid, List<String> userids) throws Exception {
+      Map<String,Boolean> usermap = new HashMap<String,Boolean>();
+      for (String uid : userids) {
+        usermap.put(uid, Boolean.TRUE);
+      }
+
+      List<String> ret = new ArrayList<String>();
+      Site site = siteService.getSite(siteid);
+      for (Member m : site.getMembers()) {
+        if (usermap.containsKey(m.getUserId())) ret.add(m.getUserEid());
+      }
+      return ret;
+    }
+
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
     public static String bytesToHex(byte[] bytes) {
       char[] hexChars = new char[bytes.length * 2];

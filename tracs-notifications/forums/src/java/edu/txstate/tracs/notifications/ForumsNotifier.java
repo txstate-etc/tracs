@@ -88,6 +88,10 @@ public class ForumsNotifier implements Observer {
       eventTrackingService.addObserver(this);
     }
 
+    public String getMessageId(String siteid, Message m) {
+      return "/forums/site/"+siteid+"/forum/"+m.getTopic().getBaseForum().getId()+"/topic/"+m.getTopic().getId()+"/message/"+m.getId();
+    }
+
     public void update(Observable o, Object arg) {
         Event event = (Event) arg;
 
@@ -131,12 +135,12 @@ public class ForumsNotifier implements Observer {
                         }
                         else if(releaseDate.compareTo(now) <= 0){
                             //if the release date is now or in the past, send notification
-                            notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash, false);
+                            notifyUtils.sendNotification("discussion", "creation", getMessageId(siteid, m), event.getContext(), userids, releaseDate, contenthash, false);
                         }
                         else if(releaseDate.after(now)){
                             //it's scheduled for the future
                             //don't we still send it and Dispatch will push it out at the appropriate time?
-                            notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash, false);
+                            notifyUtils.sendNotification("discussion", "creation", getMessageId(siteid, m), event.getContext(), userids, releaseDate, contenthash, false);
                         }
                     }
                     catch(Exception e){
@@ -159,7 +163,7 @@ public class ForumsNotifier implements Observer {
                         //because a hibernate proxy was being returned for the Topic instead of a usable object
                         List<String> userids = getNotifyList(siteid, topic.getId(), event.getUserId());
 
-                        notifyUtils.sendNotification("discussion", "creation", m.getUuid(), event.getContext(), userids, releaseDate, contenthash, false);
+                        notifyUtils.sendNotification("discussion", "creation", getMessageId(siteid, m), event.getContext(), userids, releaseDate, contenthash, false);
                     }
                     catch(Exception e){
                         e.printStackTrace();

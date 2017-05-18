@@ -79,9 +79,12 @@ public class AnnouncementsNotifier implements Observer {
 
           if (announceService.isMessageViewable(m)) {
             notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);
-          } else if (m.getHeader().getDraft()) System.out.println("message is in draft mode, delete any scheduled notification");
-          else if (releaseDate.after(Calendar.getInstance())) System.out.println("message is scheduled for "+notifyUtils.dateToJson(releaseDate));
-          else notifyUtils.deleteForObject("announcement", ref.getId());
+          } else if (m.getHeader().getDraft()) {
+            System.out.println("message is in draft mode, delete any scheduled notification");
+            notifyUtils.deleteForObject("announcement", ref.getId());
+          } else if (releaseDate.after(Calendar.getInstance())) {
+            notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);
+          } else notifyUtils.deleteForObject("announcement", ref.getId());
         } else if (deletes.contains(event.getEvent())) {
           Reference ref = entityManager.newReference(event.getResource());
           notifyUtils.deleteForObject("announcement", ref.getId());

@@ -10,11 +10,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.sakaiproject.announcement.api.AnnouncementMessage;
+import org.sakaiproject.announcement.api.AnnouncementMessageHeader;
 import org.sakaiproject.announcement.api.AnnouncementService;
+import org.sakaiproject.authz.api.Member;
+import org.sakaiproject.message.api.MessageHeader.MessageAccess;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.event.api.Event;
+import org.sakaiproject.site.api.Group;
 /**
  * Watches for announcement changes, POSTs to our mobile notification service
  */
@@ -74,7 +78,7 @@ public class AnnouncementsNotifier implements Observer {
 
           String contenthash = notifyUtils.hashContent(m.getAnnouncementHeader().getSubject(), m.getBody());
 
-          List<String> userids = notifyUtils.getAllUserIdsExcept(event.getContext(), event.getUserId());
+          List<String> userids = getNotifyList(event.getContext(), event.getUserId(), m);
           for (String uid : userids) System.out.println("userid: "+uid);
 
           if (m.getHeader().getDraft()) {
@@ -91,6 +95,21 @@ public class AnnouncementsNotifier implements Observer {
         }
       } catch (Exception e) {
         e.printStackTrace();
+      }
+    }
+
+    public List<String> getNotifyList(String siteid, String author, AnnouncementMessage m) throws Exception {
+      AnnouncementMessageHeader h = m.getAnnouncementHeader();
+      if (h.getAccess() == MessageAccess.GROUPED) {
+        List<String> ret = new ArrayList<String>();
+        for (Group g : h.getGroupObjects()) {
+          for (Member mem : g.getMembers()) {
+            if (mem.getUserId() != author) ret.add(mem.getUserEid());
+          }
+        }
+        return ret;
+      } else {
+        return notifyUtils.getAllUserIdsExcept(siteid, author);
       }
     }
 }

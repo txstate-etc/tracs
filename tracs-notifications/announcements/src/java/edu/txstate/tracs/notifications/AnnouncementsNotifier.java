@@ -77,11 +77,11 @@ public class AnnouncementsNotifier implements Observer {
           List<String> userids = notifyUtils.getAllUserIdsExcept(event.getContext(), event.getUserId());
           for (String uid : userids) System.out.println("userid: "+uid);
 
-          if (announceService.isMessageViewable(m)) {
-            notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);
-          } else if (m.getHeader().getDraft()) {
+          if (m.getHeader().getDraft()) {
             System.out.println("message is in draft mode, delete any scheduled notification");
             notifyUtils.deleteForObject("announcement", ref.getId());
+          } else if (announceService.isMessageViewable(m)) {
+            notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);
           } else if (releaseDate.after(Calendar.getInstance())) {
             notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);
           } else notifyUtils.deleteForObject("announcement", ref.getId());

@@ -4,12 +4,12 @@
   <name>Tracs Notifications Announcements</name>
   <parent>
     <groupId>edu.txstate.tracs</groupId>
-    <artifactId>tracs-notifications-base</artifactId>
+    <artifactId>notifications-base</artifactId>
     <version>1.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>edu.txstate.tracs</groupId>
-  <artifactId>tracs-notifications-announcements</artifactId>
+  <artifactId>notifications-announcements</artifactId>
   <packaging>jar</packaging>
   <properties>
     <deploy.target>shared</deploy.target>
@@ -38,7 +38,7 @@
     </dependency>
     <dependency>
       <groupId>edu.txstate.tracs</groupId>
-      <artifactId>tracs-notifications-util</artifactId>
+      <artifactId>notifications-util</artifactId>
       <version>${tracsnotifyVersion}</version>
     </dependency>
   </dependencies>

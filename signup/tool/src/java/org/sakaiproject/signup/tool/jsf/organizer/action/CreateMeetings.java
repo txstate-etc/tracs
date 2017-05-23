@@ -26,6 +26,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
 import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.signup.logic.SakaiFacade;
 import org.sakaiproject.signup.logic.SignupEventTypes;
@@ -418,7 +421,10 @@ public class CreateMeetings extends SignupAction implements MeetingTypes, Signup
 					logger.info(Utilities.rb.getString("error.calendarEvent.posted_failed_due_to_permission")
 							+ " - Meeting title:" + signupMeetings.get(i).getTitle());
 				} catch (Exception e) {
-					Utilities.addErrorMessage(Utilities.rb.getString("error.calendarEvent.posted_failed"));
+					//Changed by -Qu for ticket#582, taking away "alert!"
+					//Utilities.addErrorMessage(Utilities.rb.getString("error.calendarEvent.posted_failed"));
+					String message = Utilities.rb.getString("error.calendarEvent.posted_failed");
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, message, null));
 					logger.info(Utilities.rb.getString("error.calendarEvent.posted_failed") + " - Meeting title:"
 							+ signupMeetings.get(i).getTitle());
 				}

@@ -2,7 +2,7 @@
 <registration>
 	<tool id="sakai.signup"
 		title="Sign-up"
-		description="For enabling online registration for meetings and other events.">
+		description="Allow site participants to sign up for office hours, presentation times, test times, paper topics, study session, and much more.">
 		
 		<!-- <configuration name="functions.require" value="signup.view|signup.view.all" /> -->
 		<configuration name="signup.other.sites.availability" value="default" />

@@ -428,6 +428,7 @@ GradebookSpreadsheet.prototype.setupFixedTableHeader = function(reset) {
                         attr("class", self.$table.attr("class")).
                         addClass("gb-fixed-header-table").
                         attr("role", "presentation").
+                        attr("aria-hidden", "true").
                         hide();
 
   var $fixedHeaderHead = $("<thead>");
@@ -493,11 +494,13 @@ GradebookSpreadsheet.prototype.setupFixedColumns = function() {
   self.$fixedColumnsHeader = $("<table>").attr("class", self.$table.attr("class")).
                                           addClass("gb-fixed-column-headers-table").
                                           attr("role", "presentation").
+                                          attr("aria-hidden", "true").
                                           hide();
 
   self.$fixedColumns = $("<table>").attr("class", self.$table.attr("class")).
                                     addClass("gb-fixed-columns-table").
                                     attr("role", "presentation").
+                                    attr("aria-hidden", "true").
                                     hide();
 
   var $headers = self.$table.find("> thead > tr.gb-headers > th").slice(0,3);
@@ -1806,6 +1809,13 @@ GradebookEditableCell.prototype.handleBeforeSave = function() {
 
 GradebookEditableCell.prototype.handleSaveComplete = function(cellId) {
   this.handleWicketCellReplacement(cellId);
+  // ensure fixed headers are aligned correctly after save, as vertical scroll
+  // may change as messages are added/removed from above the grade table
+  setTimeout(function() {
+    // take this off the critical path as we don't want any errors on
+    // the document scroll to stop the spreadsheet working
+    $(document).trigger("scroll");
+  });
 };
 
 
@@ -2400,7 +2410,8 @@ GradebookAPI = {};
 GradebookAPI.isAnotherUserEditing = function(siteId, timestamp, onSuccess, onError) {
   var endpointURL = "/direct/gbng/isotheruserediting/" + siteId + ".json";
   var params = {
-    since: timestamp
+    since: timestamp,
+    auto: true // indicate that the request is automatic, not from a user action
   };
   GradebookAPI._GET(endpointURL, params, onSuccess, onError);
 };
@@ -2530,6 +2541,9 @@ ConnectionPoll.prototype.ping = function() {
   $.ajax({
     type: "GET",
     url: this.PING_URL,
+    data: {
+      auto: true // indicate that the request is automatic, not from a user action
+    },
     timeout: this.PING_TIMEOUT,
     cache: false,
     success: $.proxy(this.onSuccess, this),

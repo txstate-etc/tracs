@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sakaiproject.rsf</groupId>
     <artifactId>sakai-rsf-web</artifactId>
-    <version>11.1</version>
+    <version>11.3</version>
   </parent>
   <artifactId>sakai-rsf-web-evolvers</artifactId>
   <properties>
@@ -62,10 +62,6 @@
         <exclusion>
           <groupId>org.springframework</groupId>
           <artifactId>spring-webmvc</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
           <groupId>cglib</groupId>

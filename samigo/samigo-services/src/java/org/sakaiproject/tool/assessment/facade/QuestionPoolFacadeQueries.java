@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -66,7 +66,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class QuestionPoolFacadeQueries
     extends HibernateDaoSupport implements QuestionPoolFacadeQueriesAPI {
-  private Log log = LogFactory.getLog(QuestionPoolFacadeQueries.class);
+  private Logger log = LoggerFactory.getLogger(QuestionPoolFacadeQueries.class);
   
   // SAM-2049
   private static final String VERSION_START = " - ";
@@ -297,7 +297,7 @@ public class QuestionPoolFacadeQueries
   public List getAllItems(final Long questionPoolId) {
 	    final HibernateCallback hcb = new HibernateCallback(){
 	    	public Object doInHibernate(Session session) throws HibernateException, SQLException {
-	    		Query q = session.createQuery("select ab from ItemData ab, QuestionPoolItemData qpi where ab.itemId=qpi.itemId and qpi.questionPoolId = ?");
+	    		Query q = session.createQuery("select ab from ItemData ab, QuestionPoolItemData qpi where ab.itemId=qpi.itemId and qpi.questionPoolId = ? order by ab.itemId");
 	    		q.setLong(0, questionPoolId.longValue());
 	    		return q.list();
 	    	};
@@ -317,10 +317,10 @@ public class QuestionPoolFacadeQueries
 						     final String orderBy, final String ascending) {
 	    
 	  	// Fixed for bug 3559
-	    log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: orderBy=" + orderBy);  
+	    log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: orderBy = {}", orderBy);
 	    List list = getAllItems(questionPoolId);
 
-	    log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: size = " + list.size());
+	    log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: size = {}", list.size());
 	    HashMap hp = new HashMap();
 	    Vector origValueV;
 	    ItemData itemData;
@@ -328,21 +328,21 @@ public class QuestionPoolFacadeQueries
 	    Vector facadeVector = new Vector();
 	    String text;
 	    for (int i = 0; i < list.size(); i++) {
-	    	log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: i = " + i);
+	    	log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: i = {}", i);
 	    	itemData = (ItemData) list.get(i);
 	    	itemFacade = new ItemFacade(itemData);
 	    	facadeVector.add(itemFacade);
-	    	log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: getItemId = " + itemData.getItemId());
-	    	log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: getText = " + itemData.getText());
+	    	log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: getItemId = {}", itemData.getItemId());
+	    	log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: getText = {}", itemData.getText());
 	    	
 	    	// SAM-2499
-	    	text = formattedText.stripHtmlFromText( itemFacade.getText(), false, true ).trim();
+	    	text = formattedText.stripHtmlFromText(itemFacade.getText(), false, true);
 	    	
-	    	log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: getTextHtmlStrippedAll = '" + text + "'");
+	    	log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: getTextHtmlStrippedAll = '{}'", text);
 	    	
 	    	origValueV = (Vector) hp.get(text);
 	    	if (origValueV == null) {
-	    		log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: origValueV is null ");
+	    		log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: origValueV is null");
 	    		origValueV = new Vector();
 	    	}
 	    	origValueV.add( Integer.valueOf(i));
@@ -379,7 +379,7 @@ public class QuestionPoolFacadeQueries
 		    Iterator iter = orderdValueV.iterator();
 		    while (iter.hasNext()) {
 	    		value =  (Integer)iter.next();
-	    		log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: sorted (value) = " + value);
+	    		log.debug("QuestionPoolFacadeQueries: getAllItemFacadesOrderByItemText:: sorted (value) = {}", value);
 	    		itemFacade = (ItemFacade) facadeVector.get(value.intValue());
 	    		itemList.add(itemFacade);
 		    }
@@ -429,7 +429,7 @@ public class QuestionPoolFacadeQueries
   public List getAllItemFacades(final Long questionPoolId) {
 	    final HibernateCallback hcb = new HibernateCallback(){
 	    	public Object doInHibernate(Session session) throws HibernateException, SQLException {
-	    		Query q = session.createQuery("select ab from ItemData ab, QuestionPoolItemData qpi where ab.itemId=qpi.itemId and qpi.questionPoolId = ?");
+	    		Query q = session.createQuery("select ab from ItemData ab, QuestionPoolItemData qpi where ab.itemId=qpi.itemId and qpi.questionPoolId = ? order by ab.itemId");
 	    		q.setLong(0, questionPoolId.longValue());
 	    		return q.list();
 	    	};
@@ -455,31 +455,9 @@ public class QuestionPoolFacadeQueries
     try {
       Set questionPoolItems = qpp.getQuestionPoolItems();
       if (questionPoolItems != null) {
-    	  
-        // let's get all the items for the specified pool in one shot
-        HashMap h = new HashMap();
-        List itemList = getAllItems(qpp.getQuestionPoolId());
 
-        Iterator j = itemList.iterator();
-        while (j.hasNext()) {
-          ItemData itemData = (ItemData) j.next();
-          h.put(itemData.getItemId(), itemData);
-        }
-        ArrayList itemArrayList = new ArrayList();
-        Iterator i = questionPoolItems.iterator();
-        while (i.hasNext()) {
-          QuestionPoolItemData questionPoolItem = (QuestionPoolItemData) i.next();
-          ItemData itemData_0 = (ItemData) h.get(questionPoolItem.getItemId());
-          /*
-          Set itemTextSet = itemData_0.getItemTextSet();
-          Iterator k = itemTextSet.iterator();
-          while (k.hasNext()) {
-            ItemText itemText = (ItemText) k.next();
-          }
-          */
-          itemArrayList.add(itemData_0);
-        }
-        qpp.setQuestions(itemArrayList);
+        List itemList = getAllItems(qpp.getQuestionPoolId());
+        qpp.setQuestions(itemList);
         qpp.setSubPoolSize( Integer.valueOf(getSubPoolSize(qpp.getQuestionPoolId())));
       }
     }
@@ -517,7 +495,7 @@ public class QuestionPoolFacadeQueries
       return getQuestionPool(qpp);
     }
     catch (Exception e) {
-      log.error(e);
+      log.error(e.getMessage(), e);
       return null;
     }
   }

@@ -4,7 +4,7 @@
   <parent>
     <artifactId>common</artifactId>
     <groupId>org.sakaiproject.common</groupId>
-    <version>11.1</version><!-- ProjectVersion -->
+    <version>11.3</version><!-- ProjectVersion -->
     <relativePath>../pom.xml</relativePath>
   </parent>
   <name>Sakai Common API Composite Component Data</name>
@@ -40,10 +40,6 @@
     <dependency>
       <groupId>org.sakaiproject.common</groupId>
       <artifactId>sakai-common-type-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
     </dependency>
   </dependencies>
   <build>

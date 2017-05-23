@@ -4,7 +4,7 @@
   <parent>
     <artifactId>common</artifactId>
     <groupId>org.sakaiproject.common</groupId>
-    <version>11.1</version>
+    <version>11.3</version>
     <relativePath>../../../pom.xml</relativePath>
   </parent>
   <name>Sakai Import Blackboard 6.x</name>
@@ -81,10 +81,6 @@
                         <groupId>junit</groupId>
                         <artifactId>junit</artifactId>
                         <version>3.8.1</version>
-                </dependency>
-		<dependency>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
                 </dependency>
 	</dependencies>
   <build>

@@ -19,7 +19,7 @@
 	<parent>
 		<artifactId>mailsender</artifactId>
 		<groupId>org.sakaiproject.mailsender</groupId>
-		<version>11.1</version><!-- ProjectVersion -->
+		<version>11.3</version><!-- ProjectVersion -->
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<name>Sakai Mail Sender Tool</name>
@@ -109,16 +109,5 @@
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
-
-		<!-- provided dependencies -->
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
-
-		<!-- Sakai Dependencies -->
-		<!-- sakai-user-api -->
-		<!-- sakai-util -->
-		<!-- sakai-util-api -->
 	</dependencies>
 </project>

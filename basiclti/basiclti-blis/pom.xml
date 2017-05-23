@@ -5,7 +5,7 @@
     <parent>
         <artifactId>basiclti</artifactId>
         <groupId>org.sakaiproject.basiclti</groupId>
-        <version>11.1</version>
+        <version>11.3</version>
     </parent>
 
     <name>BasicLIS Implementation (imsblis)</name>
@@ -56,10 +56,6 @@
             <artifactId>gradebook-service-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
@@ -103,11 +99,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        
     </dependencies>
 
     <build>

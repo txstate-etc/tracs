@@ -5,7 +5,7 @@
     <parent>
         <artifactId>sitemanage</artifactId>
         <groupId>org.sakaiproject.sitemanage</groupId>
-        <version>11.1</version>
+        <version>11.3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -43,10 +43,6 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
         </dependency>
     </dependencies>
 </project>

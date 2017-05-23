@@ -4,7 +4,7 @@
   <parent>
     <artifactId>tool-base</artifactId>
     <groupId>org.sakaiproject</groupId>
-    <version>11.1</version>
+    <version>11.3</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <name>sakai-tool-tool-su</name>
@@ -66,11 +66,6 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
-      <version>1.7.0</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
     </dependency>
   </dependencies>
   <build>

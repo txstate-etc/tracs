@@ -4,7 +4,7 @@
   <parent>
     <artifactId>user</artifactId>
     <groupId>org.sakaiproject.user</groupId>
-    <version>11.1</version>
+    <version>11.3</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <name>sakai-user-tool-admin-prefs</name>
@@ -24,10 +24,6 @@
     <dependency>
       <groupId>org.sakaiproject.kernel</groupId>
       <artifactId>sakai-kernel-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
     </dependency>
     <!-- the "classic" sakai widgets. Note: requires Sun RI JSF -->
     <dependency>
@@ -59,7 +55,6 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
-      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>taglibs</groupId>

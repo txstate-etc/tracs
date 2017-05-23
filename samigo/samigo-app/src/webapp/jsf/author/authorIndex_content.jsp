@@ -87,7 +87,7 @@ $(document).ready(function() {
 	var selectedTab = 0;
 	<h:outputText rendered="#{author.justPublishedAnAssessment}" value="selectedTab = 1;" />
 
-	$("#tabs").tabs({ selected: selectedTab });
+	$("#tabs").tabs({ active: selectedTab });
 
 	// SET THE HEIGHT ON TABS CONTAINER IF PUBLISHED IS LARGER THAN WORKING COPIES
 	if ($('#tabs-2').height() > $('#tabs-1').height()) {
@@ -426,7 +426,7 @@ $(document).ready(function() {
         <h:outputText value="#{authorFrontDoorMessages.assessment_date} " />
       </f:facet>
       <h:outputText value="#{publishedAssessment.startDate}" >
-        <f:convertDateTime pattern="yyyy-MM-dd"/>
+        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
       </h:outputText>
     </t:column>
    
@@ -435,7 +435,7 @@ $(document).ready(function() {
         <h:outputText value="#{authorFrontDoorMessages.assessment_due} " />
       </f:facet>
       <h:outputText value="#{publishedAssessment.dueDate}" >
-        <f:convertDateTime pattern="yyyy-MM-dd"/>
+        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
       </h:outputText>
     </t:column>
 

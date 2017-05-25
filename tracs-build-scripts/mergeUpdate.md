@@ -10,7 +10,7 @@
 |	basiclti	|		|
 |	blogwow	|		|
 |	calendar	|		|
-|	chat	|		|
+|	chat	|    DONE       |
 |	citations	|		|
 |	cloud-content	|		|
 |	cmprovider	|		|

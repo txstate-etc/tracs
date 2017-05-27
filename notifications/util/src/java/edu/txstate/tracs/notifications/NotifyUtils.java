@@ -179,8 +179,6 @@ public class NotifyUtils {
           try (OutputStream os = http.getOutputStream()) {
             os.write(finalBody.getBytes());
           }
-
-          System.out.println(finalBody);
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -188,39 +186,38 @@ public class NotifyUtils {
 
     }
 
-    public void delete(final String body) {
+    public void delete(final Map<String,String> params) {
       notificationThread(new Runnable() {
       @Override
       public void run() {
         try {
-          HttpURLConnection http = getConnection();
+          HttpURLConnection http = getConnection(params);
           http.setRequestMethod("DELETE");
-          http.setDoOutput(true);
-          http.setFixedLengthStreamingMode(body.getBytes().length);
-          http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-          try (OutputStream os = http.getOutputStream()) {
-            os.write(body.getBytes());
-          }
-          System.out.println(body);
+          http.getResponseCode();
         } catch (Exception e) {
           e.printStackTrace();
         }
       }});
     }
     public void deleteForSite(String siteid) {
-
+      Map<String,String> params = new HashMap<String,String>();
+      params.put("keys.provider_id", "tracs");
+      params.put("other_keys.site_id", siteid);
+      delete(params);
     }
-    public void deleteForUserInSite(String siteid, String userid) {
-
+    public void deleteForUserInSite(String siteid, String eid) {
+      Map<String,String> params = new HashMap<String,String>();
+      params.put("keys.provider_id", "tracs");
+      params.put("other_keys.site_id", siteid);
+      params.put("keys.user_id", eid);
+      delete(params);
     }
     public void deleteForObject(String objecttype, String objectid) {
-      String jsonBody = "{";
-      jsonBody += "\"keys\":{";
-      jsonBody += "\"provider_id\":\"tracs\",";
-      jsonBody += "\"object_type\":\""+objecttype+"\",";
-      jsonBody += "\"object_id\":\""+objectid+"\"";
-      jsonBody += "}}";
-      delete(jsonBody);
+      Map<String,String> params = new HashMap<String,String>();
+      params.put("keys.provider_id", "tracs");
+      params.put("keys.object_type", objecttype);
+      params.put("keys.object_id", objectid);
+      delete(params);
     }
 
     public <T> T unproxy(Object maybeProxy, Class<T> baseClass) throws ClassCastException {

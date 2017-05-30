@@ -444,6 +444,11 @@ public class SectionDecorator implements RowGroupable,Serializable, Comparable{
         return section.getTitle();
     }
 
+    // Method to get the eid of this course - YuanhuaQu,11/18/08
+    public String getEid() {
+        return section.getEid();
+    }
+
     public String getUuid() {
         return section.getUuid();
     }

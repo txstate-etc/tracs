@@ -403,20 +403,15 @@ public class SyllabusEntityProvider extends AbstractEntityProvider implements En
 					}else if("body".equals(params.get("name"))){
 						String body = (String) params.get("value");
 						StringBuilder alertMsg = new StringBuilder();
-			        	String cleanedText;
-			    		try
-			    		{
-			    			cleanedText  =  FormattedText.processFormattedText(body, alertMsg);
-			    			if (alertMsg.length() > 0)
-			    			{
-			    				throw new IllegalArgumentException("Error formatting body text: " + alertMsg);
-			    			}else{
-			    				data.setAsset(cleanedText);
-			    				syllabusManager.saveSyllabus(data);
-			    			}
-			    		}catch(Exception e){
-			    			log.error(e.getMessage(), e);
-			    		}
+						String cleanedText = null;
+					cleanedText  =  FormattedText.processFormattedText(body, alertMsg);
+					if (alertMsg.length() > 0 && cleanedText.length() < 1)
+					{
+						throw new IllegalArgumentException("Error formatting body text: " + alertMsg);
+						}else{
+							data.setAsset(cleanedText);
+							syllabusManager.saveSyllabus(data);
+						}
 					}else if("startDate".equals(params.get("name"))){
 						String startDate = (String) params.get("value");
 						if(startDate == null || "".equals(startDate)){

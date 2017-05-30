@@ -7650,6 +7650,8 @@ extends VelocityPortletStateAction
 		//
 		// See if we are allowed to merge items.
 		//
+		// Modified by Anne Faber 5/30/17 : Hide 'Merge Calendar' Options (Internal and External)
+		/*
 		bar.add( new MenuEntry(mergedCalendarPage.getButtonText(), null, allow_merge_calendars, MenuItem.CHECKED_NA, mergedCalendarPage.getButtonHandlerID()) );
 		
 		// See if we are allowed to configure external calendar subscriptions
@@ -7657,6 +7659,7 @@ extends VelocityPortletStateAction
 			{
 				bar.add( new MenuEntry(rb.getString("java.subscriptions"), rb.getString("java.subscriptions.title"), null, allow_subscribe, MenuItem.CHECKED_NA, "doSubscriptions") );
 			}
+		*/
 		
 		// See if we are allowed to export items.
 		String calId = state.getPrimaryCalendarReference();

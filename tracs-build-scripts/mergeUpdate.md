@@ -9,7 +9,7 @@
 | authz         ||
 |	basiclti	|		|
 |	blogwow	|		|
-|	calendar	|		|
+|	calendar	|    DONE       |
 |	chat	|    DONE       |
 |	citations	|		|
 |	cloud-content	|		|
@@ -74,7 +74,7 @@
 |	site	|		|
 |	site-manage	|		|
 |	sitestats	|		|
-|	syllabus	|		|
+|	syllabus	|    DONE    |
 |	taggable	|		|
 |	textarea	|		|
 |	tool	|		|

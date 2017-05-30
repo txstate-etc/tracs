@@ -102,6 +102,10 @@ public class EditStudentsBean extends EditManagersBean implements Serializable {
 				availableSectionTitle = section.getTitle();
 				availableSectionMax = section.getMaxEnrollments();
 			}
+			// Show the eid here if it exists - YuanhuaQu,11/18/08
+			if(section.getEid() != null)
+			    availableSectionItems.add(new SelectItem(section.getUuid(), section.getEid()));
+			else
 			availableSectionItems.add(new SelectItem(section.getUuid(), section.getTitle()));
 		}
 	}

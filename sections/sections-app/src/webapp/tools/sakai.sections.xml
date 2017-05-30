@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <registration>
-	<tool id="sakai.sections" title="Section Info" description="For managing sections within a site.">
+	<tool id="sakai.sections" title="Section Info" description="Site administrator tool for managing sections within a site.">
 		<category name="course" />
 		<category name="project" />
 

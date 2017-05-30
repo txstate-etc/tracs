@@ -344,7 +344,7 @@ function showMessage(message, success){
 	$(spanItem).css("top", topPos); 
 	$(spanItem).show();
 	
-	setTimeout(function(){$(spanItem).fadeOut();}, 4000);
+	setTimeout(function(){$(spanItem).fadeOut();}, 6000);
 }
 
 function postAjax(id, params, msgs){
@@ -593,3 +593,10 @@ if(typeof String.prototype.trim !== 'function') {
 		return this.replace(/^\s+|\s+$/g, ''); 
 	};
 }
+
+$(document).ready(function() {
+	// if all items are unpublished
+	if ($('.publish').length && !$('.group').find('img.publishOn:visible').length) {
+		showMessage("To publish an item, click the lightbulb icon", false);
+	}
+});

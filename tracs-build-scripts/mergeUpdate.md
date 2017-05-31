@@ -1,12 +1,12 @@
 
 | Tool          | Status        |
 | ------------- | ------------- |
-| access        |               |
-| alias         |               |
+| access        | NO LOCAL CHANGES |
+| alias         | NO LOCAL CHANGES |
 | announcement  |    DONE       |
-| archive       ||
+| archive       | NO LOCAL CHANGES |
 | assignment    ||
-| authz         ||
+| authz         | NO LOCAL CHANGES |
 |	basiclti	|		|
 |	blogwow	|		|
 |	calendar	|    DONE       |
@@ -18,21 +18,21 @@
 |	config	|		|
 |	content	|		|
 |	content-review	|		|
-|	courier	|		|
+|	courier	| NO LOCAL CHANGES |
 |	dashboard	|		|
 |	dav	|		|
-|	delegatedaccess	|		|
-|	deploy	|		|
+|	delegatedaccess	| NO LOCAL CHANGES |
+|	deploy	| NO LOCAL CHANGES |
 |	edu-services	|		|
-|	emailtemplateservice	|		|
+|	emailtemplateservice	| NO LOCAL CHANGES |
 |	entitybroker	|		|
 |	etudes-util	|		|
-|	external-calendaring-service	|		|
-|	feedback	|		|
+|	external-calendaring-service	| NO LOCAL CHANGES |
+|	feedback	| NO LOCAL CHANGES |
 |	gradebook	|		|
 |	gradebookng	|		|
 |	help	|		|
-|	hierarchy	|		|
+|	hierarchy	| NO LOCAL CHANGES |
 |	irubric	|		|
 |	jobscheduler	|		|
 |	jsf	|		|
@@ -44,47 +44,47 @@
 |	mailsender	|	DONE	|
 |	master	|		|
 |	melete	|	DONE	|
-|	memory	|		|
-|	message	|		|
+|	memory	| NO LOCAL CHANGES |
+|	message	| NO LOCAL CHANGES |
 |	msgcntr	|		|
-|	oauth	|		|
-|	pack	|		|
-|	pasystem	|		|
+|	oauth	| NO LOCAL CHANGES |
+|	pack	| NO LOCAL CHANGES |
+|	pasystem	| NO LOCAL CHANGES |
 |	podcasts	|    DONE    |
 |	polls	|	DONE	|
 |	portal	|		|
 |	postem	|		|
-|	presence	|		|
+|	presence	| NO LOCAL CHANGES |
 |	profile2	|		|
 |	providers	|		|
 |	reference	|		|
 |	reset-pass	|		|
 |	rest	|		|
-|	rights	|		|
+|	rights	| NO LOCAL CHANGES |
 |	roster2	|		|
 |	roster_legacy	|		|
-|	rsf	|		|
+|	rsf	| NO LOCAL CHANGES |
 |	rwiki	|		|
 |	samigo	|		|
 |	search	|		|
 |	sections	|    DONE    |
-|	shortenedurl	|		|
+|	shortenedurl	| NO LOCAL CHANGES |
 |	signup	|	DONE	|
-|	simple-rss-portlet	|		|
-|	site	|		|
+|	simple-rss-portlet	| NO LOCAL CHANGES |
+|	site	| NO LOCAL CHANGES |
 |	site-manage	|		|
 |	sitestats	|		|
 |	syllabus	|    DONE    |
-|	taggable	|		|
-|	textarea	|		|
+|	taggable	| NO LOCAL CHANGES |
+|	textarea	| NO LOCAL CHANGES |
 |	tool	|		|
 |	tracs-build-scripts	|		|
 |	tracs-docker	|		|
 |	tracs-notifications	|		|
 |	turningpoint	|		|
 |	user	|		|
-|	userauditservice	|		|
-|	usermembership	|		|
-|	velocity	|		|
+|	userauditservice	| NO LOCAL CHANGES |
+|	usermembership	| NO LOCAL CHANGES |
+|	velocity	| NO LOCAL CHANGES |
 |	web	|		|
 |	webservices	|		|

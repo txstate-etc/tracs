@@ -5,7 +5,7 @@
     <parent>
         <artifactId>external-calendaring-service</artifactId>
         <groupId>org.sakaiproject.calendaring</groupId>
-        <version>11.1</version>
+        <version>11.3</version>
     </parent>
     
 	<name>External Calendaring Service :: Implementation</name>
@@ -34,10 +34,6 @@
             <groupId>org.sakaiproject.calendar</groupId>
             <artifactId>sakai-calendar-api</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -120,6 +116,7 @@
                 <directory>${basedir}/src/test</directory>
                 <includes>
                     <include>test-components.xml</include>
+                    <include>log4j.properties</include>
                 </includes>
             </testResource>
         </testResources>

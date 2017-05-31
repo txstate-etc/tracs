@@ -4,7 +4,7 @@
     <parent>
         <artifactId>edu-services</artifactId>
         <groupId>org.sakaiproject.edu-services</groupId>
-        <version>11.1</version><!-- ProjectVersion -->
+        <version>11.3</version><!-- ProjectVersion -->
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>org.sakaiproject.edu-services.gradebook</groupId>
@@ -48,10 +48,6 @@
             <groupId>org.sakaiproject.kernel</groupId>
             <artifactId>sakai-kernel-api</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -131,12 +127,10 @@
         <dependency>
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
-            <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>dom4j</groupId>

@@ -23,6 +23,7 @@
 
 package org.sakaiproject.lessonbuildertool.model;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,23 +31,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
-import java.sql.Connection;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.sakaiproject.authz.api.SecurityService;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.sakaiproject.authz.api.AuthzGroupService;
+import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.db.api.SqlReader;
 import org.sakaiproject.db.api.SqlService;
 import org.sakaiproject.event.cover.EventTrackingService;
@@ -75,19 +73,22 @@ import org.sakaiproject.lessonbuildertool.SimplePagePeerEvalResult;
 import org.sakaiproject.lessonbuildertool.SimplePagePeerEvalResultImpl;
 import org.sakaiproject.lessonbuildertool.SimplePageProperty;
 import org.sakaiproject.lessonbuildertool.SimplePagePropertyImpl;
+import org.sakaiproject.lessonbuildertool.SimpleChecklistItem;
+import org.sakaiproject.lessonbuildertool.SimpleChecklistItemImpl;
+import org.sakaiproject.lessonbuildertool.ChecklistItemStatus;
 
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.cover.UserDirectoryService;
 import org.springframework.dao.DataAccessException;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.hibernate.HibernateException;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.JSONArray;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class SimplePageToolDaoImpl extends HibernateDaoSupport implements SimplePageToolDao {
-	private static Log log = LogFactory.getLog(SimplePageToolDaoImpl.class);
 
 	private ToolManager toolManager;
 	private SecurityService securityService;
@@ -114,6 +115,19 @@ public class SimplePageToolDaoImpl extends HibernateDaoSupport implements Simple
     public HibernateTemplate getDaoHibernateTemplate() {
 	return getHibernateTemplate();
     }
+
+    // make sure future reads come from the database. Currently used to minimize the possibiliy of race conditions
+    // involving old data, for the sequence number. I'm not currently clearing the session cache, because this 
+    // method is called before anyone has read any items, so there shouldn't be any old data there.
+	public void setRefreshMode() {
+	    final HibernateCallback hcb = new HibernateCallback(){
+		    public Object doInHibernate(Session session) throws HibernateException, SQLException {
+			session.setCacheMode(org.hibernate.CacheMode.REFRESH);
+			return null;
+		    };
+		};
+            getHibernateTemplate().executeFind(hcb);
+	}
 
 	public boolean canEditPage() {
 		String ref = null;
@@ -649,6 +663,54 @@ public class SimplePageToolDaoImpl extends HibernateDaoSupport implements Simple
 		    } else if (o instanceof SimplePage) {
 			SimplePage i = (SimplePage)o;
 			EventTrackingService.post(EventTrackingService.newEvent("lessonbuilder.create", "/lessonbuilder/page/" + i.getPageId(), true));
+		    } 
+
+		    if(o instanceof SimplePageItem || o instanceof SimplePage) {
+		    	updateStudentPage(o);
+		    }
+		    
+		    return true;
+		} catch (org.springframework.dao.DataIntegrityViolationException e) {
+		    getCause(e, elist);
+		    return false;
+		} catch (org.hibernate.exception.DataException e) {
+		    getCause(e, elist);
+		    return false;
+		} catch (DataAccessException e) {
+		    getCause(e, elist);
+		    return false;
+		}
+	}
+
+	public boolean saveOrUpdate(Object o, List<String>elist, String nowriteerr, boolean requiresEditPermission) {
+		
+		/*
+		 * 1) If o is SimplePageItem or SimplePage, it makes sure it gets the right page and checks the
+		 *    permissions on it.
+		 * 2) If it's a log entry or question response, it lets it go.
+		 * 3) If requiresEditPermission is set to false, it lets it go.
+		 * 
+		 * Essentially, if any of those say that the edit is fine, it won't throw the error.
+		 */
+	    if(requiresEditPermission && !(o instanceof SimplePageItem && canEditPage(((SimplePageItem)o).getPageId()))
+	    			&& !(o instanceof SimplePage && canEditPage((SimplePage)o))
+				&& !(o instanceof SimplePageLogEntry || o instanceof SimplePageQuestionResponse)
+				&& !(o instanceof SimplePageGroup)) {
+			elist.add(nowriteerr);
+			return false;
+		}
+
+		try {
+		    getHibernateTemplate().saveOrUpdate(o);
+		    
+		    if (o instanceof SimplePageItem) {
+			SimplePageItem i = (SimplePageItem)o;
+			String eventType = (i.getId() == 0 ? "lessonbuilder.create" : "lessonbuilder.update");
+			EventTrackingService.post(EventTrackingService.newEvent(eventType, "/lessonbuilder/item/" + i.getId(), true));
+		    } else if (o instanceof SimplePage) {
+			SimplePage i = (SimplePage)o;
+			String eventType = (i.getPageId() == 0 ? "lessonbuilder.create" : "lessonbuilder.update");
+			EventTrackingService.post(EventTrackingService.newEvent(eventType, "/lessonbuilder/page/" + i.getPageId(), true));
 		    } 
 
 		    if(o instanceof SimplePageItem || o instanceof SimplePage) {
@@ -1369,7 +1431,7 @@ public class SimplePageToolDaoImpl extends HibernateDaoSupport implements Simple
 		    try {
 			conn.setAutoCommit(wasCommit);
 		    } catch (Exception e) {
-			System.out.println("transact: (setAutoCommit): " + e);
+			log.info("transact: (setAutoCommit): " + e);
 		    }
   
 		    sqlService.returnConnection(conn);
@@ -1523,5 +1585,181 @@ public class SimplePageToolDaoImpl extends HibernateDaoSupport implements Simple
 
 	}
 
+	public List<SimpleChecklistItem> findChecklistItems(SimplePageItem checklist) {
+		List<SimpleChecklistItem> ret = new ArrayList<SimpleChecklistItem>();
+
+		// find new id number, max + 1
+		List checklistItems = (List)checklist.getJsonAttribute("checklistItems");
+		if (checklistItems == null)
+			return ret;
+		for (Object i: checklistItems) {
+			Map checklistItem = (Map) i;
+			SimpleChecklistItem newChecklistItem = new SimpleChecklistItemImpl((Long)checklistItem.get("id"), (String)checklistItem.get("name"));
+			ret.add(newChecklistItem);
+		}
+		return ret;
+	}
+
+	public SimpleChecklistItem findChecklistItem(SimplePageItem checklist, long checklistItemId) {
+		// find new id number, max + 1
+		List checklistItems = (List)checklist.getJsonAttribute("checklistItems");
+		if (checklistItems == null)
+			return null;
+		for (Object i: checklistItems) {
+			Map checklistItem = (Map) i;
+			if (checklistItemId == (Long)checklistItem.get("id")) {
+				SimpleChecklistItem newChecklistItem = new SimpleChecklistItemImpl(checklistItemId, (String)checklistItem.get("name"));
+				return newChecklistItem;
+			}
+		}
+		return null;
+	}
+
+	public boolean deleteAllSavedStatusesForChecklist(SimplePageItem checklist) {
+		try {
+			List<ChecklistItemStatus> checklistItemStatuses = findChecklistItemStatusesForChecklist(checklist.getId());
+			if(checklistItemStatuses != null) {
+				getHibernateTemplate().deleteAll(checklistItemStatuses);
+			}
+			return true;
+		} catch (DataAccessException dae) {
+			log.warn("Unable to delete all saved status for checklist: " + dae);
+			return false;
+		}
+	}
+
+	public boolean deleteAllSavedStatusesForChecklistItem(long checklistId, long checklistItemId) {
+		try {
+			List<ChecklistItemStatus> checklistItemStatuses = findChecklistItemStatusesForChecklistItem(checklistId, checklistItemId);
+			if(checklistItemStatuses != null) {
+				getHibernateTemplate().deleteAll(checklistItemStatuses);
+			}
+			return true;
+		} catch (DataAccessException dae) {
+			log.warn("Unable to delete all checklist item statuses for checklist item " + dae);
+			return false;
+		}
+	}
+
+	public void clearChecklistItems(SimplePageItem checklist) {
+		checklist.setJsonAttribute("checklistItems", null);
+	}
+
+	public Long maxChecklistItem(SimplePageItem checklist)  {
+		Long max = 0L;
+		List checklistItems = (List)checklist.getJsonAttribute("checklistItems");
+		if (checklistItems == null)
+			return max;
+		for (Object i: checklistItems) {
+			Map item = (Map) i;
+			Long id = (Long)item.get("id");
+			if (id > max)
+				max = id;
+		}
+		return max;
+	}
+
+	public Long addChecklistItem(SimplePageItem checklist, Long id, String name) {
+		// no need to check security. that happens when item is saved
+
+		List checklistItems = (List)checklist.getJsonAttribute("checklistItems");
+		if (checklistItems == null) {
+			checklistItems = new JSONArray();
+			checklist.setJsonAttribute("checklistItems", checklistItems);
+			if (id <= 0L)
+				id = 1L;
+		} else if (id <= 0L) {
+			Long max = 0L;
+			for (Object i: checklistItems) {
+				Map item = (Map) i;
+				Long newId = (Long)item.get("id");
+				if (newId > max)
+					max = newId;
+			}
+			id = max + 1;
+		}
+
+		// create and add the json form of the answer
+		Map newChecklistItem = new JSONObject();
+		newChecklistItem.put("id", id);
+		newChecklistItem.put("name", name);
+		checklistItems.add(newChecklistItem);
+
+		return id;
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean isChecklistItemChecked(long checklistId, long checklistItemId, String userId) {
+		DetachedCriteria d = DetachedCriteria.forClass(ChecklistItemStatus.class)
+				.add(Restrictions.eq("checklistId", checklistId))
+				.add(Restrictions.eq("checklistItemId", checklistItemId))
+				.add(Restrictions.eq("owner", userId));
+
+		List<ChecklistItemStatus> list = (List<ChecklistItemStatus>) getHibernateTemplate().findByCriteria(d);
+
+		if(list.size() > 0) {
+			return list.get(0).isDone();
+		}else {
+			return false;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ChecklistItemStatus> findChecklistItemStatusesForChecklist(long checklistId) {
+		DetachedCriteria d = DetachedCriteria.forClass(ChecklistItemStatus.class)
+				.add(Restrictions.eq("checklistId", checklistId));
+		List<ChecklistItemStatus> list = (List<ChecklistItemStatus>) getHibernateTemplate().findByCriteria(d);
+
+		if(list.size() > 0) {
+			return list;
+		} else {
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ChecklistItemStatus> findChecklistItemStatusesForChecklistItem(long checklistId, long checklistItemId) {
+		DetachedCriteria d = DetachedCriteria.forClass(ChecklistItemStatus.class)
+				.add(Restrictions.eq("checklistId", checklistId))
+				.add(Restrictions.eq("checklistItemId", checklistItemId));
+		List<ChecklistItemStatus> list = (List<ChecklistItemStatus>) getHibernateTemplate().findByCriteria(d);
+
+		if(list.size() > 0) {
+			return list;
+		} else {
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public ChecklistItemStatus findChecklistItemStatus(long checklistId, long checklistItemId, String userId) {
+		DetachedCriteria d = DetachedCriteria.forClass(ChecklistItemStatus.class)
+				.add(Restrictions.eq("checklistId", checklistId))
+				.add(Restrictions.eq("checklistItemId", checklistItemId))
+				.add(Restrictions.eq("owner", userId));
+		List<ChecklistItemStatus> list = (List<ChecklistItemStatus>) getHibernateTemplate().findByCriteria(d);
+
+		if(list.size() > 0) {
+			return list.get(0);
+		}else {
+			return null;
+		}
+	}
+
+	public boolean saveChecklistItemStatus(ChecklistItemStatus checklistItemStatus) {
+		try {
+			getHibernateTemplate().saveOrUpdate(checklistItemStatus);
+			return true;
+		} catch (DataAccessException e) {
+			log.warn("Failed to save checklist item status " + checklistItemStatus.toString());
+			return false;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<SimplePageItem> findAllChecklistsInSite(String siteId) {
+		String hql = "select item from org.sakaiproject.lessonbuildertool.SimplePageItem item, org.sakaiproject.lessonbuildertool.SimplePage page where item.pageId = page.pageId and page.siteId = :site and item.type = 15";
+		return (List<SimplePageItem>) getHibernateTemplate().findByNamedParam(hql, "site", siteId);
+	}
 
 }

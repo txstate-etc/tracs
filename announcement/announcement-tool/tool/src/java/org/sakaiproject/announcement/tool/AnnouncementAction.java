@@ -39,8 +39,8 @@ import java.text.ParseException;
 import java.text.RuleBasedCollator;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sakaiproject.announcement.api.AnnouncementChannel;
 import org.sakaiproject.announcement.api.AnnouncementChannelEdit;
 import org.sakaiproject.announcement.api.AnnouncementMessage;
@@ -126,7 +126,7 @@ import org.w3c.dom.Element;
 public class AnnouncementAction extends PagedResourceActionII
 {
 	/** Our logger. */
-	private static Log M_log = LogFactory.getLog(AnnouncementAction.class);
+	private static Logger M_log = LoggerFactory.getLogger(AnnouncementAction.class);
 	
 	/** Resource bundle using current language locale */
 	private static ResourceLoader rb = new ResourceLoader("announcement");
@@ -1183,10 +1183,8 @@ public class AnnouncementAction extends PagedResourceActionII
 				menu_new = channel.allowAddMessage();
 				menu_delete = channel.allowRemoveMessage(message);
 				menu_revise = channel.allowEditMessage(message.getId());
-			} catch (IdUnusedException e) {
-				M_log.error(e);
-			} catch (PermissionException e) {
-				M_log.error(e);
+			} catch (IdUnusedException | PermissionException e) {
+				M_log.error(e.getMessage());
 			}
 
 		}
@@ -1941,7 +1939,7 @@ public class AnnouncementAction extends PagedResourceActionII
 			context.put("annToGroups", allGroupString);
 			
 		} catch (IdUnusedException e1) {
-			M_log.error(e1);
+			M_log.error(e1.getMessage());
 		}
 		}
 		
@@ -4083,14 +4081,10 @@ public class AnnouncementAction extends PagedResourceActionII
 				if (o1ModDate != null && o2ModDate != null) 
 				{
 					// sorted by the discussion message date
-					if (o1ModDate.before(o2ModDate))
-					{
-						result = -1;
-					}
-					else
-					{
-						result = 1;
-					}
+					result = o1ModDate.compareTo(o2ModDate);
+				}
+				else if (o1ModDate == null && o2ModDate == null) {
+					return 0;
 				}
 				else if (o1ModDate == null)
 				{
@@ -4103,15 +4097,20 @@ public class AnnouncementAction extends PagedResourceActionII
 			}
 			else if (m_criteria.equals(SORT_MESSAGE_ORDER))
 			{
+				int order1 = ((AnnouncementMessage) o1).getAnnouncementHeader().getMessage_order();
+				int order2 = ((AnnouncementMessage) o2).getAnnouncementHeader().getMessage_order();
 				// sorted by the message order
-				if ((((AnnouncementMessage) o1).getAnnouncementHeader().getMessage_order()) <
-						(((AnnouncementMessage) o2).getAnnouncementHeader().getMessage_order()))
+				if (order1 < order2)
 				{
 					result = -1;
 				}
-				else
+				else if (order1 > order2)
 				{
 					result = 1;
+				}
+				else
+				{
+					return 0;
 				}
 			}
 			else if (m_criteria.equals(SORT_RELEASEDATE))
@@ -4138,16 +4137,12 @@ public class AnnouncementAction extends PagedResourceActionII
 				}
 
 				if (o1releaseDate != null && o2releaseDate != null) 
+				if (o1releaseDate != null && o2releaseDate != null) 
 				{
-					// sorted by the discussion message date
-					if (o1releaseDate.before(o2releaseDate))
-					{
-						result = -1;
-					}
-					else
-					{
-						result = 1;
-					}
+					result = o1releaseDate.compareTo(o2releaseDate);
+				}
+				else if (o1releaseDate == null && o2releaseDate == null) {
+					return 0;
 				}
 				else if (o1releaseDate == null)
 				{
@@ -4183,15 +4178,10 @@ public class AnnouncementAction extends PagedResourceActionII
 
 				if (o1retractDate != null && o2retractDate != null) 
 				{
-					// sorted by the discussion message date
-					if (o1retractDate.before(o2retractDate))
-					{
-						result = -1;
-					}
-					else
-					{
-						result = 1;
-					}
+					result = o1retractDate.compareTo(o2retractDate);
+				}
+				else if (o1retractDate == null && o2retractDate == null) {
+					return 0;
 				}
 				else if (o1retractDate == null)
 				{
@@ -4861,10 +4851,8 @@ public class AnnouncementAction extends PagedResourceActionII
 						messageOrder++;
 					}
 				}
-				} catch (PermissionException e1) {
-					M_log.error(e1);
-				} catch (IdUnusedException e1) {
-					M_log.error(e1);
+				} catch (PermissionException | IdUnusedException e1) {
+					M_log.error(e1.getMessage());
 				}
 			}
 		}

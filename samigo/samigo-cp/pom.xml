@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.sakaiproject.samigo</groupId>
 		<artifactId>samigo</artifactId>
-		<version>11.1</version>
+		<version>11.3</version>
 	</parent>
     
 	<name>Sakai Samigo Content Packaging (samigo-cp)</name>
@@ -42,10 +42,6 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>samigo-qti</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
 		</dependency>
         <dependency>
             <groupId>jdom</groupId>

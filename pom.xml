@@ -111,7 +111,7 @@
                 <module>taggable</module>
                 <module>textarea</module>
                 <module>tool</module>
-                <module>tracs-notifications</module>
+                <module>notifications</module>
                 <module>user</module>
                 <module>userauditservice</module>
                 <module>usermembership</module>

@@ -4,12 +4,12 @@
   <name>Tracs Notifications Component Package</name>
   <parent>
     <groupId>edu.txstate.tracs</groupId>
-    <artifactId>tracs-notifications-base</artifactId>
+    <artifactId>notifications-base</artifactId>
     <version>1.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>edu.txstate.tracs</groupId>
-  <artifactId>tracs-notifications-pack</artifactId>
+  <artifactId>notifications-pack</artifactId>
   <organization>
     <name>Texas State University</name>
     <url>http://txstate.edu/</url>

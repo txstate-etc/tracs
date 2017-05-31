@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <name>Tracs Notifications Base</name>
   <groupId>edu.txstate.tracs</groupId>
-  <artifactId>tracs-notifications-base</artifactId>
+  <artifactId>notifications-base</artifactId>
   
   <organization>
     <name>Texas State University</name>

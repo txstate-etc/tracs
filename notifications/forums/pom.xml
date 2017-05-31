@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
-  <name>Tracs Notifications Util</name>
+  <name>Tracs Notifications Forums</name>
   <parent>
     <groupId>edu.txstate.tracs</groupId>
-    <artifactId>tracs-notifications-base</artifactId>
+    <artifactId>notifications-base</artifactId>
     <version>1.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>edu.txstate.tracs</groupId>
-  <artifactId>tracs-notifications-util</artifactId>
+  <artifactId>notifications-forums</artifactId>
   <packaging>jar</packaging>
   <properties>
     <deploy.target>shared</deploy.target>
@@ -20,21 +20,22 @@
       <artifactId>commons-logging</artifactId>
       <version>${sakai.commons-logging.version}</version>
     </dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-		</dependency>
     <dependency>
       <groupId>org.sakaiproject.kernel</groupId>
       <artifactId>sakai-kernel-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sakaiproject.kernel</groupId>
-      <artifactId>sakai-component-manager</artifactId>
+      <groupId>org.sakaiproject.msgcntr</groupId>
+      <artifactId>messageforums-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sakaiproject.entitybroker</groupId>
       <artifactId>entitybroker-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>edu.txstate.tracs</groupId>
+      <artifactId>notifications-util</artifactId>
+      <version>${tracsnotifyVersion}</version>
     </dependency>
   </dependencies>
   <build>

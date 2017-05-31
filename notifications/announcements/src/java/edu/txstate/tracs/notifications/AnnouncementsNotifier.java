@@ -10,11 +10,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.sakaiproject.announcement.api.AnnouncementMessage;
+import org.sakaiproject.announcement.api.AnnouncementMessageHeader;
 import org.sakaiproject.announcement.api.AnnouncementService;
+import org.sakaiproject.authz.api.Member;
+import org.sakaiproject.message.api.MessageHeader.MessageAccess;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.event.api.Event;
+import org.sakaiproject.site.api.Group;
 /**
  * Watches for announcement changes, POSTs to our mobile notification service
  */
@@ -59,41 +63,53 @@ public class AnnouncementsNotifier implements Observer {
     }
 
     public void update(Observable o, Object arg) {
-        Event event = (Event) arg;
-        System.out.println("received "+event.getEvent()+" event for ticket " + event.getResource());
-
+      Event event = (Event) arg;
+      System.out.println("received "+event.getEvent()+" event for ticket " + event.getResource());
+      try {
         if (updates.contains(event.getEvent())) {
-          try {
-            Reference ref = entityManager.newReference(event.getResource());
-            AnnouncementMessage m = (AnnouncementMessage) announceService.getMessage(ref);
+          Reference ref = entityManager.newReference(event.getResource());
+          AnnouncementMessage m = (AnnouncementMessage) announceService.getMessage(ref);
 
-            Calendar releaseDate;
-            String releaseDateStr = m.getProperties().getProperty(AnnouncementService.RELEASE_DATE);
-            System.out.println("release date = "+releaseDateStr);
-            if (releaseDateStr != null)
-              releaseDate = notifyUtils.translateDate(releaseDateStr);
-            else releaseDate = Calendar.getInstance();
+          Calendar releaseDate;
+          String releaseDateStr = m.getProperties().getProperty(AnnouncementService.RELEASE_DATE);
+          if (releaseDateStr != null)
+            releaseDate = notifyUtils.translateDate(releaseDateStr);
+          else releaseDate = Calendar.getInstance();
 
-            String contenthash = notifyUtils.hashContent(m.getAnnouncementHeader().getSubject(), m.getBody());
-            System.out.println("content hash = "+contenthash);
+          String contenthash = notifyUtils.hashContent(m.getAnnouncementHeader().getSubject(), m.getBody());
 
-            List<String> userids = notifyUtils.getAllUserIdsExcept(event.getContext(), event.getUserId());
-            for (String uid : userids) System.out.println("userid: "+uid);
+          List<String> userids = getNotifyList(event.getContext(), event.getUserId(), m);
+          for (String uid : userids) System.out.println("userid: "+uid);
 
-            System.out.println("announcement update detected");
-            if (announceService.isMessageViewable(m)) {
-              System.out.println("message is viewable, send notification immediately");
-              notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash);
-            } else if (m.getHeader().getDraft()) System.out.println("message is in draft mode, delete any scheduled notification");
-            else if (releaseDate.after(Calendar.getInstance())) System.out.println("message is scheduled for "+notifyUtils.dateToJson(releaseDate));
-            else System.out.println("message is scheduled for the past, delete any scheduled notification");
-          } catch (Exception e) {
-            // don't send a notification
-            e.printStackTrace();
-          }
+          if (m.getHeader().getDraft()) {
+            System.out.println("message is in draft mode, delete any scheduled notification");
+            notifyUtils.deleteForObject("announcement", ref.getId());
+          } else if (announceService.isMessageViewable(m)) {
+            notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);
+          } else if (releaseDate.after(Calendar.getInstance())) {
+            notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);
+          } else notifyUtils.deleteForObject("announcement", ref.getId());
         } else if (deletes.contains(event.getEvent())) {
           Reference ref = entityManager.newReference(event.getResource());
           notifyUtils.deleteForObject("announcement", ref.getId());
         }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    public List<String> getNotifyList(String siteid, String author, AnnouncementMessage m) throws Exception {
+      AnnouncementMessageHeader h = m.getAnnouncementHeader();
+      if (h.getAccess() == MessageAccess.GROUPED) {
+        List<String> ret = new ArrayList<String>();
+        for (Group g : h.getGroupObjects()) {
+          for (Member mem : g.getMembers()) {
+            if (mem.getUserId() != author) ret.add(mem.getUserEid());
+          }
+        }
+        return ret;
+      } else {
+        return notifyUtils.getAllUserIdsExcept(siteid, author);
+      }
     }
 }

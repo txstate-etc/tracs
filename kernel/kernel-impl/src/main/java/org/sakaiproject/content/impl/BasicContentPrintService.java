@@ -26,8 +26,8 @@ import java.util.HashMap;
 
 import org.sakaiproject.content.api.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class BasicContentPrintService implements ContentPrintService
 {
 	/** Our logger. */
-	private static Logger M_log = LoggerFactory.getLogger(BasicContentPrintService.class);
+	private static Log M_log = LogFactory.getLog(BasicContentPrintService.class);
 
 	/**
 	 * {@inheritDoc}

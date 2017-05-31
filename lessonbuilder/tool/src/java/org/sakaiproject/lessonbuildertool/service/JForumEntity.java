@@ -44,9 +44,7 @@ import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.tool.api.ActiveTool;
 import org.sakaiproject.tool.cover.ActiveToolManager;
 import org.sakaiproject.site.cover.SiteService;
-import org.sakaiproject.component.cover.ServerConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.sakaiproject.component.cover.ServerConfigurationService;             
 import org.sakaiproject.component.cover.ComponentManager;
 
 import org.sakaiproject.lessonbuildertool.service.LessonSubmission;
@@ -77,7 +75,6 @@ import uk.org.ponder.messageutil.MessageLocator;
 
 public class JForumEntity implements LessonEntity, ForumInterface {
 
-    private static final Logger log = LoggerFactory.getLogger(JForumEntity.class);
     static boolean initdone = false;
     static boolean haveJforum = false;
 
@@ -87,7 +84,7 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 	if (ComponentManager.get("org.etudes.api.app.jforum.JforumService") != null ||
 	    ComponentManager.get("org.etudes.api.app.jforum.JForumService") != null)
 	    haveJforum = true;
-	log.info("JforumEntity init: haveJforum = " + haveJforum);
+	System.out.println("JforumEntity init: haveJforum = " + haveJforum);
     }
 
     // to create bean. the bean is used only to call the pseudo-static
@@ -216,7 +213,7 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 
 	    // String toolid = "8f83cd4b-74ca-4428-0055-85ddd19a8d00";
 	} catch (Exception e) {
-	    log.info("tool problem " + e);
+	    System.out.println("tool problem " + e);
 	}
 
 	Connection connection = null;
@@ -288,7 +285,7 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 			}
 		}
 	} catch (Exception e) {
-	    log.info("JForum Lesson Builder find all in site error " + e);
+	    System.out.println("JForum Lesson Builder find all in site error " + e);
 	} finally {
 	    try {
 		if (connection != null)
@@ -372,7 +369,7 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 		name = titles.get(0);
 
 	} catch (Exception e) {
-	    log.info("JForum Lesson Builder get name error " + e);
+	    System.out.println("JForum Lesson Builder get name error " + e);
 	} finally {
 	    try {
 		if (connection != null)
@@ -410,7 +407,7 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 	    prefix = ServerConfigurationService.getToolUrl() + "/" + siteTool.getId();
 	    // String toolid = "8f83cd4b-74ca-4428-0055-85ddd19a8d00";
 	} catch (Exception e) {
-	    log.info("tool problem " + e);
+	    System.out.println("tool problem " + e);
 	    return null;
 	}
 
@@ -485,7 +482,7 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 	    }
 
 	} catch (Exception e) {
-	    log.info("JForum Lesson Builder get name error " + e);
+	    System.out.println("JForum Lesson Builder get name error " + e);
 	} finally {
 	    try {
 		if (connection != null)
@@ -592,14 +589,14 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 
 	JForumTitle title = titles.get(0);
 
-	//	log.info("object " + "jforum_topic/" + title.category + "\n" + title.forum + "\n" + title.topic);
+	//	System.out.println("object " + "jforum_topic/" + title.category + "\n" + title.forum + "\n" + title.topic);
 	return "jforum_topic/" + title.category + "\n" + title.forum + "\n" + title.topic;
 
     }
 
     // objectid is titles of category, forum, topic. find the topic and return a string with its ID
     public String findObject(String objectid, Map<String,String>objectMap, String siteid) {
-	//	log.info("findobject " + objectid);
+	//	System.out.println("findobject " + objectid);
 	if (!haveJforum || !objectid.startsWith("jforum_topic/")) {
 	    if (nextEntity != null) 
 		return nextEntity.findObject(objectid, objectMap, siteid);
@@ -634,7 +631,7 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 	    
 	// unfortunately we have to search the topic tree to find it.
 
-	//	log.info("parsed " + category + ">" + forum +">" + topic);
+	//	System.out.println("parsed " + category + ">" + forum +">" + topic);
 
 	List<LessonEntity>ret = new ArrayList<LessonEntity>();
 	
@@ -654,7 +651,7 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 		}
 	    });
 
-	//	log.info("found categories" + categories);
+	//	System.out.println("found categories" + categories);
 	if (categories == null || categories.size() < 1)
 	    return null;
 
@@ -680,7 +677,7 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 	    }
 	}
 
-	//	log.info("found forums " + forums);
+	//	System.out.println("found forums " + forums);
 	if (forums == null || forums.size() < 1) 
 	    return null;
 
@@ -707,14 +704,14 @@ public class JForumEntity implements LessonEntity, ForumInterface {
 	    }
 	}
 	
-	//	log.info("topics " + topics);
+	//	System.out.println("topics " + topics);
 	if (topics == null || topics.size() < 1)
 	    return null;
 
 	// there will be only one non-null topic
 	for (Integer t: topics) {
 	    if (t != null) {
-		//log.info("return " + "/jforum_topic/" + t);
+		//System.out.println("return " + "/jforum_topic/" + t);
 		return "/jforum_topic/" + t;
 	    }
 	}

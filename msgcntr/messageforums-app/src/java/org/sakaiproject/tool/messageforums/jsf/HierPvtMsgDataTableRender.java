@@ -21,8 +21,8 @@
 package org.sakaiproject.tool.messageforums.jsf;
 
 import com.sun.faces.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
@@ -50,7 +50,8 @@ import org.sakaiproject.component.cover.ComponentManager;
  * Preferences - Java - Code Style - Code Templates
  */
 public class HierPvtMsgDataTableRender extends HtmlBasicRenderer {
-	protected static Logger log = LoggerFactory.getLogger(HierPvtMsgDataTableRender.class);
+	protected static Log log = LogFactory
+			.getLog(HierPvtMsgDataTableRender.class);
 
 	private static final String RESOURCE_PATH;
 

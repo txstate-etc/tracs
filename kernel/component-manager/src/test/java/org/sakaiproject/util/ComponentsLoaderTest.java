@@ -42,7 +42,9 @@ public class ComponentsLoaderTest {
 	@After
 	public void tearDown() throws Exception {
 		builder.tearDown();
+		NoisierDefaultListableBeanFactory.noisyClose = false;
 		componentMgr.close();
+		NoisierDefaultListableBeanFactory.noisyClose = true;
 	}
 	
 	/**

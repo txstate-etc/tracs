@@ -11,7 +11,7 @@
   <directives>
     <directive name="omitXmlDeclaration" value="true" />
     <directive name="omitDoctypeDeclaration" value="true" />
-    <directive name="maxInputSize" value="150000" /><!-- default of 100k -->
+    <!-- directive name="maxInputSize" value="100000" / --><!-- default of 100k -->
     <directive name="useXHTML" value="true" /><!-- allow loose html, default true -->
     <directive name="validateParamAsEmbed" value="true" />
     <directive name="onUnknownTag" value="remove" /><!-- default remove, encode will keep the tag as HTML entities encoding -->
@@ -432,64 +432,6 @@
                 <regexp name="number"/>
             </regexp-list>
          </attribute>
-
-         <!-- Added for TRACS -->
-         <!-- margin attributes for pasting from word -->
-        <attribute name="margin">
-            <literal-list>
-                <literal value="inherit"/>
-                <literal value="auto"/>
-            </literal-list>
-            <regexp-list>
-                <regexp name="number" />
-                <regexp name="length"/>
-                <regexp name="percentage"/>
-            </regexp-list>
-        </attribute>
-        <attribute name="margin-top">
-            <literal-list>
-                <literal value="inherit"/>
-                <literal value="auto"/>
-            </literal-list>
-            <regexp-list>
-                <regexp name="number" />
-                <regexp name="length"/>
-                <regexp name="percentage"/>
-            </regexp-list>
-        </attribute>
-        <attribute name="margin-right">
-            <literal-list>
-                <literal value="inherit"/>
-                <literal value="auto"/>
-            </literal-list>
-            <regexp-list>
-                <regexp name="number" />
-                <regexp name="length"/>
-                <regexp name="percentage"/>
-            </regexp-list>
-        </attribute>
-        <attribute name="margin-bottom">
-            <literal-list>
-                <literal value="inherit"/>
-                <literal value="auto"/>
-            </literal-list>
-            <regexp-list>
-                <regexp name="number" />
-                <regexp name="length"/>
-                <regexp name="percentage"/>
-            </regexp-list>
-        </attribute>
-        <attribute name="margin-left">
-            <literal-list>
-                <literal value="inherit"/>
-                <literal value="auto"/>
-            </literal-list>
-            <regexp-list>
-                <regexp name="number" />
-                <regexp name="length"/>
-                <regexp name="percentage"/>
-            </regexp-list>
-        </attribute>
 
         <!-- MathML common attributes -->
         <attribute name="xref">
@@ -1140,12 +1082,6 @@
         <!-- Not valid in base, br, frame, frameset, hr, iframe, param, and script elements.  -->
         <attribute name="lang"/>
         <attribute name="dir"/>
-        <!-- margin attributes for pasting from word -->
-        <attribute name="margin"/>
-        <attribute name="margin-right"/>
-        <attribute name="margin-left"/>
-        <attribute name="margin-top"/>
-        <attribute name="margin-bottom"/>
     </global-tag-attributes>
 
     <!-- You can declare tags here that will not be removed, filtered, validated or truncated, but encoded using HTML entities -->
@@ -1217,7 +1153,7 @@
             hardened so this is safe to do, if it's something you want to allow. Beware the <><ing possibilities!
          -->
             
-        <tag name="form" action="remove">
+        <tag name="form" action="validate">
             
             <attribute name="action">
                 <regexp-list>

@@ -23,8 +23,8 @@
 package org.sakaiproject.tool.assessment.ui.web.action;
 import javax.servlet.http.HttpServlet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.cover.ComponentManager;
 
 import org.sakaiproject.tool.assessment.facade.AssessmentFacadeQueriesAPI;
@@ -60,7 +60,7 @@ public class InitAction extends HttpServlet{
 	 * 
 	 */
 	private static final long serialVersionUID = 8101462284850616249L;
-private static Logger log = LoggerFactory.getLogger(InitAction.class);
+private static Log log = LogFactory.getLog(InitAction.class);
 
   public void init(){
     // store all types in memory

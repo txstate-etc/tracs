@@ -28,18 +28,30 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.cover.ServerConfigurationService;
+import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.portal.api.Portal;
 import org.sakaiproject.portal.api.PortalService;
 import org.sakaiproject.portal.api.StoredState;
 import org.sakaiproject.portal.render.api.RenderResult;
 import org.sakaiproject.portal.render.api.ToolRenderException;
 import org.sakaiproject.portal.render.api.ToolRenderService;
+import org.sakaiproject.portal.util.ByteArrayServletResponse;
 import org.sakaiproject.portal.util.URLUtils;
+import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
+import org.sakaiproject.site.cover.SiteService;
+import org.sakaiproject.tool.api.ActiveTool;
+import org.sakaiproject.tool.api.Session;
+import org.sakaiproject.tool.api.Tool;
+import org.sakaiproject.tool.api.ToolException;
+import org.sakaiproject.tool.api.ToolSession;
+import org.sakaiproject.tool.cover.ActiveToolManager;
+import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.util.Web;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * I Frame tool renderer, renders the iframe header to contain the tool content
@@ -51,7 +63,7 @@ import org.slf4j.LoggerFactory;
 public class IFrameToolRenderService implements ToolRenderService
 {
 
-	private static final Logger LOG = LoggerFactory.getLogger(IFrameToolRenderService.class);
+	private static final Log LOG = LogFactory.getLog(IFrameToolRenderService.class);
 
 	private PortalService portalService;
 
@@ -122,8 +134,8 @@ public class IFrameToolRenderService implements ToolRenderService
 
 		sb.append("\">") .append("\n").append("</iframe>");
 		
-		RenderResult result = new RenderResult() {
-						
+		RenderResult result = new RenderResult()
+		{
 			public String getHead() {
 				return "";
 			}
@@ -152,7 +164,7 @@ public class IFrameToolRenderService implements ToolRenderService
 				return null;
 			}
 		};
-		
+
 		return result;
 	}
 

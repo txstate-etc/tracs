@@ -22,8 +22,8 @@
 package org.sakaiproject.poll.tool.validators;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.poll.model.Option;
 import org.sakaiproject.poll.util.PollUtils;
 import org.sakaiproject.util.FormattedText;
@@ -34,7 +34,7 @@ import org.springframework.validation.Validator;
 public class OptionValidator implements Validator {
 
 	/** Logger for this class and subclasses */
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Log logger = LogFactory.getLog(getClass());
 	public String submissionStatus;
 	
 	public boolean supports(Class clazz) {

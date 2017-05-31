@@ -32,8 +32,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.radeox.Messages;
 import org.radeox.util.Encoder;
 
@@ -47,7 +47,7 @@ import org.radeox.util.Encoder;
 
 public abstract class TextFileUrlMapper implements UrlMapper
 {
-	private static Logger log = LoggerFactory.getLogger(TextFileUrlMapper.class);
+	private static Log log = LogFactory.getLog(TextFileUrlMapper.class);
 
 	private Map services;
 

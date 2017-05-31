@@ -1,8 +1,5 @@
 package org.sakaiproject.gradebookng.business;
 
-import java.math.RoundingMode;
-import java.text.Format;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,7 +18,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.math.NumberUtils;
@@ -72,6 +68,7 @@ import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.util.ResourceLoader;
 
 import lombok.Setter;
+import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * Business service for GradebookNG
@@ -87,7 +84,7 @@ import lombok.Setter;
 // TODO some of these methods pass in empty lists and its confusing. If we
 // aren't doing paging, remove this.
 
-@Slf4j
+@CommonsLog
 public class GradebookNgBusinessService {
 
 	@Setter
@@ -492,20 +489,13 @@ public class GradebookNgBusinessService {
 			// the passed in grades represents a percentage so the number needs to be adjusted back to points
 			final Double newGradePercentage = NumberUtils.toDouble(newGrade);
 			final Double newGradePointsFromPercentage = (newGradePercentage / 100) * maxPoints;
-			newGradeAdjusted = FormatHelper.formatDoubleToDecimal(newGradePointsFromPercentage);
+			newGradeAdjusted = FormatHelper.formatDoubleToTwoDecimalPlaces(newGradePointsFromPercentage);
 
 			// only convert if we had a previous value otherwise it will be out of sync
 			if (StringUtils.isNotBlank(oldGradeAdjusted)) {
-				// To check if our data is out of date, we first compare what we think
-				// is the latest saved score against score stored in the database. As the score
-				// is stored as points, we must convert this to a percentage. To be sure we're
-				// comparing apples with apples, we first determine the number of decimal places
-				// on the score, so the converted points-as-percentage is in the expected format.
-
 				final Double oldGradePercentage = NumberUtils.toDouble(oldGrade);
 				final Double oldGradePointsFromPercentage = (oldGradePercentage / 100) * maxPoints;
-
-				oldGradeAdjusted = FormatHelper.formatDoubleToMatch(oldGradePointsFromPercentage, storedGradeAdjusted);
+				oldGradeAdjusted = FormatHelper.formatDoubleToTwoDecimalPlaces(oldGradePointsFromPercentage);
 			}
 
 			// we dont need processing of the stored grade as the service does that when persisting.
@@ -620,8 +610,6 @@ public class GradebookNgBusinessService {
 	 * @param studentUuids student uuids
 	 * @param uiSettings the settings from the UI that wraps up preferences
 	 * @return
-	 *
-	 * TODO refactor this into a hierarchical method structure
 	 */
 	public List<GbStudentGradeInfo> buildGradeMatrix(final List<Assignment> assignments,
 			final List<String> studentUuids, final GradebookUiSettings uiSettings) throws GbException {
@@ -826,12 +814,13 @@ public class GradebookNgBusinessService {
 					}
 
 					final Double categoryScore = this.gradebookService.calculateCategoryScore(gradebook,
-							student.getId(), category, category.getAssignmentList(), gradeMap);
+							student.getId(), category, assignments, gradeMap);
 
 					// add to GbStudentGradeInfo
 					sg.addCategoryAverage(category.getId(), categoryScore);
 
-					// TODO the TA permission check could reuse this iteration... check performance.
+					// TODO the TA permission check could reuse this
+					// iteration... check performance.
 
 				}
 			}
@@ -1017,7 +1006,15 @@ public class GradebookNgBusinessService {
 
 		final List<GbGroup> rval = new ArrayList<>();
 
-		// get groups (handles both groups and sections)
+		// get sections
+		// groups handles both
+		/*
+		 * try { Set<Section> sections = courseManagementService.getSections(siteId); for(Section section: sections){ rval.add(new
+		 * GbGroup(section.getEid(), section.getTitle(), GbGroup.Type.SECTION)); } } catch (IdNotFoundException e) { //not a course site or
+		 * no sections, ignore }
+		 */
+
+		// get groups
 		try {
 			final Site site = this.siteService.getSite(siteId);
 			final Collection<Group> groups = site.getGroups();
@@ -1292,7 +1289,8 @@ public class GradebookNgBusinessService {
 	 * @return
 	 */
 	public Assignment getAssignment(final long assignmentId) {
-		return this.getAssignment(getCurrentSiteId(), assignmentId);
+		final String siteId = getCurrentSiteId();
+		return this.getAssignment(siteId, assignmentId);
 	}
 
 	/**
@@ -1306,34 +1304,6 @@ public class GradebookNgBusinessService {
 		final Gradebook gradebook = getGradebook(siteId);
 		if (gradebook != null) {
 			return this.gradebookService.getAssignment(gradebook.getUid(), assignmentId);
-		}
-		return null;
-	}
-
-	/**
-	 * Get an Assignment in the current site given the assignment name
-	 * This should be avoided where possible but is required for the import process to allow modification of assignment point values
-	 *
-	 * @param assignmentName
-	 * @return
-	 */
-	public Assignment getAssignment(final String assignmentName) {
-		return this.getAssignment(getCurrentSiteId(), assignmentName);
-	}
-
-	/**
-	 * Get an Assignment in the specified site given the assignment name
-	 * This should be avoided where possible but is required for the import process to allow modification of assignment point values
-	 *
-	 * @param siteId
-	 * @param assignmentName
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	public Assignment getAssignment(final String siteId, final String assignmentName) {
-		final Gradebook gradebook = getGradebook(siteId);
-		if (gradebook != null) {
-			return this.gradebookService.getAssignment(gradebook.getUid(), assignmentName);
 		}
 		return null;
 	}
@@ -1366,7 +1336,7 @@ public class GradebookNgBusinessService {
 
 			for (int i = 0; i < assignments.size(); i++) {
 				final Assignment a = assignments.get(i);
-				if (assignmentId == a.getId() && a.getSortOrder() != null) {
+				if (assignmentId == a.getId()) {
 					return a.getSortOrder();
 				}
 			}
@@ -2033,8 +2003,8 @@ public class GradebookNgBusinessService {
 			final int gradeIndex1 = this.ascendingGrades.indexOf(letterGrade1);
 			final int gradeIndex2 = this.ascendingGrades.indexOf(letterGrade2);
 
-			final Double calculatedGrade1 = cg1.getCalculatedGrade() == null ? null : Double.valueOf(cg1.getCalculatedGrade());
-			final Double calculatedGrade2 = cg2.getCalculatedGrade() == null ? null : Double.valueOf(cg2.getCalculatedGrade());
+			final Double calculatedGrade1 = Double.valueOf(cg1.getCalculatedGrade());
+			final Double calculatedGrade2 = Double.valueOf(cg2.getCalculatedGrade());
 
 			return new CompareToBuilder()
 					.append(gradeIndex1, gradeIndex2)

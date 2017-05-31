@@ -2,14 +2,13 @@ package org.sakaiproject.tool.assessment.data.dao.assessment;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Category;
 
 public class EventLogData
 implements java.io.Serializable{
 
 	private static final long serialVersionUID = 1L;
-	static Logger errorLogger = LoggerFactory.getLogger("errorLogger");
+	static Category errorLogger = Category.getInstance("errorLogger");
 
 	private Long eventLogId;
 	private Long assessmentId;

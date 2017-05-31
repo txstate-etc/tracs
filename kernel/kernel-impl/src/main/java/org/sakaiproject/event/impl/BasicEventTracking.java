@@ -21,8 +21,8 @@
 
 package org.sakaiproject.event.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.event.api.Event;
 
 /**
@@ -36,7 +36,7 @@ import org.sakaiproject.event.api.Event;
 public abstract class BasicEventTracking extends BaseEventTrackingService
 {
 	/** Our logger. */
-	private static Logger M_log = LoggerFactory.getLogger(BasicEventTracking.class);
+	private static Log M_log = LogFactory.getLog(BasicEventTracking.class);
 
 	/** String used to identify this service in the logs */
 	protected static final String m_logId = "EventTracking: ";

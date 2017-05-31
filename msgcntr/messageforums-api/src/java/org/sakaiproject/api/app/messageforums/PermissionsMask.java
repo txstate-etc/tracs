@@ -26,8 +26,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is critical for the interaction with AuthorizationManager.
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PermissionsMask implements Map
 {
-  private static final Logger LOG = LoggerFactory.getLogger(PermissionsMask.class);
+  private static final Log LOG = LogFactory.getLog(PermissionsMask.class);
 
   private Map map;
 

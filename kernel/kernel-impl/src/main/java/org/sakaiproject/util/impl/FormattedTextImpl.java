@@ -32,8 +32,8 @@ import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.w3c.dom.Element;
 
@@ -50,20 +50,13 @@ import org.sakaiproject.util.ResourceLoader;
 import org.sakaiproject.util.Xml;
 import org.sakaiproject.util.api.FormattedText;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.CharacterCodingException;
-
 /**
  * FormattedText provides support for user entry of formatted text; the formatted text is HTML. This includes text formatting in user input such as bold, underline, and fonts.
  */
 public class FormattedTextImpl implements FormattedText
 {
     /** Our log (commons). */
-    private static final Logger M_log = LoggerFactory.getLogger(FormattedTextImpl.class);
+    private static final Log M_log = LogFactory.getLog(FormattedTextImpl.class);
 
     private ServerConfigurationService serverConfigurationService = null;
     public void setServerConfigurationService(ServerConfigurationService serverConfigurationService) {
@@ -96,8 +89,6 @@ public class FormattedTextImpl implements FormattedText
     private boolean showDetailedErrorToUser = false;
     private boolean returnErrorToTool = false;
     private boolean logErrors = false;
-    private boolean cleanUTF8 = true;
-    private String restrictReplacement = null;
 
     private final String DEFAULT_RESOURCECLASS = "org.sakaiproject.localization.util.ContentProperties";
     protected final String DEFAULT_RESOURCEBUNDLE = "org.sakaiproject.localization.bundle.content.content";
@@ -108,10 +99,6 @@ public class FormattedTextImpl implements FormattedText
         boolean useLegacy = false;
         if (serverConfigurationService != null) { // this keeps the tests from dying
             useLegacy = serverConfigurationService.getBoolean("content.cleaner.use.legacy.html", useLegacy);
-
-            //Filter content output to limited unicode characters KNL-1431
-            cleanUTF8 = serverConfigurationService.getBoolean("content.cleaner.filter.utf8",cleanUTF8);
-            restrictReplacement = serverConfigurationService.getString("content.cleaner.filter.utf8.replacement",restrictReplacement);
 
             /* KNL-1075 - content.cleaner.errors.handling = none|logged|return|notify|display
              * - none - errors are completely ignored and not even stored at all
@@ -186,24 +173,6 @@ public class FormattedTextImpl implements FormattedText
             throw new IllegalStateException("Unable to startup the antisamy html code cleanup handler (cannot complete startup): " + e, e);
         }
 
-    }
-
-    /*
-        Removes surrogates from a string http://stackoverflow.com/a/12867139/3708872
-        @param str Value to process
-    */
-    public String removeSurrogates(String str) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (!Character.isSurrogate(c)) {
-                sb.append(c);
-            }
-            else if (restrictReplacement != null) {
-                sb.append(restrictReplacement);
-            }
-        }
-        return sb.toString();
     }
 
     boolean defaultAddBlankTargetToLinks = true;
@@ -366,9 +335,6 @@ public class FormattedTextImpl implements FormattedText
         }
 
         try {
-            if (cleanUTF8) {
-                val = removeSurrogates(val);
-            }
             if (replaceWhitespaceTags) {
                 // normalize all variants of the "<br>" HTML tag to be "<br />\n"
                 val = M_patternTagBr.matcher(val).replaceAll("<br />");
@@ -386,7 +352,7 @@ public class FormattedTextImpl implements FormattedText
                     as = antiSamyLow;
                 }
                 try {
-                    CleanResults cr = as.scan(val);
+                    CleanResults cr = as.scan(strFromBrowser);
                     if (cr.getNumberOfErrors() > 0) {
                         // TODO currently no way to get internationalized versions of error messages
                         for (String errorMsg : cr.getErrorMessages()) {
@@ -440,7 +406,7 @@ public class FormattedTextImpl implements FormattedText
                 }
             }
             if (logErrors && M_log.isInfoEnabled()) {
-                // KNL-1075 - Logger errors if desired so they can be easily found
+                // KNL-1075 - Log errors if desired so they can be easily found
                 String user = "UNKNOWN";
                 try {
                     user = sessionManager.getCurrentSession().getUserEid();
@@ -496,9 +462,6 @@ public class FormattedTextImpl implements FormattedText
     {
         if (value == null) return "";
         if (value.length() == 0) return "";
-        if (cleanUTF8) {
-            value = removeSurrogates(value);
-        }
 
         if (supressNewlines)
         {
@@ -1201,34 +1164,53 @@ public class FormattedTextImpl implements FormattedText
 
     @Override
     public String stripHtmlFromText(String text, boolean smartSpacing) {
-        return stripHtmlFromText(text, smartSpacing, false);
+        // KNL-1253 use Jsoup
+        if (text != null && !"".equals(text)) {
+            if (smartSpacing) {
+                // replace block level html with an extra space (to try to preserve the intent)
+                text = addSmartSpacing(text);
+            }
+            text = org.jsoup.Jsoup.clean(text, "", org.jsoup.safety.Whitelist.none(), new org.jsoup.nodes.Document.OutputSettings().prettyPrint(false).outline(false));
+            if (smartSpacing) {
+                text = eliminateExtraWhiteSpace(text);
+            }
+        }
+        return text;
     }
 
     @Override
     public String stripHtmlFromText(String text, boolean smartSpacing, boolean stripEscapeSequences)
     {
-        if (StringUtils.isBlank(text)) return text;
-
-        if (smartSpacing) {
-            text = text.replaceAll("/br>", "/br> ").replaceAll("/p>", "/p> ").replaceAll("/tr>", "/tr> ");
+        // KNL-1267	--bbailla2
+        if (!stripEscapeSequences)
+        {
+            return stripHtmlFromText(text, smartSpacing);
         }
 
-        if (stripEscapeSequences) {
-            org.jsoup.nodes.Document document = org.jsoup.Jsoup.parse(text);
-            org.jsoup.nodes.Element body = document.body();
-            //remove any html tags, unescape any escape characters
-            text = body.text();
-            //&nbsp; are converted to char code 160, java doesn't treat it like whitespace, so replace it with ' '
-            text = text.replace((char)160, ' ');
-        } else {
-            text = org.jsoup.Jsoup.clean(text, "", org.jsoup.safety.Whitelist.none(), new org.jsoup.nodes.Document.OutputSettings().prettyPrint(false).outline(false));
+        if (smartSpacing)
+        {
+            text = addSmartSpacing(text);
         }
 
-        if (smartSpacing || stripEscapeSequences) {
-            text = text.replaceAll("\\s+", " ");
-        }
+        org.jsoup.nodes.Document document = org.jsoup.Jsoup.parse(text);
+        org.jsoup.nodes.Element body = document.body();
+        //remove any html tags, unescape any escape characters
+        String strippedText = body.text();
+        //&nbsp; are converted to char code 160, java doesn't treat it like whitespace, so replace it with ' '
+        //Could there be others like this?
+        strippedText = strippedText.replace((char)160, ' ');
+        strippedText = eliminateExtraWhiteSpace(strippedText);
+        return strippedText;
+    }
 
-        return text.trim();
+    private String addSmartSpacing(String text)
+    {
+        return text.replaceAll("/br>", "/br> ").replaceAll("/p>", "/p> ").replaceAll("/tr>", "/tr> ");
+    }
+
+    private String eliminateExtraWhiteSpace(String text)
+    {
+        return text.replaceAll("\\s+", " ").trim();
     }
 
     public NumberFormat getNumberFormat(Integer maxFractionDigits, Integer minFractionDigits, Boolean groupingUsed) {
@@ -1256,7 +1238,7 @@ public class FormattedTextImpl implements FormattedText
     /**
      * SAK-23567 Gets the shortened version of the title
      *
-     * Controlled by "site.title.cut.method", "site.title.cut.maxlength", and "site.title.cut.separator"
+     * Controlled by "site.title.cut.method", "site.title.maxlength", and "site.title.cut.separator"
      *
      * @param text the full site title (or desc) to shorten
      * @param maxLength maximum length for the string before it is shortened (and after shortening) (null defaults to 25)
@@ -1267,8 +1249,7 @@ public class FormattedTextImpl implements FormattedText
     public String makeShortenedText(String text, Integer maxLength, String separator, String cutMethod) {
         // this method defines the defaults for the 3 configuration options
         if (maxLength == null || maxLength < 1) {
-        	// SAK-31985: New property needed to control the site title
-            maxLength = serverConfigurationService.getInt("site.title.cut.maxlength", serverConfigurationService.getInt("site.title.maxlength", 25));
+            maxLength = serverConfigurationService.getInt("site.title.maxlength", 25);
         }
         if (separator == null) {
             separator = serverConfigurationService.getString("site.title.cut.separator", " ...");

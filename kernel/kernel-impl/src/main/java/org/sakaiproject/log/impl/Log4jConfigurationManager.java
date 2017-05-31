@@ -26,8 +26,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.*;
 import org.apache.log4j.spi.ErrorHandler;
 import org.apache.log4j.spi.Filter;
@@ -43,9 +44,11 @@ import org.sakaiproject.util.StringUtil;
  * Log4jConfigurationManager lets us configure the log4j system with overrides from sakai.properties. Someday it might even have a service API for other fun things!
  * </p>
  */
-@Slf4j
 public abstract class Log4jConfigurationManager implements LogConfigurationManager
 {
+	/** Our log (commons). */
+	private static Log M_log = LogFactory.getLog(Log4jConfigurationManager.class);
+
 	/**********************************************************************************************************************************************************************************************************************************************************
 	 * Dependencies
 	 *********************************************************************************************************************************************************************************************************************************************************/
@@ -130,13 +133,13 @@ public abstract class Log4jConfigurationManager implements LogConfigurationManag
 					}
 					else
 					{
-						log.warn("invalid log.config entry: ignoring: " + configs[i]);
+						M_log.warn("invalid log.config entry: ignoring: " + configs[i]);
 					}
 				}
 			}
 		}
 
-		log.info("init(): enabled: " + m_enabled);
+		M_log.info("init(): enabled: " + m_enabled);
 	}
 
 	/**
@@ -144,7 +147,7 @@ public abstract class Log4jConfigurationManager implements LogConfigurationManag
 	 */
 	public void destroy()
 	{
-		log.info("destroy()");
+		M_log.info("destroy()");
 	}
 
 	/**
@@ -163,24 +166,25 @@ public abstract class Log4jConfigurationManager implements LogConfigurationManag
 			if (logger != null)
 			{
 				logger.setLevel(org.apache.log4j.Level.OFF);
-				log.info("OFF logging for: " + loggerName);
+				M_log.info("OFF logging for: " + loggerName);
 			}
 			else
 			{
-				log.warn("no logger found: ignoring: " + loggerName);
+				M_log.warn("no logger found: ignoring: " + loggerName);
 			}
 		}
 		else if (level.equals("TRACE"))
 		{
+			// Note: log4j has nothing below debug
 			Logger logger = Logger.getLogger(loggerName);
 			if (logger != null)
 			{
-				logger.setLevel(org.apache.log4j.Level.TRACE);
-				log.info("TRACE logging for: " + loggerName);
+				logger.setLevel(org.apache.log4j.Level.DEBUG);
+				M_log.info("TRACE (DEBUG) logging for: " + loggerName);
 			}
 			else
 			{
-				log.warn("no logger found: ignoring: " + loggerName);
+				M_log.warn("no logger found: ignoring: " + loggerName);
 			}
 		}
 		else if (level.equals("DEBUG"))
@@ -189,11 +193,11 @@ public abstract class Log4jConfigurationManager implements LogConfigurationManag
 			if (logger != null)
 			{
 				logger.setLevel(org.apache.log4j.Level.DEBUG);
-				log.info("DEBUG logging for: " + loggerName);
+				M_log.info("DEBUG logging for: " + loggerName);
 			}
 			else
 			{
-				log.warn("no logger found: ignoring: " + loggerName);
+				M_log.warn("no logger found: ignoring: " + loggerName);
 			}
 		}
 		else if (level.equals("INFO"))
@@ -202,11 +206,11 @@ public abstract class Log4jConfigurationManager implements LogConfigurationManag
 			if (logger != null)
 			{
 				logger.setLevel(org.apache.log4j.Level.INFO);
-				log.info("INFO logging for: " + loggerName);
+				M_log.info("INFO logging for: " + loggerName);
 			}
 			else
 			{
-				log.warn("no logger found: ignoring: " + loggerName);
+				M_log.warn("no logger found: ignoring: " + loggerName);
 			}
 		}
 		else if (level.equals("WARN"))
@@ -215,11 +219,11 @@ public abstract class Log4jConfigurationManager implements LogConfigurationManag
 			if (logger != null)
 			{
 				logger.setLevel(org.apache.log4j.Level.WARN);
-				log.info("WARN logging for: " + loggerName);
+				M_log.info("WARN logging for: " + loggerName);
 			}
 			else
 			{
-				log.warn("no logger found: ignoring: " + loggerName);
+				M_log.warn("no logger found: ignoring: " + loggerName);
 			}
 		}
 		else if (level.equals("ERROR"))
@@ -228,11 +232,11 @@ public abstract class Log4jConfigurationManager implements LogConfigurationManag
 			if (logger != null)
 			{
 				logger.setLevel(org.apache.log4j.Level.ERROR);
-				log.info("ERROR logging for: " + loggerName);
+				M_log.info("ERROR logging for: " + loggerName);
 			}
 			else
 			{
-				log.warn("no logger found: ignoring: " + loggerName);
+				M_log.warn("no logger found: ignoring: " + loggerName);
 			}
 		}
 		else if (level.equals("FATAL"))
@@ -241,11 +245,11 @@ public abstract class Log4jConfigurationManager implements LogConfigurationManag
 			if (logger != null)
 			{
 				logger.setLevel(org.apache.log4j.Level.FATAL);
-				log.info("FATAL logging for: " + loggerName);
+				M_log.info("FATAL logging for: " + loggerName);
 			}
 			else
 			{
-				log.warn("no logger found: ignoring: " + loggerName);
+				M_log.warn("no logger found: ignoring: " + loggerName);
 			}
 		}
 		else if (level.equals("ALL"))
@@ -254,16 +258,16 @@ public abstract class Log4jConfigurationManager implements LogConfigurationManag
 			if (logger != null)
 			{
 				logger.setLevel(org.apache.log4j.Level.ALL);
-				log.info("ALL logging for: " + loggerName);
+				M_log.info("ALL logging for: " + loggerName);
 			}
 			else
 			{
-				log.warn("no logger found: ignoring: " + loggerName);
+				M_log.warn("no logger found: ignoring: " + loggerName);
 			}
 		}
 		else
 		{
-			log.warn("invalid log level: ignoring: " + level);
+			M_log.warn("invalid log level: ignoring: " + level);
 			return false;
 		}
 

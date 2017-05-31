@@ -21,8 +21,8 @@
 
 package edu.amc.sakai.user;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.novell.ldap.LDAPConnection;
 
@@ -30,7 +30,7 @@ public class NativeLdapConnectionLivenessValidator
 implements LdapConnectionLivenessValidator {
 
 	/** Class-specific logger */
-	private static Logger log = LoggerFactory.getLogger(NativeLdapConnectionLivenessValidator.class);
+	private static Log log = LogFactory.getLog(NativeLdapConnectionLivenessValidator.class);
 	
 	public boolean isConnectionAlive(LDAPConnection connectionToTest) {
 		if ( log.isDebugEnabled() ) {

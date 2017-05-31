@@ -32,7 +32,6 @@ import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * Hook some Sakai-specific operations into the normal ApplicationContext
@@ -45,7 +44,7 @@ public class SakaiApplicationContext extends GenericApplicationContext {
 	private String[] configLocations;
 
 	public SakaiApplicationContext() {
-		super(new DefaultListableBeanFactory());
+		super(new NoisierDefaultListableBeanFactory());
 	}
 	
 	/**

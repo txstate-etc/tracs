@@ -38,8 +38,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.content.api.ResourceType;
 import org.sakaiproject.content.api.ResourceTypeRegistry;
 import org.sakaiproject.content.api.GroupAwareEntity.AccessMode;
@@ -65,7 +65,8 @@ public class SAXSerializableResourceAccess implements SerializableResourceAccess
 
 	protected static final long START_OF_TIME = 365L * 24L * 60L * 60L * 1000L;
 
-	protected static final Logger log = LoggerFactory.getLogger(SAXSerializableResourceAccess.class);
+	protected static final Log log = LogFactory
+			.getLog(SAXSerializableResourceAccess.class);
 
 	private Type1BaseContentResourceSerializer type1ResourceSerializer;
 
@@ -477,7 +478,7 @@ public class SAXSerializableResourceAccess implements SerializableResourceAccess
 						}
 						catch (UnsupportedEncodingException e)
 						{
-							log.error(e.getMessage(), e);
+							log.error(e);
 						}
 						body = new byte[(int) contentLength];
 						System.arraycopy(decoded, 0, body, 0, (int) contentLength);

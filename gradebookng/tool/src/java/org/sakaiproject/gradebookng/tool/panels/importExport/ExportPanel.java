@@ -1,14 +1,13 @@
 package org.sakaiproject.gradebookng.tool.panels.importExport;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.LoadableDetachableModel;
@@ -24,7 +23,12 @@ import org.sakaiproject.gradebookng.business.util.FormatHelper;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.CourseGrade;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ExportPanel extends Panel {
 
@@ -59,92 +63,74 @@ public class ExportPanel extends Panel {
 	public void onInitialize() {
 		super.onInitialize();
 
-		add(new AjaxCheckBox("includeStudentName", Model.of(this.includeStudentName)) {
-			private static final long serialVersionUID = 1L;
-
+		add(new AjaxCheckBox("includeStudentName", Model.of(includeStudentName)) {
 			@Override
-			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
-				ExportPanel.this.includeStudentName = !ExportPanel.this.includeStudentName;
-				setDefaultModelObject(ExportPanel.this.includeStudentName);
+			protected void onUpdate(AjaxRequestTarget ajaxRequestTarget) {
+				includeStudentName = !includeStudentName;
+				setDefaultModelObject(includeStudentName);
 			}
 		});
-		add(new AjaxCheckBox("includeStudentId", Model.of(this.includeStudentId)) {
-			private static final long serialVersionUID = 1L;
-
+		add(new AjaxCheckBox("includeStudentId", Model.of(includeStudentId)) {
 			@Override
-			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
-				ExportPanel.this.includeStudentId = !ExportPanel.this.includeStudentId;
-				setDefaultModelObject(ExportPanel.this.includeStudentId);
+			protected void onUpdate(AjaxRequestTarget ajaxRequestTarget) {
+				includeStudentId = !includeStudentId;
+				setDefaultModelObject(includeStudentId);
 			}
 		});
-		add(new AjaxCheckBox("includeGradeItemScores", Model.of(this.includeGradeItemScores)) {
-			private static final long serialVersionUID = 1L;
-
+		add(new AjaxCheckBox("includeGradeItemScores", Model.of(includeGradeItemScores)) {
 			@Override
-			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
-				ExportPanel.this.includeGradeItemScores = !ExportPanel.this.includeGradeItemScores;
-				setDefaultModelObject(ExportPanel.this.includeGradeItemScores);
+			protected void onUpdate(AjaxRequestTarget ajaxRequestTarget) {
+				includeGradeItemScores = !includeGradeItemScores;
+				setDefaultModelObject(includeGradeItemScores);
 			}
 		});
-		add(new AjaxCheckBox("includeGradeItemComments", Model.of(this.includeGradeItemComments)) {
-			private static final long serialVersionUID = 1L;
-
+		add(new AjaxCheckBox("includeGradeItemComments", Model.of(includeGradeItemComments)) {
 			@Override
-			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
-				ExportPanel.this.includeGradeItemComments = !ExportPanel.this.includeGradeItemComments;
-				setDefaultModelObject(ExportPanel.this.includeGradeItemComments);
+			protected void onUpdate(AjaxRequestTarget ajaxRequestTarget) {
+				includeGradeItemComments = !includeGradeItemComments;
+				setDefaultModelObject(includeGradeItemComments);
 			}
 		});
-		add(new AjaxCheckBox("includePoints", Model.of(this.includePoints)) {
-			private static final long serialVersionUID = 1L;
-
+		add(new AjaxCheckBox("includePoints", Model.of(includePoints)) {
 			@Override
-			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
-				ExportPanel.this.includePoints = !ExportPanel.this.includePoints;
-				setDefaultModelObject(ExportPanel.this.includePoints);
+			protected void onUpdate(AjaxRequestTarget ajaxRequestTarget) {
+				includePoints = !includePoints;
+				setDefaultModelObject(includePoints);
 			}
 
 			@Override
 			public boolean isVisible() {
 				// only allow option if categories are not weighted
-				final GbCategoryType categoryType = ExportPanel.this.businessService.getGradebookCategoryType();
+				GbCategoryType categoryType = ExportPanel.this.businessService.getGradebookCategoryType();
 				return categoryType != GbCategoryType.WEIGHTED_CATEGORY;
 			}
 		});
-		add(new AjaxCheckBox("includeLastLogDate", Model.of(this.includeLastLogDate)) {
-			private static final long serialVersionUID = 1L;
-
+		add(new AjaxCheckBox("includeLastLogDate", Model.of(includeLastLogDate)) {
 			@Override
-			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
-				ExportPanel.this.includeLastLogDate = !ExportPanel.this.includeLastLogDate;
-				setDefaultModelObject(ExportPanel.this.includeLastLogDate);
+			protected void onUpdate(AjaxRequestTarget ajaxRequestTarget) {
+				includeLastLogDate = !includeLastLogDate;
+				setDefaultModelObject(includeLastLogDate);
 			}
 		});
-		add(new AjaxCheckBox("includeCourseGrade", Model.of(this.includeCourseGrade)) {
-			private static final long serialVersionUID = 1L;
-
+		add(new AjaxCheckBox("includeCourseGrade", Model.of(includeCourseGrade)) {
 			@Override
-			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
-				ExportPanel.this.includeCourseGrade = !ExportPanel.this.includeCourseGrade;
-				setDefaultModelObject(ExportPanel.this.includeCourseGrade);
+			protected void onUpdate(AjaxRequestTarget ajaxRequestTarget) {
+				includeCourseGrade = !includeCourseGrade;
+				setDefaultModelObject(includeCourseGrade);
 			}
 		});
-		add(new AjaxCheckBox("includeCalculatedGrade", Model.of(this.includeCalculatedGrade)) {
-			private static final long serialVersionUID = 1L;
-
+		add(new AjaxCheckBox("includeCalculatedGrade", Model.of(includeCalculatedGrade)) {
 			@Override
-			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
-				ExportPanel.this.includeCalculatedGrade = !ExportPanel.this.includeCalculatedGrade;
-				setDefaultModelObject(ExportPanel.this.includeCalculatedGrade);
+			protected void onUpdate(AjaxRequestTarget ajaxRequestTarget) {
+				includeCalculatedGrade = !includeCalculatedGrade;
+				setDefaultModelObject(includeCalculatedGrade);
 			}
 		});
-		add(new AjaxCheckBox("includeGradeOverride", Model.of(this.includeGradeOverride)) {
-			private static final long serialVersionUID = 1L;
-
+		add(new AjaxCheckBox("includeGradeOverride", Model.of(includeGradeOverride)) {
 			@Override
-			protected void onUpdate(final AjaxRequestTarget ajaxRequestTarget) {
-				ExportPanel.this.includeGradeOverride = !ExportPanel.this.includeGradeOverride;
-				setDefaultModelObject(ExportPanel.this.includeGradeOverride);
+			protected void onUpdate(AjaxRequestTarget ajaxRequestTarget) {
+				includeGradeOverride = !includeGradeOverride;
+				setDefaultModelObject(includeGradeOverride);
 			}
 		});
 
@@ -179,48 +165,48 @@ public class ExportPanel extends Panel {
 
 			// Create csv header
 			final List<String> header = new ArrayList<String>();
-			if (!isCustomExport || this.includeStudentId) {
+			if (!isCustomExport || includeStudentId) {
 				header.add(getString("importExport.export.csv.headers.studentId"));
 			}
-			if (!isCustomExport || this.includeStudentName) {
+			if (!isCustomExport || includeStudentName) {
 				header.add(getString("importExport.export.csv.headers.studentName"));
 			}
 
 			// get list of assignments. this allows us to build the columns and then fetch the grades for each student for each assignment from the map
-			final List<Assignment> assignments = this.businessService.getGradebookAssignments();
+			List<Assignment> assignments = this.businessService.getGradebookAssignments();
 
 			//build column header
 			assignments.forEach(assignment -> {
 				final String assignmentPoints = assignment.getPoints().toString();
-				if (!isCustomExport || this.includeGradeItemScores) {
+				if (!isCustomExport || includeGradeItemScores) {
 					header.add(assignment.getName() + " [" + StringUtils.removeEnd(assignmentPoints, ".0") + "]");
 				}
-				if (!isCustomExport || this.includeGradeItemComments) {
-					header.add("* " + assignment.getName());
+				if (!isCustomExport || includeGradeItemComments) {
+					header.add("*/ " + assignment.getName() + " Comments */");
 				}
 			});
 
-			if (isCustomExport && this.includePoints) {
+			if (isCustomExport && includePoints) {
 				header.add(String.format("%s%s",
 					CUSTOM_EXPORT_COLUMN_PREFIX,
 					getString("importExport.export.csv.headers.points")));
 			}
-			if (isCustomExport && this.includeCalculatedGrade) {
+			if (isCustomExport && includeCalculatedGrade) {
 				header.add(String.format("%s%s",
 					CUSTOM_EXPORT_COLUMN_PREFIX,
 					getString("importExport.export.csv.headers.calculatedGrade")));
 			}
-			if (isCustomExport && this.includeCourseGrade) {
+			if (isCustomExport && includeCourseGrade) {
 				header.add(String.format("%s%s",
 					CUSTOM_EXPORT_COLUMN_PREFIX,
 					getString("importExport.export.csv.headers.courseGrade")));
 			}
-			if (isCustomExport && this.includeGradeOverride) {
+			if (isCustomExport && includeGradeOverride) {
 				header.add(String.format("%s%s",
 					CUSTOM_EXPORT_COLUMN_PREFIX,
 					getString("importExport.export.csv.headers.gradeOverride")));
 			}
-			if (isCustomExport && this.includeLastLogDate) {
+			if (isCustomExport && includeLastLogDate) {
 				header.add(String.format("%s%s",
 					CUSTOM_EXPORT_COLUMN_PREFIX,
 					getString("importExport.export.csv.headers.lastLogDate")));
@@ -229,55 +215,55 @@ public class ExportPanel extends Panel {
 			csvWriter.writeNext(header.toArray(new String[] {}));
 
 			// get the grade matrix
-			final List<GbStudentGradeInfo> grades = this.businessService.buildGradeMatrix(assignments);
+			List<GbStudentGradeInfo> grades = this.businessService.buildGradeMatrix(assignments);
 
 			//add grades
 			grades.forEach(studentGradeInfo -> {
 				final List<String> line = new ArrayList<String>();
-				if (!isCustomExport || this.includeStudentId) {
+				if (!isCustomExport || includeStudentId) {
 					line.add(studentGradeInfo.getStudentEid());
 				}
-				if (!isCustomExport ||this.includeStudentName) {
+				if (!isCustomExport ||includeStudentName) {
 					line.add(studentGradeInfo.getStudentLastName() + ", " + studentGradeInfo.getStudentFirstName());
 				}
-				if (!isCustomExport || this.includeGradeItemScores || this.includeGradeItemComments) {
+				if (!isCustomExport || includeGradeItemScores || includeGradeItemComments) {
 					assignments.forEach(assignment -> {
 						final GbGradeInfo gradeInfo = studentGradeInfo.getGrades().get(assignment.getId());
 						if (gradeInfo != null) {
-							if (!isCustomExport || this.includeGradeItemScores) {
+							if (!isCustomExport || includeGradeItemScores) {
 								line.add(StringUtils.removeEnd(gradeInfo.getGrade(), ".0"));
 							}
-							if (!isCustomExport || this.includeGradeItemComments) {
+							if (!isCustomExport || includeGradeItemComments) {
 								line.add(gradeInfo.getGradeComment());
 							}
 						} else {
 							// Need to account for no grades
-							if (!isCustomExport || this.includeGradeItemScores) {
+							if (!isCustomExport || includeGradeItemScores) {
 								line.add(null);
 							}
-							if (!isCustomExport || this.includeGradeItemComments) {
+							if (!isCustomExport || includeGradeItemComments) {
 								line.add(null);
 							}
 						}
 					});
 				}
 
-				final GbCourseGrade gbCourseGrade = studentGradeInfo.getCourseGrade();
-				final CourseGrade courseGrade = gbCourseGrade.getCourseGrade();
+				GbCourseGrade gbCourseGrade = studentGradeInfo.getCourseGrade();
+				CourseGrade courseGrade = gbCourseGrade.getCourseGrade();
 
-				if (isCustomExport && this.includePoints) {
-					line.add(FormatHelper.formatDoubleToDecimal(courseGrade.getPointsEarned()));
+				if (isCustomExport && includePoints) {
+					line.add(FormatHelper.formatDoubleToTwoDecimalPlaces(courseGrade.getPointsEarned()));
 				}
-				if (isCustomExport && this.includeCalculatedGrade) {
+				if (isCustomExport && includeCalculatedGrade) {
 					line.add(courseGrade.getCalculatedGrade());
 				}
-				if (isCustomExport && this.includeCourseGrade) {
+				if (isCustomExport && includeCourseGrade) {
 					line.add(courseGrade.getMappedGrade());
 				}
-				if (isCustomExport && this.includeGradeOverride) {
+				if (isCustomExport && includeGradeOverride) {
 					line.add(courseGrade.getEnteredGrade());
 				}
-				if (isCustomExport && this.includeLastLogDate) {
+				if (isCustomExport && includeLastLogDate) {
 					if (courseGrade.getDateRecorded() == null) {
 						line.add(null);
 					} else {
@@ -299,8 +285,8 @@ public class ExportPanel extends Panel {
 	}
 
 	private String buildFileName() {
-		final String prefix = "gradebook_export";
-		final String extension = this.exportFormat.toString().toLowerCase();
+		String prefix = "gradebook_export";
+		String extension = exportFormat.toString().toLowerCase();
 		String gradebookName = this.businessService.getGradebook().getName();
 
 		if (StringUtils.trimToNull(gradebookName) == null) {

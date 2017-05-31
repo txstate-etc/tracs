@@ -34,8 +34,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.section.api.coursemanagement.Course;
 import org.sakaiproject.section.api.coursemanagement.CourseSection;
 import org.sakaiproject.section.api.coursemanagement.Meeting;
@@ -49,7 +49,7 @@ public class CourseSectionImpl implements CourseSection, Comparable<CourseSectio
 	private static final long serialVersionUID = 1L;
 	private static final String TIME_FORMAT_LONG = "h:mm a";
 	private static final String TIME_FORMAT_DATE_TZ = "dd/MM/yyyy HH:mm zzzz";
-	private static final Logger log = LoggerFactory.getLogger(CourseSectionImpl.class);
+	private static final Log log = LogFactory.getLog(CourseSectionImpl.class);
 	public static final String SEP_CHARACTER = ",";
 	public static final String CATEGORY = "sections_category";
 	public static final String END_TIME = "sections_end_time";
@@ -76,7 +76,6 @@ public class CourseSectionImpl implements CourseSection, Comparable<CourseSectio
     protected List<Meeting> meetings;
     protected String title;
     protected String eid;
-    protected boolean isLocked;
     
     protected boolean lazy_eid = false;
     
@@ -127,7 +126,6 @@ public class CourseSectionImpl implements CourseSection, Comparable<CourseSectio
 		this.course = new CourseImpl(group.getContainingSite());
 		this.title = group.getTitle();
 		this.description = group.getDescription();
-		this.isLocked = group.isLocked();
 
 		ResourceProperties props = group.getProperties();
 		this.category = props.getProperty(CourseSectionImpl.CATEGORY);
@@ -614,10 +612,6 @@ public class CourseSectionImpl implements CourseSection, Comparable<CourseSectio
 
 	public void setMeetings(List<Meeting> meetings) {
 		this.meetings = meetings;
-	}
-
-	public boolean isLocked(){
-		return isLocked;
 	}
 
 	public Integer getMaxEnrollments() {

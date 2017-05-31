@@ -46,8 +46,8 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.alias.api.Alias;
 import org.sakaiproject.alias.api.AliasService;
 import org.sakaiproject.authz.api.PermissionsHelper;
@@ -122,7 +122,7 @@ extends VelocityPortletStateAction
 	private static final long serialVersionUID = -8571818334710261359L;
 
 	/** Our logger. */
-	private static Logger M_log = LoggerFactory.getLogger(CalendarAction.class);
+	private static Log M_log = LogFactory.getLog(CalendarAction.class);
 
 	/** Resource bundle using current language locale */
 	private static ResourceLoader rb = new ResourceLoader("calendar");
@@ -7650,8 +7650,6 @@ extends VelocityPortletStateAction
 		//
 		// See if we are allowed to merge items.
 		//
-		// Modified by Anne Faber 5/30/17 : Hide 'Merge Calendar' Options (Internal and External)
-		/*
 		bar.add( new MenuEntry(mergedCalendarPage.getButtonText(), null, allow_merge_calendars, MenuItem.CHECKED_NA, mergedCalendarPage.getButtonHandlerID()) );
 		
 		// See if we are allowed to configure external calendar subscriptions
@@ -7659,7 +7657,6 @@ extends VelocityPortletStateAction
 			{
 				bar.add( new MenuEntry(rb.getString("java.subscriptions"), rb.getString("java.subscriptions.title"), null, allow_subscribe, MenuItem.CHECKED_NA, "doSubscriptions") );
 			}
-		*/
 		
 		// See if we are allowed to export items.
 		String calId = state.getPrimaryCalendarReference();
@@ -7670,9 +7667,8 @@ extends VelocityPortletStateAction
 		}
 		
 		
-		// A link for subscribing to the implicit calendar if the user is logged in.
-		if ( sessionManager.getCurrentSessionUserId() != null &&
-				(ServerConfigurationService.getBoolean("ical.public.secureurl.subscribe", ServerConfigurationService.getBoolean("ical.opaqueurl.subscribe", true))) )
+		// A link for subscribing to the implicit calendar
+		if ( ServerConfigurationService.getBoolean("ical.public.secureurl.subscribe", ServerConfigurationService.getBoolean("ical.opaqueurl.subscribe", true)) )
 		{
 			bar.add( new MenuEntry(rb.getString("java.opaque_subscribe"), rb.getString("java.opaque_subscribe.title"), null, allow_subscribe_this, MenuItem.CHECKED_NA, "doOpaqueUrl") );
 		}

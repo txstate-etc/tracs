@@ -30,8 +30,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Category;
 import org.sakaiproject.tool.assessment.data.dao.shared.TypeD;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.AssessmentIfc;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.ItemDataIfc;
@@ -43,7 +42,7 @@ import org.sakaiproject.tool.assessment.data.ifc.shared.TypeIfc;
 
 public class SectionData
     implements java.io.Serializable, SectionDataIfc, Comparable{
-  static Logger errorLogger = LoggerFactory.getLogger("errorLogger");
+  static Category errorLogger = Category.getInstance("errorLogger");
 
   private static final long serialVersionUID = 7526471155622776147L;
   public static final Integer ACTIVE_STATUS =   Integer.valueOf(1);

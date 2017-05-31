@@ -40,7 +40,7 @@ public class CalculatedQuestionBean
 	private String text;
 	private String feedback;
 	private AnswerIfc answer;
-	private Boolean isCorrect;
+	private boolean isCorrect;
 
 	public ItemContentsBean getItemContentsBean()
 	{
@@ -147,12 +147,12 @@ public class CalculatedQuestionBean
 	    return answer;
 	}
 
-	public void setIsCorrect(Boolean isCorrect)
+	public void setIsCorrect(boolean isCorrect)
 	{
 	    this.isCorrect = isCorrect;
 	}
 	  
-	public Boolean getIsCorrect()
+	public boolean getIsCorrect()
 	{
 	    return isCorrect;
 	}

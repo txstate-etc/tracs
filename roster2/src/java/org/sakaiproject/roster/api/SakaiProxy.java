@@ -22,6 +22,7 @@ package org.sakaiproject.roster.api;
 import java.util.List;
 import java.util.Map;
 
+import org.sakaiproject.memory.api.Cache;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.sitestats.api.SitePresenceTotal;
 import org.sakaiproject.user.api.User;
@@ -215,7 +216,7 @@ public interface SakaiProxy {
 	 * Returns whether or not the current user is a super user.
 	 * 
 	 * @return <code>true</code> if the current user is a super user, else
-	 *         returns <code>false</code>.
+	 *         returns <code>false</code.
 	 */
 	public boolean isSuperUser();
 	

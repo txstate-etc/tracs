@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import lombok.extern.slf4j.Slf4j;
 import org.sakaibrary.xserver.session.MetasearchSession;
 import org.sakaibrary.xserver.session.MetasearchSessionManager;
 import org.xml.sax.SAXException;
@@ -37,7 +36,6 @@ import org.xml.sax.SAXParseException;
  * @author gbhatnag
  * @version
  */
-@Slf4j
 public class AssetIterator extends org.xml.sax.helpers.DefaultHandler
 implements org.osid.repository.AssetIterator {
   /*
@@ -48,6 +46,9 @@ implements org.osid.repository.AssetIterator {
 
 	private static final long serialVersionUID = 1L;
 	private static final String REGULAR_EXPRESSION_FILE = "/data/citationRegex.txt";
+	private static final org.apache.commons.logging.Log LOG =
+		org.apache.commons.logging.LogFactory.getLog(
+				"org.sakaibrary.osid.repository.xserver.AssetIterator" );
 
 	private java.util.LinkedList assetQueue;
 	private java.util.ArrayList regexArray;
@@ -92,7 +93,7 @@ implements org.osid.repository.AssetIterator {
 		try {
 			regexArray = loadCitationRegularExpressions( REGULAR_EXPRESSION_FILE );
 		} catch( java.io.IOException ioe ) {
-			log.warn( "AssetIterator() failed reading citation regular " +
+			LOG.warn( "AssetIterator() failed reading citation regular " +
 					"expressions - regex file: " + REGULAR_EXPRESSION_FILE, ioe );
 		}
 	}
@@ -139,7 +140,7 @@ implements org.osid.repository.AssetIterator {
       xserver.updateSearchStatusProperties();
 			statusProperties = xserver.getSearchStatusProperties();
 		} catch( org.sakaibrary.xserver.XServerException xse ) {
-			log.warn( "X-Server error: " + xse.getErrorCode() +
+			LOG.warn( "X-Server error: " + xse.getErrorCode() +
 					" - " + xse.getErrorText() );
 
       // throw exception now that status has been updated
@@ -154,7 +155,7 @@ implements org.osid.repository.AssetIterator {
 		try {
 			status = ( String ) statusProperties.getProperty( "status" );
 		} catch( org.osid.shared.SharedException se ) {
-			log.warn( "hasNextAsset() failed getting status " +
+			LOG.warn( "hasNextAsset() failed getting status " +
 					"property", se );
 		}
 
@@ -173,7 +174,7 @@ implements org.osid.repository.AssetIterator {
 				return false;
 			}
 		} else {
-			log.warn( "hasNextAsset() - status property is null" );
+			LOG.warn( "hasNextAsset() - status property is null" );
 		}
 
 		// get updated metasearchSession
@@ -199,7 +200,7 @@ implements org.osid.repository.AssetIterator {
 
 	public org.osid.repository.Asset nextAsset()
 	throws org.osid.repository.RepositoryException {
-		log.debug( "nextAsset() [entry] - returned: " + numRecordsReturned + "; total: " +
+		LOG.debug( "nextAsset() [entry] - returned: " + numRecordsReturned + "; total: " +
         totalRecordsCursor + "; in queue: " + assetQueue.size() );
 
 		// return Asset, if ready
@@ -217,7 +218,7 @@ implements org.osid.repository.AssetIterator {
 			try {
 				status = ( String ) statusProperties.getProperty( "status" );
 			} catch( org.osid.shared.SharedException se ) {
-				log.warn( "nextAsset() failed getting status property", se );
+				LOG.warn( "nextAsset() failed getting status property", se );
 			}
 
 			if( status == null || !status.equals( "ready" ) ) {
@@ -235,12 +236,12 @@ implements org.osid.repository.AssetIterator {
 			  org.sakaibrary.xserver.XServer xserver =
 			    new org.sakaibrary.xserver.XServer( guid );
 
-			  log.debug( "nextAsset() calling XServer.getRecordsXML() - assets in " +
+			  LOG.debug( "nextAsset() calling XServer.getRecordsXML() - assets in " +
 			      "queue: " + assetQueue.size() );
 			  createAssets( xserver.getRecordsXML( totalRecordsCursor ),
 			      repositoryId );
 			} catch( org.sakaibrary.xserver.XServerException xse ) {
-			  log.warn( "X-Server error: " + xse.getErrorCode() + " - " +
+			  LOG.warn( "X-Server error: " + xse.getErrorCode() + " - " +
 			      xse.getErrorText() );
         //
         // Have all (or too many) records been merged?  If so, indicate
@@ -249,7 +250,7 @@ implements org.osid.repository.AssetIterator {
         if ((xse.getErrorCodeIntValue() == XSERVER_ERROR_MERGE_LIMIT) ||
             (xse.getErrorCodeIntValue() == XSERVER_ERROR_ALL_MERGED))
         {
-          log.debug("nextAsset(), Xserver Error "
+          LOG.debug("nextAsset(), Xserver Error "
                 +                 xse.getErrorCodeIntValue()
                 +                 ", throwing NO_MORE_ITERATOR_ELEMENTS");
 
@@ -263,7 +264,7 @@ implements org.osid.repository.AssetIterator {
 			      org.sakaibrary.osid.repository.xserver.MetasearchException.
 			      METASEARCH_ERROR );
 			}
-			log.debug( "nextAsset(), XServer.getRecordsXML() returns - assets in " +
+			LOG.debug( "nextAsset(), XServer.getRecordsXML() returns - assets in " +
 			    "queue: " + assetQueue.size() );
       //
       // Make sure there really is an asset available - if not, signal "end-of-file"
@@ -273,7 +274,7 @@ implements org.osid.repository.AssetIterator {
       //
       if (assetQueue.size() == 0)
       {
-        log.debug("nextAsset(), An asset is expected, but the asset queue is enpty");
+        LOG.debug("nextAsset(), An asset is expected, but the asset queue is enpty");
 
      		throw new org.osid.repository.RepositoryException(
 				          org.osid.shared.SharedException.NO_MORE_ITERATOR_ELEMENTS);
@@ -331,7 +332,7 @@ implements org.osid.repository.AssetIterator {
 		  }
 
 		  // Error generated by the parser
-		  log.warn("createAssets() parsing exception: " +
+		  LOG.warn("createAssets() parsing exception: " +
 		      spe.getMessage() + " - xml line " + spe.getLineNumber() +
 		      ", uri " + spe.getSystemId(), x );
 		} catch (SAXException sxe) {
@@ -343,14 +344,14 @@ implements org.osid.repository.AssetIterator {
 		    x = sxe.getException();
 		  }
 
-		  log.warn( "createAssets() SAX exception: " + sxe.getMessage(),	x );
+		  LOG.warn( "createAssets() SAX exception: " + sxe.getMessage(),	x );
 		} catch (ParserConfigurationException pce) {
 		  // Parser with specified options can't be built
-		  log.warn( "createAssets() SAX parser cannot be built with " +
+		  LOG.warn( "createAssets() SAX parser cannot be built with " +
 		  "specified options" );
 		} catch (IOException ioe) {
 		  // I/O error
-		  log.warn( "createAssets() IO exception", ioe );
+		  LOG.warn( "createAssets() IO exception", ioe );
 		}
 	}
 
@@ -413,7 +414,7 @@ implements org.osid.repository.AssetIterator {
 			// create a new record
 			record = asset.createRecord( recordStructureId );
 			} catch( org.osid.repository.RepositoryException re ) {
-				log.warn( "populateAssetFromText() failed to " +
+				LOG.warn( "populateAssetFromText() failed to " +
 						"create new Asset/Record pair.", re );
 			}
 		} else if( elementName.equals( "record" ) ) {
@@ -431,7 +432,7 @@ implements org.osid.repository.AssetIterator {
 					doRegexParse( ( String )inLineCitation.getValue() );
 				}
 			} catch( org.osid.repository.RepositoryException re ) {
-				log.warn( "populateAssetFromText() failed to " +
+				LOG.warn( "populateAssetFromText() failed to " +
 						"gracefully process inLineCitation value.", re );
 			}
 
@@ -443,7 +444,7 @@ implements org.osid.repository.AssetIterator {
           if ((preferredUrlFormat != null) &&
              !(preferredUrlFormat.equalsIgnoreCase("HTML")))
           {
-  				  log.debug("Unexpected URL format: " + preferredUrlFormat);
+  				  LOG.debug("Unexpected URL format: " + preferredUrlFormat);
   			  }
 
           if ((preferredUrlFormat == null) || 
@@ -456,7 +457,7 @@ implements org.osid.repository.AssetIterator {
   		} 
   		catch( org.osid.repository.RepositoryException exception) 
   		{
-  			log.warn("Failed to create preferred URL Part", exception);
+  			LOG.warn("Failed to create preferred URL Part", exception);
   		}
   		finally
   		{
@@ -550,7 +551,7 @@ implements org.osid.repository.AssetIterator {
 						text );
 			}
 		} catch( org.osid.repository.RepositoryException re ) {
-			log.warn( "populateAssetFromText() failed to " +
+			LOG.warn( "populateAssetFromText() failed to " +
 					"create new Part.", re );
 		}
 
@@ -581,7 +582,7 @@ implements org.osid.repository.AssetIterator {
 			record.createPart( DateRetrievedPartStructure.getInstance().getId(),
 				dateRetrieved );
 		} catch( org.osid.repository.RepositoryException re ) {
-			log.warn( "setDateRetrieved() failed " +
+			LOG.warn( "setDateRetrieved() failed " +
 					"creating new dateRetrieved Part.", re );
 		}
 	}
@@ -606,7 +607,7 @@ implements org.osid.repository.AssetIterator {
 				}
 			}
 		} catch( org.osid.repository.RepositoryException re ) {
-			log.warn( "recordHasPart() failed getting Parts.", re );
+			LOG.warn( "recordHasPart() failed getting Parts.", re );
 		}
 
 		// did not find the Part
@@ -979,7 +980,7 @@ implements org.osid.repository.AssetIterator {
 					}
 				}
 			} catch( org.osid.repository.RepositoryException re ) {
-				log.warn( "doRegexParse() failed getting " +
+				LOG.warn( "doRegexParse() failed getting " +
 						"PartStructure Types.", re );
 			}
 		}

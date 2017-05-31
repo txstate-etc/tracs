@@ -42,7 +42,7 @@ import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
  */
 
 public class RetakeAssessmentListener implements ActionListener {
-	//private static Logger log = LoggerFactory.getLogger(ConfirmRemovePartListener.class);
+	//private static Log log = LogFactory.getLog(ConfirmRemovePartListener.class);
 
 	public RetakeAssessmentListener() {
 	}

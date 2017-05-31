@@ -16,8 +16,7 @@
 package org.sakaiproject.profile2.tool.pages;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.sakaiproject.profile2.tool.pages.panels.ConfirmedFriends;
@@ -26,7 +25,7 @@ import org.sakaiproject.profile2.util.ProfileConstants;
 
 public class MyFriends extends BasePage {
 
-	private static final Logger log = LoggerFactory.getLogger(MyFriends.class);
+	private static final Logger log = Logger.getLogger(MyFriends.class);
 	private Panel confirmedFriends;
 	private Panel requestedFriends;
 	

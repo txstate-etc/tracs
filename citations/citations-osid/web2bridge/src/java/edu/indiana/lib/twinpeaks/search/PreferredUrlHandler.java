@@ -39,6 +39,7 @@ import org.xml.sax.*;
  */
 public class PreferredUrlHandler
 {
+	private static org.apache.commons.logging.Log	_log = LogUtils.getLog(PreferredUrlHandler.class);
 	/**
 	 * American Social History Online
 	 */

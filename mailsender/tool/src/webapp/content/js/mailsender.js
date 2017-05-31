@@ -329,9 +329,6 @@ var RcptSelect = function()
 						if (!isTLM) {
 							RcptSelect.toggleSelectAll(jQuery(link).siblings('input[type=checkbox]:first').attr('id'));
 						}
-						else{
-							RcptSelect.toggleSelectAll(null); 
-						}
 						// We do this in the callback (once the HTML has been added to the DOM).
 						resetFrame();
 					});
@@ -421,11 +418,7 @@ var RcptSelect = function()
 			if (!checkboxId)
 			{
 				var checked = jQuery('#mailsender-rcpt-all').attr('checked');
-				//jQuery('input[type=checkbox]:enabled', context).attr('checked', checked);
-				jQuery('input[type=checkbox]:enabled', context).not('#sendMeCopy') 
-					.not('#addToArchive')
-					.not('#appendRecipientList')
-					.attr('checked', checked);
+				jQuery('input[type=checkbox]:enabled', context).attr('checked', checked);
 			}
 			else
 			{

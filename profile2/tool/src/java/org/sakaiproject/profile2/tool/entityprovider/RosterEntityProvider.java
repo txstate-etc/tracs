@@ -9,7 +9,8 @@ import java.util.Set;
 
 import lombok.Data;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.apachecommons.CommonsLog;
+
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
@@ -38,7 +39,7 @@ import org.sakaiproject.site.api.SiteService;
 /**
  * Entity provider for the Roster tool
  */
-@Slf4j
+@CommonsLog
 public class RosterEntityProvider extends AbstractEntityProvider implements
 		AutoRegisterEntityProvider, ActionsExecutable, Outputable,
 		Describeable, Sampleable, Redirectable {

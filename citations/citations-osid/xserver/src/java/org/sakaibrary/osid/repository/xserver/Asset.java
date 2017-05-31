@@ -21,14 +21,15 @@
 
 package org.sakaibrary.osid.repository.xserver;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class Asset implements org.osid.repository.Asset
 {
+
 	private static final long serialVersionUID = 1L;
 
 	private org.osid.id.IdManager idManager = Managers.getIdManager();
+	private static final org.apache.commons.logging.Log LOG =
+		org.apache.commons.logging.LogFactory.getLog(
+				"org.sakaibrary.osid.repository.xserver.Asset" );
 
   // Types
   private org.osid.shared.Type assetType = new Type( "sakaibrary", "asset",
@@ -60,7 +61,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn( t.getMessage() );
+    	LOG.warn( t.getMessage() );
     }
 
   }
@@ -157,7 +158,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn(t.getMessage());
+    	LOG.warn(t.getMessage());
       throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
     }
   }
@@ -198,7 +199,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn(t.getMessage());
+    	LOG.warn(t.getMessage());
       throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
     }
   }
@@ -222,7 +223,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn(t.getMessage());
+    	LOG.warn(t.getMessage());
       throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
     }
   }
@@ -268,7 +269,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn(t.getMessage());
+    	LOG.warn(t.getMessage());
       throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
     }
   }
@@ -299,7 +300,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn(t.getMessage());
+    	LOG.warn(t.getMessage());
       throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
     }
   }
@@ -338,7 +339,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn(t.getMessage());
+    	LOG.warn(t.getMessage());
       throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
     }
   }
@@ -358,7 +359,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn(t.getMessage());
+    	LOG.warn(t.getMessage());
       throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
     }
   }
@@ -407,7 +408,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn(t.getMessage());
+    	LOG.warn(t.getMessage());
       throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
     }
   }
@@ -440,7 +441,7 @@ public class Asset implements org.osid.repository.Asset
     }
     catch (Throwable t)
     {
-    	log.warn( t.getMessage() );
+    	LOG.warn( t.getMessage() );
       throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
     }
   }

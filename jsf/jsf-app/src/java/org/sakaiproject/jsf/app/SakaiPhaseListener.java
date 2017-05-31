@@ -24,11 +24,11 @@ import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class SakaiPhaseListener implements PhaseListener {
-	private static final Logger logger = LoggerFactory.getLogger(SakaiPhaseListener.class);
+	private static final Log logger = LogFactory.getLog(SakaiPhaseListener.class);
 
 	public PhaseId getPhaseId() {
 		return PhaseId.ANY_PHASE;

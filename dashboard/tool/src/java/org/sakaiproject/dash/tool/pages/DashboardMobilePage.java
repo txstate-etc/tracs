@@ -33,8 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONObject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.wicket.IRequestTarget;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
@@ -44,6 +43,7 @@ import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.request.target.basic.StringRequestTarget;
 import org.sakaiproject.dash.app.DashboardCommonLogic;
 import org.sakaiproject.dash.app.DashboardConfig;
+import org.sakaiproject.dash.logic.DashboardLogic;
 import org.sakaiproject.dash.model.NewsLink;
 import org.sakaiproject.dash.tool.panels.CalendarLinksPanel;
 import org.sakaiproject.dash.tool.panels.MOTDPanel;
@@ -59,7 +59,7 @@ import org.sakaiproject.util.ResourceLoader;
  */
 public class DashboardMobilePage extends BasePage {
 	
-	private static final Logger logger = LoggerFactory.getLogger(DashboardMobilePage.class); 
+	private static final Logger logger = Logger.getLogger(DashboardMobilePage.class); 
 	
 	protected static final String DATETIME_FORMAT = "dd-MMM-yyyy HH:mm";
 	
@@ -126,7 +126,7 @@ public class DashboardMobilePage extends BasePage {
                    
 
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage(), ex);
+                    logger.error(ex);
                 }
 
                 Locale locale = hsr.getLocale();
@@ -213,7 +213,9 @@ public class DashboardMobilePage extends BasePage {
 						success = false;
 					}
 					else {
-						logger.debug(" json  is :"+ jsonString);
+						if(logger.isDebugEnabled()) {
+							logger.debug(" json  is :"+ jsonString);
+						}
 						JSONObject jsonObject = JSONObject.fromObject(jsonString);
 
 						itemId = jsonObject.optLong("itemId", Long.MIN_VALUE);
@@ -222,7 +224,7 @@ public class DashboardMobilePage extends BasePage {
 
 
 				} catch (IOException ex) {
-					logger.error(ex.getMessage(), ex);
+					logger.error(ex);
 					message = rl.getString("dash.ajax.failed");
 					success = false;
 				}

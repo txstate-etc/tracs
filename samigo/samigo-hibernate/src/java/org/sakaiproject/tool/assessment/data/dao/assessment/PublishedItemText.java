@@ -29,12 +29,11 @@ import org.sakaiproject.tool.assessment.data.ifc.assessment.ItemDataIfc;
 import java.io.*;
 import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.*;
 
 public class PublishedItemText
     implements Serializable, ItemTextIfc, Comparable<ItemTextIfc> {
-  static Logger errorLogger = LoggerFactory.getLogger("errorLogger");
+  static Category errorLogger = Category.getInstance("errorLogger");
 
   private static final long serialVersionUID = 7526471155622776147L;
 

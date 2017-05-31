@@ -25,8 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -69,7 +68,7 @@ public class NewsLinksPanel extends Panel {
 	public static final String TAB_ID_STARRED = "starred";
 	public static final String TAB_ID_HIDDEN = "hidden";
 
-	private static final Logger logger = LoggerFactory.getLogger(NewsLinksPanel.class);
+	private static final Logger logger = Logger.getLogger(NewsLinksPanel.class);
 	
 	protected static final String DATE_FORMAT = "dd-MMM-yyyy";
 	protected static final String TIME_FORMAT = "HH:mm";
@@ -307,7 +306,7 @@ public class NewsLinksPanel extends Panel {
 						public void onClick(AjaxRequestTarget target) {
 							logger.debug("starringAction onClick() called -- unstar ");
 							// need to keep one item
-							logger.debug(Long.toString(newsItemId));
+							logger.debug(newsItemId);
 							//logger.debug(this.getModelObject());
 							
 							String sakaiUserId = sakaiProxy.getCurrentUserId();
@@ -369,7 +368,7 @@ public class NewsLinksPanel extends Panel {
 						public void onClick(AjaxRequestTarget target) {
 							logger.debug("starringAction onClick() called -- star ");
 							// need to keep one item
-							logger.debug(Long.toString(newsItemId));
+							logger.debug(newsItemId);
 							//logger.debug(this.getModelObject());
 							
 							String sakaiUserId = sakaiProxy.getCurrentUserId();
@@ -424,7 +423,7 @@ public class NewsLinksPanel extends Panel {
 						public void onClick(AjaxRequestTarget target) {
 							logger.debug("hidingAction onClick() called -- show");
 							// need to trash one item
-							logger.debug(Long.toString(newsItemId));
+							logger.debug(newsItemId);
 							//logger.debug(this.getModelObject());
 							String sakaiUserId = sakaiProxy.getCurrentUserId();
 							boolean success = dashboardCommonLogic.unhideNewsItem(sakaiUserId, newsItemId);
@@ -483,7 +482,7 @@ public class NewsLinksPanel extends Panel {
 						public void onClick(AjaxRequestTarget target) {
 							logger.debug("hidingAction onClick() called -- hide");
 							// need to trash one item
-							logger.debug(Long.toString(newsItemId));
+							logger.debug(newsItemId);
 							//logger.debug(this.getModelObject());
 							String sakaiUserId = sakaiProxy.getCurrentUserId();
 							boolean success = dashboardCommonLogic.hideNewsItem(sakaiUserId, newsItemId);

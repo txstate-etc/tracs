@@ -8,15 +8,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author andrew
  */
 public class Balancer
 {
-	private static final Logger log = LoggerFactory.getLogger(Balancer.class);
+	private static final Log log = LogFactory.getLog(Balancer.class);
 
 	StringBuffer sb;
 

@@ -17,10 +17,14 @@
 **********************************************************************************/
 package edu.indiana.lib.twinpeaks.util;
 
+import edu.indiana.lib.twinpeaks.search.*;
+
+import java.io.*;
+import java.net.*;
 import java.lang.*;
+import java.sql.*;
 import java.util.*;
 
-import lombok.extern.slf4j.Slf4j;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.memory.api.Cache;
 import org.sakaiproject.memory.api.MemoryService;
@@ -29,9 +33,11 @@ import org.sakaiproject.memory.api.MemoryService;
 /**
  * Expose the session context block
  */
-@Slf4j
 public class SessionContext
 {
+
+	private static org.apache.commons.logging.Log	_log = LogUtils.getLog(SessionContext.class);
+
 	/**
 	 * Cache name
 	 */
@@ -77,19 +83,19 @@ public class SessionContext
 		{
 			if ( cache == null ) {
 				cache = memoryService.getCache(CACHENAME);
-				log.debug(CACHENAME + ":" + cache.toString());
+				_log.debug(CACHENAME + ":" + cache.toString()); 
 			}
 			/*
 			 * Fetch the session cache (create a new one if necessary)
 			 */
 			hashmap = (HashMap) cache.get(id);
-			log.debug("cache.get(" + id + ") finds " + hashmap);
+			_log.debug("cache.get(" + id + ") finds " + hashmap);
 
 			if (hashmap == null)
 		{
 				cache.put(id, new HashMap());
 
-				log.debug("HashMap() created for id " + id);
+				_log.debug("HashMap() created for id " + id);
 
 			}
 		}

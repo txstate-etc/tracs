@@ -54,8 +54,6 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 
-import lombok.extern.slf4j.Slf4j;
-
 
 /**
  * Utilities for generating and processing http requests,
@@ -64,7 +62,6 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-@Slf4j
 public class HttpRESTUtils {
 
     public static final String CONTENT_TYPE_UTF8 = "text/xml; charset=UTF-8";
@@ -196,7 +193,7 @@ public class HttpRESTUtils {
             gm.setQueryString( mergeQueryStringWithParams(gm.getQueryString(), params) );
             // warn about data being set
             if (data != null) {
-                log.warn("Data cannot be passed in GET requests, data will be ignored (org.sakaiproject.entitybroker.util.http.HttpUtils#fireRequest)");
+                System.out.println("WARN: data cannot be passed in GET requests, data will be ignored (org.sakaiproject.entitybroker.util.http.HttpUtils#fireRequest)");
             }
             gm.setFollowRedirects(true);
             httpMethod = gm;
@@ -207,7 +204,7 @@ public class HttpRESTUtils {
                 for (Entry<String, String> entry : params.entrySet()) {
                     if (entry.getKey() == null
                             || entry.getValue() == null) {
-                        log.warn("null value supplied for param name ("+entry.getKey()+") or value ("
+                        System.out.println("WARN: null value supplied for param name ("+entry.getKey()+") or value ("
                                 +entry.getValue()+") (org.sakaiproject.entitybroker.util.http.HttpUtils#fireRequest)");
                     }
                     pm.addParameter(entry.getKey(), entry.getValue());
@@ -229,7 +226,7 @@ public class HttpRESTUtils {
             dm.setQueryString( mergeQueryStringWithParams(dm.getQueryString(), params) );
             // warn about data being set
             if (data != null) {
-                log.warn("Data cannot be passed in DELETE requests, data will be ignored (org.sakaiproject.entitybroker.util.http.HttpUtils#fireRequest)");
+                System.out.println("WARN: data cannot be passed in DELETE requests, data will be ignored (org.sakaiproject.entitybroker.util.http.HttpUtils#fireRequest)");
             }
             httpMethod = dm;
         } else {

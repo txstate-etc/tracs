@@ -26,8 +26,8 @@ import java.util.List;
 import org.sakaiproject.tool.assessment.data.dao.grading.ItemGradingData;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.AnswerIfc;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.ItemTextIfc;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This is the JSF backing bean for delivery, used for TF and MC questions
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SelectionBean {
 
-	private static Logger log = LoggerFactory.getLogger(SelectionBean.class);
+	private static Log log = LogFactory.getLog(SelectionBean.class);
 
 	private ItemContentsBean parent;
 

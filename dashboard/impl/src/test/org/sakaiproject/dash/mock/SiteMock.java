@@ -522,7 +522,5 @@ public class SiteMock implements Site {
 		
 	}
 	
-	public Set getAllUsersHasRole(String role) {
-		return null;
-	}
+
 }

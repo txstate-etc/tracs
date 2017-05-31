@@ -1,7 +1,7 @@
 package org.sakaiproject.component.app.scheduler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -22,8 +22,8 @@ import java.util.Date;
  */
 public class NavigableEventLogListener implements TriggerListener, JobListener
 {
-    private final static Logger
-        LOG = LoggerFactory.getLogger(NavigableEventLogListener.class.getName() + ".jobExecutions");
+    private final static Log
+        LOG = LogFactory.getLog(NavigableEventLogListener.class.getName() + ".jobExecutions");
 
     private static enum EVENTTYPE
     {
@@ -124,11 +124,8 @@ public class NavigableEventLogListener implements TriggerListener, JobListener
 
                 if (exception != null)
                 {
-                    sb.append (", exception: ").append(exception.getMessage());
-                    if (exception.getCause() != null)
-                    {
-                      sb.append(", exception cause: ").append(exception.getCause().getClass().getName());
-                    }
+                    sb.append (", exception: ").append(exception.getMessage())
+                      .append(", exception cause: ").append(exception.getCause().getClass().getName());
                 }
                 sb.append("]");
 

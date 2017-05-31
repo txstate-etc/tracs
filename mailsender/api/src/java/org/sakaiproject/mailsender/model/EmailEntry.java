@@ -34,7 +34,6 @@ public class EmailEntry
 	private String content = "";
 	private List<String> attachments = new ArrayList<String>();
 	private ConfigEntry config;
-	private String csrf = null;
 
 	public EmailEntry(ConfigEntry config)
 	{
@@ -102,15 +101,6 @@ public class EmailEntry
 			this.content = content;
 		}
 	}
-
-	public String getCsrf() {
-		return this.csrf;
-	}
-
-	public void setCsrf (String s) {
-		this.csrf = s;
-	}
-
 
 	public List<String> getAttachments()
 	{

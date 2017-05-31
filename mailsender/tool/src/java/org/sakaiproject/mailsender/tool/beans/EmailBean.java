@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.email.api.Attachment;
 import org.sakaiproject.exception.IdUnusedException;
@@ -40,8 +40,6 @@ import org.sakaiproject.mailsender.model.ConfigEntry;
 import org.sakaiproject.mailsender.model.EmailEntry;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.util.StringUtil;
-import org.sakaiproject.util.Web;
-import org.sakaiproject.tool.cover.SessionManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import uk.org.ponder.messageutil.MessageLocator;
@@ -55,7 +53,7 @@ public class EmailBean
 	public static final String EMAIL_CANCELLED = "emailCancelled";
 
 	private Map<String, MultipartFile> multipartMap;
-	private final Logger log = LoggerFactory.getLogger(EmailBean.class);
+	private final Log log = LogFactory.getLog(EmailBean.class);
 	private ComposeLogic composeLogic;
 	private ConfigLogic configLogic;
 	private ExternalLogic externalLogic;
@@ -139,10 +137,6 @@ public class EmailBean
 		ConfigEntry config = emailEntry.getConfig();
 		User curUser = externalLogic.getCurrentUser();
 
-		String csrfToken = SessionManager.getCurrentSession().getAttribute("sakai.csrf.token").toString();
-		if (csrfToken != null && !csrfToken.equals(emailEntry.getCsrf()))
-		    return EMAIL_FAILED;
-
 		String fromEmail = "";
 		String fromDisplay = "";
 		if (curUser != null)
@@ -218,7 +212,7 @@ public class EmailBean
 						MultipartFile mf = entry.getValue();
 						// Although JavaDoc says it may contain path, Commons implementation always just
 						// returns the filename without the path.
-		                String filename = Web.escapeHtml(mf.getOriginalFilename());
+		                String filename = mf.getOriginalFilename();
 		                try
 		                {
 		                    File f = File.createTempFile(filename, null);
@@ -267,7 +261,7 @@ public class EmailBean
 		catch (MailsenderException me)
 		{
 			//Print this exception
-			log.warn(me.getMessage());
+			log.warn(me);
 			messages.clear();
 			List<Map<String, Object[]>> msgs = me.getMessages();
 			if (msgs != null)
@@ -323,12 +317,12 @@ public class EmailBean
 				{
 					attachment_info.append("<br/>");
 					attachment_info.append("Attachment #").append(i).append(": ").append(
-							Web.escapeHtml(file.getOriginalFilename())).append("(").append(file.getSize()).append(" Bytes)");
+							file.getOriginalFilename()).append("(").append(file.getSize()).append(" Bytes)");
 					i++;
 				}
 			}
 			String emailarchive = "/mailarchive/channel/" + siteId + "/main";
-			String content = Web.cleanHtml(emailEntry.getContent()) + attachment_info.toString();
+			String content = emailEntry.getContent() + attachment_info.toString();
 			externalLogic.addToArchive(config, emailarchive, fromString, subject, content, attachments);
 		}
 	}
@@ -465,5 +459,4 @@ public class EmailBean
 		
 		return recipientList.toString();
 	}
-
 }

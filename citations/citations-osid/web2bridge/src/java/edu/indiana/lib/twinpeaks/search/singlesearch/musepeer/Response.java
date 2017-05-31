@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -58,9 +57,10 @@ import edu.indiana.lib.twinpeaks.util.StringUtils;
 /**
  * Parse the Musepeer XML response
  */
-@Slf4j
 public class Response extends SearchResultBase
 {
+	private static org.apache.commons.logging.Log _log = LogUtils.getLog(Response.class);
+
 	private SessionContext sessionContext;
 
 	/**
@@ -116,7 +116,7 @@ public class Response extends SearchResultBase
     {
       String errorText = "Unexpected server response (no search result records provided)";
 
-			LogUtils.displayXml(log, errorText, responseDocument);
+			LogUtils.displayXml(_log, errorText, responseDocument);
 
 			StatusUtils.setGlobalError(sessionContext, errorText);
 			throw new SearchException(errorText);
@@ -150,7 +150,7 @@ public class Response extends SearchResultBase
 			 * document
 			 */
 			if ((dataElement = DomUtils.getElement(recordElement, "DATA")) == null) {
-				log.error("No DATA element present in server response");
+				_log.error("No DATA element present in server response");
   			displayXml(recordElement);
 				throw new SearchException(
 						"Missing mandatory <DATA> element in server response");
@@ -158,13 +158,13 @@ public class Response extends SearchResultBase
 
 			title = getText(dataElement, "TITLE");
 			if (StringUtils.isNull(title)) {
-				log.debug("No TITLE text in server response");
+				_log.debug("No TITLE text in server response");
 				title = "";
 			}
 
 			description = getText(dataElement, "DESCRIPTION");
 			if (StringUtils.isNull(description)) {
-				log.debug("No DESCRIPTION text in server response");
+				_log.debug("No DESCRIPTION text in server response");
 				description = "";
 			}
 			/*
@@ -174,7 +174,7 @@ public class Response extends SearchResultBase
 			/*
 			 * Title, abstract, record ID
 			 */
-			log.debug("Adding TITLE: " + title);
+			_log.debug("Adding TITLE: " + title);
 
 			item.setDisplayName(title);
 			item.setDescription(description);
@@ -430,7 +430,7 @@ public class Response extends SearchResultBase
 			}
 
 		} catch (org.osid.repository.RepositoryException e) {
-			log.warn("doRegexParse() failed", e);
+			_log.warn("doRegexParse() failed", e);
 		}
 	}
 
@@ -459,7 +459,7 @@ public class Response extends SearchResultBase
 
 			// delete all non-digit chars (ie: p., pp., etc.)
 			spage = spage.replaceAll("\\D", "");
-			log.debug("======================&&&& Start page: spage &&&================");
+			_log.debug("======================&&&& Start page: spage &&&================");
 
 			// create startPage part
 			addPartStructure(item,
@@ -473,7 +473,7 @@ public class Response extends SearchResultBase
 						.getId(), epage);
 			}
 		} catch (StringIndexOutOfBoundsException e) {
-			log.warn("createPagesPart()", e);
+			_log.warn("createPagesPart()", e);
 		}
 	}
 
@@ -625,7 +625,7 @@ public class Response extends SearchResultBase
 
 		try
 		{
-			LogUtils.displayXml(log, errorText, xmlObject);
+			LogUtils.displayXml(_log, errorText, xmlObject);
 		}
 		catch (Exception ignore) { }
 	}
@@ -640,7 +640,7 @@ public class Response extends SearchResultBase
 
 		try
 		{
-			LogUtils.displayXml(log, xmlObject);
+			LogUtils.displayXml(_log, xmlObject);
 		}
 		catch (Exception ignore) { }
 	}

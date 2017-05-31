@@ -4,7 +4,7 @@
   <parent>
     <artifactId>kernel</artifactId>
     <groupId>org.sakaiproject</groupId>
-    <version>11.3</version><!-- KernelVersion -->
+    <version>11.1</version><!-- KernelVersion -->
     <relativePath>../pom.xml</relativePath>
   </parent>
   <name>Sakai Core Kernel Implementation</name>
@@ -116,6 +116,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
     </dependency>
@@ -134,6 +138,7 @@
     <dependency>
       <groupId>commons-validator</groupId>
       <artifactId>commons-validator</artifactId>
+      <version>1.4.1</version>
     </dependency>
     <dependency>
         <!-- for parsing CSV data from config service files -->
@@ -141,10 +146,22 @@
         <artifactId>opencsv</artifactId>
         <version>2.3</version>
     </dependency>
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-log4j12</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+	</dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -271,6 +288,7 @@
       <groupId>org.owasp.antisamy</groupId>
       <artifactId>antisamy</artifactId>
       <version>1.5.3</version>
+      <type>jar</type>
     </dependency>
     <!-- KNL-1253 -->
     <dependency>
@@ -300,6 +318,10 @@
       <artifactId>subethasmtp</artifactId>
       <version>3.1.6</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jmock</groupId>

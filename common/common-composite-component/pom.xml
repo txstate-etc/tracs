@@ -4,7 +4,7 @@
   <parent>
     <artifactId>common</artifactId>
     <groupId>org.sakaiproject.common</groupId>
-    <version>11.3</version><!-- ProjectVersion -->
+    <version>11.1</version><!-- ProjectVersion -->
     <relativePath>../pom.xml</relativePath>
   </parent>
   <name>Sakai Common API Composite Component</name>
@@ -66,6 +66,11 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
 		<groupId>commons-lang</groupId>

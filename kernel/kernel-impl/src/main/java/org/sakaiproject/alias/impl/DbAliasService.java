@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.alias.api.Alias;
 import org.sakaiproject.alias.api.AliasEdit;
 import org.sakaiproject.db.api.SqlReader;
@@ -54,7 +54,7 @@ import org.sakaiproject.util.StringUtil;
 public abstract class DbAliasService extends BaseAliasService
 {
 	/** Our logger. */
-	private static Logger M_log = LoggerFactory.getLogger(DbAliasService.class);
+	private static Log M_log = LogFactory.getLog(DbAliasService.class);
 
 	/** Table name for aliases. */
 	protected String m_tableName = "SAKAI_ALIAS";

@@ -5,8 +5,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +19,7 @@ import lombok.Setter;
  */
 public class SparserPage {
 	
-	private static Logger log = LoggerFactory.getLogger(SparserPage.class);
+	private static Log log = LogFactory.getLog(SparserPage.class);
 	
 	@Getter
 	private List<SparserPage> childPages = new ArrayList<SparserPage>();

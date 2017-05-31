@@ -34,8 +34,8 @@ import java.util.Stack;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.alias.api.AliasService;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.component.api.ComponentManager;
@@ -64,7 +64,6 @@ import org.sakaiproject.user.api.UserDirectoryService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
 import org.hibernate.HibernateException;
-import org.sakaiproject.util.api.FormattedText;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -104,7 +103,7 @@ import uk.ac.cam.caret.sakai.rwiki.utils.TimeLogger;
 public class RWikiObjectServiceImpl implements RWikiObjectService
 {
 
-	private static Logger log = LoggerFactory.getLogger(RWikiObjectServiceImpl.class);
+	private static Log log = LogFactory.getLog(RWikiObjectServiceImpl.class);
 
 	private RWikiCurrentObjectDao cdao;
 
@@ -141,8 +140,6 @@ public class RWikiObjectServiceImpl implements RWikiObjectService
 	private DigestService digestService;
 
 	private SecurityService securityService;
-
-	private FormattedText formattedTextService;
 
 	/** Configuration: to run the ddl on init or not. */
 	protected boolean autoDdl = false;
@@ -192,7 +189,7 @@ public class RWikiObjectServiceImpl implements RWikiObjectService
 		renderService = (RenderService) load(cm, RenderService.class.getName());
 		preferenceService = (PreferenceService) load(cm,
 				PreferenceService.class.getName());
-		formattedTextService = (FormattedText) load(cm, FormattedText.class.getName());
+
 		userDirectoryService = (UserDirectoryService) load(cm,UserDirectoryService.class.getName());
 		entityManager.registerEntityProducer(this,
 				RWikiObjectService.REFERENCE_ROOT);
@@ -588,14 +585,12 @@ public class RWikiObjectServiceImpl implements RWikiObjectService
 
 		if (content != null && !content.equals(rwo.getContent()))
 		{
+
 			// create a history instance
 			RWikiHistoryObject rwho = hdao.createRWikiHistoryObject(rwo);
 
-			// sanitize the content
-			String formattedContent = formattedTextService.escapeHtmlFormattedTextarea(content);
-
 			// set the content and increment the revision
-			rwo.setContent(formattedContent.replaceAll("\r\n?", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
+			rwo.setContent(content.replaceAll("\r\n?", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
 			rwo.setRevision(Integer.valueOf(rwo.getRevision().intValue() + 1));
 
 			// render to get a list of links

@@ -45,7 +45,6 @@ import org.sakaiproject.entitybroker.entityprovider.capabilities.PropertyProvide
 import org.sakaiproject.entitybroker.entityprovider.capabilities.Resolvable;
 import org.sakaiproject.entitybroker.entityprovider.extension.ActionReturn;
 import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
-import org.sakaiproject.entitybroker.exception.EntityException;
 import org.sakaiproject.entitybroker.exception.EntityNotFoundException;
 import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
 import org.sakaiproject.exception.IdUnusedException;
@@ -56,8 +55,8 @@ import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.time.api.Time;
 import org.sakaiproject.time.cover.TimeService;
 import org.sakaiproject.tool.api.SessionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentService;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 
@@ -67,7 +66,7 @@ public class AssignmentEntityProvider extends AbstractEntityProvider implements 
 		AutoRegisterEntityProvider, PropertyProvideable, Outputable, Inputable {
 
 	public final static String ENTITY_PREFIX = "assignment";
-	private static Logger M_log = LoggerFactory.getLogger(AssignmentEntityProvider.class);
+	private static Log M_log = LogFactory.getLog(AssignmentEntityProvider.class);
 
 	@AllArgsConstructor
 	public class DecoratedAttachment implements Comparable<Object> {
@@ -596,8 +595,9 @@ public class AssignmentEntityProvider extends AbstractEntityProvider implements 
 	}
 
 	@EntityCustomAction(action = "deepLinkWithPermissions", viewKey = EntityView.VIEW_LIST)
-	public Map<String, String> getAssignmentDeepLinks(EntityView view,
+	public Map<String, Object> getAssignmentDeepLinks(EntityView view,
 			Map<String, Object> params) {
+		Map<String, Object> assignData = new HashMap<String, Object>();
 
 		String context = view.getPathSegment(2);
 		String assignmentId = view.getPathSegment(3);
@@ -608,8 +608,6 @@ public class AssignmentEntityProvider extends AbstractEntityProvider implements 
 							+ view
 							+ "): e.g. /direct/assignment/deepLinkWithPermissions/{context}/{assignmentId}");
 		}
-
-		Map<String, String> assignData = new HashMap<String, String>();
 
 		try {
 			Assignment a = assignmentService.getAssignment(assignmentId);
@@ -623,22 +621,75 @@ public class AssignmentEntityProvider extends AbstractEntityProvider implements 
 			boolean allowSubmitAssignment = params.get("allowSubmitAssignment") != null ? ((Boolean) params
 					.get("allowSubmitAssignment")).booleanValue() : false;
 
-			assignData.put("assignmentUrl"
-                                , assignmentService.getDeepLinkWithPermissions(context, assignmentId
-                                            ,allowReadAssignment, allowAddAssignment, allowSubmitAssignment));
+			String assignmentContext = a.getContext(); // assignment context
+			if (allowReadAssignment
+					&& a.getOpenTime().before(TimeService.newTime())) {
+				// this checks if we want to display an assignment link
+				try {
+					Site site = siteService.getSite(assignmentContext); 
+					// site id
+					ToolConfiguration fromTool = site
+							.getToolForCommonId("sakai.assignment.grades");
+					// Three different urls to be rendered depending on the
+					// user's permission
+					if (allowAddAssignment) {
+						assignData
+								.put("assignmentUrl",
+										ServerConfigurationService
+												.getPortalUrl()
+												+ "/directtool/"
+												+ fromTool.getId()
+												+ "?assignmentId="
+												+ a.getReference()
+												+ "&panel=Main&sakai_action=doView_assignment");
+					} else if (allowSubmitAssignment) {
+						assignData
+								.put("assignmentUrl",
+										ServerConfigurationService
+												.getPortalUrl()
+												+ "/directtool/"
+												+ fromTool.getId()
+												+ "?assignmentReference="
+												+ a.getReference()
+												+ "&panel=Main&sakai_action=doView_submission");
+					} else {
+						// user can read the assignment, but not submit, so
+						// render the appropriate url
+						assignData
+								.put("assignmentUrl",
+										ServerConfigurationService
+												.getPortalUrl()
+												+ "/directtool/"
+												+ fromTool.getId()
+												+ "?assignmentId="
+												+ a.getReference()
+												+ "&panel=Main&sakai_action=doView_assignment_as_student");
+					}
+				} catch (IdUnusedException e) {
+					// No site found
+					assignData.remove("assignmentTitle");
+					assignData.remove("assignmentUrl");
+					throw new IdUnusedException(
+							"No site found while creating assignment url");
+				}
+			}
 		} catch (IdUnusedException e) {
-			throw new EntityNotFoundException("Assignment or site not found", assignmentId, e);
+			assignData.remove("assignmentTitle");
+			assignData.remove("assignmentUrl");
+			throw new EntityNotFoundException("No assignment found",
+					assignmentId, e);
 		} catch (PermissionException e) {
+			assignData.remove("assignmentTitle");
+			assignData.remove("assignmentUrl");
 			throw new SecurityException(e);
-		} catch (Exception e) {
-			throw new EntityException(e.getMessage(), assignmentId);
-        }
+		}
 		return assignData;
 	}
 
 	@EntityCustomAction(action = "deepLink", viewKey = EntityView.VIEW_LIST)
-	public Map<String, String> getAssignmentDeepLink(EntityView view,
+	public Map<String, Object> getAssignmentDeepLink(EntityView view,
 			Map<String, Object> params) {
+		Map<String, Object> assignData = new HashMap<String, Object>();
 
 		String context = view.getPathSegment(2);
 		String assignmentId = view.getPathSegment(3);
@@ -650,20 +701,80 @@ public class AssignmentEntityProvider extends AbstractEntityProvider implements 
 							+ "): e.g. /direct/assignment/deepLink/{context}/{assignmentId}");
 		}
 
-		Map<String, String> assignData = new HashMap<String, String>();
-
 		try {
 			Assignment a = assignmentService.getAssignment(assignmentId);
 			assignData.put("assignmentId", assignmentId);
 			assignData.put("assignmentTitle", a.getTitle());
-			assignData.put("assignmentUrl", assignmentService.getDeepLink(context, assignmentId));
+
+			boolean allowReadAssignment = assignmentService
+					.allowGetAssignment(context);
+			boolean allowAddAssignment = assignmentService
+					.allowAddAssignment(context);
+			boolean allowSubmitAssignment = assignmentService
+					.allowAddSubmission(context);
+
+			String assignmentContext = a.getContext(); // assignment context
+			if (allowReadAssignment
+					&& a.getOpenTime().before(TimeService.newTime())) {
+				// this checks if we want to display an assignment link
+				try {
+					Site site = siteService.getSite(assignmentContext); 
+					// site id
+					ToolConfiguration fromTool = site
+							.getToolForCommonId("sakai.assignment.grades");
+					// Three different urls to be rendered depending on the
+					// user's permission
+					if (allowAddAssignment) {
+						assignData
+								.put("assignmentUrl",
+										ServerConfigurationService
+												.getPortalUrl()
+												+ "/directtool/"
+												+ fromTool.getId()
+												+ "?assignmentId="
+												+ a.getReference()
+												+ "&panel=Main&sakai_action=doView_assignment");
+					} else if (allowSubmitAssignment) {
+						assignData
+								.put("assignmentUrl",
+										ServerConfigurationService
+												.getPortalUrl()
+												+ "/directtool/"
+												+ fromTool.getId()
+												+ "?assignmentReference="
+												+ a.getReference()
+												+ "&panel=Main&sakai_action=doView_submission");
+					} else {
+						// user can read the assignment, but not submit, so
+						// render the appropriate url
+						assignData
+								.put("assignmentUrl",
+										ServerConfigurationService
+												.getPortalUrl()
+												+ "/directtool/"
+												+ fromTool.getId()
+												+ "?assignmentId="
+												+ a.getReference()
+												+ "&panel=Main&sakai_action=doView_assignment_as_student");
+					}
+				} catch (IdUnusedException e) {
+					// No site found
+					assignData.remove("assignmentTitle");
+					assignData.remove("assignmentUrl");
+					throw new IdUnusedException(
+							"No site found while creating assignment url");
+				}
+			}
 		} catch (IdUnusedException e) {
-			throw new EntityNotFoundException("Assignment or site not found", assignmentId, e);
+			assignData.remove("assignmentTitle");
+			assignData.remove("assignmentUrl");
+			throw new EntityNotFoundException("No assignment found",
+					assignmentId, e);
 		} catch (PermissionException e) {
+			assignData.remove("assignmentTitle");
+			assignData.remove("assignmentUrl");
 			throw new SecurityException(e);
-		} catch (Exception e) {
-			throw new EntityException(e.getMessage(), assignmentId);
-        }
+		}
 		return assignData;
 	}
 

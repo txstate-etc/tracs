@@ -21,8 +21,8 @@
 
 package edu.amc.sakai.user;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.novell.ldap.LDAPEntry;
 
@@ -36,7 +36,7 @@ import com.novell.ldap.LDAPEntry;
 public class EmptyStringUserTypeMapper extends StringUserTypeMapper {
 	
 	/** Class-specific logger */
-	private static Logger M_log = LoggerFactory.getLogger(EmptyStringUserTypeMapper.class);
+	private static Log M_log = LogFactory.getLog(EmptyStringUserTypeMapper.class);
 	
 	/**
 	 * Initializes the cached user type <code>String</code> to an

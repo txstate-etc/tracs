@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import org.junit.AfterClass;
 import org.sakaiproject.component.cover.TestComponentManagerContainer;
+import org.sakaiproject.util.NoisierDefaultListableBeanFactory;
 
 /**
  * Base class for kernel integration tests, provides methods to bring up the Component manager
@@ -123,7 +124,9 @@ public class SakaiKernelTestBase {
 	@AfterClass
 	public static void oneTimeTearDown() {
 		if (testComponentManagerContainer != null) {
+			NoisierDefaultListableBeanFactory.noisyClose = false;
 			testComponentManagerContainer.getComponentManager().close();
+			NoisierDefaultListableBeanFactory.noisyClose = true;
 		}
 	}
 

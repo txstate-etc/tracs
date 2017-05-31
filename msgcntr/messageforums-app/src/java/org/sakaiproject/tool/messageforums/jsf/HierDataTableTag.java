@@ -33,8 +33,8 @@ import javax.faces.el.MethodBinding;
 import javax.faces.webapp.UIComponentTag;
 import javax.faces.webapp.UIComponentBodyTag;
 import javax.servlet.jsp.JspException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author cwen
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HierDataTableTag extends UIComponentTag 
 {
-	public static Logger log = LoggerFactory.getLogger(HierDataTableTag.class);
+	public static Log log = LogFactory.getLog(HierDataTableTag.class);
 	
 	//
 	// Instance Variables

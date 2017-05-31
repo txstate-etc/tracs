@@ -314,7 +314,7 @@ function resizeFrame(){
 		        </div>
 		    </div>
             
-            #javascript("/library/js/lang-datepicker/lang-datepicker.js")
+            <script type="text/javascript" src="/library/js/lang-datepicker/lang-datepicker.js"></script>
 
             #set( $H = '-' )
             <script type="text/javascript">

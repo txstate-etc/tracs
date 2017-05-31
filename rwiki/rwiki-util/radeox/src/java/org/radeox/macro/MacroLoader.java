@@ -23,8 +23,8 @@
 
 package org.radeox.macro;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Plugin loader for macros
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 public class MacroLoader extends PluginLoader
 {
-	private static Logger log = LoggerFactory.getLogger(MacroLoader.class);
+	private static Log log = LogFactory.getLog(MacroLoader.class);
 
 	public Class getLoadClass()
 	{

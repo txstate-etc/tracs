@@ -26,8 +26,6 @@ package org.sakaiproject.lessonbuildertool.tool.producers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sakaiproject.lessonbuildertool.SimplePage;
 import org.sakaiproject.lessonbuildertool.SimplePageItem;
 import org.sakaiproject.lessonbuildertool.model.SimplePageToolDao;
@@ -61,7 +59,6 @@ import uk.org.ponder.rsf.viewstate.ViewParamsReporter;
  * 
  */
 public class PreviewProducer implements ViewComponentProducer, NavigationCaseReporter, ViewParamsReporter {
-	private static final Logger log = LoggerFactory.getLogger(PreviewProducer.class);
 	private SimplePageBean simplePageBean;
 	private SimplePageToolDao simplePageToolDao;
 	private ShowPageProducer showPageProducer;
@@ -96,7 +93,7 @@ public class PreviewProducer implements ViewComponentProducer, NavigationCaseRep
 
 		// page should always be in this site, or someone is gaming us                                                   
 		if (!page.getSiteId().equals(siteId)) {
-		    log.info("attempt to preview page not in the site");
+		    System.out.println("attempt to preview page not in the site");
 		    return;
 		}
 

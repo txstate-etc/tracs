@@ -20,8 +20,8 @@
 
 package org.sakaiproject.entitybroker.util.spring;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.entitybroker.entityprovider.EntityProvider;
 import org.sakaiproject.entitybroker.entityprovider.EntityProviderManager;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.AutoRegisterEntityProvider;
@@ -38,7 +38,7 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class EntityProviderAutoRegistrar implements ApplicationContextAware {
 
-    private static Logger log = LoggerFactory.getLogger(EntityProviderAutoRegistrar.class);
+    private static Log log = LogFactory.getLog(EntityProviderAutoRegistrar.class);
 
     EntityProviderManager entityProviderManager;
     public void setEntityProviderManager(EntityProviderManager entityProviderManager) {

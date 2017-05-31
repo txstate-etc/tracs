@@ -38,8 +38,8 @@ import java.util.Map;
 import java.util.Iterator;
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -123,7 +123,7 @@ public class Assignment2Entity implements LessonEntity, AssignmentInterface {
 	String groupid;
     }
 
-    private static Logger log = LoggerFactory.getLogger(Assignment2Entity.class);
+    private static Log log = LogFactory.getLog(Assignment2Entity.class);
 
     private static Cache assignmentCache = null;
     protected static final int DEFAULT_EXPIRATION = 10 * 60;
@@ -182,7 +182,7 @@ public class Assignment2Entity implements LessonEntity, AssignmentInterface {
 	    try {
 		saveMethod = dao.getClass().getMethod("save", Object.class);
 	    } catch (Exception f) {
-		log.info("assignment2 lessons interface unable to get save method from A2 dao " + f);
+		System.out.println("assignment2 lessons interface unable to get save method from A2 dao " + f);
 	    };
 
 	    //try {
@@ -194,7 +194,7 @@ public class Assignment2Entity implements LessonEntity, AssignmentInterface {
 	    //		    }
 	    //		}
 	    //	    } catch (Exception e) {
-	    //		log.info("getmethod failed " + e);
+	    //		System.out.println("getmethod failed " + e);
 	    //	    }
 
 	    String vendor = SqlService.getVendor();
@@ -288,7 +288,7 @@ public class Assignment2Entity implements LessonEntity, AssignmentInterface {
 	    }
 	    
 	} catch (Exception e) {
-	    log.info("Assignment2Entity Eexception " + e);
+	    System.out.println("Assignment2Entity Eexception " + e);
 	    ret = null;
 	} finally {
 	    try {
@@ -802,7 +802,7 @@ public class Assignment2Entity implements LessonEntity, AssignmentInterface {
 	       contextId, toolTitle, type, content, properties);
 	    newAttRef = newResource.getId();
 	} catch (Exception e) {
-	    log.info("unable to make attachment resource " + e);
+	    System.out.println("unable to make attachment resource " + e);
 	}
 	}
 	newAttRef = href;
@@ -817,7 +817,7 @@ public class Assignment2Entity implements LessonEntity, AssignmentInterface {
 	    return "/assignment2/" + assignment.getId();
 
 	} catch (Exception e) {
-	    log.info("invoke failed " + e);
+	    System.out.println("invoke failed " + e);
 	}
 
 	return null;
@@ -891,7 +891,7 @@ public class Assignment2Entity implements LessonEntity, AssignmentInterface {
 	try {
 	    saveMethod.invoke(dao, assignment);
 	} catch (Exception e) {
-	    log.info("invoke failed " + e);
+	    System.out.println("invoke failed " + e);
 	    return null;
 	}
 
@@ -901,7 +901,7 @@ public class Assignment2Entity implements LessonEntity, AssignmentInterface {
 		try {
 		    saveMethod.invoke(dao, attachment);
 		} catch (Exception e) {
-		    log.info("invoke failed " + e);
+		    System.out.println("invoke failed " + e);
 		}
 	    }
 	}

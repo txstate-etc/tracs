@@ -24,13 +24,13 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.api.ServerConfigurationService;
 
 public class CopyrightManager implements org.sakaiproject.content.copyright.api.CopyrightManager {
 
-	static final Logger logger = LoggerFactory.getLogger(CopyrightManager.class);
+	static final Log logger = LogFactory.getLog(CopyrightManager.class);
 	
 	protected boolean active = true;
 	

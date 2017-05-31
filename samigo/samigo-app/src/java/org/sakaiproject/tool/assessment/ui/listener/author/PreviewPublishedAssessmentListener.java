@@ -43,7 +43,7 @@ import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 public class PreviewPublishedAssessmentListener
     implements ActionListener
 {
-  //private static Logger log = LoggerFactory.getLogger(PreviewPublishedAssessmentListener.class);
+  //private static Log log = LogFactory.getLog(PreviewPublishedAssessmentListener.class);
 
   public PreviewPublishedAssessmentListener()
   {

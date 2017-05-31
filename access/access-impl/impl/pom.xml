@@ -4,7 +4,7 @@
   <parent>
     <artifactId>access-base</artifactId>
     <groupId>org.sakaiproject</groupId>
-    <version>11.3</version>
+    <version>11.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <name>sakai-access-impl</name>
@@ -48,6 +48,11 @@
     <dependency>
       <groupId>org.sakaiproject.velocity</groupId>
       <artifactId>sakai-velocity-tool</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>${sakai.commons-logging.version}</version>
     </dependency>
   </dependencies>
   <build>

@@ -30,16 +30,18 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.util.conversion.SchemaConversionHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author ieb
  */
 public class ExtractXMLToColumns implements SchemaConversionHandler
 {
-	private static final Logger log = LoggerFactory.getLogger(ExtractXMLToColumns.class);
+
+	private static final Log log = LogFactory
+			.getLog(ExtractXMLToColumns.class);
 
 	/*
 	 * (non-Javadoc)
@@ -171,7 +173,7 @@ public class ExtractXMLToColumns implements SchemaConversionHandler
 			}
 			else
 			{
-				log.info("getValidateSource(" + id + ") blob ==  null" );
+				System.out.println("getValidateSource(" + id + ") blob ==  null" );
 			}
 			break;
 		case Types.CLOB:

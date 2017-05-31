@@ -34,8 +34,8 @@ import java.util.Stack;
 import java.util.UUID;
 import java.util.Vector;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.EntityTransferrer;
@@ -64,7 +64,7 @@ import org.w3c.dom.NodeList;
 public class PollListManagerImpl implements PollListManager,EntityTransferrer {
 
     // use commons logger
-    private static Logger log = LoggerFactory.getLogger(PollListManagerImpl.class);
+    private static Log log = LogFactory.getLog(PollListManagerImpl.class);
     public static final String REFERENCE_ROOT = Entity.SEPARATOR + "poll";
 
 

@@ -4,7 +4,7 @@
   <parent>
     <artifactId>citations-base</artifactId>
     <groupId>org.sakaiproject</groupId>
-    <version>11.3</version>
+    <version>11.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <name>sakai-citations-impl</name>
@@ -59,6 +59,11 @@
     <dependency>
       <groupId>OKI</groupId>
       <artifactId>OkiOSID</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>${sakai.commons-logging.version}</version>
     </dependency>
     <dependency>
     	<groupId>commons-lang</groupId>
@@ -131,7 +136,6 @@
         <directory>${basedir}/src/test</directory>
         <includes>
           <include>**/*.xml</include>
-          <include>**/log4j.properties</include>
         </includes>
       </testResource>
     </testResources>

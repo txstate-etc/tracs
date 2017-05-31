@@ -101,7 +101,6 @@
             <script type="text/javascript">
                   localDatePicker({
                   	input:'.openDate',
-                  	allowEmptyDate:true,
                   	ashidden: { iso8601: 'openDateISO8601' }, 
                   	getval:'.openDate',
                   	useTime:1 
@@ -109,7 +108,6 @@
 
                   localDatePicker({
                   	input:'.closeDate', 
-                  	allowEmptyDate:true,
                   	ashidden: { iso8601: 'closeDateISO8601' },
                   	getval:'.closeDate',
                   	useTime:1 

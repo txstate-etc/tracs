@@ -21,8 +21,8 @@
 
 package org.sakaiproject.user.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -54,7 +54,7 @@ import org.sakaiproject.user.api.UserNotDefinedException;
  */
 public abstract class PrecachingDbUserService extends DbUserService
 {
-    private static Logger log = LoggerFactory.getLogger(PrecachingDbUserService.class);
+    private static Log log = LogFactory.getLog(PrecachingDbUserService.class);
 
     boolean logUsersRemoved = false; 
     boolean logUsersNotRemoved = false; 

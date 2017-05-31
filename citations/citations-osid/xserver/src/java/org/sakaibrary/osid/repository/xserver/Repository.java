@@ -21,7 +21,6 @@
 
 package org.sakaibrary.osid.repository.xserver;
 
-import lombok.extern.slf4j.Slf4j;
 import org.sakaibrary.xserver.XServerException;
 import org.sakaibrary.xserver.XServer;
 import org.sakaiproject.citation.util.impl.CQL2XServerFindCommand;
@@ -30,10 +29,13 @@ import org.sakaiproject.citation.util.impl.CQL2XServerFindCommand;
  * 
  * @author gbhatnag
  */
-@Slf4j
 public class Repository implements org.osid.repository.Repository
 {
 	private static final long serialVersionUID = 1L;
+
+	private static final org.apache.commons.logging.Log LOG =
+		org.apache.commons.logging.LogFactory.getLog(
+				"org.sakaibrary.osid.repository.xserver.Repository" );
 
 	private org.osid.shared.Id id = null;
 	private String idString = null;
@@ -88,7 +90,7 @@ public class Repository implements org.osid.repository.Repository
 		try {
 			this.id = idManager.getId(this.idString);
 		} catch (Throwable t) {
-			log.warn(t.getMessage());
+			LOG.warn(t.getMessage());
 		}
 	}
 
@@ -195,7 +197,7 @@ public class Repository implements org.osid.repository.Repository
 		}
 		catch (Throwable t)
 		{
-			log.warn(t.getMessage());
+			LOG.warn(t.getMessage());
 			throw new org.osid.repository.RepositoryException(
 					org.osid.OsidException.OPERATION_FAILED);
 		}
@@ -237,7 +239,7 @@ public class Repository implements org.osid.repository.Repository
 		}
 		catch (Throwable t)
 		{
-			log.warn(t.getMessage());
+			LOG.warn(t.getMessage());
 			throw new org.osid.repository.RepositoryException(
 					org.osid.OsidException.OPERATION_FAILED);
 		}
@@ -345,7 +347,7 @@ public class Repository implements org.osid.repository.Repository
 		}
 
 		if( !( searchCriteria instanceof String ) ) {
-			log.warn( "getAssetsBySearch() invalid search criteria: " + searchCriteria );
+			LOG.warn( "getAssetsBySearch() invalid search criteria: " + searchCriteria );
 			throw new org.osid.repository.RepositoryException(
 					org.osid.OsidException.OPERATION_FAILED );
 		}
@@ -360,10 +362,10 @@ public class Repository implements org.osid.repository.Repository
 				knownPropertiesType = searchProperties.getType().isEqual(
 						searchPropertiesType );
 			} catch( org.osid.shared.SharedException se ) {
-				log.warn( "Unable to check searchProperties Type" );
+				LOG.warn( "Unable to check searchProperties Type" );
 			}
 			if( !knownPropertiesType ) {
-				log.warn( "searchProperties are of unknown type" );
+				LOG.warn( "searchProperties are of unknown type" );
 				throw new org.osid.repository.RepositoryException(
 						org.osid.shared.SharedException.UNKNOWN_TYPE );
 			}
@@ -377,7 +379,7 @@ public class Repository implements org.osid.repository.Repository
 				username    = ( String ) searchProperties.getProperty( "username" );
 				password    = ( String ) searchProperties.getProperty( "password" );
 			} catch( org.osid.shared.SharedException se ) {
-				log.warn( "Problem getting guid from org.osid.shared.Properties " +
+				LOG.warn( "Problem getting guid from org.osid.shared.Properties " +
 						"object passed to getAssetsBySearch().", se );
 				throw new org.osid.repository.RepositoryException(
 						org.osid.OsidException.OPERATION_FAILED );
@@ -387,7 +389,7 @@ public class Repository implements org.osid.repository.Repository
 					baseUrl == null || baseUrl.trim().equals( "" ) ||
 					username == null || username.trim().equals( "" ) ||
 					password == null || password.trim().equals( "" ) ) {
-				log.warn( "required search property is null or empty:" +
+				LOG.warn( "required search property is null or empty:" +
 						"\n  guid: " + guid +
 						"\n  baseUrl: " + baseUrl +
 						"\n  username: " + username +
@@ -397,7 +399,7 @@ public class Repository implements org.osid.repository.Repository
 			}
 
 			if( databaseIds == null || databaseIds.size() == 0 ) {
-				log.warn( "ERROR: databaseIds from org.osid.shared.Properties is " +
+				LOG.warn( "ERROR: databaseIds from org.osid.shared.Properties is " +
 				"null or empty" );
 				throw new org.osid.repository.RepositoryException(
 						org.osid.OsidException.OPERATION_FAILED );
@@ -410,7 +412,7 @@ public class Repository implements org.osid.repository.Repository
 			( searchTypeVector.elementAt( i ) );
 
 			if( !type.isEqual( searchType ) ) {
-				log.warn( "searchType is of unknown type" );
+				LOG.warn( "searchType is of unknown type" );
 				throw new org.osid.repository.RepositoryException(
 						org.osid.shared.SharedException.UNKNOWN_TYPE );
 			}
@@ -470,12 +472,12 @@ public class Repository implements org.osid.repository.Repository
 		} catch( XServerException xse ) {
 			if( xse.getErrorCode() != null && !xse.getErrorCode().trim().equals("") )
 			{
-				log.warn( "X-Server error " + xse.getErrorCode() + " - " +
+				LOG.warn( "X-Server error " + xse.getErrorCode() + " - " +
 						xse.getErrorText() );
 			}
 			else
 			{
-				log.warn( "X-Server error - " + xse.getErrorText() );
+				LOG.warn( "X-Server error - " + xse.getErrorText() );
 			}
 			throw new org.osid.repository.RepositoryException(
 					org.sakaibrary.osid.repository.xserver.
@@ -488,12 +490,12 @@ public class Repository implements org.osid.repository.Repository
 		} catch( XServerException xse ) {
 			if( xse.getErrorCode() != null && !xse.getErrorCode().trim().equals("") )
 			{
-				log.warn( "X-Server error " + xse.getErrorCode() + " - " +
+				LOG.warn( "X-Server error " + xse.getErrorCode() + " - " +
 						xse.getErrorText() );
 			}
 			else
 			{
-				log.warn( "X-Server error - " + xse.getErrorText() );
+				LOG.warn( "X-Server error - " + xse.getErrorText() );
 			}
 			throw new org.osid.repository.RepositoryException(
 					org.sakaibrary.osid.repository.xserver.
@@ -540,7 +542,7 @@ public class Repository implements org.osid.repository.Repository
 		try {
 			guid = ( String ) searchProperties.getProperty( "guid" );
 		} catch( org.osid.shared.SharedException se ) {
-			log.warn( "getProperties() could not get guid: " +
+			LOG.warn( "getProperties() could not get guid: " +
 					se.getMessage(), se );
 			throw new org.osid.repository.RepositoryException(
 					org.osid.OsidException.OPERATION_FAILED);
@@ -564,7 +566,7 @@ public class Repository implements org.osid.repository.Repository
 		}
 		catch (Throwable t)
 		{
-			log.warn(t.getMessage());
+			LOG.warn(t.getMessage());
 			throw new org.osid.repository.RepositoryException(
 					org.osid.OsidException.OPERATION_FAILED);
 		}
@@ -615,7 +617,7 @@ public class Repository implements org.osid.repository.Repository
 		}
 		catch (Throwable t)
 		{
-			log.warn(t.getMessage());
+			LOG.warn(t.getMessage());
 			throw new org.osid.repository.RepositoryException(
 					org.osid.OsidException.OPERATION_FAILED);
 		}

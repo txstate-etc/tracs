@@ -22,8 +22,6 @@ package org.sakaiproject.content.impl;
 
 import java.text.MessageFormat;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.content.api.ContentFilter;
 import org.sakaiproject.content.api.ContentResource;
@@ -32,7 +30,6 @@ import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.site.api.Site;
-import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.util.Validator;
 
 /**
@@ -43,9 +40,6 @@ import org.sakaiproject.util.Validator;
  *
  */
 public class HtmlPageFilter implements ContentFilter {
-
-	private static final String MATHJAX_ENABLED = "mathJaxEnabled";
-	private static final String MATHJAX_SRC_PATH_SAKAI_PROP = "portal.mathjax.src.path";
 
 	private EntityManager entityManager;
 	
@@ -61,8 +55,7 @@ public class HtmlPageFilter implements ContentFilter {
 "    <title>{2}</title>\n" +
 "    <link href=\"{0}/tool_base.css\" type=\"text/css\" rel=\"stylesheet\" media=\"all\" />\n" +
 "    <link href=\"{0}/{1}/tool.css\" type=\"text/css\" rel=\"stylesheet\" media=\"all\" />\n" +
-"    <script type=\"text/javascript\" src=\"/library/js/headscripts.js\"></script>\n" +
-"{3}"+
+"    <script type=\"text/javascript\" language=\"JavaScript\" src=\"/library/js/headscripts.js\"></script>\n" +
 "    <style>body '{ padding: 5px !important; }'</style>\n" +
 "  </head>\n" +
 "  <body>\n";
@@ -70,10 +63,6 @@ public class HtmlPageFilter implements ContentFilter {
 	private String footerTemplate = "\n" +
 "  </body>\n" +
 "</html>\n";
-
-	private String mathjaxTemplate =
-"    <script type=\"text/x-mathjax-config\">\nMathJax.Hub.Config('{'\ntex2jax: '{' inlineMath: [[''\\\\('',''\\\\)'']] '}'\n'}');\n</script>\n" +
-"    <script src=\"{0}\"  language=\"JavaScript\" type=\"text/javascript\"></script>\n" ;
 
 	public void setEntityManager(EntityManager entityManager) {
 		this.entityManager = entityManager;
@@ -105,7 +94,7 @@ public class HtmlPageFilter implements ContentFilter {
 			return content;
 		}
 		Reference contentRef = entityManager.newReference(content.getReference());
-		Reference siteRef = entityManager.newReference(Entity.SEPARATOR+ SiteService.SITE_SUBTYPE+ Entity.SEPARATOR+ contentRef.getContext());
+		Reference siteRef = entityManager.newReference(contentRef.getContext());
 		Entity entity = siteRef.getEntity();
 		
 		String addHtml = content.getProperties().getProperty(ResourceProperties.PROP_ADD_HTML);
@@ -121,15 +110,7 @@ public class HtmlPageFilter implements ContentFilter {
 			String docType = serverConfigurationService.getString("content.html.doctype", "<!DOCTYPE html>");
 			header.append(docType + "\n");
 		}
-		StringBuilder additionalScripts = new StringBuilder();
-		if (isMathJaxEnabled(entity)) {
-			additionalScripts.append(MessageFormat.format(mathjaxTemplate,
-				serverConfigurationService.getString(MATHJAX_SRC_PATH_SAKAI_PROP
-				)
-			));
-		}
-		additionalScripts.append(serverConfigurationService.getString("portal.include.extrahead", ""));
-		header.append(MessageFormat.format(headerTemplate, skinRepo, siteSkin, title, additionalScripts));
+		header.append(MessageFormat.format(headerTemplate, skinRepo, siteSkin, title));
         
 		return new WrappedContentResource(content, header.toString(), footerTemplate, detectHtml);
 	}
@@ -155,30 +136,8 @@ public class HtmlPageFilter implements ContentFilter {
 				siteSkin = site.getSkin();
 			}
 		}
-		return siteSkin;
-	}
 
-	/**
-	 * Check if MathJax should be enabled for this site.
-	 * @param entity The Site that the content is in.
-	 * @return <code>true</code> if we should enabled MathJax
-     */
-	private boolean isMathJaxEnabled(Entity entity) {
-		if (serverConfigurationService.getBoolean("portal.mathjax.enabled", true)) {
-			if (entity instanceof Site) {
-				Site site = (Site)entity;
-				String strMathJaxEnabled = site.getProperties().getProperty(MATHJAX_ENABLED);
-				if (!StringUtils.isBlank(strMathJaxEnabled))
-				{
-					String[] mathJaxTools = strMathJaxEnabled.split(",");
-					if (ArrayUtils.contains(mathJaxTools, "sakai.resources"))
-					{
-						return true;
-					}
-				}
-			}
-		}
-		return false;
+		return siteSkin;
 	}
 
 }

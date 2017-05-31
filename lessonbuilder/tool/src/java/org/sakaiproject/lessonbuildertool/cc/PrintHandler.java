@@ -1,8 +1,5 @@
 package org.sakaiproject.lessonbuildertool.cc;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /***********
  * This code is based on a reference implementation done for the IMS Consortium.
  * The copyright notice for that implementation is included below. 
@@ -108,7 +105,7 @@ import org.sakaiproject.tool.assessment.qti.constants.QTIVersion;
 public class PrintHandler extends DefaultHandler implements AssessmentHandler, DiscussionHandler, AuthorizationHandler,
                                        MetadataHandler, LearningApplicationResourceHandler, QuestionBankHandler,
                                        WebContentHandler, WebLinkHandler{
-  private static final Logger log = LoggerFactory.getLogger(PrintHandler.class);
+
   private static final String HREF="href";
   private static final String TYPE="type";
   private static final String FILE="file";
@@ -479,11 +476,11 @@ public class PrintHandler extends DefaultHandler implements AssessmentHandler, D
 		  break;
 	      Element valueElt = propertiesIt.next();
 	      if (!"source".equals(nameElt.getName())) {
-		  log.info("first item in structure not source " + nameElt.getName());
+		  System.out.println("first item in structure not source " + nameElt.getName());
 		  break;
 	      }
 	      if (!"value".equals(valueElt.getName())) {
-		  log.info("second item in structure not source " + valueElt.getName());
+		  System.out.println("second item in structure not source " + valueElt.getName());
 		  break;
 	      }
 	      String name = nameElt.getText();
@@ -571,7 +568,7 @@ public class PrintHandler extends DefaultHandler implements AssessmentHandler, D
 				  int offset = Integer.parseInt(fixup);
 				  htmlString = htmlString.substring(0, offset) + baseUrl + htmlString.substring(offset+3);
 			      } catch (Exception e) {
-				  log.info("exception " + e);
+				  System.out.println("exception " + e);
 			      }
 			  }
 		      }
@@ -762,7 +759,7 @@ public class PrintHandler extends DefaultHandler implements AssessmentHandler, D
 	      if (nopage)
 		  title = simplePageBean.getMessageLocator().getMessage("simplepage.cc-defaultforum");
 
-	      // log.info("about to call forum import base " + base);
+	      // System.out.println("about to call forum import base " + base);
 	      // title is for the cartridge. That will be used as the forum
 	      // if already added, don't do it again
 	      String sakaiId = itemsAdded.get(filename);
@@ -774,13 +771,13 @@ public class PrintHandler extends DefaultHandler implements AssessmentHandler, D
 	      }
 
 	      if (!hide) {
-		  // log.info("about to add formum item");
+		  // System.out.println("about to add formum item");
 		  SimplePageItem item = simplePageToolDao.makeItem(page.getPageId(), seq, SimplePageItem.FORUM, sakaiId, title);
 		  simplePageBean.saveItem(item);
 		  if (roles.size() > 0)
 		      simplePageBean.setItemGroups(item, roles.toArray(new String[0]));
 		  sequences.set(top, seq+1);
-		  // log.info("finished with forum item");
+		  // System.out.println("finished with forum item");
 	      }
 	    }
 	  } else if (type.equals(ASSESSMENT) || type.equals(QUESTION_BANK)) {
@@ -848,7 +845,7 @@ public class PrintHandler extends DefaultHandler implements AssessmentHandler, D
 			  sakaiId = SimplePageItem.DUMMY;
 
 		  } catch (Exception e) {
-		      log.info("CC import error creating or parsing QTI file " + fileName + " " +  e);
+		      System.out.println("CC import error creating or parsing QTI file " + fileName + " " +  e);
 		      simplePageBean.setErrKey("simplepage.create.object.failed", e.toString());
 		  }
 
@@ -912,7 +909,7 @@ public class PrintHandler extends DefaultHandler implements AssessmentHandler, D
 
 		if (!hide) {
 		    if ( sakaiId != null) {
-			// log.info("Adding LTI content item "+sakaiId);
+			// System.out.println("Adding LTI content item "+sakaiId);
 			SimplePageItem item = simplePageToolDao.makeItem(page.getPageId(), seq, SimplePageItem.BLTI, sakaiId, title);
 			item.setHeight(""); // default depends upon format, so it's supplied at runtime
 			simplePageBean.saveItem(item);
@@ -920,7 +917,7 @@ public class PrintHandler extends DefaultHandler implements AssessmentHandler, D
 			    simplePageBean.setItemGroups(item, roles.toArray(new String[0]));
 			sequences.set(top, seq+1);
 		    } else {
-			log.info("LTI Import Failed..");
+			System.out.println("LTI Import Failed..");
 		    }
 		}
 	    }
@@ -1128,10 +1125,10 @@ public class PrintHandler extends DefaultHandler implements AssessmentHandler, D
 	      }
 	  }
 	  simplePageBean.setErrKey("simplepage.create.resource.failed", e + ": " + the_file_id);
-	  log.info("CC loader: unable to get file " + the_file_id + " error: " + e);
+	  System.out.println("CC loader: unable to get file " + the_file_id + " error: " + e);
         } catch (Exception e) {
 	  simplePageBean.setErrKey("simplepage.create.resource.failed", e + ": " + the_file_id);
-	  log.info("CC loader: unable to get file " + the_file_id + " error: " + e);
+	  System.out.println("CC loader: unable to get file " + the_file_id + " error: " + e);
         }
         break;  // if we get to the end, no need to retry; really a goto would be clearer
       }

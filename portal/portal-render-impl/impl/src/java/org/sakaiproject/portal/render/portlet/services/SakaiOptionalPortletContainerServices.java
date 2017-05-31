@@ -32,8 +32,8 @@ import java.util.Properties;
 
 import javax.portlet.PortletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.pluto.OptionalContainerServices;
 import org.apache.pluto.PortletContainerException;
 import org.apache.pluto.PortletWindow;
@@ -71,7 +71,8 @@ import org.sakaiproject.user.cover.UserDirectoryService;
 public class SakaiOptionalPortletContainerServices implements OptionalContainerServices
 {
 
-	private static Logger M_log = LoggerFactory.getLogger(SakaiOptionalPortletContainerServices.class);
+	private static Log M_log = LogFactory
+			.getLog(SakaiOptionalPortletContainerServices.class);
 
 	protected final static String CURRENT_PLACEMENT = "sakai:ToolComponent:current.placement";
 

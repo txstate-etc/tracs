@@ -24,7 +24,7 @@
 package org.sakaiproject.tool.assessment.ui.bean.delivery;
 
 import java.io.Serializable;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math.util.MathUtils;
 
 /**
  * <p> Table of Contents and Contents Data</p>
@@ -129,7 +129,7 @@ private java.util.ArrayList partsContents;
 	  String pointsDisplayString = "";
 	  if (showStudentScore)
 	  {
-		  pointsDisplayString = "" + Precision.round(currentScore, 2);
+		  pointsDisplayString = "" + MathUtils.round(currentScore, 2);
 	  }
 	  return pointsDisplayString;
   }

@@ -8,7 +8,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.apachecommons.CommonsLog;
+
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.component.cover.ComponentManager;
@@ -48,7 +49,7 @@ import org.sakaiproject.user.api.UserNotDefinedException;
 /**
  * Entity provider for the Content / Resources tool
  */
-@Slf4j
+@CommonsLog
 public class ContentEntityProvider extends AbstractEntityProvider implements EntityProvider, AutoRegisterEntityProvider, ActionsExecutable, Outputable, Describeable {
 
 	public final static String ENTITY_PREFIX = "content";

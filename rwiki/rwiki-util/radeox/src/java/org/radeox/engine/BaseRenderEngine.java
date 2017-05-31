@@ -29,8 +29,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.radeox.EngineManager;
 import org.radeox.api.engine.RenderEngine;
 import org.radeox.api.engine.context.InitialRenderContext;
@@ -54,7 +54,7 @@ import org.radeox.util.Service;
 
 public class BaseRenderEngine implements RenderEngine
 {
-	private static Logger log = LoggerFactory.getLogger(BaseRenderEngine.class);
+	private static Log log = LogFactory.getLog(BaseRenderEngine.class);
 
 	protected InitialRenderContext initialContext;
 

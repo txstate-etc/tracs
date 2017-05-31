@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>msgcntr</artifactId>
 		<groupId>org.sakaiproject.msgcntr</groupId>
-		<version>11.3</version>
+		<version>11.1</version>
 	</parent>
 	<name>Sakai Message Forums Tool</name>
 	<groupId>org.sakaiproject.msgcntr</groupId>
@@ -75,6 +75,11 @@
 		<dependency>
 		  <groupId>commons-validator</groupId>
 		  <artifactId>commons-validator</artifactId>
+		  <version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -100,8 +105,27 @@
 		<dependency>
 		  <groupId>net.sf.json-lib</groupId>
 		  <artifactId>json-lib</artifactId>
-		  <version>2.4</version>
+		  <version>2.2.3</version>
 		  <classifier>jdk15</classifier>
+		  <type>jar</type>
+		</dependency>
+		<dependency>
+		  <groupId>net.sf.json-lib</groupId>
+		  <artifactId>json-lib</artifactId>
+		  <version>2.2.3</version>
+		  <classifier>jdk15-sources</classifier>
+		  <type>jar</type>
+		</dependency>
+		<dependency>
+		  <groupId>net.sf.json-lib</groupId>
+		  <artifactId>json-lib</artifactId>
+		  <version>2.2.3</version>
+		  <classifier>jdk15-javadoc</classifier>
+		  <type>jar</type>
+		</dependency>
+		<dependency>
+		  <groupId>org.projectlombok</groupId>
+		  <artifactId>lombok</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
@@ -28,8 +29,6 @@ import net.oauth.server.OAuthServlet;
 import net.oauth.signature.OAuthSignatureMethod;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tsugi.basiclti.Base64;
 import org.tsugi.basiclti.XMLMap;
 import org.w3c.dom.Document;
@@ -38,7 +37,7 @@ import org.w3c.dom.NodeList;
 
 public class IMSPOXRequest {
 
-	private final static Logger logger = LoggerFactory.getLogger(IMSPOXRequest.class);
+	private final static Logger Log = Logger.getLogger(IMSPOXRequest.class .getName());
 
 	public final static String MAJOR_SUCCESS = "success";
 	public final static String MAJOR_FAILURE = "failure";
@@ -176,7 +175,7 @@ public class IMSPOXRequest {
 		String contentType = request.getContentType();
 		if ( ! "application/xml".equals(contentType) ) {
 			errorMessage = "Content Type must be application/xml";
-		 	logger.info(errorMessage+"\n"+contentType);
+			Log.info(errorMessage+"\n"+contentType);
 			return;
 		}
 
@@ -200,7 +199,7 @@ public class IMSPOXRequest {
 
 		if ( oauth_body_hash == null ) {
 			errorMessage = "Did not find oauth_body_hash";
-		 logger.info(errorMessage+"\n"+header);
+			Log.info(errorMessage+"\n"+header);
 			return;
 		}
 
@@ -322,7 +321,7 @@ public class IMSPOXRequest {
 				}
 			}
 		} catch (Throwable t) {
-		 	logger.warn(t.getMessage());
+			Log.warning(t.getMessage());
 			// t.printStackTrace();
 		}
 		return null;
@@ -459,7 +458,7 @@ public class IMSPOXRequest {
 
 		if ( internalError.length() > 0 ) {
 			description = description + " (Internal error: " + internalError.toString() + ")";
-		 	logger.warn(internalError.toString());
+			Log.warning(internalError.toString());
 		}
 
 		if ( bodyString == null ) bodyString = "";
@@ -530,7 +529,7 @@ public class IMSPOXRequest {
 		Properties props = new Properties();
 		props.setProperty("fred","zap");
 		props.setProperty("sam",IMSPOXRequest.MINOR_IDALLOC);
-		System.out.println("---- Generate logger Error ----");
+		System.out.println("---- Generate Log Error ----");
 		output = pox.getResponseFailure(desc,props);
 		System.out.println("---- Failure ----");
 		System.out.println(output);

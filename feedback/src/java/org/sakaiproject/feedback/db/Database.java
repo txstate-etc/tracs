@@ -25,12 +25,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.sakaiproject.db.api.SqlService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class Database {
 
-    private Logger logger = LoggerFactory.getLogger(Database.class);
+    private Logger logger = Logger.getLogger(Database.class);
 
     public final static String DB_ERROR = "DB_ERROR";
 

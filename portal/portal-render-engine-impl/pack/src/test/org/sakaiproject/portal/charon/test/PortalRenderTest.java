@@ -23,8 +23,8 @@ package org.sakaiproject.portal.charon.test;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import junit.framework.TestCase;
 
@@ -38,7 +38,7 @@ import junit.framework.TestCase;
 public class PortalRenderTest extends TestCase
 {
 
-	private static final Logger log = LoggerFactory.getLogger(PortalRenderTest.class);
+	private static final Log log = LogFactory.getLog(PortalRenderTest.class);
 
 	public static void main(String[] args)
 	{

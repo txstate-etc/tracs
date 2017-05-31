@@ -3,8 +3,8 @@ package org.sakaiproject.entitybroker.util;
 
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.target.HotSwappableTargetSource;
@@ -40,7 +40,7 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class ReloadableComponentProxy extends ProxyFactoryBean implements InitializingBean {
 
-   private static Logger log = LoggerFactory.getLogger(ReloadableComponentProxy.class);
+   private static Log log = LogFactory.getLog(ReloadableComponentProxy.class);
 
    private String sakaiComponentName;
    /**

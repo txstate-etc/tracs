@@ -46,8 +46,6 @@ package org.sakaiproject.lessonbuildertool.cc;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -62,7 +60,6 @@ import java.io.StringBufferInputStream;
 
 public abstract class AbstractParser {
 
-  private static final Logger log = LoggerFactory.getLogger(AbstractParser.class);
   private static final String RESOURCE_QUERY="ims:resource[@identifier='xxx']";
   private static final String MD_ROOT="lom";
   private static final String METADATA="metadata";
@@ -160,9 +157,9 @@ public abstract class AbstractParser {
       } catch (Exception e) {
 	  e.printStackTrace();
           if (the_resource == null)
-              log.info("processresouce the item null");
+              System.out.println("processresouce the item null");
           else
-              log.info("processresource failed " + the_resource.getAttributeValue(ID));
+              System.out.println("processresource failed " + the_resource.getAttributeValue(ID));
 
       };
   }

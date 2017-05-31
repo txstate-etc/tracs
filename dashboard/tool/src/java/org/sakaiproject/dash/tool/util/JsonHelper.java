@@ -27,8 +27,8 @@ import java.util.Map;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.dash.app.DashboardCommonLogic;
 import org.sakaiproject.dash.app.DashboardConfig;
 import org.sakaiproject.dash.model.CalendarItem;
@@ -43,7 +43,7 @@ import org.sakaiproject.util.FormattedText;
  */
 public class JsonHelper {
 	
-	private static Logger logger = LoggerFactory.getLogger(JsonHelper.class);
+	private static Log logger = LogFactory.getLog(JsonHelper.class);
 	
 	protected DashboardCommonLogic dashboardCommonLogic;
 	protected DashboardConfig dashboardConfig;

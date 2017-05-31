@@ -24,6 +24,6 @@
 				SelectActionListener listener = new SelectActionListener();
 				listener.processAction(null);
 			%>
-			<%@ include file="../select/selectIndex_content.jsp"%>
+			<%@ include file="../select/selectIndex_noHeader.jsp"%>
 		</h:panelGroup>
   </f:view>

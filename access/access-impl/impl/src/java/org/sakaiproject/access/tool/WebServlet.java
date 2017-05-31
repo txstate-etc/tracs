@@ -31,8 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.content.api.ContentCollection;
 import org.sakaiproject.content.api.ContentHostingService;
@@ -62,7 +62,7 @@ import org.sakaiproject.tool.api.Session;
 public class WebServlet extends AccessServlet
 {
 	/** Our log (commons). */
-	private static Logger M_log = LoggerFactory.getLogger(WebServlet.class);
+	private static Log M_log = LogFactory.getLog(WebServlet.class);
 	protected ContentHostingService contentHostingService;
 	protected UserDirectoryService userDirectoryService;
 	protected TimeService timeService;

@@ -17,20 +17,19 @@
 **********************************************************************************/
 package edu.indiana.lib.twinpeaks.util;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.servlet.*;
 import javax.servlet.http.*;
 
 /**
  * HTTP utilites
  */
-@Slf4j
 public class HttpTransactionUtils
 {
+	private static org.apache.commons.logging.Log	_log = LogUtils.getLog(HttpTransactionUtils.class);
 
   private HttpTransactionUtils() {
   }
@@ -296,7 +295,7 @@ public class HttpTransactionUtils
 			params	= getUrlComponent(original, PARAMETERS);
 
 		} catch (MalformedURLException exception) {
-			log.warn("Invalid URL provided: " + original);
+			_log.warn("Invalid URL provided: " + original);
 			return original;
 		}
 

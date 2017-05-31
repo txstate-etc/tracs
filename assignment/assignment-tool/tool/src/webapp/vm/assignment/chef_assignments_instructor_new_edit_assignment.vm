@@ -66,7 +66,7 @@
 				reviewSwitchNe1.style.display='none';
 				lblReviewService.className='';
 				reviewSwitchNe2.style.display='none';
-				useReview.disabled=false;
+				ASNseReview.disabled=false;
 			#end
 			## SAK-26640
 			document.getElementById('tempAllowRes').style.display = 'block';
@@ -88,7 +88,7 @@
 				}
 				useReview.checked=false;
 				useReview.disabled=true;
-				lblUseReview.className='';
+				lblUseReview.className='instruction';
 				reviewSwitchNe1.style.removeProperty('display');
 			#end
 			## SAK-26640
@@ -100,7 +100,7 @@
 	}
 	focus_path = [ '$fField' ];
 </script>
-#javascript("/library/js/lang-datepicker/lang-datepicker.js")
+<script type="text/javascript" src="/library/js/lang-datepicker/lang-datepicker.js"></script>
 
 <div class="portletBody container-fluid">
 	#navBarOnClick( $allowAddAssignment $withGrade $allowGradeSubmission $allowAddAssignment $allowAllGroups $assignmentscheck $allowUpdateSite $enableViewOption $view "newAssignmentForm" "new" )
@@ -744,32 +744,6 @@
 						</div>
 						#end
 				<!-- End VeriCite custom options -->
-				#elseif($reviewServiceName.equals("Compilatio"))
-						#if ($content_review_note)
-							$content_review_note
-						#end
-						<h4>
-							$tlang.getString("review.originality.reports")
-						</h4>
-						<div class="radio">
-							#if($show_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT.contains($name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_IMMEDIATELY))
-								<label for="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_RADIO">
-									<input type="radio" name="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_RADIO" value="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_IMMEDIATELY" #if($value_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_RADIO.equals("$name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_IMMEDIATELY"))checked#end/>$tlang.getString("review.originality.reports.immediately")<br/>
-								</label>
-								<br/>
-							#end
-							#if($show_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT.contains($name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_DUE))
-								<label for="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_RADIO">
-									<input type="radio" name="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_RADIO" value="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_DUE" #if($value_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_RADIO.equals("$name_NEW_ASSIGNMENT_REVIEW_SERVICE_REPORT_DUE"))checked#end/>$tlang.getString("review.originality.reports.due")<br/>
-								</label>
-							#end
-						</div>
-				<!-- End Compilatio custom options -->
-				#elseif($reviewServiceName.equals("Urkund"))
-						#if ($content_review_note)
-							$content_review_note
-						#end
-				<!-- End Urkund custom options -->
 				#end
 			</div>
 		#end
@@ -1695,10 +1669,10 @@
 						<tr>
 							<td class="groupCell">
 								<a href="javascript:void(0)" id="collapse_$roleCount" class="toggleRoleLink" style="display:none;" title="$collapseString">
-									<img src="/library/image/sakai/collapse.gif" alt="$collapseString" /><span class="members"><i class="icon-sakai--sakai-membership"></i></span>
+									<img src="/library/image/sakai/collapse.gif" alt="$collapseString" /><span class="members"><i class="icon-sakai-membership"></i></span>
 								</a>
 								<a href="javascript:void(0)" id="expand_$roleCount" class="toggleRoleLink" style="display:inline" title="$expandString">
-									<img src="/library/image/sakai/expand.gif"  alt="$expandString"/><span class="members"><i class="icon-sakai--sakai-membership"></i></span>
+									<img src="/library/image/sakai/expand.gif"  alt="$expandString"/><span class="members"><i class="icon-sakai-membership"></i></span>
 								</a>
 								<input id="$showInputString" name="showInputString_$roleCount" #if ($!value_allPurposeAccessList.contains($role)) checked="checked" #end type="checkbox" name="allPurpose_$role" class="selectAllMembers"/>
 								<label for="showInputString_$roleCount">
@@ -1730,8 +1704,9 @@
 				<input class="extraNodeInput" type="button" id ="allPurpose_cancel" value="$tlang.getString("allPurpose_cancel")" />
 			</p>
 		</fieldset>
+		#set($submitnotif="submitnotifBottom")
 		<div class="row col-sm-12">
-			#buttonBar()
+			#buttonBar($submitnotif)
 		</div>
 		<input type="hidden" name="sakai_csrf_token" value="$sakai_csrf_token" />
 	</form>

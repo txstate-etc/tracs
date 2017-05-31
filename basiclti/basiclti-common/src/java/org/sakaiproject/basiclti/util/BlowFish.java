@@ -26,8 +26,8 @@ import java.io.FileInputStream;
 
 import org.sakaiproject.component.cover.ServerConfigurationService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.security.*;
 import javax.crypto.*;

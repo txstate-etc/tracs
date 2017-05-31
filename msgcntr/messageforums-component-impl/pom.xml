@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sakaiproject.msgcntr</groupId>
     <artifactId>msgcntr</artifactId>
-    <version>11.3</version>
+    <version>11.1</version>
   </parent>
   <name>Sakai Message Forums Component Implementation</name>
   <groupId>org.sakaiproject.msgcntr</groupId>
@@ -70,6 +70,7 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>org.sakaiproject.common</groupId>
@@ -79,6 +80,10 @@
       <groupId>org.sakaiproject.common</groupId>
       <artifactId>sakai-common-manager-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+  </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>

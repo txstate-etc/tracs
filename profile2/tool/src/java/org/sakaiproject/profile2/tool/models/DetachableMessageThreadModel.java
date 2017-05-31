@@ -82,6 +82,10 @@ public class DetachableMessageThreadModel extends LoadableDetachableModel<Messag
 	 * @see org.apache.wicket.model.LoadableDetachableModel#load()
 	 */
 	protected MessageThread load(){
+		
+		System.out.println("1: " + messagingLogic);
+		System.out.println("2: " + id);
+
 		return messagingLogic.getMessageThread(id);
 	}
 }

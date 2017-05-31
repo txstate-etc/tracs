@@ -30,8 +30,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.sakaiproject.assignment.api.Assignment;
 import org.sakaiproject.assignment.api.AssignmentService;
 import org.sakaiproject.content.api.ContentResource;
@@ -62,7 +61,7 @@ import org.sakaiproject.util.ResourceLoader;
  */
 public class AssignmentSupport {
 	
-	private static Logger logger = LoggerFactory.getLogger(AssignmentSupport.class);
+	private static Logger logger = Logger.getLogger(AssignmentSupport.class);
 
 	ResourceLoader rl = new ResourceLoader("dash_entity");
 	

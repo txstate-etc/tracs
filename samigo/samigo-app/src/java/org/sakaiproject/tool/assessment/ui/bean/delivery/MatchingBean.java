@@ -57,7 +57,7 @@ public class MatchingBean
   private String text;
   private String feedback;
   private AnswerIfc answer;
-  private Boolean isCorrect;
+  private boolean isCorrect;
   private String itemSequence;
 
   public String getItemSequence() {
@@ -75,7 +75,7 @@ public class AnswerLabelWithCorrectStatus {
 		  isCorrect = correct;
 		  answerLabel = label;
 	  }
-	  public Boolean getIsCorrect() {
+	  public boolean getIsCorrect() {
 		  return isCorrect;
 	  }
 	  public String getAnswerLabel() {
@@ -199,11 +199,11 @@ public class AnswerLabelWithCorrectStatus {
     return answer;
   }
 
-  public void setIsCorrect(Boolean isCorrect){
+  public void setIsCorrect(boolean isCorrect){
     this.isCorrect = isCorrect;
   }
   
-  public Boolean getIsCorrect()
+  public boolean getIsCorrect()
   {
       /*
     if (data != null && data.getPublishedAnswerId() != null &&

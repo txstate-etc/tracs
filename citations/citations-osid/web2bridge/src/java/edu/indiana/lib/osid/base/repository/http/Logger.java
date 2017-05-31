@@ -36,7 +36,7 @@ public class Logger
 	}
 
 	/**
-	 * Logger a message
+	 * Log a message
 	 */
 	public void log(String entry)
 	throws org.osid.repository.RepositoryException

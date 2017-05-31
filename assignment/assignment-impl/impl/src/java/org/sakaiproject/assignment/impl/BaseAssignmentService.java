@@ -27,19 +27,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.sakaiproject.announcement.api.AnnouncementChannel;
 import org.sakaiproject.announcement.api.AnnouncementService;
 import org.sakaiproject.assignment.api.*;
-import org.sakaiproject.assignment.api.model.AssignmentAllPurposeItem;
-import org.sakaiproject.assignment.api.model.AssignmentAllPurposeItemAccess;
-import org.sakaiproject.assignment.api.model.AssignmentModelAnswerItem;
-import org.sakaiproject.assignment.api.model.AssignmentNoteItem;
-import org.sakaiproject.assignment.api.model.AssignmentSupplementItemAttachment;
-import org.sakaiproject.assignment.api.model.AssignmentSupplementItemService;
 import org.sakaiproject.assignment.taggable.api.AssignmentActivityProducer;
 import org.sakaiproject.authz.api.*;
 import org.sakaiproject.authz.cover.FunctionManager;
@@ -74,7 +68,6 @@ import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentServ
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.Group;
 import org.sakaiproject.site.api.Site;
-import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.site.cover.SiteService;
 import org.sakaiproject.taggable.api.TaggingManager;
 import org.sakaiproject.taggable.api.TaggingProvider;
@@ -113,7 +106,6 @@ import java.util.zip.ZipOutputStream;
 
 //Export to excel
 import java.text.DecimalFormat;
-
 import org.sakaiproject.entitybroker.DeveloperHelperService;
 
 /**
@@ -127,7 +119,7 @@ import org.sakaiproject.entitybroker.DeveloperHelperService;
 public abstract class BaseAssignmentService implements AssignmentService, EntityTransferrer, EntityTransferrerRefMigrator
 {
 	/** Our logger. */
-	private static Logger M_log = LoggerFactory.getLogger(BaseAssignmentService.class);
+	private static Log M_log = LogFactory.getLog(BaseAssignmentService.class);
 
 	/** the resource bundle */
 	private static ResourceLoader rb = new ResourceLoader("assignment");
@@ -3497,17 +3489,19 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 				if (a.isGroup()) {
 					return getUserGroupSubmissionMap(a, Collections.singletonList(person)).get(person);
 				}
-			} catch (IdUnusedException | PermissionException e) {
-				M_log.debug(e.getMessage());
+			} catch (IdUnusedException iue) { 
+				M_log.debug(iue);
+			} catch (PermissionException pme) { 
+				M_log.debug(pme);
 			}
 		}
 		
-		M_log.debug("No submission found for user {} in assignment {}", person.getId(), assignmentReference);
+		M_log.debug("No submission found for user " + person.getId() + " in assignment " + assignmentReference);
 
 		return submission;
 	}
 
-	/**
+	/** 
 	 * Gets a map of users to their submissions for the specified assignment
 	 * @param a the assignment in question
 	 * @param users the users making up the key set
@@ -3610,7 +3604,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			}
 			catch (PermissionException e)
 			{
-				M_log.debug(e.getMessage());
+				M_log.debug(e);
 				return null;
 			}
 		}
@@ -3632,11 +3626,12 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			{
 				for (String userId : sub.getSubmitterIds())
 				{
-						M_log.debug("getSubmission(List, User) comparing aUser id : {} and chosen user id : {}",
-								userId, person.getId());
+						M_log.debug(this + " getSubmission(List, User) comparing aUser id : " + userId + " and chosen user id : "
+								+ person.getId());
 					if (userId.equals(person.getId()))
 					{
-						M_log.debug("getSubmission(List, User) found a match : return value is {}", sub.getId());
+						
+							M_log.debug(this + " getSubmission(List, User) found a match : return value is " + sub.getId());
 						retVal = sub;
 					}
 				}
@@ -4717,7 +4712,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 	        if (a != null)
 	        {
 	        	Site st = SiteService.getSite(contextString);
-	        	if (StringUtils.equals(allOrOneGroup, AssignmentConstants.ALL) || StringUtils.isEmpty(allOrOneGroup))
+	        	if (allOrOneGroup.equals(AssignmentConstants.ALL))
 	        	{
 		            if (a.getAccess().equals(Assignment.AssignmentAccess.SITE))
 		            {
@@ -7016,81 +7011,6 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 						}
 					}
 				} // if-else
-				//Import supplementary items if they are present in the assignment to be imported
-				AssignmentSupplementItemService assignmentSupplementItemService =
-						(AssignmentSupplementItemService) ComponentManager.get("org.sakaiproject.assignment.api.model.AssignmentSupplementItemService");
-				// Model Answer
-				AssignmentModelAnswerItem oModelAnswerItem = assignmentSupplementItemService.getModelAnswer(oAssignmentId);
-				if (oModelAnswerItem != null) {
-					AssignmentModelAnswerItem nModelAnswerItem = assignmentSupplementItemService.newModelAnswer();
-					assignmentSupplementItemService.saveModelAnswer(nModelAnswerItem);
-					nModelAnswerItem.setAssignmentId(nAssignment.getId());
-					nModelAnswerItem.setText(oModelAnswerItem.getText());
-					nModelAnswerItem.setShowTo(oModelAnswerItem.getShowTo());
-					Set oAttachments = oModelAnswerItem.getAttachmentSet();
-					Set<AssignmentSupplementItemAttachment> nAttachments = new HashSet<AssignmentSupplementItemAttachment>();
-					for (Iterator iter = oAttachments.iterator(); iter.hasNext();) {
-						AssignmentSupplementItemAttachment a = (AssignmentSupplementItemAttachment) iter.next();
-						AssignmentSupplementItemAttachment nAttach = assignmentSupplementItemService.newAttachment();
-						// New attachment creation
-						String nAttachId = transferAttachment(fromContext, toContext, null, a.getAttachmentId().replaceFirst("/content", ""));
-						if (StringUtils.isNotEmpty(nAttachId)) {
-							nAttach.setAssignmentSupplementItemWithAttachment(nModelAnswerItem);
-							nAttach.setAttachmentId(nAttachId);
-							assignmentSupplementItemService.saveAttachment(nAttach);
-							nAttachments.add(nAttach);
-						}
-					}
-					nModelAnswerItem.setAttachmentSet(nAttachments);
-					assignmentSupplementItemService.saveModelAnswer(nModelAnswerItem);
-				}
-				// Private Note
-				AssignmentNoteItem oNoteItem = assignmentSupplementItemService.getNoteItem(oAssignmentId);
-				if (oNoteItem != null) {
-					AssignmentNoteItem nNoteItem = assignmentSupplementItemService.newNoteItem();
-					//assignmentSupplementItemService.saveNoteItem(nNoteItem);
-					nNoteItem.setAssignmentId(nAssignment.getId());
-					nNoteItem.setNote(oNoteItem.getNote());
-					nNoteItem.setShareWith(oNoteItem.getShareWith());
-					nNoteItem.setCreatorId(UserDirectoryService.getCurrentUser().getId());
-					assignmentSupplementItemService.saveNoteItem(nNoteItem);
-				}
-				// All Purpose 
-				AssignmentAllPurposeItem oAllPurposeItem = assignmentSupplementItemService.getAllPurposeItem(oAssignmentId);
-				if (oAllPurposeItem != null) {
-					AssignmentAllPurposeItem nAllPurposeItem = assignmentSupplementItemService.newAllPurposeItem();
-					assignmentSupplementItemService.saveAllPurposeItem(nAllPurposeItem);
-					nAllPurposeItem.setAssignmentId(nAssignment.getId());
-					nAllPurposeItem.setTitle(oAllPurposeItem.getTitle());
-					nAllPurposeItem.setText(oAllPurposeItem.getText());
-					nAllPurposeItem.setHide(oAllPurposeItem.getHide());
-					nAllPurposeItem.setReleaseDate(null);
-					nAllPurposeItem.setRetractDate(null);
-					Set oAttachments = oAllPurposeItem.getAttachmentSet();
-					Set<AssignmentSupplementItemAttachment> nAttachments = new HashSet<AssignmentSupplementItemAttachment>();
-					for (Iterator iter = oAttachments.iterator(); iter.hasNext();) {
-						AssignmentSupplementItemAttachment a = (AssignmentSupplementItemAttachment) iter.next();
-						AssignmentSupplementItemAttachment nAttach = assignmentSupplementItemService.newAttachment();
-						// New attachment creation
-						String nAttachId = transferAttachment(fromContext, toContext, null, a.getAttachmentId().replaceFirst("/content", ""));
-						if (StringUtils.isNotEmpty(nAttachId)) {
-							nAttach.setAssignmentSupplementItemWithAttachment(nAllPurposeItem);
-							nAttach.setAttachmentId(nAttachId);
-							assignmentSupplementItemService.saveAttachment(nAttach);
-							nAttachments.add(nAttach);
-						}
-					}
-					nAllPurposeItem.setAttachmentSet(nAttachments);
-					assignmentSupplementItemService.cleanAllPurposeItemAccess(nAllPurposeItem);
-					Set<AssignmentAllPurposeItemAccess> accessSet = new HashSet<AssignmentAllPurposeItemAccess>();
-					AssignmentAllPurposeItemAccess access = assignmentSupplementItemService.newAllPurposeItemAccess();
-					access.setAccess(UserDirectoryService.getCurrentUser().getId());
-					access.setAssignmentAllPurposeItem(nAllPurposeItem);
-					assignmentSupplementItemService.saveAllPurposeItemAccess(access);
-					accessSet.add(access);
-					nAllPurposeItem.setAccessSet(accessSet);
-					assignmentSupplementItemService.saveAllPurposeItem(nAllPurposeItem);
-				}
 			} // if
 		} // for
 		return transversalMap;
@@ -11916,13 +11836,13 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 				}
 			}
 		}
-
-
-
+		
+		
+		
 		public String getGradeForUserInGradeBook(String userId)
 		{
 			String rv =null;
-			if (userId == null)
+			if (userId == null) 
 			{
 				userId = m_submitterId;
 			}
@@ -11948,7 +11868,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 				}
 				catch (Exception e)
 				{
-					M_log.warn(" BaseAssignmentSubmission getGradeFromGradeBook  "+ e.getMessage());
+					M_log.warn(" BaseAssignmentSubmission getGradeFromGradeBook  "+ e.getMessage()); 
 				}
 			}
 			return rv;
@@ -12758,7 +12678,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 				}
 				else
 				{
-					// error, assignment couldn't be found. Logger the error
+					// error, assignment couldn't be found. Log the error
 					M_log.debug(this + " BaseAssignmentSubmissionEdit postAttachment: Unable to find assignment associated with submission id= " + this.m_id + " and assignment id=" + this.m_assignment);
 				}
 			}
@@ -13179,7 +13099,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		 * NB: This method does not support gorup assignments - it's intended for perfromance in retrieving submissions for non-group assignments (e. where 1 submission has 1 submitterId)
 		 */
 		public Map<User, AssignmentSubmission> getUserSubmissionMap(Assignment assignment, List<User> users);
-
+		
 		/**
 		 * Get the number of submissions which has been submitted.
 		 * 
@@ -14364,10 +14284,6 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		{
 			List submissionLog=submission.getSubmissionLog();
 			
-			//Special case for old submissions prior to Sakai 10 where the submission log did not exist. Just return true for backward compatibility.
-			if (submissionLog == null || submissionLog.size() == 0) {
-				return true;
-			}
 			for (int x = 0; x < submissionLog.size(); x++)
 			{
 			    String itemString = (String) submissionLog.get(x);
@@ -14383,67 +14299,6 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			return false;
 		}
 		return false;
-	}
-
-	public String getDeepLink(String context, String assignmentId) throws Exception {
-
-		Assignment a = getAssignment(assignmentId);
-
-		boolean allowReadAssignment = allowGetAssignment(context);
-		boolean allowAddAssignment = allowAddAssignment(context);
-		boolean allowSubmitAssignment = allowAddSubmission(context);
-
-		return getDeepLinkWithPermissions(context, assignmentId
-											, allowReadAssignment, allowAddAssignment, allowSubmitAssignment);
-	}
-
-	public String getDeepLinkWithPermissions(String context, String assignmentId, boolean allowReadAssignment
-					, boolean allowAddAssignment, boolean allowSubmitAssignment) throws Exception {
-
-		Assignment a = getAssignment(assignmentId);
-
-		String assignmentContext = a.getContext(); // assignment context
-		if (allowReadAssignment
-				&& a.getOpenTime().before(TimeService.newTime())) {
-			// this checks if we want to display an assignment link
-			try {
-				Site site = SiteService.getSite(assignmentContext);
-				// site id
-				ToolConfiguration fromTool = site
-						.getToolForCommonId("sakai.assignment.grades");
-				// Three different urls to be rendered depending on the
-				// user's permission
-				if (allowAddAssignment) {
-					return m_serverConfigurationService.getPortalUrl()
-												+ "/directtool/"
-												+ fromTool.getId()
-												+ "?assignmentId=" + assignmentId + "&assignmentReference="
-												+ a.getReference()
-												+ "&panel=Main&sakai_action=doView_assignment";
-				} else if (allowSubmitAssignment) {
-					return m_serverConfigurationService.getPortalUrl()
-											+ "/directtool/"
-											+ fromTool.getId()
-											+ "?assignmentId=" + assignmentId + "&assignmentReference="
-											+ a.getReference()
-											+ "&panel=Main&sakai_action=doView_submission";
-				} else {
-					// user can read the assignment, but not submit, so
-					// render the appropriate url
-					return m_serverConfigurationService.getPortalUrl()
-											+ "/directtool/"
-											+ fromTool.getId()
-											+ "?assignmentId=" + assignmentId + "&assignmentReference="
-											+ a.getReference()
-											+ "&panel=Main&sakai_action=doView_assignment_as_student";
-				}
-			} catch (IdUnusedException e) {
-				// No site found
-				throw new IdUnusedException(
-						"No site found while creating assignment url");
-			}
-		}
-		return "";
-	}
+	} 
 } // BaseAssignmentService
 

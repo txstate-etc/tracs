@@ -2,34 +2,16 @@ package org.sakaiproject.gradebookng.business.model;
 
 import java.io.Serializable;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 /**
- * Encapsulates the details of an imported grade for a student and any comment
- *
- * TODO refactor to ProcessedCell?
+ * Created by chmaurer on 1/27/15.
  */
-@ToString
+@Data
 public class ProcessedGradeItemDetail implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
-	@Getter
-	@Setter
 	private String studentEid;
-
-	@Getter
-	@Setter
 	private String studentUuid;
-
-	@Getter
-	@Setter
 	private String grade;
-
-	@Getter
-	@Setter
 	private String comment;
-
 }

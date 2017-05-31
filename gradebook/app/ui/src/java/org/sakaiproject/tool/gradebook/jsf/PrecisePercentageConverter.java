@@ -26,8 +26,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.NumberConverter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.sakaiproject.util.ResourceLoader;
 
@@ -44,7 +44,7 @@ import org.sakaiproject.util.ResourceLoader;
  * 
  */
 public class PrecisePercentageConverter extends NumberConverter {
-	private static final Logger log = LoggerFactory.getLogger(PrecisePercentageConverter.class);
+	private static final Log log = LogFactory.getLog(PrecisePercentageConverter.class);
 
 	public PrecisePercentageConverter() {
 		setType("percent");

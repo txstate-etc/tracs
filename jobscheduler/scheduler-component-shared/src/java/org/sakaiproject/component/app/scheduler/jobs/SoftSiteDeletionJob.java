@@ -5,7 +5,10 @@ import java.util.Date;
 import java.util.List;
 
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.apachecommons.CommonsLog;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -37,7 +40,7 @@ import org.sakaiproject.tool.api.SessionManager;
  * @author Steve Swinsburg (steve.swinsburg@gmail.com)
  * 
  */
-@Slf4j
+@CommonsLog
 public class SoftSiteDeletionJob implements Job {
 
 	private final int GRACETIME_DEFAULT = 30;

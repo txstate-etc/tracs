@@ -34,8 +34,8 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.announcement.api.AnnouncementMessage;
 import org.sakaiproject.calendar.api.Calendar;
 import org.sakaiproject.calendar.api.CalendarEvent;
@@ -71,7 +71,7 @@ import org.sakaiproject.util.ResourceLoader;
  */
 public class ScheduleSupport{
 	
-	private Logger logger = LoggerFactory.getLogger(ScheduleSupport.class);
+	private Log logger = LogFactory.getLog(ScheduleSupport.class);
 	
 	ResourceLoader rl = new ResourceLoader("dash_entity");
 
@@ -445,7 +445,7 @@ public class ScheduleSupport{
 	 */
 	public class ScheduleNewEventProcessor implements EventProcessor {
 
-		private Logger logger = LoggerFactory.getLogger(ScheduleNewEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleNewEventProcessor.class);
 
 		/* (non-Javadoc)
 		 * @see org.sakaiproject.dash.listener.EventProcessor#getEventIdentifer()
@@ -459,13 +459,18 @@ public class ScheduleSupport{
 		 * @see org.sakaiproject.dash.listener.EventProcessor#processEvent(org.sakaiproject.event.api.Event)
 		 */
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-			logger.debug("removing links and item for {}", event.getResource());
-
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("removing links and item for " + event.getResource());
+			}
 			String eventId = event.getEvent();
+			
 			String eventContextString = event.getContext();
-
+			
 			Entity entity = sakaiProxy.getEntity(event.getResource());
 			// handle add events
 			if(entity != null && entity instanceof CalendarEvent) {
@@ -532,7 +537,7 @@ public class ScheduleSupport{
 							RepeatingCalendarItem repeatingCalendarItem = dashboardLogic.createRepeatingCalendarItem(cEvent.getDisplayName(), new Date(cEvent.getRange().firstTime().getTime()), 
 									lastDate, key, cEventReference, context, sourceType, frequency, maxCount);
 								
-							logger.debug(repeatingCalendarItem.toString());
+							logger.debug(repeatingCalendarItem);
 						}
 					}
 				}
@@ -540,7 +545,7 @@ public class ScheduleSupport{
 			} else {
 				// for now, let's log the error. 
 				// this event is posted for creation of a calendar as well as for creation of calendar events, so this is not necessarily an error.
-				logger.debug("{} is not processed for entityReference {}", eventId, event.getResource());
+				logger.debug(eventId + " is not processed for entityReference " + event.getResource());
 			}
 		}
 		
@@ -551,7 +556,7 @@ public class ScheduleSupport{
 	 */
 	public class ScheduleRemoveEventProcessor implements EventProcessor {
 		
-		private Logger logger = LoggerFactory.getLogger(ScheduleRemoveEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleRemoveEventProcessor.class);
 		
 		/* (non-Javadoc)
 		 * @see org.sakaiproject.dash.listener.EventProcessor#getEventIdentifer()
@@ -565,10 +570,17 @@ public class ScheduleSupport{
 		 * @see org.sakaiproject.dash.listener.EventProcessor#processEvent(org.sakaiproject.event.api.Event)
 		 */
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-			logger.debug("removing news links and news item for {}", event.getResource());
-			logger.debug("removing calendar links and news item for {}", event.getResource());
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("removing news links and news item for " + event.getResource());
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("removing calendar links and news item for " + event.getResource());
+			}
 			// remove all links and CalendarItem itself
 			dashboardLogic.removeCalendarItems(event.getResource());
 		}
@@ -580,7 +592,7 @@ public class ScheduleSupport{
 	 */
 	public class ScheduleUpdateTitleEventProcessor implements EventProcessor {
 		
-		private Logger logger = LoggerFactory.getLogger(ScheduleUpdateTitleEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleUpdateTitleEventProcessor.class);
 
 		/* (non-Javadoc)
 		 * @see org.sakaiproject.dash.listener.EventProcessor#getEventIdentifer()
@@ -594,9 +606,14 @@ public class ScheduleSupport{
 		 * @see org.sakaiproject.dash.listener.EventProcessor#processEvent(org.sakaiproject.event.api.Event)
 		 */
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-			logger.debug("updating title of calendar item for {}", event.getResource());
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("updating title of calendar item for " + event.getResource());
+			}
 			Entity entity = sakaiProxy.getEntity(event.getResource());
 			
 			if(entity != null && entity instanceof CalendarEvent) {
@@ -646,7 +663,7 @@ public class ScheduleSupport{
 	 */
 	public class ScheduleUpdateTimeEventProcessor implements EventProcessor {
 		
-		private Logger logger = LoggerFactory.getLogger(ScheduleUpdateTimeEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleUpdateTimeEventProcessor.class);
 		
 		/* (non-Javadoc)
 		 * @see org.sakaiproject.dash.listener.EventProcessor#getEventIdentifer()
@@ -660,10 +677,15 @@ public class ScheduleSupport{
 		 * @see org.sakaiproject.dash.listener.EventProcessor#processEvent(org.sakaiproject.event.api.Event)
 		 */
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-			logger.debug("updating time of calendar item for {}", event.getResource());
-
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("updating time of calendar item for " + event.getResource());
+			}
+			
 			String entityReference = event.getResource();
 			Entity entity = sakaiProxy.getEntity(entityReference );
 			
@@ -709,7 +731,7 @@ public class ScheduleSupport{
 			}
 			
 			if(logger.isDebugEnabled()) {
-				logger.debug("removing news links and news item for {}", event.getResource());
+				logger.debug("removing news links and news item for " + event.getResource());
 			}
 		}
 
@@ -720,7 +742,7 @@ public class ScheduleSupport{
 	 */
 	public class ScheduleUpdateTypeEventProcessor implements EventProcessor {
 
-		private Logger logger = LoggerFactory.getLogger(ScheduleUpdateTypeEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleUpdateTypeEventProcessor.class);
 
 		/* (non-Javadoc)
 		 * @see org.sakaiproject.dash.listener.EventProcessor#getEventIdentifer()
@@ -734,10 +756,15 @@ public class ScheduleSupport{
 		 * @see org.sakaiproject.dash.listener.EventProcessor#processEvent(org.sakaiproject.event.api.Event)
 		 */
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-			logger.debug("updating type of calendar item for {}", event.getResource());
-
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("updating type of calendar item for " + event.getResource());
+			}
+			
 			String[] parts = event.getResource().split("::");
 			if(parts.length > 2) {
 				String entityReference = parts[0];
@@ -753,7 +780,9 @@ public class ScheduleSupport{
 					// get the assignment entity and its new time
 					CalendarEvent cEvent = (CalendarEvent) entity;
 					
-					logger.debug("removing news links and news item for {}", entityReference);
+					if(logger.isDebugEnabled()) {
+						logger.debug("removing news links and news item for " + entityReference);
+					}
 					if(cEvent.getRecurrenceRule() != null) {
 						// update the label key for the repeating calendar item 
 						dashboardLogic.reviseRepeatingCalendarItemsLabelKey(entityReference, oldLabelKey, newLabelKey);
@@ -775,22 +804,28 @@ public class ScheduleSupport{
 
 	public class ScheduleReviseEventProcessor implements EventProcessor {
 
-		private Logger logger = LoggerFactory.getLogger(ScheduleReviseEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleReviseEventProcessor.class);
 
 		public String getEventIdentifer() {
 			return SakaiProxy.EVENT_SCHEDULE_REVISE_EVENT;
 		}
 
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-			logger.debug("revising calendar item for {}", event.getResource());
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("revising calendar item for " + event.getResource());
+			}
+
 		}
+		
 	}
 	
 	public class ScheduleUpdateAccessEventProcessor implements EventProcessor {
 
-		private Logger logger = LoggerFactory.getLogger(ScheduleUpdateAccessEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleUpdateAccessEventProcessor.class);
 
 		public String getEventIdentifer() {
 			
@@ -798,10 +833,14 @@ public class ScheduleSupport{
 		}
 
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-			logger.debug("revising calendar item for {}", event.getResource());
-
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("revising calendar item for " + event.getResource());
+			}
+			
 			Entity entity = sakaiProxy.getEntity(event.getResource());
 			
 			if(entity != null && entity instanceof AnnouncementMessage) {
@@ -814,13 +853,18 @@ public class ScheduleSupport{
 				dashboardLogic.updateCalendarLinks(cReference);
 			}
 			
-			logger.debug("removing news links and news item for {}", event.getResource());
+			if(logger.isDebugEnabled()) {
+				logger.debug("removing news links and news item for " + event.getResource());
+			}
+
+
 		}
+	
 	}
 	
 	public class ScheduleUpdateFrequencyEventProcessor implements EventProcessor {
 
-		private Logger logger = LoggerFactory.getLogger(ScheduleUpdateFrequencyEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleUpdateFrequencyEventProcessor.class);
 
 		public String getEventIdentifer() {
 			
@@ -828,10 +872,14 @@ public class ScheduleSupport{
 		}
 
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-			logger.debug("revising calendar item for {}", event.getResource());
-
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("revising calendar item for " + event.getResource());
+			}
+			
 			String entityReference = event.getResource();
 			Entity entity = sakaiProxy.getEntity(entityReference );
 			
@@ -906,7 +954,7 @@ public class ScheduleSupport{
 	
 	public class ScheduleUpdateExcludedEventProcessor implements EventProcessor {
 
-		private Logger logger = LoggerFactory.getLogger(ScheduleUpdateExcludedEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleUpdateExcludedEventProcessor.class);
 
 		public String getEventIdentifer() {
 			
@@ -914,9 +962,11 @@ public class ScheduleSupport{
 		}
 
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			
 			// This is a case of a revision to one instance of a repeating event. If effect, 
 			// a new calendar-event entity has been created to represent the instance that 
 			// was excluded from the recurring event.  
@@ -957,7 +1007,7 @@ public class ScheduleSupport{
 				dashboardLogic.createCalendarLinks(calendarItem);
 			} else {
 				// for now, let's log the error
-				logger.info("{} is not processed for entityReference {}",eventId, event.getResource());
+				logger.info(eventId + " is not processed for entityReference " + event.getResource());
 			}
 		}
 	
@@ -965,7 +1015,7 @@ public class ScheduleSupport{
 	
 	public class ScheduleUpdateExclusionsEventProcessor implements EventProcessor {
 
-		private Logger logger = LoggerFactory.getLogger(ScheduleUpdateExclusionsEventProcessor.class);
+		private Log logger = LogFactory.getLog(ScheduleUpdateExclusionsEventProcessor.class);
 		
 		public String getEventIdentifer() {
 			
@@ -973,9 +1023,11 @@ public class ScheduleSupport{
 		}
 
 		public void processEvent(Event event) {
-			logger.debug("\n\n\n============================================================\n{}\n=============================================================\n\n\n",
-					event.toString());
-
+			if(logger.isDebugEnabled()) {
+				logger.debug("\n\n\n=============================================================\n" + event  
+						+ "\n=============================================================\n\n\n");
+			}
+			
 			// This is a case of a revision to one instance of a repeating event, which is 
 			// then no longer an instance of the repeating event. This event processor handles
 			// the change to the repeating event: exclusion of one instance from the sequence.
@@ -1010,8 +1062,10 @@ public class ScheduleSupport{
 					}
 					entityReference = buf.toString();
 				}
-				logger.info("processEvent() {} {}", entityReference, sequenceNumber);
-
+				if(logger.isDebugEnabled()) {
+					logger.info("processEvent() " + entityReference + " " + sequenceNumber);
+				}
+				
 				if(entityReference != null && sequenceNumber >= -1) {
 					String calendarTimeLabelKey = null;
 					CalendarItem calendarItem = dashboardLogic.getCalendarItem(entityReference, calendarTimeLabelKey, sequenceNumber);

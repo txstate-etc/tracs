@@ -4,7 +4,7 @@
   <parent>
     <artifactId>podcasts-base</artifactId>
     <groupId>org.sakaiproject</groupId>
-    <version>11.3</version>
+    <version>11.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <name>sakai-podcasts</name>
@@ -43,6 +43,10 @@
       <artifactId>commons-fileupload</artifactId>
     </dependency>
     <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-podcasts-api</artifactId>
     </dependency>
@@ -69,6 +73,10 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>

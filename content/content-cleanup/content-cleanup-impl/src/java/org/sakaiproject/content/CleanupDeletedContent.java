@@ -21,8 +21,8 @@ package org.sakaiproject.content;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -48,7 +48,8 @@ import org.sakaiproject.tool.api.SessionManager;
  */
 public class CleanupDeletedContent implements Job {
 
-	private static final Logger log = LoggerFactory.getLogger(CleanupDeletedContent.class);
+	private static final Log log = LogFactory
+			.getLog(CleanupDeletedContent.class);
 
 	private ContentHostingService chs;
 	private ServerConfigurationService scs;
@@ -116,16 +117,19 @@ public class CleanupDeletedContent implements Job {
 					}
 				}
 				else {
-					log.debug("Resource {} is still too new, skipping.", resource.getId());
+					if (log.isDebugEnabled()) {
+						log.debug("Resource " + resource.getId() + " is still too new, skipping.");
+					}
 				}
 			} 
 			else {
-				log.warn("No modified date set for file with id {}. Cannot process for deletion.", resource.getId());
+				log.warn("No modified date set for file with id " + resource.getId() + ". Cannot process for deletion.");
 			}
 		}
 		int failed = attempted - removed;
-		log.info("Out of {}(~{}) deleted resources, successfully removed {}(~{}), failed resources: {}",
-				deleted.size(), formatSize(totalSize), removed, formatSize(removedSize), failed);
+		log.info("Out of " + deleted.size() + "(~"+ formatSize(totalSize)+ ") "
+				+ "deleted resources, successfully removed " + removed + "(~"+ formatSize(removedSize)+ ")"
+				+ ((failed > 0) ? ", failed on " + failed + " resources": ""));
 	}
 	
 	static String formatSize(long size) {

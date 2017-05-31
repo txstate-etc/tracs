@@ -18,15 +18,16 @@
 package edu.indiana.lib.twinpeaks.search.sru.ss360search;
 
 import edu.indiana.lib.twinpeaks.util.*;
-import lombok.extern.slf4j.Slf4j;
+import java.util.*;
 
 
 /**
  * Data normalization for 360 Search results
  */
-@Slf4j
 public class ResultUtils
 {
+
+  private static org.apache.commons.logging.Log	_log = LogUtils.getLog(ResultUtils.class);
   /*
    * Database names
    */
@@ -49,7 +50,7 @@ public class ResultUtils
   {
     String result = resultData.trim();
 
-    log.debug("normalize() called with " + result
+    _log.debug("normalize() called with " + result
             +  " -- " + partDataName
             +  " -- " + database);
     /*

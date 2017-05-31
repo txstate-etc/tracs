@@ -20,16 +20,14 @@ package edu.indiana.lib.osid.base.repository.http;
  * limitations under the License.
  *
  **********************************************************************************/
-
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * @author Massachusetts Institute of Techbology, Sakai Software Development Team
  * @version
  */
-@Slf4j
 public class Asset extends edu.indiana.lib.osid.base.repository.Asset
 {
+		private static org.apache.commons.logging.Log	_log = edu.indiana.lib.twinpeaks.util.LogUtils.getLog(Asset.class);
+
     private org.osid.shared.Type assetType = new Type("mit.edu", "asset", "library_content");
     private org.osid.shared.Type recordStructureType = new Type("mit.edu", "recordStructure", "library_content");
     private org.osid.shared.Type dcRecordStructureType = new Type("mit.edu", "recordStructure", "dublinCore");
@@ -63,7 +61,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
          }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
         }
 
     }
@@ -135,7 +133,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
         }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
             throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
         }
     }
@@ -162,7 +160,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
         }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
             throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
         }
     }
@@ -186,7 +184,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
         }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
             throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
         }
     }
@@ -232,7 +230,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
         }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
             throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
         }
     }
@@ -263,7 +261,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
         }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
             throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
         }
     }
@@ -302,7 +300,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
         }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
             throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
         }
     }
@@ -322,7 +320,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
         }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
             throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
         }
     }
@@ -347,7 +345,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
         }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
             throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
         }
     }
@@ -380,7 +378,7 @@ public class Asset extends edu.indiana.lib.osid.base.repository.Asset
         }
         catch (Throwable t)
         {
-            log.error(t.getMessage());
+            _log.error(t.getMessage());
             throw new org.osid.repository.RepositoryException(org.osid.OsidException.OPERATION_FAILED);
         }
     }

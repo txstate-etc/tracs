@@ -1,7 +1,7 @@
 package org.sakaiproject.component.app.scheduler.jobs.backfillrole;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -26,7 +26,7 @@ public class BackFillRoleJob  implements Job {
 
     private static final String TEMPLATE_PREFIX = "!site.template";
 
-    private final Logger log = LoggerFactory.getLogger(BackFillRoleJob.class);
+    private final Log log = LogFactory.getLog(BackFillRoleJob.class);
 
     private SiteService siteService;
 
@@ -124,7 +124,7 @@ public class BackFillRoleJob  implements Job {
                 continue;
             }
             examined++;
-            // Logger progress
+            // Log progress
             if (interval != 0 && examined % interval == 0) {
                 log.info("Processed: "+ examined);
             }

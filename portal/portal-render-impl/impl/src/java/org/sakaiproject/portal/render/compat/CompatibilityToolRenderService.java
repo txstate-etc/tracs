@@ -29,8 +29,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.portal.api.Portal;
 import org.sakaiproject.portal.render.api.RenderResult;
 import org.sakaiproject.portal.render.api.ToolRenderException;
@@ -47,7 +47,8 @@ import org.sakaiproject.site.api.ToolConfiguration;
 public class CompatibilityToolRenderService implements ToolRenderService
 {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CompatibilityToolRenderService.class);
+	private static final Log LOG = LogFactory
+			.getLog(CompatibilityToolRenderService.class);
 
 	private List renderServices = null;
 

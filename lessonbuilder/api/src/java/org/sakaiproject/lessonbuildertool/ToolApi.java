@@ -5,6 +5,5 @@ import java.io.InputStream;
 
 public interface ToolApi {
     public String loadCartridge(File f, String d, String siteId);
-    public String deleteOrphanPages(String siteId);
 }
 

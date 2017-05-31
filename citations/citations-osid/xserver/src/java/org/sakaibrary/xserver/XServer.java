@@ -36,7 +36,6 @@ import java.net.URL;
 import java.net.HttpURLConnection;
 
 //SAX XML parsing imports
-import lombok.extern.slf4j.Slf4j;
 import org.sakaibrary.osid.repository.xserver.SearchStatusProperties;
 import org.sakaibrary.xserver.session.MetasearchSession;
 import org.sakaibrary.xserver.session.MetasearchSessionManager;
@@ -46,7 +45,6 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.ParserConfigurationException;
 
-@Slf4j
 public class XServer extends DefaultHandler {
   //
   // Number of records the Xserver should fetch at one time
@@ -59,6 +57,9 @@ public class XServer extends DefaultHandler {
 	boolean printXML = false;
 
 	/* constants */
+	private static final org.apache.commons.logging.Log LOG =
+		org.apache.commons.logging.LogFactory.getLog(
+		"org.sakaibrary.xserver.XServer" );
 	private static final String XSLT_FILE = "/xsl/xserver2sakaibrary.xsl";
 
 	/* fields coming from searchProperties */
@@ -124,12 +125,12 @@ public class XServer extends DefaultHandler {
 				x = sxe.getException();
 			}
 
-			log.warn( "XServer() SAX exception in trying to get a new SAXParser " +
+			LOG.warn( "XServer() SAX exception in trying to get a new SAXParser " +
 					"from SAXParserFactory: " + sxe.getMessage(), x );
 			throw new RuntimeException( "XServer() SAX exception: " + sxe.getMessage(), x );
 		} catch (ParserConfigurationException pce) {
 			// Parser with specified options can't be built
-			log.warn( "XServer() SAX parser cannot be built with specified options" );
+			LOG.warn( "XServer() SAX parser cannot be built with specified options" );
 			throw new RuntimeException( "XServer() SAX parser cannot be built with " +
 					"specified options: " + pce.getMessage(), pce );
 		}
@@ -174,7 +175,7 @@ public class XServer extends DefaultHandler {
 			pageSize = ( Integer ) searchProperties.getProperty( "pageSize" );
 			startRecord = ( Integer ) searchProperties.getProperty( "startRecord" );
 		} catch( org.osid.shared.SharedException se ) {
-			log.warn( "XServer() failed to get search properties - will assign " +
+			LOG.warn( "XServer() failed to get search properties - will assign " +
 					"defaults", se );
 		}
 
@@ -194,7 +195,7 @@ public class XServer extends DefaultHandler {
 
 		// check args
 		if( startRecord.intValue() <= 0 ) {
-			log.warn( "XServer() - startRecord must be set to 1 or higher." );
+			LOG.warn( "XServer() - startRecord must be set to 1 or higher." );
 			startRecord = null;
 			startRecord = new Integer( 1 );
 		}
@@ -231,7 +232,7 @@ public class XServer extends DefaultHandler {
 
 		if( printXML ) {
 			// print xml
-			log.debug( xml.toString() );
+			LOG.debug( xml.toString() );
 		}
 
 		// run SAX Parser
@@ -246,11 +247,11 @@ public class XServer extends DefaultHandler {
 				x = sxe.getException();
 			}
 
-			log.warn( "loginURL() SAX exception: " + sxe.getMessage(),
+			LOG.warn( "loginURL() SAX exception: " + sxe.getMessage(),
 					x );
 		} catch (IOException ioe) {
 			// I/O error
-			log.warn( "loginURL() IO exception", ioe );
+			LOG.warn( "loginURL() IO exception", ioe );
 		}
 
 		// return whether or not the login was successful
@@ -300,7 +301,7 @@ public class XServer extends DefaultHandler {
 
 		if( printXML ) {
 			// print xml
-			log.debug( xml.toString() );
+			LOG.debug( xml.toString() );
 		}
 
 		// run SAX Parser
@@ -315,10 +316,10 @@ public class XServer extends DefaultHandler {
 				x = sxe.getException();
 			}
 
-			log.warn( "findURL() SAX exception: " + sxe.getMessage(), x );
+			LOG.warn( "findURL() SAX exception: " + sxe.getMessage(), x );
 		} catch (IOException ioe) {
 			// I/O error
-			log.warn( "findURL() IO exception", ioe );
+			LOG.warn( "findURL() IO exception", ioe );
 		}
 	}
 
@@ -341,7 +342,7 @@ public class XServer extends DefaultHandler {
 
 		if( printXML ) {
 			// print xml
-			log.debug( xml.toString() );
+			LOG.debug( xml.toString() );
 		}
 
 		// run SAX Parser
@@ -356,10 +357,10 @@ public class XServer extends DefaultHandler {
 				x = sxe.getException();
 			}
 
-			log.warn( "findGroupInfoURL() SAX exception: " + sxe.getMessage(), x );
+			LOG.warn( "findGroupInfoURL() SAX exception: " + sxe.getMessage(), x );
 		} catch (IOException ioe) {
 			// I/O error
-			log.warn( "findGroupInfoURL() IO exception", ioe );
+			LOG.warn( "findGroupInfoURL() IO exception", ioe );
 		}
 	}
 
@@ -399,7 +400,7 @@ public class XServer extends DefaultHandler {
 
 		if( printXML ) {
 			// print xml
-			log.debug( xml.toString() );
+			LOG.debug( xml.toString() );
 		}
 
 		// run SAX Parser
@@ -414,10 +415,10 @@ public class XServer extends DefaultHandler {
 				x = sxe.getException();
 			}
 
-			log.warn( "mergeSortURL() SAX exception: " + sxe.getMessage(), x );
+			LOG.warn( "mergeSortURL() SAX exception: " + sxe.getMessage(), x );
 		} catch (IOException ioe) {
 			// I/O error
-			log.warn( "mergeSortURL() IO exception", ioe );
+			LOG.warn( "mergeSortURL() IO exception", ioe );
 		}
 	}
 
@@ -463,7 +464,7 @@ public class XServer extends DefaultHandler {
 
 		if( printXML ) {
 			// print xml
-			log.debug( xml.toString() );
+			LOG.debug( xml.toString() );
 		}
 
 		return xml;
@@ -492,7 +493,7 @@ public class XServer extends DefaultHandler {
 	throws XServerException, org.osid.repository.RepositoryException {
 		// check args
 		if( numAssets < 0 ) {
-			log.warn( "getRecordsXML() - numAssets below zero." );
+			LOG.warn( "getRecordsXML() - numAssets below zero." );
 			numAssets = 0;
 		}
 
@@ -510,7 +511,7 @@ public class XServer extends DefaultHandler {
 
 		if( setNumber == null ) {
 			// null setNumber indicates multiple search sources, do a merge
-			log.debug( "getRecordsXML() - doing merge, set number is null" );
+			LOG.debug( "getRecordsXML() - doing merge, set number is null" );
 			mergeSortURL( "merge", sortBy );
 
 			// we'll be getting a new setNumber for the merged set, store it
@@ -522,7 +523,7 @@ public class XServer extends DefaultHandler {
 		} else {
 			if( !singleSearchSource ) {
 				// do a merge_more if we're working with multiple search sources
-				log.debug( "getRecordsXML() - doing merge_more, set number " +
+				LOG.debug( "getRecordsXML() - doing merge_more, set number " +
 						"is " + setNumber );
 				mergeSortURL( "merge_more", sortBy );
 			}
@@ -585,7 +586,7 @@ public class XServer extends DefaultHandler {
 ** **** end original code ********/
 
 		setEntryEnd = df.format( setEntryEndValue );
-		log.debug( "getRecordsXML() - presenting records: " +
+		LOG.debug( "getRecordsXML() - presenting records: " +
 				setEntryStart + "-" + setEntryEnd );
 
 		// run the present X-Service
@@ -605,7 +606,7 @@ public class XServer extends DefaultHandler {
 	throws XServerException {
 		this.searchSourceIds = sourceIds;
 
-		log.debug( "initAsynchSearch() - searchSourceIds: " + searchSourceIds.size() );
+		LOG.debug( "initAsynchSearch() - searchSourceIds: " + searchSourceIds.size() );
 		if( searchSourceIds.size() == 1 ) {
 			// only one search source - do not need to merge
 			singleSearchSource = true;
@@ -613,7 +614,7 @@ public class XServer extends DefaultHandler {
 			singleSearchSource = false;
 		}
 
-		log.debug( "initAsynchSearch() - find_command: " + criteria );
+		LOG.debug( "initAsynchSearch() - find_command: " + criteria );
 		// run the find X-Service in non-blocking mode
 		findURL( criteria, "N" );
 
@@ -976,11 +977,11 @@ public class XServer extends DefaultHandler {
 				metasearchSession.getFoundGroupNumber() == null ||
 				metasearchSession.getSearchProperties() == null ) {
 			if( metasearchSession == null ) {
-				log.error( "checkSessionState() - session state out of sync:" +
+				LOG.error( "checkSessionState() - session state out of sync:" +
 						"\n  guid: " + guid +
 				"\n  MetasearchSession: null" );
 			} else {
-				log.error( "checkSessionState() - session state out of sync:" +
+				LOG.error( "checkSessionState() - session state out of sync:" +
 						"\n  guid: " + guid +
 						"\n  MetasearchSession: " + metasearchSession +
 						"\n  logged in: " + metasearchSession.isLoggedIn() +
@@ -1021,13 +1022,13 @@ public class XServer extends DefaultHandler {
 			// disconnect
 			urlConn.disconnect();
 		} catch( MalformedURLException mue ) {
-			log.warn( "doURLConnection() malformed URL" );
+			LOG.warn( "doURLConnection() malformed URL" );
 			wrapXServerException( null, "Error in connecting to X-Server. Please contact Citations Helper Administrator." );
 		} catch( IOException ioe ) {
-			log.warn( "doURLConnection() IOException, connection failed" );
+			LOG.warn( "doURLConnection() IOException, connection failed" );
 			wrapXServerException( null, "Error in connecting to X-Server. Please contact Citations Helper Administrator." );
 		} catch( XServerException xse ) {
-			log.warn( "doURLConnection() - XServerException: " +
+			LOG.warn( "doURLConnection() - XServerException: " +
 					xse.getErrorCode() + " - " + xse.getErrorText() );
 			wrapXServerException( xse.getErrorCode(), xse.getErrorText() + "Please contact Citations Helper Administrator." );
 		}

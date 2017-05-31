@@ -65,7 +65,7 @@ public class CategoryColumnHeaderPanel extends Panel {
 				gradebookPage.setUiSettings(settings);
 
 				// refresh
-				setResponsePage(GradebookPage.class);
+				setResponsePage(new GradebookPage());
 			}
 
 		};

@@ -39,7 +39,7 @@ import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 
 public class RemoveAttachmentListener implements ActionListener
 {
-  //private static Logger log = LoggerFactory.getLogger(RemoveAttachmentListener.class);
+  //private static Log log = LogFactory.getLog(RemoveAttachmentListener.class);
 
   public RemoveAttachmentListener()
   {

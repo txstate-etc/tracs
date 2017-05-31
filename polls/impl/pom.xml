@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sakaiproject.polls</groupId>
         <artifactId>polls</artifactId>
-        <version>11.3</version>
+        <version>11.1</version>
     </parent>
 
     <name>Sakai Polls Implementation Module (polls-impl)</name>
@@ -56,12 +56,17 @@
             <artifactId>commons-collections</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+        <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
+            <version>1.3.1</version>
         </dependency>
         <dependency>
             <groupId>dom4j</groupId>
@@ -135,6 +140,10 @@
             <artifactId>oro</artifactId>
             <version>2.0.8</version>
         </dependency>
+	<dependency>
+	  <groupId>org.slf4j</groupId>
+   	  <artifactId>slf4j-log4j12</artifactId>
+	  </dependency>
     </dependencies>
 
     <build>
@@ -179,7 +188,6 @@
                 <includes>
                     <include>hibernate-test.xml</include>
                     <include>hibernate.properties</include>
-                    <include>log4j.properties</include>
                 </includes>
             </testResource>
         </testResources>

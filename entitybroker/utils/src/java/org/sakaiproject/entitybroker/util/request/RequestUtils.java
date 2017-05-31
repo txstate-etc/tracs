@@ -46,15 +46,12 @@ import org.sakaiproject.entitybroker.exception.EntityException;
 import org.sakaiproject.entitybroker.providers.EntityRequestHandler;
 import org.sakaiproject.entitybroker.util.TemplateParseUtil;
 
-import lombok.extern.slf4j.Slf4j;
-
 
 /**
  * Contains a set of static utility methods for working with requests
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-@Slf4j
 public class RequestUtils {
 
     private static final String DIVIDER = "||";
@@ -412,7 +409,7 @@ public class RequestUtils {
                                 limit = Integer.valueOf(value.toString()).intValue();
                                 search.setLimit(limit);
                             } catch (NumberFormatException e) {
-                                log.warn("Invalid non-number passed in for _limit/_perpage param: " + value + ":" + e);
+                                System.out.println("WARN Invalid non-number passed in for _limit/_perpage param: " + value + ":" + e);
                             }
                             continue;
                         } else if ("_start".equals(key)
@@ -421,7 +418,7 @@ public class RequestUtils {
                                 int start = Integer.valueOf(value.toString()).intValue();
                                 search.setStart(start);
                             } catch (NumberFormatException e) {
-                                log.warn("Invalid non-number passed in for '_start' param: " + value + ":" + e);
+                                System.out.println("WARN Invalid non-number passed in for '_start' param: " + value + ":" + e);
                             }
                             continue;
                         } else if ("_page".equals(key)
@@ -430,7 +427,7 @@ public class RequestUtils {
                             try {
                                 page = Integer.valueOf(value.toString()).intValue();
                             } catch (NumberFormatException e) {
-                                log.warn("Invalid non-number passed in for '_page' param: " + value + ":" + e);
+                                System.out.println("WARN Invalid non-number passed in for '_page' param: " + value + ":" + e);
                             }
                             continue;
                         } else if ("_order".equals(key)
@@ -457,7 +454,7 @@ public class RequestUtils {
                                         }
                                     }
                                 } catch (RuntimeException e) {
-                                    log.warn("WARN Failed while getting the sort/order param: " + val + ":" + e);
+                                    System.out.println("WARN Failed while getting the sort/order param: " + val + ":" + e);
                                 }
                             }
                             continue;
@@ -477,14 +474,14 @@ public class RequestUtils {
             }
         } catch (Exception e) {
             // failed to translate the request to a search, not really much to do here
-            log.warn("Could not translate entity request into search params: " + e.getMessage() + ":" + e);
+            System.out.println("WARN Could not translate entity request into search params: " + e.getMessage() + ":" + e);
         }
         // translate page into start/limit
         if (page > 0) {
             if (limit <= -1) {
                 limit = 10; // set to a default value
                 search.setLimit(limit);
-                log.warn("Page is set without a limit per page, setting per page limit to default value of 10");
+                System.out.println("WARN page is set without a limit per page, setting per page limit to default value of 10");
             }
             search.setStart( (page-1) * limit );
         }

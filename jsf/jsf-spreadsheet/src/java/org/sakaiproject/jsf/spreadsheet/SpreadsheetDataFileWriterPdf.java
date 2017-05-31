@@ -9,8 +9,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 
 import com.lowagie.text.BadElementException;
@@ -28,7 +28,7 @@ import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfWriter;
 
 public class SpreadsheetDataFileWriterPdf implements SpreadsheetDataFileWriter {
-	private static final Logger log = LoggerFactory.getLogger(SpreadsheetDataFileWriterCsv.class);
+	private static final Log log = LogFactory.getLog(SpreadsheetDataFileWriterCsv.class);
 	private List<List<String>> studentInfo = new ArrayList<List<String>>();
 	private static final int MAX_COLUMNS = 8;
 	
@@ -123,14 +123,16 @@ public class SpreadsheetDataFileWriterPdf implements SpreadsheetDataFileWriter {
 				document.add(new Paragraph("There are no grade records to display"));
 			}
 			
-		}catch (DocumentException | IOException e) {
-			log.error(e.getMessage());
+		}catch (DocumentException e) {
+			if (log.isErrorEnabled()) log.error(e);
+		} catch (IOException e) {
+			if (log.isErrorEnabled()) log.error(e);
 		}finally{
 			document.close();
 			try {
 				if (out != null) out.close();
 			} catch (IOException e) {
-				log.error(e.getMessage());
+				if (log.isErrorEnabled()) log.error(e);
 			}
 		}
 

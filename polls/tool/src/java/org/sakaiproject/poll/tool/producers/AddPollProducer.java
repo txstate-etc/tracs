@@ -29,8 +29,8 @@ import java.util.Map;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.poll.logic.ExternalLogic;
 import org.sakaiproject.poll.logic.PollListManager;
 import org.sakaiproject.poll.logic.PollVoteManager;
@@ -85,7 +85,7 @@ public class AddPollProducer implements ViewComponentProducer,NavigationCaseRepo
 	private LocaleGetter localeGetter;
 
 
-	private static final Logger LOG = LoggerFactory.getLogger(AddPollProducer.class);
+	private static final Log LOG = LogFactory.getLog(AddPollProducer.class);
 
 	public String getViewID() {
 		return VIEW_ID;

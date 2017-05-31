@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import lombok.extern.slf4j.Slf4j;
 import org.sakaiproject.cheftool.Context;
 import org.sakaiproject.cheftool.JetspeedRunData;
 import org.sakaiproject.cheftool.PortletConfig;
@@ -60,7 +59,6 @@ import org.apache.commons.lang.StringUtils;
  * SynopticMessageAction is a the Sakai synopsis tool for messages (chat, announcement, discussion).
  * </p>
  */
-@Slf4j
 public class SynopticMessageAction extends VelocityPortletPaneledAction
 {
 
@@ -457,7 +455,7 @@ public class SynopticMessageAction extends VelocityPortletPaneledAction
 				} catch (EntityPropertyNotDefinedException e) {
 					releaseDate = null;
 				} catch (EntityPropertyTypeException e) {
-				 	log.error(e.getMessage(), e);
+					Log.error("chef", e.getMessage(), e);
 					releaseDate = null;
 				}
 				return releaseDate == null ? true : releaseDate
@@ -475,7 +473,7 @@ public class SynopticMessageAction extends VelocityPortletPaneledAction
 				} catch (EntityPropertyNotDefinedException e) {
 					releaseDate = null;
 				} catch (EntityPropertyTypeException e) {
-				 	log.error(e.getMessage(), e);
+					Log.error("chef", e.getMessage(), e);
 					releaseDate = null;
 				}
 				// if no release-date is set, use the header-date as
@@ -498,7 +496,7 @@ public class SynopticMessageAction extends VelocityPortletPaneledAction
 				} catch (EntityPropertyNotDefinedException e) {
 					expireDate = null;
 				} catch (EntityPropertyTypeException e) {
-				 	log.error(e.getMessage(), e);
+					Log.error("chef", e.getMessage(), e);
 					expireDate = null;
 				}
 				return expireDate == null ? true : expireDate
@@ -708,7 +706,7 @@ public class SynopticMessageAction extends VelocityPortletPaneledAction
 				String channel_ref = ((MessageService) state.getAttribute(STATE_SERVICE)).channelReference(placementContext,
 						newChannel);
 				state.setAttribute(STATE_CHANNEL_REF, channel_ref);
-				log.debug("newChannel: {}", channel_ref);
+				if (Log.getLogger("chef").isDebugEnabled())	Log.debug("chef", this + ".doUpdate(): newChannel: " + channel_ref);
 				// updateObservationOfChannel(state, peid);
 
 				// update the tool config

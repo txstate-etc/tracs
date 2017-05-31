@@ -19,8 +19,8 @@
 package org.sakaiproject.dash.jobs;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -34,7 +34,7 @@ import org.quartz.JobExecutionException;
  *
  */
 public class DashSyncUserSitesJob extends DashQuartzJob {
-	private Logger logger = LoggerFactory.getLogger(DashSyncUserSitesJob.class);
+	private Log logger = LogFactory.getLog(DashSyncUserSitesJob.class);
 	
 	//Matches the bean id
 	final static String beanId = "dashSyncUserSitesJob";

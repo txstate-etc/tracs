@@ -15,11 +15,6 @@ if (!String.prototype.trim) {
     };
 }
 
-if (!window.location.origin) { // Some browsers (mainly IE) does not have this property, so we need to build it manually...
-  window.location.origin = window.location.protocol + '//' + window.location.hostname + (window.location.port ? (':' + window.location.port) : '');
-}
-
-
 /** Create Movie html */
 
 /** Movie object */
@@ -55,7 +50,7 @@ Audio.prototype.getInnerHTML = function (objectId){
 	var s = "";
 	// html
     if(audioMimeSupported.contains(this.contentType)) {
-		s += '<object class="audioobject" type="'+this.contentType+'" width="110" height="90">';
+		s += '<object class="audioobject" type="'+this.contentType+'" width="300" height="50">';
 	   	//s += ' classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6"><param name = "url" value = "'+mediaurl+'">';
         s += '<param name = "src" value = "'+mediaurl+'">';
         s += '<param name = "autostart" value = "0"></object>';
@@ -81,10 +76,10 @@ CKEDITOR.plugins.add( 'audiorecorder',
 	 requires : [ 'fakeobjects', 'flash', 'iframedialog' ],
    //http://alfonsoml.blogspot.com/2009/12/plugin-localization-in-ckeditor-vs.html
    lang: ['en'],
-   getPlaceholderCss1 : function (thisfullpath) {
+   getPlaceholderCss1 : function () {
        return 'img.cke_audiorecorder1' +
 		    '{' +
-		    'background-image: url(' + CKEDITOR.getUrl( thisfullpath + 'images/placeholder1.png' ) + ');' +
+		    'background-image: url(' + CKEDITOR.getUrl( this.path + 'images/placeholder1.png' ) + ');' +
 		    'background-position: center center;' +
 		    'background-repeat: no-repeat;' +
 		    'border: 1px solid #a9a9a9;' +
@@ -92,10 +87,10 @@ CKEDITOR.plugins.add( 'audiorecorder',
 		    'height: 90px;' +
 		    '}';
    },
-   getPlaceholderCss2 : function (thisfullpath) {
+   getPlaceholderCss2 : function () {
        return 'img.cke_audiorecorder2' +
 		    '{' +
-		    'background-image: url(' + CKEDITOR.getUrl( thisfullpath + 'images/placeholder2.png' ) + ');' +
+		    'background-image: url(' + CKEDITOR.getUrl( this.path + 'images/placeholder2.png' ) + ');' +
 		    'background-position: center center;' +
 		    'background-repeat: no-repeat;' +
 		    'border: 1px solid #a9a9a9;' +
@@ -106,13 +101,10 @@ CKEDITOR.plugins.add( 'audiorecorder',
 
    onLoad: function() {
        //v4
-     // Check to see is this.path has a proto in it, otherwise add it in
-     // Workoung around this bug http://dev.ckeditor.com/ticket/10331
-     var thisfullpath = this.path.indexOf("//") == -1 ? window.location.origin + this.path : this.path;
-     if (CKEDITOR.addCss) {
-         CKEDITOR.addCss(this.getPlaceholderCss1(thisfullpath));
-         CKEDITOR.addCss(this.getPlaceholderCss2(thisfullpath));
-     }
+       if (CKEDITOR.addCss) {
+	   CKEDITOR.addCss(this.getPlaceholderCss1());
+	   CKEDITOR.addCss(this.getPlaceholderCss2());
+       }
    },
    init: function( editor )
    {

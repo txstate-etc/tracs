@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.chat2.model.ChatChannel;
 import org.sakaiproject.chat2.model.ChatManager;
 import org.sakaiproject.chat2.model.ChatMessage;
@@ -62,7 +62,7 @@ import org.sakaiproject.util.ResourceLoader;
  */
 public class ChatContentProducer implements EntityContentProducer {
 
-   protected final Logger logger = LoggerFactory.getLogger(getClass());
+   protected final Log logger = LogFactory.getLog(getClass());
    private SearchService searchService = null;
    private SearchIndexBuilder searchIndexBuilder = null;
    private EntityManager entityManager = null;
@@ -235,7 +235,7 @@ protected void init() throws Exception {
       try {
          sender = UserDirectoryService.getUser(user);
       } catch(UserNotDefinedException e) {
-         logger.error(e.getMessage());
+         logger.error(e);
          return user;
       }
       if (contextualUserDisplayService == null) {

@@ -23,20 +23,23 @@
 
 package org.sakaiproject.lessonbuildertool.service;
 
-import java.io.File;
 import java.util.List;
+import java.io.File;
+import java.io.InputStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.authz.cover.FunctionManager;
 import org.sakaiproject.db.api.SqlService;
 import org.sakaiproject.entity.api.HttpAccess;
-import org.sakaiproject.lessonbuildertool.LessonBuilderAccessAPI;
-import org.sakaiproject.lessonbuildertool.SimplePage;
-import org.sakaiproject.lessonbuildertool.ToolApi;
+
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-import lombok.extern.slf4j.Slf4j;
+import org.sakaiproject.lessonbuildertool.SimplePage;
+import org.sakaiproject.lessonbuildertool.LessonBuilderAccessAPI;
+import org.sakaiproject.lessonbuildertool.ToolApi;
 
 /**
  * Currently, the sole purpose of this service is to register our edit permission, and create table
@@ -45,8 +48,8 @@ import lombok.extern.slf4j.Slf4j;
  * @author Maarten van Hoof
  * 
  */
-@Slf4j
 public class SimplePageToolService implements ResourceLoaderAware, LessonBuilderAccessAPI {
+	private static Log log = LogFactory.getLog(SimplePageToolService.class);
 
 	SqlService sqlService = null;
 	boolean autoDdl = false;
@@ -84,13 +87,8 @@ public class SimplePageToolService implements ResourceLoaderAware, LessonBuilder
 	}
 
 	public String loadCartridge(File f, String d, String siteId) {
-	    log.info("loadcart in simplepagetoolservice " + f + " " + d + " " + siteId);
+	    System.out.println("loadcart in simplepagetoolservice " + f + " " + d + " " + siteId);
 	    return toolApi.loadCartridge(f, d, siteId);
-	}
-
-	public String deleteOrphanPages(String siteId) {
-	    log.info("deleteOrphanPages in simplepagetoolservice " + siteId);
-	    return toolApi.deleteOrphanPages(siteId);
 	}
 
 	public SimplePageToolService() {}

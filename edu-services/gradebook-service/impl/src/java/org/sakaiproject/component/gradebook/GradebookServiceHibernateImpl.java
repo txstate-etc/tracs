@@ -44,13 +44,14 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.StaleObjectStateException;
+import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.section.api.coursemanagement.CourseSection;
 import org.sakaiproject.section.api.coursemanagement.EnrollmentRecord;
 import org.sakaiproject.section.api.coursemanagement.User;
@@ -70,7 +71,6 @@ import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.service.gradebook.shared.InvalidGradeException;
 import org.sakaiproject.service.gradebook.shared.SortType;
 import org.sakaiproject.service.gradebook.shared.StaleObjectModificationException;
-import org.sakaiproject.service.gradebook.shared.exception.UnmappableCourseGradeOverrideException;
 import org.sakaiproject.site.api.Group;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
@@ -96,7 +96,7 @@ import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureExcep
  * A Hibernate implementation of GradebookService.
  */
 public class GradebookServiceHibernateImpl extends BaseHibernateManager implements GradebookService {
-    private static final Logger log = LoggerFactory.getLogger(GradebookServiceHibernateImpl.class);
+    private static final Log log = LogFactory.getLog(GradebookServiceHibernateImpl.class);
 
     private Authz authz;
     private GradebookPermissionService gradebookPermissionService;
@@ -779,18 +779,6 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 					+ " attempted to change the definition of assignment " + assignmentId);
 			throw new SecurityException("You do not have permission to perform this operation");
 		}
-		
-		//validate the name
-		String validatedName = StringUtils.trimToNull(assignmentDefinition.getName());
-        if (validatedName == null){
-            throw new ConflictingAssignmentNameException("You cannot save an assignment without a name");
-        }
-        
-        // name cannot start with * or # as they are reserved for special columns in import/export
-        if(StringUtils.startsWithAny(validatedName, new String[]{"*", "#"})) {
-            // TODO InvalidAssignmentNameException plus move all exceptions to their own package
-        	throw new ConflictingAssignmentNameException("Assignment names cannot start with * or # as they are reserved");
-        }
 
 		final Gradebook gradebook = this.getGradebook(gradebookUid);
 
@@ -806,15 +794,14 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				// check if we need to scale the grades
 				// this will be if we have percentage grading and we change the points possible
 				boolean scaleGrades = false;
-				final Double originalPointsPossible = assignment.getPointsPossible();
 				if (gradebook.getGrade_type() == GradebookService.GRADE_TYPE_PERCENTAGE
-					&& !assignment.getPointsPossible().equals(assignmentDefinition.getPoints())) {
+						&& assignment.getPointsPossible() != assignmentDefinition.getPoints()) {
 					scaleGrades = true;
 				}
 
 				// external assessments are supported, but not these fields
 				if (!assignmentDefinition.isExternallyMaintained()) {
-					assignment.setName(validatedName);
+					assignment.setName(StringUtils.trim(assignmentDefinition.getName()));
 					assignment.setPointsPossible(assignmentDefinition.getPoints());
 					assignment.setDueDate(assignmentDefinition.getDueDate());
 				}
@@ -834,7 +821,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				updateAssignment(assignment, session);
 
 				if (scaleGrades) {
-					convertGradePointsForUpdatedTotalPoints(gradebook, assignment, originalPointsPossible);
+					convertGradePointsForUpdatedTotalPoints(gradebook, assignment);
 				}
 
 				return null;
@@ -1960,12 +1947,10 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		  if (gradeEntryType == GradebookService.GRADE_TYPE_POINTS ||
 				  gradeEntryType == GradebookService.GRADE_TYPE_PERCENTAGE) {
 			  try {
-				  NumberFormat nbFormat = NumberFormat.getInstance(new ResourceLoader().getLocale());
-				  Double gradeAsDouble = new Double (nbFormat.parse(grade).doubleValue());
-				  String decSeparator =((DecimalFormat)nbFormat).getDecimalFormatSymbols().getDecimalSeparator()+"";
+				  Double gradeAsDouble = Double.parseDouble(grade);
 				  // grade must be greater than or equal to 0
 				  if (gradeAsDouble.doubleValue() >= 0) {
-						String[] splitOnDecimal = grade.split("\\"+decSeparator);
+						String[] splitOnDecimal = grade.split("\\.");
 					  // check that there are no more than 2 decimal places
 					  if (splitOnDecimal == null) {
 						  gradeIsValid = true;
@@ -1973,12 +1958,12 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 					  // check for a valid score matching ##########.##
 					  // where integer is maximum of 10 integers in length
 					  // and maximum of 2 decimal places
-					  } else if (grade.matches("[0-9]{0,10}(\\"+decSeparator+"[0-9]{0,2})?")) {
+					  } else if (grade.matches("[0-9]{0,10}(\\.[0-9]{0,2})?")) {
 						  gradeIsValid = true;
 					  }
 				  }
-			  } catch (NumberFormatException | ParseException nfe) {
-				  log.debug("Passed grade is not a numeric value");
+			  } catch (NumberFormatException nfe) {
+				  if (log.isDebugEnabled()) log.debug("Passed grade is not a numeric value");
 			  }
 
 		  } else if (gradeEntryType == GradebookService.GRADE_TYPE_LETTER) {
@@ -2260,10 +2245,9 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	  if (grade != null && !"".equals(grade)) {
 		  if (gradeEntryType == GradebookService.GRADE_TYPE_POINTS) {
 			  try {
-				  NumberFormat nbFormat = NumberFormat.getInstance(new ResourceLoader().getLocale());				
-				  Double pointValue = new Double (nbFormat.parse(grade).doubleValue());
+				  Double pointValue = Double.parseDouble(grade);
 				  convertedValue = pointValue;
-			  } catch (NumberFormatException | ParseException nfe) {
+			  } catch (NumberFormatException nfe) {
 				  throw new InvalidGradeException("Invalid grade passed to convertInputGradeToPoints");
 			  }
 		  } else if (gradeEntryType == GradebookService.GRADE_TYPE_PERCENTAGE ||
@@ -2848,7 +2832,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				Number numericScore = numberFormat.parse(doubleAsString.trim());
 				scoreAsDouble = numericScore.doubleValue();
 			} catch (ParseException e) {
-				log.error(e.getMessage());
+				log.error(e);
 			}
 	    }
 
@@ -3041,7 +3025,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
     }
 	
 	@Override
-	public Double calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category, final List<org.sakaiproject.service.gradebook.shared.Assignment> categoryAssignments, Map<Long,String> gradeMap) {
+	public Double calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category, final List<org.sakaiproject.service.gradebook.shared.Assignment> viewableAssignments, Map<Long,String> gradeMap) {
 		
 		Gradebook gb = (Gradebook) gradebook;
 		
@@ -3051,7 +3035,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		//collect the data and turn it into a list of AssignmentGradeRecords
 		//this is the info that is compatible with both applyDropScores and the calculateCategoryScore method
 		List<AssignmentGradeRecord> gradeRecords = new ArrayList<>();
-		for(org.sakaiproject.service.gradebook.shared.Assignment assignment: categoryAssignments) {
+		for(org.sakaiproject.service.gradebook.shared.Assignment assignment: viewableAssignments) {
 			
 			Long assignmentId = assignment.getId();
 			
@@ -3116,9 +3100,9 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	/**
 	 * Does the heavy lifting for the category calculations.
 	 * Requires the List of AssignmentGradeRecord so that we can applyDropScores.
-	 * @param studentUuid the studnet uuid
-	 * @param categoryId the cateogry id we are interested in
-	 * @param gradeRecords all grade records for the student
+	 * @param studentUuid
+	 * @param categoryId
+	 * @param gradeRecords
 	 * @return
 	 */
 	private Double calculateCategoryScore(String studentUuid, Long categoryId, List<AssignmentGradeRecord> gradeRecords) {
@@ -3140,65 +3124,36 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		BigDecimal totalEarned = new BigDecimal("0");
 		BigDecimal totalPossible = new BigDecimal("0");
 				
-		// apply any drop/keep settings for this category
+		//apply any drop/keep settings for this category
 		this.applyDropScores(gradeRecords);
-		
-		// Since all gradeRecords for the student are passed in, not just for this category,
-		// plus they may not meet the criteria for including in the calculation,
-		// this list is filtered down according to the following rules:
-		// Rule 1. remove gradeRecords that don't match the given category
-		// Rule 2. the assignment must have points to be assigned
-		// Rule 3. there is a non blank grade for the student
-		// Rule 4. the assignment is included in course grade calculations
-		// Rule 5. the assignment is  released to the student (safety check against condition 3)
-		// Rule 6. the grade is not dropped from the calc
-		// Rule 7. extra credit items have their grade value counted only. Their total points possible does not apply to the calculations
-		log.debug("categoryId: " + categoryId);
-
-		gradeRecords.removeIf(gradeRecord -> {
-			Assignment assignment = gradeRecord.getAssignment();
-						
-			// remove if not for this category (rule 1)
-			if(assignment.getCategory() == null){
-				return true;
-			}
-			if(categoryId.longValue() != assignment.getCategory().getId().longValue()){
-				return true;
-			}
-			
-			//remove if the assignment/graderecord doesn't meet the criteria for the calculation (rule 2-6)
-			if(assignment.getPointsPossible() == null || gradeRecord.getPointsEarned() == null || !assignment.isCounted() || !assignment.isReleased() || gradeRecord.getDroppedFromGrade()) {
-				return true;
-			}
-
-			return false;
-		});
-		
-		log.debug("gradeRecords.size(): " + gradeRecords.size());
-		
-		// pre-calculation
-		// Rule 1. If category only has a single EC item, don't try to calculate category total.
-		if(gradeRecords.size() == 1 && gradeRecords.get(0).getAssignment().isExtraCredit()) {
-			return null;
-		}
-		
-		//iterate the filtered list and set the variables for the calculation
+				
+		//iterate every grade record, check it's for the category we want, otherwise discard
 		for(AssignmentGradeRecord gradeRecord: gradeRecords) {
 			
 			Assignment assignment = gradeRecord.getAssignment();
-			
-			// EC item, don't count points possible
-			if(!assignment.isExtraCredit()) {
+						
+			//check category ids match, otherwise skip
+			if(assignment.getCategory() != null && categoryId.longValue() != assignment.getCategory().getId().longValue()){
+				continue;
+			}
+						
+			//only update the variables for the calculation if:
+			// 1. the assignment has points to be assigned
+			// 2. there is a grade for the student
+			// 3. the assignment is included in course grade calculations
+			// 4. the assignment is  released to the student (safety check against condition 3)
+			// 5. the grade is not dropped from the calc
+			if(assignment.getPointsPossible() != null && gradeRecord.getPointsEarned() != null && assignment.isCounted() && assignment.isReleased() && !gradeRecord.getDroppedFromGrade()) {
 				totalPossible = totalPossible.add(new BigDecimal(assignment.getPointsPossible().toString()));
 				numOfAssignments++;
 				numScored++;
+				
+				//sanitise grade, null values to "0";
+				String grade = (gradeRecord.getPointsEarned() != null) ? String.valueOf(gradeRecord.getPointsEarned()) : "0";
+				
+				//update total points earned
+				totalEarned = totalEarned.add(new BigDecimal(grade));
 			}
-			
-			//sanitise grade, null values to "0";
-			String grade = (gradeRecord.getPointsEarned() != null) ? String.valueOf(gradeRecord.getPointsEarned()) : "0";
-			
-			//update total points earned
-			totalEarned = totalEarned.add(new BigDecimal(grade));
 			
 		}
 		
@@ -3297,31 +3252,16 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			throw new IllegalArgumentException("There is no gradebook associated with this id: " + gradebookUid);
 		}
 		
-		Map<String,Double> bottomPercents = gbInfo.getSelectedGradingScaleBottomPercents();
-		
-		//Before we do any work, check if any existing course grade overrides might be left in an unmappable state
-		List<CourseGradeRecord> courseGradeOverrides = (List<CourseGradeRecord>)getHibernateTemplate().execute(new HibernateCallback() {
-            @Override
-			public Object doInHibernate(Session session) throws HibernateException {
-                return getCourseGradeOverrides(gradebook, session);
-            }
-		});		
-		courseGradeOverrides.forEach(cgr -> {
-			if(!bottomPercents.containsKey(cgr.getEnteredGrade())) {
-				throw new UnmappableCourseGradeOverrideException("The grading schema could not be updated as it would leave some course grade overrides in an unmappable state.");
-			}
-		});
-		
-		//iterate all available grademappings for this gradebook and set the one that we have the ID and bottomPercents for
+		//iterate all available grademappings for this gradebook and set the one that we have the ID for
 		Set<GradeMapping> gradeMappings = gradebook.getGradeMappings();
-		gradeMappings.forEach(gradeMapping -> {
+		for(GradeMapping gradeMapping: gradeMappings) {
 			if(StringUtils.equals(Long.toString(gradeMapping.getId()), gbInfo.getSelectedGradeMappingId())) {
 				gradebook.setSelectedGradeMapping(gradeMapping);
 					
 				//update the map values
-				updateGradeMapping(gradeMapping.getId(), bottomPercents);
+				updateGradeMapping(gradeMapping.getId(), gbInfo.getSelectedGradingScaleBottomPercents());
 			}
-		});
+		}
 				
 		//set grade type
 		gradebook.setGrade_type(gbInfo.getGradeType());
@@ -3661,7 +3601,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	 * @param gradebook the gradebook
 	 * @param assignment assignment with original total point value
 	 */
-	private void convertGradePointsForUpdatedTotalPoints(final Gradebook gradebook, final Assignment assignment, final Double originalPointsPossible) {
+	private void convertGradePointsForUpdatedTotalPoints(final Gradebook gradebook, final Assignment assignment) {
 		if (gradebook == null || assignment == null || assignment.getPointsPossible() == null) {
 			throw new IllegalArgumentException("null values found in convertGradePointsForUpdatedTotalPoints.");
 		}
@@ -3675,19 +3615,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 
 			// Calculate the new points value that we should be persisting based on the new total points
 			if (assignment.getPointsPossible() != null) {
-				for (AssignmentGradeRecord gr : gradeRecords) {
-					if (gr.getPointsEarned() != null) {
-						final BigDecimal scoreAsPercentage = (new BigDecimal(gr.getPointsEarned())
-								.divide(new BigDecimal(originalPointsPossible)))
-								.multiply(new BigDecimal(100));
-
-						final Double scaledScore = calculateEquivalentPointValueForPercent(
-								assignment.getPointsPossible(),
-								Double.valueOf(scoreAsPercentage.doubleValue()));
-
-						gr.setPointsEarned(scaledScore);
-					}
-				}
+				gradeRecords.forEach(gr -> gr.setPointsEarned(
+						calculateEquivalentPointValueForPercent(assignment.getPointsPossible(), gr.getPointsEarned())));
 			}
 		}
 

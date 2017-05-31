@@ -107,6 +107,7 @@
 			<h:panelGroup rendered="#{! ForumTool.disableLongDesc}">
 				<h:outputText id="outputLabel2" value="#{msgs.cdfm_fullDescription}" styleClass="labeled"/>
 			<sakai:inputRichText textareaOnly="#{PrivateMessagesTool.mobileSession}" rows="#{ForumTool.editorRows}" cols="132" id="df_compose_description" value="#{ForumTool.selectedForum.forum.extendedDescription}">
+				<f:validateLength maximum="65000"/>
 			</sakai:inputRichText>
 	      	</h:panelGroup>
 	      	
@@ -226,7 +227,6 @@
  		<script type="text/javascript">
  		      localDatePicker({
  		      	input:'.openDate', 
- 		      	allowEmptyDate:true, 
  		      	ashidden: { iso8601: 'openDateISO8601' },
  		      	getval:'.openDate',
  		      	useTime:1 
@@ -234,7 +234,6 @@
 
  		      localDatePicker({
  		      	input:'.closeDate', 
- 		      	allowEmptyDate:true, 
  		      	ashidden: { iso8601: 'closeDateISO8601' },
  		      	getval:'.closeDate',
  		      	useTime:1 

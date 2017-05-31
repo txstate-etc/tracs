@@ -4,7 +4,7 @@
     <parent>
         <artifactId>edu-services</artifactId>
         <groupId>org.sakaiproject.edu-services</groupId>
-        <version>11.3</version><!-- ProjectVersion -->
+        <version>11.1</version><!-- ProjectVersion -->
 		<relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>org.sakaiproject.edu-services.gradebook</groupId>
@@ -15,6 +15,10 @@
         <deploy.target>shared</deploy.target>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>

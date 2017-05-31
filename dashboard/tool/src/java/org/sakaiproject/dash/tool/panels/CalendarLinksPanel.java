@@ -25,8 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -70,7 +69,7 @@ public class CalendarLinksPanel extends Panel {
 	public static final String TAB_ID_HIDDEN = "hidden";
 	public static final String TAB_ID_PAST_HIDDEN = "past-hidden";
 
-	private static final Logger logger = LoggerFactory.getLogger(CalendarLinksPanel.class);
+	private static final Logger logger = Logger.getLogger(CalendarLinksPanel.class);
 	
 	protected static final String DATE_FORMAT = "dd-MMM-yyyy";
 	protected static final String TIME_FORMAT = "HH:mm";
@@ -337,7 +336,7 @@ public class CalendarLinksPanel extends Panel {
 							public void onClick(AjaxRequestTarget target) {
 								logger.debug("starringAction onClick() called -- unstar ");
 								// need to keep one item
-								logger.debug(Long.toString(calendarItemId));
+								logger.debug(calendarItemId);
 								//logger.debug(this.getModelObject());
 								
 								String sakaiUserId = sakaiProxy.getCurrentUserId();
@@ -401,7 +400,7 @@ public class CalendarLinksPanel extends Panel {
 							public void onClick(AjaxRequestTarget target) {
 								logger.debug("starringAction onClick() called -- star ");
 								// need to keep one item
-								logger.debug(Long.toString(calendarItemId));
+								logger.debug(calendarItemId);
 								//logger.debug(this.getModelObject());
 								
 								ResourceLoader rl = new ResourceLoader("dash_entity");
@@ -459,7 +458,7 @@ public class CalendarLinksPanel extends Panel {
 							public void onClick(AjaxRequestTarget target) {
 								logger.debug("hidingAction onClick() called -- show");
 								// need to trash one item
-								logger.debug(Long.toString(calendarItemId));
+								logger.debug(calendarItemId);
 								//logger.debug(this.getModelObject());
 								String sakaiUserId = sakaiProxy.getCurrentUserId();
 								boolean success = dashboardCommonLogic.unhideCalendarItem(sakaiUserId, calendarItemId);
@@ -520,7 +519,7 @@ public class CalendarLinksPanel extends Panel {
 							public void onClick(AjaxRequestTarget target) {
 								logger.debug("hidingAction onClick() called -- hide");
 								// need to trash one item
-								logger.debug(Long.toString(calendarItemId));
+								logger.debug(calendarItemId);
 								//logger.debug(this.getModelObject());
 								String sakaiUserId = sakaiProxy.getCurrentUserId();
 								boolean success = dashboardCommonLogic.hideCalendarItem(sakaiUserId, calendarItemId);

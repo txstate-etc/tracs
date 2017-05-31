@@ -18,11 +18,15 @@
 package edu.indiana.lib.twinpeaks.net;
 
 import edu.indiana.lib.twinpeaks.util.*;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
+
+import javax.xml.parsers.*;
+
+import org.w3c.dom.*;
+import org.xml.sax.*;
 
 /**
  * Handle HTTP based search operations.  Send (POST or GET) a query to the
@@ -31,8 +35,10 @@ import java.util.*;
  * The response text and HTTP details (status, character set, etc) are made
  * available to caller.
  */
-@Slf4j
 public class HttpTransaction {
+
+private static org.apache.commons.logging.Log	_log = LogUtils.getLog(HttpTransaction.class);
+
   /**
    * Agent identification, HTTP form submission types
    */
@@ -310,12 +316,12 @@ public class HttpTransaction {
 		}
 
 		contentType	= connection.getContentType();
-    log.debug("ContentType = " + contentType);
+    _log.debug("ContentType = " + contentType);
 
 		index = (contentType == null) ? -1 : contentType.toLowerCase().indexOf(CHARSETEQ);
 
 		if (index == -1) {
-			log.debug("return default character set: "
+			_log.debug("return default character set: "
 											 + getDefaultCharacterSet());
 			return getDefaultCharacterSet();
 		}
@@ -334,7 +340,7 @@ public class HttpTransaction {
 					break;
 			}
 		}
-		log.debug("character set = "
+		_log.debug("character set = "
 											+ ((buffer.length() == 0) ? getDefaultCharacterSet()
 																								: buffer.toString()));
 		return (buffer.length() == 0) ? getDefaultCharacterSet() : buffer.toString();
@@ -567,7 +573,7 @@ public class HttpTransaction {
     /*
      * Get connection, set transaction characteristics
      */
-		log.debug("*** CONNECTING to URL: " + this.url.toString());
+		_log.debug("*** CONNECTING to URL: " + this.url.toString());
 
     reset();
     connection = getConnection();
@@ -580,7 +586,7 @@ public class HttpTransaction {
 		 */
     clientCookie = setRequestCookies();
 		if (clientCookie.length() > 0) {
-			log.debug("Cookie: " + clientCookie);
+			_log.debug("Cookie: " + clientCookie);
     	connection.setRequestProperty("Cookie", clientCookie);
 	  }
 		/*

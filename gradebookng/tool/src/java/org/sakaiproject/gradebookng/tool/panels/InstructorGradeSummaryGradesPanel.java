@@ -132,7 +132,7 @@ public class InstructorGradeSummaryGradesPanel extends Panel {
 
 		addOrReplace(new Label("courseGrade", courseGradeFormatter.format(courseGrade)).setEscapeModelStrings(false));
 
-		addOrReplace(new Label("courseGradeNotReleasedFlag", getString("label.studentsummary.coursegradenotreleasedflag")) {
+		addOrReplace(new Label("courseGradeNotReleasedFlag", "*") {
 			@Override
 			public boolean isVisible() {
 				return !gradebook.isCourseGradeDisplayed();

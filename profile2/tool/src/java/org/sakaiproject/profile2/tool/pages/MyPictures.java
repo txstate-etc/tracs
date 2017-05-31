@@ -23,8 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
@@ -61,7 +60,7 @@ import org.sakaiproject.profile2.util.ProfileUtils;
  */
 public class MyPictures extends BasePage {
 
-	private static final Logger log = LoggerFactory.getLogger(MyPictures.class);
+	private static final Logger log = Logger.getLogger(MyPictures.class);
 
 	private List<File> addPictureFiles = new ArrayList<File>();
 	private FileListView addPictureListView;

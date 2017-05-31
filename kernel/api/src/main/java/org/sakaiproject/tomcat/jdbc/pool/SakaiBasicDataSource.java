@@ -35,8 +35,8 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
@@ -50,7 +50,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 public class SakaiBasicDataSource extends DataSource
 {
 	/** Our logger. */
-	private static Logger M_log = LoggerFactory.getLogger(SakaiBasicDataSource.class);
+	private static Log M_log = LogFactory.getLog(SakaiBasicDataSource.class);
 
 	private MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 

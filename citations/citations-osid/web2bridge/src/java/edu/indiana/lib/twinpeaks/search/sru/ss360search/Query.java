@@ -17,6 +17,8 @@
 **********************************************************************************/
 package edu.indiana.lib.twinpeaks.search.sru.ss360search;
 
+import edu.indiana.lib.twinpeaks.net.*;
+import edu.indiana.lib.twinpeaks.search.*;
 import edu.indiana.lib.twinpeaks.search.sru.CqlParser;
 import edu.indiana.lib.twinpeaks.search.sru.SruQueryBase;
 import edu.indiana.lib.twinpeaks.util.*;
@@ -25,15 +27,20 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.util.*;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.w3c.dom.*;
+import org.xml.sax.*;
 
 /**
  * Send a query to the Serials Solutions 360 Search server
  */
-@Slf4j
 public class Query extends SruQueryBase implements Constants
 {
+	private static org.apache.commons.logging.Log	_log = LogUtils.getLog(Query.class);
   /**
    * Display debug details (verbose)
    */
@@ -104,7 +111,7 @@ public class Query extends SruQueryBase implements Constants
 
     Integer p = getIntegerRequestParameter("pageSize");
     Integer r = getIntegerRequestParameter("startingRecord");
-    log.debug("PageSize: " + p + ", Starting Record: " + r);
+    _log.debug("PageSize: " + p + ", Starting Record: " + r);
 
 
 		/*
@@ -117,7 +124,7 @@ public class Query extends SruQueryBase implements Constants
 		session = getSessionContext();
 		action  = getRequestParameter("action");
 
-		log.debug("Requested ACTION: " + action);
+		_log.debug("Requested ACTION: " + action);
 		/*
 		 * Start a new search?
 		 */
@@ -170,7 +177,7 @@ public class Query extends SruQueryBase implements Constants
 		/*
 		 * Unexpected action: log it and continue
 		 */
-		log.warn("Unexpected ACTION requested: \"" + action + "\"");
+		_log.warn("Unexpected ACTION requested: \"" + action + "\"");
 	}
 
   /**
@@ -287,7 +294,7 @@ public class Query extends SruQueryBase implements Constants
 		int     startRecord	= getSessionContext().getInt("startRecord");
 		int     pageSize	  = getSessionContext().getInt("pageSize");
 
-    log.debug("New Page: starting record = " + startRecord
+    _log.debug("New Page: starting record = " + startRecord
             +  ", page size = " + pageSize);
     /*
      * Fix up the sort key
@@ -334,7 +341,7 @@ public class Query extends SruQueryBase implements Constants
 		int     startRecord	= getSessionContext().getInt("startRecord");
 		int     pageSize	  = getSessionContext().getInt("pageSize");
 
-    log.debug("New Page: starting record = " + startRecord
+    _log.debug("New Page: starting record = " + startRecord
             +  ", page size = " + pageSize);
     /*
      * Fix up the sort key
@@ -403,7 +410,7 @@ public class Query extends SruQueryBase implements Constants
 
 			StatusUtils.setGlobalError(sessionContext, message, details);
 
-			log.error("Diagnotic record found");
+			_log.error("Diagnotic record found");
 			displayXml(element);
 
 			throw new SearchException(message + ", " + details);
@@ -446,7 +453,7 @@ public class Query extends SruQueryBase implements Constants
 		{
 		  String message = "No database specified for provider in 360 Search response";
 
-      log.error(message);
+      _log.error(message);
       displayXml(element);
 
 			throw new SearchException(message);
@@ -488,7 +495,7 @@ public class Query extends SruQueryBase implements Constants
                                                               "type", "partial");
 			hits = Integer.parseInt(DomUtils.getText(element));
 
-      log.debug("*** Estimated hits: " + estimate + ", actual hits: " + hits);
+      _log.debug("*** Estimated hits: " + estimate + ", actual hits: " + hits);
       /*
        * Set up the status map for the current provider.  The provider is active
        * only when the estimated and actual hit counts are both available.
@@ -504,7 +511,7 @@ public class Query extends SruQueryBase implements Constants
 				map.put("STATUS", "ACTIVE");
   			active++;
 	  	}
-	  	log.debug("Database details: " + map);
+	  	_log.debug("Database details: " + map);
     }
 		/*
 		 * Save:
@@ -535,7 +542,7 @@ public class Query extends SruQueryBase implements Constants
     {
       String message = "No result set id in 360 Search response";
 
-      log.error(message);
+      _log.error(message);
       throw new SearchException(message);
     }
     /*
@@ -545,7 +552,7 @@ public class Query extends SruQueryBase implements Constants
 
     if (!resultSetId.equals(previousId))
     {
-      log.debug("*** Result set ID changed.  Was: "
+      _log.debug("*** Result set ID changed.  Was: "
               +  previousId
               +  ", now: "
               + resultSetId);
@@ -578,7 +585,7 @@ public class Query extends SruQueryBase implements Constants
     }
     catch (UnsupportedEncodingException exception)
     {
-      log.error("UTF-8: " + exception);
+      _log.error("UTF-8: " + exception);
 
       return value;
     }
@@ -677,12 +684,12 @@ public class Query extends SruQueryBase implements Constants
 		CqlParser	parser;
 		String		result;
 
-		log.debug("Initial CQL Criteria: " + cql);
+		_log.debug("Initial CQL Criteria: " + cql);
 
 		parser 	= new CqlParser();
 		result	= parser.doCQL2MetasearchCommand(cql);
 
-		log.debug("Processed Result: " + result);
+		_log.debug("Processed Result: " + result);
 		return result;
 	}
 
@@ -696,7 +703,7 @@ public class Query extends SruQueryBase implements Constants
 
 		try
 		{
-			LogUtils.displayXml(log, xmlObject);
+			LogUtils.displayXml(_log, xmlObject);
 		}
 		catch (Exception ignore) { }
 	}

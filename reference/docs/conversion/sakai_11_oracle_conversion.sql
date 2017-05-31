@@ -463,7 +463,7 @@ UPDATE SAKAI_SITE_TOOL SET TITLE='Calendar' WHERE REGISTRATION = 'sakai.schedule
 UPDATE SAKAI_SITE_PAGE SET TITLE='Calendar' WHERE TITLE = 'Schedule';
 
 -- SAK-30000 Site creation notification email template updates
-UPDATE EMAIL_TEMPLATE_ITEM
+UPDATE email_template_item
 SET message = '
 From Worksite Setup to ${serviceName} support:
 
@@ -473,7 +473,7 @@ From Worksite Setup to ${serviceName} support:
 ${sections}
 '
 WHERE template_key = 'sitemanage.notifySiteCreation' AND template_locale = 'default';
-UPDATE EMAIL_TEMPLATE_ITEM
+UPDATE email_template_item
 SET subject = 'Site "${siteTitle}" was successfully created by ${currentUserDisplayName}', message = '
 Hi, ${currentUserDisplayName}:
 

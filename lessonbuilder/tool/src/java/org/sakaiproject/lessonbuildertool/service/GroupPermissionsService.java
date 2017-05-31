@@ -29,8 +29,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.Role;
 import org.sakaiproject.authz.api.RoleAlreadyDefinedException;
@@ -59,7 +59,7 @@ import org.sakaiproject.db.api.SqlReader;
  * 
  */
 public class GroupPermissionsService {
-	private static Logger log = LoggerFactory.getLogger(GroupPermissionsService.class);
+	private static Log log = LogFactory.getLog(GroupPermissionsService.class);
 
         static private LessonEntity forumEntity = null;
         public void setForumEntity(Object e) {
@@ -250,7 +250,7 @@ public class GroupPermissionsService {
 	    int i = sakaiId.indexOf("/",1);
 	    if (i > 0) {
 		prefix = sakaiId.substring(1, i);
-		log.info("prefix " + prefix);
+		System.out.println("prefix " + prefix);
 		if (prefix.equals(LessonEntity.ASSIGNMENT) ||
 		    prefix.equals(LessonEntity.ASSIGNMENT2))
 		    lessonEntity = assignmentEntity.getEntity(sakaiId);
@@ -299,12 +299,12 @@ public class GroupPermissionsService {
 	    try {
 		for (String sakaiId: sakaiIds) {
 		    String siteId = null;
-		    log.info("sakaiid " + sakaiId);
+		    System.out.println("sakaiid " + sakaiId);
 		    LessonEntity lessonEntity = getEntity(sakaiId);
-		    log.info("entity " + lessonEntity);
+		    System.out.println("entity " + lessonEntity);
 		    if (lessonEntity != null) {
 			siteId = lessonEntity.getSiteId();
-			log.info("siteid " + siteId);
+			System.out.println("siteid " + siteId);
 		    }
 		    if (siteId == null)
 			siteId = "--";

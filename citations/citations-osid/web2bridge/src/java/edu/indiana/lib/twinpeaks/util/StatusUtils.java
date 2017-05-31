@@ -17,14 +17,17 @@
  *******************************************************************************/
 package edu.indiana.lib.twinpeaks.util;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.lang.*;
 import java.util.*;
 
-@Slf4j
+import org.w3c.dom.*;
+import org.xml.sax.*;
+
 public class StatusUtils
 {
+
+private static org.apache.commons.logging.Log	_log = LogUtils.getLog(StatusUtils.class);
+
 	/**
 	 * Set up initial status information
 	 */
@@ -220,7 +223,7 @@ public class StatusUtils
 		{
 			throw new SearchException("No status map found for target database " + target);
 		}
-  	log.debug("Map for target " + target + ": " + targetMap);
+  	_log.debug("Map for target " + target + ": " + targetMap);
 		/*
 		 * Update total hits from this search source
 		 */

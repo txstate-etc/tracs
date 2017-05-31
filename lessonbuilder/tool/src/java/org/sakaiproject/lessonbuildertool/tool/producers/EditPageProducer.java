@@ -65,8 +65,6 @@ import uk.org.ponder.rsf.viewstate.SimpleViewParameters;
 import uk.org.ponder.rsf.viewstate.ViewParameters;
 import uk.org.ponder.rsf.viewstate.ViewParamsReporter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.content.cover.ContentHostingService;
 import org.sakaiproject.exception.IdUnusedException;
@@ -80,7 +78,6 @@ import org.sakaiproject.exception.IdUnusedException;
  */
 public class EditPageProducer implements ViewComponentProducer, NavigationCaseReporter, ViewParamsReporter {
 
-	private static final Logger log = LoggerFactory.getLogger(EditPageProducer.class);
 	private TextInputEvolver richTextEvolver;
 	private SimplePageBean simplePageBean;
 	private ShowPageProducer showPageProducer;
@@ -107,7 +104,7 @@ public class EditPageProducer implements ViewComponentProducer, NavigationCaseRe
 			try {
 				simplePageBean.updatePageObject(gparams.getSendingPage());
 			} catch (Exception e) {
-				log.info("EditPage permission exception " + e);
+				System.out.println("EditPage permission exception " + e);
 				return;
 			}
 		}
@@ -123,7 +120,7 @@ public class EditPageProducer implements ViewComponentProducer, NavigationCaseRe
 		if (itemId != null && itemId != -1) {
 			SimplePageItem i = simplePageBean.findItem(itemId);
 			if (i.getPageId() != page.getPageId()) {
-				log.info("EditPage asked to edit item not in current page");
+				System.out.println("EditPage asked to edit item not in current page");
 				return;
 			}
 			try {

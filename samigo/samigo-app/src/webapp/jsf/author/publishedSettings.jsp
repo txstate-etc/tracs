@@ -43,6 +43,7 @@
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
       <head><%= request.getAttribute("html.head") %>
       <title><h:outputText value="#{assessmentSettingsMessages.sakai_assessment_manager} #{assessmentSettingsMessages.dash} #{assessmentSettingsMessages.settings}" /></title>
+      <script type="text/javascript" src="../../js/extendedTime.js"/>
       <samigo:script path="/jsf/widget/hideDivision/hideDivision.js"/>
       <samigo:script path="/jsf/widget/colorpicker/colorpicker.js"/>
       <script type="text/javascript" src="/library/js/lang-datepicker/lang-datepicker.js"></script>
@@ -99,6 +100,7 @@
           lockdownMarkForReview(navVal);
           showHideReleaseGroups();
           initTimedCheckBox();
+          extendedTimeInitialize();
           checkUncheckTimeBox();
           checkLastHandling();
         });
@@ -191,7 +193,7 @@
             styleClass="form-control-label col-md-2"/>
         <div class=" col-md-10">
             <h:panelGrid rendered="#{publishedSettings.valueMap.description_isInstructorEditable==true}">
-                <samigo:wysiwyg rows="100" columns="400" value="#{publishedSettings.description}" hasToggle="yes" mode="author" >
+                <samigo:wysiwyg rows="100" columns="400" value="#{assessmentSettings.description}" hasToggle="yes" mode="author" >
                     <f:validateLength maximum="60000"/>
                 </samigo:wysiwyg>
             </h:panelGrid>
@@ -261,7 +263,7 @@
       <h:outputLabel styleClass="col-md-2" value="#{assessmentSettingsMessages.released_to} " />
       <div class="col-md-10">
         <h:selectOneMenu id="releaseTo" disabled="true" value="#{publishedSettings.firstTargetSelected}" >
-        <f:selectItems value="#{publishedSettings.publishingTargets}" />
+        <f:selectItems value="#{assessmentSettings.publishingTargets}" />
       </h:selectOneMenu>
       </div>
   </div>
@@ -274,6 +276,11 @@
     </h:selectManyCheckbox>
   </div>
   
+  <%--
+  <!-- Extended Time -->
+  <%@ include file="inc/publishedExtendedTime.jspf"%>
+  --%>
+
     <!-- NUMBER OF SUBMISSIONS -->
   <h:panelGroup styleClass="row" layout="block" rendered="#{publishedSettings.valueMap.submissionModel_isInstructorEditable==true}">
     <h:outputLabel styleClass="col-md-2" value="#{assessmentSettingsMessages.submissions_allowed}" />
@@ -409,7 +416,7 @@
         </div>
     </h:panelGroup>
     
-    <h:panelGroup styleClass="form-group row" layout="block" rendered="#{publishedSettings.valueMap.passwordRequired_isInstructorEditable==true}">
+    <h:panelGroup styleClass="form-group row" layout="block" rendered="#{assessmentSettings.valueMap.passwordRequired_isInstructorEditable==true}">
         <h:outputLabel value="#{assessmentSettingsMessages.high_security_secondary_id_pw}" styleClass="col-md-2 form-control-label"/>
         <div class="col-md-10">
             <h:outputLabel for="password" value="#{assessmentSettingsMessages.high_security_password}"/>
@@ -689,7 +696,7 @@
 <p class="act">
 
   <!-- Save button -->
-  <h:commandButton type="submit" value="#{commonMessages.action_save}" action="#{publishedSettings.getOutcome}"  styleClass="active" onclick="setBlockDivs();updateItemNavigation(false);" >
+  <h:commandButton type="submit" value="#{commonMessages.action_save}" action="#{publishedSettings.getOutcome}"  styleClass="active" onclick="extendedTimeCombine();setBlockDivs();updateItemNavigation(false);" >
       <f:actionListener type="org.sakaiproject.tool.assessment.ui.listener.author.SavePublishedSettingsListener" />
   </h:commandButton>
   

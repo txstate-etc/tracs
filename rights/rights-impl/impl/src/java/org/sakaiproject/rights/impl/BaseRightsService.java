@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.id.cover.IdManager;
 import org.sakaiproject.rights.api.Copyright;
@@ -458,7 +458,7 @@ public abstract class BaseRightsService implements RightsService
 
 		
 	/** Our logger. */
-	private static Logger M_log = LoggerFactory.getLogger(BaseRightsService.class);
+	private static Log M_log = LogFactory.getLog(BaseRightsService.class);
 	
 	protected Storage m_storage = null;
 

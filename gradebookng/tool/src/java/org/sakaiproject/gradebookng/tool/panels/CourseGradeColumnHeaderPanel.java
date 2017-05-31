@@ -68,7 +68,7 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 				gradebookPage.setUiSettings(settings);
 
 				// refresh
-				setResponsePage(GradebookPage.class);
+				setResponsePage(new GradebookPage());
 			}
 
 		};
@@ -145,7 +145,7 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 				gradebookPage.setUiSettings(settings);
 
 				// refresh
-				setResponsePage(GradebookPage.class);
+				setResponsePage(new GradebookPage());
 			}
 
 			@Override

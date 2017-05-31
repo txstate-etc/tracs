@@ -23,8 +23,9 @@
 					rendered="#{PostemTool.editable}"/>
    	        </sakai:tool_bar>
 			<sakai:view_content>
+				<br/>
 	
-				<sakai:flat_list value="#{PostemTool.gradebooks}" var="gradebook" binding="#{PostemTool.gradebookTable}" styleClass="table table-bordered table-striped">
+				<sakai:flat_list value="#{PostemTool.gradebooks}" var="gradebook" binding="#{PostemTool.gradebookTable}" styleClass="listHier lines nolines">
 					<h:column>
 						<f:facet name="header">
 							<h:commandLink action="#{PostemTool.toggleTitleSort}" title="#{msgs.sort_title}">
@@ -74,7 +75,8 @@
 								<h:graphicImage value="postem/images/sortdescending.gif"  rendered="#{PostemTool.releasedSort && !PostemTool.ascending}" alt="#{msgs.sort_released_desc}"/>
 							</h:commandLink>
 						</f:facet>
-
+						<h:outputText rendered="#{gradebook.released}" value="#{msgs.yes}"/>
+						<h:outputText rendered="#{!gradebook.released}" value="#{msgs.no}"/>
 					</h:column>
 					<%-- <h:column rendered="#{PostemTool.editable}">
 						<f:facet name="header">
@@ -91,8 +93,8 @@
 							<h:outputText value="#{msgs.gradebook_view}" />
 						</h:commandLink>
 					</h:column>
-					<h:column rendered="#{PostemTool.editable}">
-						<h:commandLink action="#{PostemTool.processGradebookView}">
+					<h:column>
+						<h:commandLink action="#{PostemTool.processGradebookView}" rendered="#{PostemTool.editable}">
 							<h:outputText value="#{msgs.gradebook_preview}" />
 						</h:commandLink>
 					</h:column>
@@ -111,14 +113,16 @@
 							<h:outputText value="#{msgs.csv_download}"/>
 						</h:commandLink>
 					</h:column>
-					<h:column rendered="#{PostemTool.editable && gradebook.template != null}">
-						<h:commandLink action="#{PostemTool.processTemplateDownload}">
+					<h:column rendered="#{PostemTool.editable}">
+						<h:commandLink action="#{PostemTool.processTemplateDownload}" rendered="#{gradebook.template != null}">
 							<h:outputText value="#{msgs.template}"/>
 						</h:commandLink>
 					</h:column>
 				</sakai:flat_list>
 				
-				  <h:outputText styleClass="instruction" value="#{msgs.no_gradebooks}" rendered="#{!PostemTool.gradebooksExist}" />				
+				<p class="instruction">
+				  <h:outputText value="#{msgs.no_gradebooks}" rendered="#{!PostemTool.gradebooksExist}" />				
+				</p>
 			</sakai:view_content>
 
 		</h:form>

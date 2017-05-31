@@ -16,8 +16,7 @@
 package org.sakaiproject.profile2.tool.pages.panels;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
@@ -57,7 +56,7 @@ import org.sakaiproject.profile2.util.ProfileUtils;
 public class MessageView extends Panel {
 	
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory.getLogger(ConfirmedFriends.class);
+	private static final Logger log = Logger.getLogger(ConfirmedFriends.class);
 	
 	private DataView<Message> messageList = null;
 	private WebMarkupContainer messageListContainer = null;

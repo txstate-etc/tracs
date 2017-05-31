@@ -22,8 +22,8 @@ package org.sakaiproject.coursemanagement.impl.job;
 
 import java.io.InputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -41,7 +41,7 @@ import org.sakaiproject.tool.cover.SessionManager;
  *
  */
 public class ClassPathCMSyncJob extends CmSynchronizer implements Job {
-	private static final Logger log = LoggerFactory.getLogger(ClassPathCMSyncJob.class);
+	private static final Log log = LogFactory.getLog(ClassPathCMSyncJob.class);
 
 	protected String classPathToXml;
 

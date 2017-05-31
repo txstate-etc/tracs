@@ -30,8 +30,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A response to a specific question and its associated data
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ItemGradingData implements java.io.Serializable {
 
-    private static Logger log = LoggerFactory.getLogger(ItemGradingData.class);
+    private static Log log = LogFactory.getLog(ItemGradingData.class);
 	private static final long serialVersionUID = 7526471155622776147L;
 	private Long itemGradingId;
 	private Long assessmentGradingId;

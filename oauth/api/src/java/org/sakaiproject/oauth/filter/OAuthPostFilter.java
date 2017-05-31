@@ -1,8 +1,8 @@
 
 package org.sakaiproject.oauth.filter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.api.ComponentManager;
 import org.sakaiproject.event.api.UsageSessionService;
 import org.sakaiproject.tool.api.SessionManager;
@@ -31,7 +31,7 @@ import java.security.Principal;
  * @author Colin Hebert
  */
 public class OAuthPostFilter implements Filter {
-    private static final Logger log = LoggerFactory.getLogger(OAuthPostFilter.class);
+    private static final Log log = LogFactory.getLog(OAuthPostFilter.class);
     private OAuthHttpService oAuthHttpService;
     private SessionManager sessionManager;
     private UserDirectoryService userDirectoryService;

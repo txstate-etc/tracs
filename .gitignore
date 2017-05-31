@@ -15,9 +15,8 @@ sakai-demo.zip
 .DS_Store
 *nb-configuration.xml
 .envrc
-tracs-docker/components
-tracs-docker/lib
-tracs-docker/webapps
+docker/components
+docker/lib
+docker/webapps
 rsf/sakai-rsf-web/templates/overlays/
 rsf/sakai-rsf-web/test/overlays/
-velocity.log

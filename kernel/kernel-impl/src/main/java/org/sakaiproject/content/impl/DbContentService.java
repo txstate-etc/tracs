@@ -45,8 +45,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.content.api.ContentCollection;
 import org.sakaiproject.content.api.ContentCollectionEdit;
@@ -83,8 +83,6 @@ import org.sakaiproject.util.DbSingleStorage;
 import org.sakaiproject.util.EntityReaderAdapter;
 import org.sakaiproject.util.SingleStorageUser;
 import org.sakaiproject.util.Xml;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -99,8 +97,7 @@ import org.w3c.dom.Element;
 public class DbContentService extends BaseContentService
 {
     /** Our logger. */
-    private static Logger M_log = LoggerFactory.getLogger(DbContentService.class);
-    private static final Marker FATAL = MarkerFactory.getMarker("FATAL");
+    private static Log M_log = LogFactory.getLog(DbContentService.class);
 
     /** Table name for collections. */
     protected String m_collectionTableName = "CONTENT_COLLECTION";
@@ -423,9 +420,11 @@ public class DbContentService extends BaseContentService
             }
             catch (Exception ex)
             {
-                M_log.error(FATAL, "Check on Database Failed", ex);
-                M_log.error(FATAL, "===========================================================");
-                M_log.error(FATAL, "WARNING \n"
+                M_log.fatal("Check on Database Failed ", ex);
+                M_log
+                .fatal("===========================================================");
+                M_log
+                .fatal("WARNING \n"
                         + "  The connection from this instance of Sakai to the database\n"
                         + "  has been tested and found to corrupt UTF-8 Data. \n"
                         + "  In order for Sakai to operate correctly you must ensure that your \n"
@@ -1024,12 +1023,13 @@ public class DbContentService extends BaseContentService
                         n = rs.getInt(1);
                     }
                     if ( n != 0 ) {
-                        M_log.error(FATAL, "There are migrated content collection entries in the \n" +
+                        M_log.fatal("\n" +
+                                "There are migrated content collection entries in the \n" +
                                 "BINARY_ENTITY column  of CONTENT_COLLECTION you must ensure that this \n" +
                                 "data is not required and set all entries to null before starting \n" +
                                 "up with migrate data disabled. Failure to do this could loose \n" +
-                                "updates since this database was upgraded \n");
-                        M_log.error(FATAL, "STOP ============================================");
+                        "updates since this database was upgraded \n");
+                        M_log.fatal("STOP ============================================");
                         /*we need to close these here otherwise the system exit will lead them to being left open
                          * While this may be harmful is bad practice and prevents us identifying real issues
                          */
@@ -1044,12 +1044,13 @@ public class DbContentService extends BaseContentService
                         n = rs.getInt(1);
                     }
                     if ( n != 0 ) {
-                        M_log.error(FATAL, "There are migrated content collection entries in the \n" +
+                        M_log.fatal("\n" +
+                                "There are migrated content collection entries in the \n" +
                                 "BINARY_ENTITY column  of CONTENT_RESOURCE you must ensure that this \n" +
                                 "data is not required and set all entries to null before starting \n" +
                                 "up with migrate data disabled. Failure to do this could loose \n" +
-                                "updates since this database was upgraded \n");
-                        M_log.error(FATAL, "STOP ============================================");
+                        "updates since this database was upgraded \n");
+                        M_log.fatal("STOP ============================================");
                         /*we need to close these here otherwise the system exit will lead them to being left open
                          * While this may be harmful is bad practice and prevents us identifying real issues
                          */
@@ -1064,12 +1065,13 @@ public class DbContentService extends BaseContentService
                         n = rs.getInt(1);
                     }
                     if ( n != 0 ) {
-                        M_log.error(FATAL, "There are migrated content collection entries in the \n" +
+                        M_log.fatal("\n" +
+                                "There are migrated content collection entries in the \n" +
                                 "BINARY_ENTITY column  of CONTENT_RESOURCE_DELETE you must ensure that this \n" +
                                 "data is not required and set all entries to null before starting \n" +
                                 "up with migrate data disabled. Failure to do this could loose \n" +
-                                "updates since this database was upgraded \n");
-                        M_log.error(FATAL, "STOP ============================================");
+                        "updates since this database was upgraded \n");
+                        M_log.fatal("STOP ============================================");
                         /*we need to close these here otherwise the system exit will lead them to being left open
                          * While this may be harmful is bad practice and prevents us identifying real issues
                          */
@@ -1083,7 +1085,7 @@ public class DbContentService extends BaseContentService
                 }
 
             } catch (SQLException e) {
-                M_log.error("Unable to get database statement: {}", e.getMessage(), e);
+                M_log.error("Unable to get database statement: " + e, e);
             } finally {
                 cleanup(connection, statement, rs, selectStatement, updateStatement);
             }
@@ -2323,10 +2325,12 @@ public class DbContentService extends BaseContentService
         		// This is another case where the nested classes and fuzzy boundaries causes
         		// rather sloppy object orientation. A more complete treatment would reevaluate
         		// the interfaces, remove the Edits, and extract these classes and casts.
-        		if (resource instanceof WrappedContentResource || !(resource instanceof BaseResourceEdit)) {
+        		ContentResource rawResource = (resource instanceof WrappedContentResource) ?
+        				((WrappedContentResource) resource).wrapped : resource;
+        		if (!(rawResource instanceof BaseResourceEdit)) {
         			return null;
         		}
-        		return fileSystemHandler.getAssetDirectLink(((BaseResourceEdit) resource).m_id, m_bodyPath, ((BaseResourceEdit) resource).m_filePath);
+        		return fileSystemHandler.getAssetDirectLink(((BaseResourceEdit) rawResource).m_id, m_bodyPath, ((BaseResourceEdit) rawResource).m_filePath);
         	}
         	catch (IOException e) {
         		M_log.debug("No direct link available for resource: " + resource.getId());

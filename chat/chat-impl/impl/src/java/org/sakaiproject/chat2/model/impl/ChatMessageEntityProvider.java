@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.chat2.model.ChatChannel;
 import org.sakaiproject.chat2.model.ChatManager;
 import org.sakaiproject.chat2.model.ChatMessage;
@@ -58,7 +58,7 @@ public class ChatMessageEntityProvider implements CoreEntityProvider,
 
 	public final static String ENTITY_PREFIX = "chat-message";
 
-	protected final Logger LOG = LoggerFactory.getLogger(getClass());
+	protected final Log LOG = LogFactory.getLog(getClass());
 
 	// We use a custom object here to avoid side-effects of EB setting the body value for new messages,
 	// and avoid returning unwanted fields for getting messages.

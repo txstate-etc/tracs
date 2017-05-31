@@ -30,8 +30,8 @@ import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Instead of using standard methods of deciding which locale should be used
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * For details, see the comments to SAK-6886.
  */
 public class LocaleUtil {
-	private static final Logger log = LoggerFactory.getLogger(LocaleUtil.class);
+	private static final Log log = LogFactory.getLog(LocaleUtil.class);
 	
 	private static Object sakaiResourceLoader = null;
 	private static Method sakaiResourceLoaderGetLocale;
@@ -68,9 +68,19 @@ public class LocaleUtil {
 				sakaiResourceLoaderGetOrientation = sakaiResourceLoaderClass.getMethod("getOrientation",new Class[]{Locale.class});
 				sakaiResourceLoader = sakaiResourceLoaderConstructor.newInstance();
 			} catch (ClassNotFoundException e) {
-				log.debug("Did not find Sakai ResourceLoader class; will use standard JSF localization");
-			} catch (SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-				log.error("Will use standard JSF localization", e);
+				if (log.isDebugEnabled()) log.debug("Did not find Sakai ResourceLoader class; will use standard JSF localization");
+			} catch (SecurityException e) {
+				if (log.isErrorEnabled()) log.error("Will use standard JSF localization", e);
+			} catch (NoSuchMethodException e) {
+				if (log.isErrorEnabled()) log.error("Will use standard JSF localization", e);
+			} catch (IllegalArgumentException e) {
+				if (log.isErrorEnabled()) log.error("Will use standard JSF localization", e);
+			} catch (InstantiationException e) {
+				if (log.isErrorEnabled()) log.error("Will use standard JSF localization", e);
+			} catch (IllegalAccessException e) {
+				if (log.isErrorEnabled()) log.error("Will use standard JSF localization", e);
+			} catch (InvocationTargetException e) {
+				if (log.isErrorEnabled()) log.error("Will use standard JSF localization", e);
 			}
 			isInitialized = true;
 		}
@@ -82,8 +92,12 @@ public class LocaleUtil {
 		if (sakaiResourceLoader != null) {
 			try {
 				locale = (Locale)sakaiResourceLoaderGetLocale.invoke(sakaiResourceLoader);
-			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-				log.error(e.getMessage());
+			} catch (IllegalArgumentException e) {
+				if (log.isErrorEnabled()) log.error(e);
+			} catch (IllegalAccessException e) {
+				if (log.isErrorEnabled()) log.error(e);
+			} catch (InvocationTargetException e) {
+				if (log.isErrorEnabled()) log.error(e);
 			}
 		} else {
 			// Use standard JSF approach.
@@ -107,8 +121,12 @@ public class LocaleUtil {
 		if (sakaiResourceLoader != null) {
 			try {
 				orientation = (String) sakaiResourceLoaderGetOrientation.invoke(sakaiResourceLoader, new Object[]{loc});
-			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-				log.error(e.getMessage());
+			} catch (IllegalArgumentException e) {
+				if (log.isErrorEnabled()) log.error(e);
+			} catch (IllegalAccessException e) {
+				if (log.isErrorEnabled()) log.error(e);
+			} catch (InvocationTargetException e) {
+				if (log.isErrorEnabled()) log.error(e);
 			}
 		}
 		return orientation;

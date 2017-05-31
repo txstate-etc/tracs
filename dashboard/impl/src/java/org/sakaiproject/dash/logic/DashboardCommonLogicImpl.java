@@ -37,8 +37,7 @@ import java.util.Collection;
 
 import net.sf.ehcache.Cache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.sakaiproject.authz.api.SecurityAdvisor;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.dash.app.DashboardCommonLogic;
@@ -70,7 +69,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  *
  */
 public class DashboardCommonLogicImpl implements DashboardCommonLogic, Observer {
-	private static Logger logger = LoggerFactory.getLogger(DashboardCommonLogicImpl.class);
+	private static Logger logger = Logger.getLogger(DashboardCommonLogicImpl.class);
 	
 	private static final int TASK_LOGGING_INTERVAL = 100;
 	

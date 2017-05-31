@@ -42,7 +42,6 @@ import org.sakaiproject.service.gradebook.shared.PermissionDefinition;
  */
 public class AssignmentColumnHeaderPanel extends Panel {
 
-	public static final String ICON_SAKAI = "icon-sakai--";
 	private static final long serialVersionUID = 1L;
 
 	private final IModel<Assignment> modelData;
@@ -97,7 +96,7 @@ public class AssignmentColumnHeaderPanel extends Panel {
 				gradebookPage.setUiSettings(settings);
 
 				// refresh
-				setResponsePage(GradebookPage.class);
+				setResponsePage(new GradebookPage());
 			}
 
 		};
@@ -140,13 +139,13 @@ public class AssignmentColumnHeaderPanel extends Panel {
 			externalAppFlag.add(new AttributeModifier("data-content",
 					gradebookPage.generatePopoverContent(new StringResourceModel("label.gradeitem.externalapplabel",
 							null, new Object[] { assignment.getExternalAppName() }).getString())));
-			String iconClass = ICON_SAKAI + "default-tool";
+			String iconClass = "icon-sakai";
 			if ("Assignments".equals(assignment.getExternalAppName())) {
-				iconClass = ICON_SAKAI + "sakai-assignment-grades";
+				iconClass = "icon-sakai-assignment-grades";
 			} else if ("Tests & Quizzes".equals(assignment.getExternalAppName())) {
-				iconClass = ICON_SAKAI + "sakai-samigo";
+				iconClass = "icon-sakai-samigo";
 			} else if ("Lesson Builder".equals(assignment.getExternalAppName())) {
-				iconClass = ICON_SAKAI + "sakai-lessonbuildertool";
+				iconClass = "icon-sakai-lessonbuildertool";
 			}
 			externalAppFlag
 					.add(new AttributeModifier("class", "gb-external-app-flag " + iconClass));
@@ -242,7 +241,7 @@ public class AssignmentColumnHeaderPanel extends Panel {
 					AssignmentColumnHeaderPanel.this.businessService.updateAssignmentOrder(assignmentId.longValue(), (order - 1));
 				}
 
-				setResponsePage(GradebookPage.class);
+				setResponsePage(new GradebookPage());
 			}
 
 			@Override
@@ -281,7 +280,7 @@ public class AssignmentColumnHeaderPanel extends Panel {
 					AssignmentColumnHeaderPanel.this.businessService.updateAssignmentOrder(assignmentId.longValue(), (order + 1));
 				}
 
-				setResponsePage(GradebookPage.class);
+				setResponsePage(new GradebookPage());
 			}
 
 			@Override

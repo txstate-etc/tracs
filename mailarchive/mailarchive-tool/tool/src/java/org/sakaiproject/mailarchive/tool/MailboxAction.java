@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import lombok.extern.slf4j.Slf4j;
 import org.sakaiproject.alias.api.Alias;
 import org.sakaiproject.alias.api.AliasService;
 import org.sakaiproject.authz.api.PermissionsHelper;
@@ -76,7 +75,6 @@ import org.sakaiproject.util.Validator;
  * MailboxAction is a the Sakai mailbox tool.
  * </p>
  */
-@Slf4j
 public class MailboxAction extends PagedResourceActionII
 {
 	private static ResourceLoader rb = new ResourceLoader("email");
@@ -202,7 +200,7 @@ public class MailboxAction extends PagedResourceActionII
 		}
 		catch (Exception e)
 		{
-		 	log.warn("failed search={} exeption={}", search, e.getMessage());
+			Log.warn("sakai", "sizeResources failed search="+search+" exeption="+e);
 		}
         	return 0;
 	}
@@ -239,7 +237,8 @@ public class MailboxAction extends PagedResourceActionII
 		}
 		catch (Exception e)
 		{
-		 	log.warn("not able to retrieve messages sort={} search={} first={} last={}", sort, search, first, last);
+			Log.warn("sakai", "readResourcesPage not able to retrieve messages sort ="+ 
+					sort+" search = "+search+" first="+first+" last="+last);
 		}
 	
 		// deal with no messages
@@ -345,7 +344,7 @@ public class MailboxAction extends PagedResourceActionII
 
 		else
 		{
-		 	log.warn("invalid mode: {}", mode);
+			Log.warn("sakai", this + ".buildMainPanelContext: invalid mode: " + mode);
 			return null;
 		}
 
@@ -391,7 +390,7 @@ public class MailboxAction extends PagedResourceActionII
 		}
 		catch (Exception e)
 		{
-		 	log.warn("Cannot find channel {}", channelRef);
+			Log.warn("sakai", "Cannot find channel "+channelRef);
 		}
 
                 // Read a single message
@@ -403,7 +402,7 @@ public class MailboxAction extends PagedResourceActionII
 			// Sadly this is the only way to send this to a menu pick :(
                 	state.setAttribute(STATE_DELETE_CONFIRM_ID, msg.getId());
 		} else {
-		 	log.warn("Could not retrieve message {}", channelRef);
+			Log.warn("sakai", "Could not retrieve message "+channelRef);
 			context.put("message", rb.getString("thiemames1"));
 		}
 

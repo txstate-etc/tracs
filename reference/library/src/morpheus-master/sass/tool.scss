@@ -39,22 +39,14 @@
 @import "modules/tool/sitesetup/sitesetup";
 @import "modules/tool/dropbox/dropbox";
 @import "modules/tool/sitestats/sitestats";
-@import "modules/tool/roster/roster";
 
 
 @import "base/rtl";
 
 @import "modules/access/base";
-@import "modules/quicklinks/_quicklinks_variables.scss";
-@import "modules/quicklinks/_base";
 @import "modules/more-sites/base";
 @import "modules/timeout-alert/base";
 @import "modules/swapped-view/base";
 @import "modules/cookies/base";
 @import "modules/tutorial/base";
 @import "modules/profile-popup/base";
-
-//The defaults are loaded first and can be overwritten 
-//by the other imports.  These changes, loaded last,
-//can override CSS set above.
-@import "tracs-skins/tracs-modifications";

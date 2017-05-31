@@ -4,7 +4,7 @@
   <parent>
     <artifactId>login</artifactId>
     <groupId>org.sakaiproject.login</groupId>
-    <version>11.3</version>
+    <version>11.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <name>sakai-login-tool</name>
@@ -32,6 +32,11 @@
     <dependency>
       <groupId>org.sakaiproject.kernel</groupId>
       <artifactId>sakai-component-manager</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>${sakai.commons-logging.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sakaiproject.login</groupId>
@@ -63,6 +68,13 @@
     	<groupId>org.mockito</groupId>
     	<artifactId>mockito-all</artifactId>
     	<version>1.8.5</version>
+    	<type>jar</type>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>log4j</groupId>
+    	<artifactId>log4j</artifactId>
+    	<version>1.2.16</version>
     	<type>jar</type>
     	<scope>test</scope>
     </dependency>

@@ -42,7 +42,6 @@ public class FilePickerViewParameters extends HelperViewParameters {
         private boolean website = false;
         private boolean caption = false;
 	public String addBefore = ""; // itemid to add a new item before that item
-	public String name = "";
 
 	public FilePickerViewParameters() {
 		super();
@@ -103,14 +102,6 @@ public class FilePickerViewParameters extends HelperViewParameters {
 		if (addBefore == null)
 		    return "";
 		return addBefore;
-	}
-
-	public void setName(String s) {
-		this.name = s;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 }

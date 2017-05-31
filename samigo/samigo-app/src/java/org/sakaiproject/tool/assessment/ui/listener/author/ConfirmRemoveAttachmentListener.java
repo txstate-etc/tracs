@@ -39,7 +39,7 @@ import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 
 public class ConfirmRemoveAttachmentListener implements ActionListener
 {
-  //private static Logger log = LoggerFactory.getLogger(ConfirmRemoveAttachmentListener.class);
+  //private static Log log = LogFactory.getLog(ConfirmRemoveAttachmentListener.class);
 
   public ConfirmRemoveAttachmentListener()
   {

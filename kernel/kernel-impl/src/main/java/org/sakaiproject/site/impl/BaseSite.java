@@ -34,8 +34,8 @@ import java.util.Stack;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
@@ -78,7 +78,7 @@ import org.w3c.dom.NodeList;
 public class BaseSite implements Site
 {
 	/** Our log (commons). */
-	private static Logger M_log = LoggerFactory.getLogger(BaseSite.class);
+	private static Log M_log = LogFactory.getLog(BaseSite.class);
 
 	/** A fixed class serian number. */
 	private static final long serialVersionUID = 1L;
@@ -695,12 +695,12 @@ public class BaseSite implements Site
 				.setLazy(((BaseResourceProperties) pOther).isLazy());
 
 		// deep copy the pages, but avoid triggering fetching by passing false to getPages
-		List<BaseSitePage> otherPages = new ArrayList<BaseSitePage>(other.getPages(false));
-		List<BaseSitePage> copiedPages = new ArrayList<BaseSitePage>(otherPages.size());
-		for (BaseSitePage page : otherPages) {
-		    copiedPages.add(new BaseSitePage(siteService, page, this, exact));
+		m_pages = new ResourceVector();
+		for (Iterator iPages = other.getPages(false).iterator(); iPages.hasNext();)
+		{
+			BaseSitePage page = (BaseSitePage) iPages.next();
+			m_pages.add(new BaseSitePage(siteService,page, this, exact));
 		}
-		m_pages = new ResourceVector(copiedPages);
 		m_pagesLazy = other.m_pagesLazy;
 
 		// deep copy the groups, but avoid triggering fetching by passing false to getGroups
@@ -1730,10 +1730,6 @@ public class BaseSite implements Site
 	 */
 	public void removeGroup(Group group)
 	{
-		if(group.isLocked()) {
-			M_log.error("Error, cannot remove a locked group");
-			return;
-		}
 		// remove it
 		m_groups.remove(group);
 

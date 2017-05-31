@@ -36,8 +36,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Iterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -106,7 +106,7 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 	public static final int CACHE_MAX_ENTRIES = 5000;
 	public static final int CACHE_TIME_TO_LIVE_SECONDS = 600;
 	public static final int CACHE_TIME_TO_IDLE_SECONDS = 360;
-	private static Logger log = LoggerFactory.getLogger(AssignmentEntity.class);
+	private static Log log = LogFactory.getLog(AssignmentEntity.class);
 
     private static Cache assignmentCache = null;
 
@@ -367,8 +367,11 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 	} catch (IdUnusedException e) {
 	    log.warn("ID unused ", e);
 	    return false;
-	} catch (PermissionException | InUseException e) {
-	    log.warn(e.getMessage(), e);
+	} catch (PermissionException e) {
+	    log.warn(e);
+	    return false;
+	} catch (InUseException e) {
+	    log.warn(e);
 	    return false;
 	}
 
@@ -404,7 +407,7 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 		try {
 		    edit.setGroupAccess(newGroups);
 		} catch (PermissionException e) {
-		    log.warn(e.getMessage());
+		    log.warn(e);
 		    return false;
 		}
 
@@ -428,7 +431,7 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 		    // this change mode to grouped
 		    edit.setGroupAccess(groups);
 		} catch (PermissionException e) {
-		    log.warn(e.getMessage());
+		    log.warn(e);
 		    return false;
 		}
 		
@@ -437,7 +440,7 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 		return true;
 	    }
 	} catch (Exception e) {
-	    log.warn(e.getMessage());
+	    log.warn(e);
 	    return false;
 	} finally {
 	    if (doCancel) {
@@ -460,8 +463,14 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 	
 	try {
 	    edit = AssignmentService.editAssignment(ref);
-	} catch (IdUnusedException | PermissionException | InUseException e) {
-	    log.warn(e.getMessage());
+	} catch (IdUnusedException e) {
+	    log.warn(e);
+	    return false;
+	} catch (PermissionException e) {
+	    log.warn(e);
+	    return false;
+	} catch (InUseException e) {
+	    log.warn(e);
 	    return false;
 	}
 	
@@ -495,7 +504,7 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 		    try {
 			edit.setGroupAccess(newGroups);
 		    } catch (PermissionException e) {
-			log.warn(e.getMessage());
+			log.warn(e);
 			return false;
 		    }
 		} else {
@@ -516,7 +525,7 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 	    }
 	    
 	} catch (Exception e) {
-	    log.warn(e.getMessage());
+	    log.warn(e);
 	    return false;
 	} finally {
 	    if (doCancel) {
@@ -546,7 +555,6 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 	    user = UserDirectoryService.getUser(userId);
 	    submission = AssignmentService.getSubmission(assignment.getReference(), user);
 	} catch (Exception e) {
-		log.warn(e.getMessage());
 	    return null;
 	}
 
@@ -680,8 +688,11 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 	} catch (IdUnusedException e) {
 	    log.warn("ID unused ", e);
 	    return;
-	} catch (PermissionException | InUseException e) {
-	    log.warn(e.getMessage());
+	} catch (PermissionException e) {
+	    log.warn(e);
+	    return;
+	} catch (InUseException e) {
+	    log.warn(e);
 	    return;
 	}
 
@@ -710,7 +721,7 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 	    return;
 
 	} catch (Exception e) {
-	    log.warn(e.getMessage());
+	    log.warn(e);
 	    return;
 	} finally {
 	    if (doCancel) {
@@ -752,8 +763,8 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 	// i is start of title
 	String title = objectid.substring(i+1);
 
-	Iterator aIter = AssignmentService.getAssignmentsForContext(siteid);
-	
+	Iterator aIter = AssignmentService.getAssignmentsForContext(ToolManager.getCurrentPlacement().getContext());
+
 	// security. assume this is only used in places where it's OK, so skip security checks
 	while (aIter.hasNext()) {
 	    Assignment a = (Assignment) aIter.next();
@@ -802,7 +813,7 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 	    AssignmentService.commitEdit(a);
 	    return "/assignment/" + a.getId();
 	} catch (Exception e) {
-	    log.info("can't create assignment " + e);
+	    System.out.println("can't create assignment " + e);
 	};
 	return null;
     }
@@ -946,7 +957,7 @@ public class AssignmentEntity implements LessonEntity, AssignmentInterface {
 
 	    return "/assignment/" + a.getId();
 	} catch (Exception e) {
-	    log.info("can't create assignment " + e);
+	    System.out.println("can't create assignment " + e);
 	};
 	return null;
     }

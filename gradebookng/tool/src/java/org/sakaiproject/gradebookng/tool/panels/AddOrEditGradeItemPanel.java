@@ -3,7 +3,6 @@ package org.sakaiproject.gradebookng.tool.panels;
 import java.text.MessageFormat;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.basic.Label;
@@ -124,14 +123,6 @@ public class AddOrEditGradeItemPanel extends Panel {
 					}
 				}
 
-				// 2. names cannot start with * or #
-				if(validated && StringUtils.startsWithAny(assignment.getName(), new String[]{"*", "#"})) {
-					validated = false;
-					error(getString("error.addeditgradeitem.titlecharacters"));
-					target.addChildren(form, FeedbackPanel.class);
-				}
-
-				// OK
 				if (validated) {
 					if (AddOrEditGradeItemPanel.this.mode == Mode.EDIT) {
 
@@ -178,7 +169,7 @@ public class AddOrEditGradeItemPanel extends Panel {
 			}
 
 			@Override
-			protected void onError(final AjaxRequestTarget target, final Form<?> form) {
+			protected void onError(AjaxRequestTarget target, Form<?> form) {
 				target.addChildren(form, FeedbackPanel.class);
 			}
 		};

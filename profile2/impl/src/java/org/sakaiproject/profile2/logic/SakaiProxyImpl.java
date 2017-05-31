@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.sakaiproject.api.common.edu.person.SakaiPerson;
 import org.sakaiproject.api.common.edu.person.SakaiPersonManager;
 import org.sakaiproject.authz.api.SecurityAdvisor;
@@ -61,8 +62,6 @@ import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserEdit;
 import org.sakaiproject.user.api.UserNotDefinedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import lombok.Setter;
 
@@ -74,7 +73,7 @@ import lombok.Setter;
  */
 public class SakaiProxyImpl implements SakaiProxy {
 
-	private static final Logger log = LoggerFactory.getLogger(SakaiProxyImpl.class);
+	private static final Logger log = Logger.getLogger(SakaiProxyImpl.class);
 
 	/**
 	 * {@inheritDoc}
@@ -1193,15 +1192,15 @@ public class SakaiProxyImpl implements SakaiProxy {
 				ProfileConstants.PICTURE_SETTING_UPLOAD_PROP);
 
 		// if 'upload'
-		if (StringUtils.equals(pictureType, ProfileConstants.PICTURE_SETTING_UPLOAD_PROP)) {
+		if (pictureType.equals(ProfileConstants.PICTURE_SETTING_UPLOAD_PROP)) {
 			return ProfileConstants.PICTURE_SETTING_UPLOAD;
 		}
 		// if 'url'
-		else if (StringUtils.equals(pictureType, ProfileConstants.PICTURE_SETTING_URL_PROP)) {
+		else if (pictureType.equals(ProfileConstants.PICTURE_SETTING_URL_PROP)) {
 			return ProfileConstants.PICTURE_SETTING_URL;
 		}
 		// if 'official'
-		else if (StringUtils.equals(pictureType, ProfileConstants.PICTURE_SETTING_OFFICIAL_PROP)) {
+		else if (pictureType.equals(ProfileConstants.PICTURE_SETTING_OFFICIAL_PROP)) {
 			return ProfileConstants.PICTURE_SETTING_OFFICIAL;
 		}
 		// gravatar is not an enforceable setting, hence no block here. it is purely a user preference.

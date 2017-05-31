@@ -37,9 +37,8 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.alias.api.Alias;
 import org.sakaiproject.alias.api.AliasService;
 import org.sakaiproject.authz.cover.SecurityService;
@@ -89,13 +88,10 @@ import org.sakaiproject.util.FormattedText;
 @SuppressWarnings("deprecation")
 public class PortalSiteHelperImpl implements PortalSiteHelper
 {
-	// namespace for sakai icons see _icons.scss
-	public static final String ICON_SAKAI = "icon-sakai--";
-
 	// Alias prefix for page aliases. Use Entity.SEPARATOR as IDs shouldn't contain it.
 	private static final String PAGE_ALIAS = Entity.SEPARATOR+ "pagealias"+ Entity.SEPARATOR;
 
-	private static final Logger log = LoggerFactory.getLogger(PortalSiteHelper.class);
+	private static final Log log = LogFactory.getLog(PortalSiteHelper.class);
 
 	private final String PROP_PARENT_ID = SiteService.PROP_PARENT_ID;
 
@@ -703,7 +699,7 @@ public class PortalSiteHelperImpl implements PortalSiteHelper
 				if (firstTool != null)
 				{
 					String menuClass = firstTool.getToolId();
-					menuClass = ICON_SAKAI + menuClass.replace('.', '-');
+					menuClass = "icon-" + menuClass.replace('.', '-');
 					m.put("menuClass", menuClass);
 					Properties tmp = firstTool.getConfig();
 					if ( tmp != null ) {
@@ -718,7 +714,7 @@ public class PortalSiteHelperImpl implements PortalSiteHelper
 				}
 				else
 				{
-					m.put("menuClass", ICON_SAKAI + "default-tool");
+					m.put("menuClass", "icon-default-tool");
 				}
 				m.put("pageProps", createPageProps(p));
 				// this is here to allow the tool reorder to work
@@ -758,7 +754,7 @@ public class PortalSiteHelperImpl implements PortalSiteHelper
 					m.put("toolpopup", Boolean.valueOf(source!=null));
 					m.put("toolpopupurl", source);
 					String menuClass = placement.getToolId();
-					menuClass = ICON_SAKAI + menuClass.replace('.', '-');
+					menuClass = "icon-" + menuClass.replace('.', '-');
 					m.put("menuClass", menuClass);
 					Properties tmp = placement.getConfig();
 					if ( tmp != null ) {
@@ -793,8 +789,8 @@ public class PortalSiteHelperImpl implements PortalSiteHelper
 		String helpUrl = ServerConfigurationService.getHelpUrl(null);
 		theMap.put("pageNavShowHelp", Boolean.valueOf(showHelp));
 		theMap.put("pageNavHelpUrl", helpUrl);
-		theMap.put("helpMenuClass", ICON_SAKAI + "help");
-		theMap.put("subsiteClass", ICON_SAKAI + "subsite");
+		theMap.put("helpMenuClass", "icon-sakai-help");
+		theMap.put("subsiteClass", "icon-sakai-subsite");
 
 		// theMap.put("pageNavSitContentshead",
 		// Web.escapeHtml(rb.getString("sit_contentshead")));
@@ -926,7 +922,7 @@ public class PortalSiteHelperImpl implements PortalSiteHelper
 		ppp = getToolManager().getCurrentPlacement();
 		if (ppp == null)
 		{
-			log.warn("portal-temporary placement not set - null");
+			System.out.println("WARNING portal-temporary placement not set - null");
 		}
 		else
 		{
@@ -937,7 +933,7 @@ public class PortalSiteHelperImpl implements PortalSiteHelper
 			}
 			else
 			{
-				log.warn("portal-temporary placement mismatch site="
+				System.out.println("WARNING portal-temporary placement mismatch site="
 						+ site.getId() + " context=" + cont);
 			}
 		}
@@ -1045,10 +1041,7 @@ public class PortalSiteHelperImpl implements PortalSiteHelper
 			{
 				String userId = SiteService.getSiteUserId(site.getId());
 				String eid = UserDirectoryService.getUserEid(userId);
-				// SAK-31889: if your EID has special chars, much easier to just use your uid
-				if (StringUtils.isAlphanumeric(eid)) {
-					return SiteService.getUserSiteId(eid);
-				}
+				return SiteService.getUserSiteId(eid);
 			}
 			catch (UserNotDefinedException e)
 			{

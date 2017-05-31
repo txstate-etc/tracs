@@ -40,7 +40,7 @@ public class FibBean
   private ItemGradingData data;
   private String response;
   private String text;
-  private Boolean isCorrect;
+  private boolean isCorrect;
   private boolean hasInput;
   
   public ItemContentsBean getItemContentsBean()
@@ -106,17 +106,17 @@ public class FibBean
     text = newtext;
   }
 
-  public Boolean getIsCorrect()
+  public boolean getIsCorrect()
   {
     return isCorrect;
   }
 
-  public void setIsCorrect(Boolean newb)
+  public void setIsCorrect(boolean newb)
   {
     isCorrect = newb;
   }
 
-  public Boolean getHasInput()
+  public boolean getHasInput()
   {
     return hasInput;
   }

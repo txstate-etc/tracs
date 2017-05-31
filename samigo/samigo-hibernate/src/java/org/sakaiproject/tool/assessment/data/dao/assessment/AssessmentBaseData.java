@@ -27,8 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Category;
 import org.sakaiproject.tool.assessment.data.dao.shared.TypeD;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.AssessmentAccessControlIfc;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.AssessmentFeedbackIfc;
@@ -41,7 +40,7 @@ public class AssessmentBaseData
     implements java.io.Serializable,
                org.sakaiproject.tool.assessment.data.ifc.assessment.AssessmentBaseIfc
 {
-  static Logger errorLogger = LoggerFactory.getLogger("errorLogger");
+  static Category errorLogger = Category.getInstance("errorLogger");
 
   private static final long serialVersionUID = 7526471155622776147L;
   public static final int TITLE_LENGTH = 255;

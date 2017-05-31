@@ -21,10 +21,11 @@
 
 package org.sakaibrary.xserver;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class FindResultSetBean {
+	private static final org.apache.commons.logging.Log LOG =
+		org.apache.commons.logging.LogFactory.getLog(
+				"org.sakaibrary.xserver.FindResultSetBean" );
+	
 	private String baseName;
 	private String sourceId;
 	private String setNumber;
@@ -98,12 +99,12 @@ public class FindResultSetBean {
 	}
 	
 	public void printInfo() {
-		log.debug( "\nFIND RESULT SET INFO" );
-		log.debug( "source id:  " + getSourceId() );
-		log.debug( "full name:  " + getFullName() );
-		log.debug( "set number: " + getSetNumber() );
-		log.debug( "status:     " + getStatus() );
-		log.debug( "error text: " + getFindErrorText() );
-		log.debug( "docs found: " + getNumDocs() );
+		LOG.debug( "\nFIND RESULT SET INFO" );
+		LOG.debug( "source id:  " + getSourceId() );
+		LOG.debug( "full name:  " + getFullName() );
+		LOG.debug( "set number: " + getSetNumber() );
+		LOG.debug( "status:     " + getStatus() );
+		LOG.debug( "error text: " + getFindErrorText() );
+		LOG.debug( "docs found: " + getNumDocs() );
 	}
 }

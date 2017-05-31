@@ -5,7 +5,8 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.apachecommons.CommonsLog;
+
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.api.app.podcasts.PodcastService;
 import org.sakaiproject.content.api.ContentResource;
@@ -30,7 +31,7 @@ import org.sakaiproject.tool.api.ToolManager;
 /**
  * Entity provider for the Podcast tool
  */
-@Slf4j
+@CommonsLog
 public class PodcastEntityProvider extends AbstractEntityProvider implements EntityProvider, AutoRegisterEntityProvider, ActionsExecutable, Outputable, Describeable {
 
 	public final static String ENTITY_PREFIX = "podcast";

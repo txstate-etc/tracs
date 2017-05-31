@@ -1,10 +1,11 @@
 package org.sakaiproject.gradebookng.tool.pages;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.StringResourceModel;
+
+import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * Page displayed when an internal error occurred.
@@ -12,7 +13,7 @@ import org.apache.wicket.model.StringResourceModel;
  * @author Steve Swinsburg (steve.swinsburg@gmail.com)
  *
  */
-@Slf4j
+@CommonsLog
 public class ErrorPage extends BasePage {
 
 	private static final long serialVersionUID = 1L;

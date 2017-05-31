@@ -31,8 +31,8 @@ import java.util.Map;
 import javax.portlet.PortletMode;
 import javax.portlet.WindowState;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author ddwolf
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class PortletState implements Serializable
 {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PortletState.class);
+	private static final Log LOG = LogFactory.getLog(PortletState.class);
 
 	//
 	// Session Scoped State

@@ -18,16 +18,15 @@ package org.sakaiproject.profile2.logic;
 import java.util.Calendar;
 import java.util.Date;
 
+import lombok.Setter;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.sakaiproject.profile2.dao.ProfileDao;
 import org.sakaiproject.profile2.model.ProfilePrivacy;
 import org.sakaiproject.profile2.model.ProfileStatus;
 import org.sakaiproject.profile2.types.PrivacyType;
 import org.sakaiproject.profile2.util.ProfileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import lombok.Setter;
 
 /**
  * Implementation of ProfileStatusLogic API
@@ -37,13 +36,12 @@ import lombok.Setter;
  */
 public class ProfileStatusLogicImpl implements ProfileStatusLogic {
 
-	private static final Logger log = LoggerFactory.getLogger(ProfileStatusLogicImpl.class);
+	private static final Logger log = Logger.getLogger(ProfileStatusLogicImpl.class);
 
 	
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public ProfileStatus getUserStatus(final String userUuid, ProfilePrivacy privacy) {
 		
 		//check privacy
@@ -84,7 +82,6 @@ public class ProfileStatusLogicImpl implements ProfileStatusLogic {
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public ProfileStatus getUserStatus(final String userUuid) {
 		return getUserStatus(userUuid, privacyLogic.getPrivacyRecordForUser(userUuid));
 	}
@@ -94,7 +91,6 @@ public class ProfileStatusLogicImpl implements ProfileStatusLogic {
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public boolean setUserStatus(String userId, String status) {
 		
 		//create object
@@ -107,7 +103,6 @@ public class ProfileStatusLogicImpl implements ProfileStatusLogic {
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public boolean setUserStatus(ProfileStatus profileStatus) {
 		
 		//current user must be the user making the request
@@ -131,7 +126,6 @@ public class ProfileStatusLogicImpl implements ProfileStatusLogic {
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public boolean clearUserStatus(String userId) {
 		
 		ProfileStatus profileStatus = getUserStatus(userId);
@@ -157,7 +151,6 @@ public class ProfileStatusLogicImpl implements ProfileStatusLogic {
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public int getStatusUpdatesCount(final String userUuid) {
 		return dao.getStatusUpdatesCount(userUuid);
 	}

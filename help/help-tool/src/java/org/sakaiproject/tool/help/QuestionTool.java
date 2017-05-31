@@ -21,8 +21,7 @@
 
 package org.sakaiproject.tool.help;
 
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
+import org.apache.commons.logging.Log;
 
 import org.sakaiproject.api.app.help.HelpManager;
 import org.sakaiproject.component.cover.ServerConfigurationService;
@@ -34,7 +33,6 @@ import org.sakaiproject.tool.cover.ToolManager;
  * question tool
  * @version $Id$
  */
-@Slf4j
 public class QuestionTool
 {
 
@@ -47,6 +45,7 @@ public class QuestionTool
 
   private String toEmailAddress;
   private EmailService emailService;
+  private Log logger;
   private HelpManager helpManager;
 
   /**
@@ -281,7 +280,10 @@ public class QuestionTool
     }
     catch (Exception e)
     {
-      log.error("email service is not set up correctly, can't send user question to support consultant!", e);
+      logger
+          .error(
+              "email service is not set up correctly, can't send user question to support consultant!",
+              e);
     }
   }
 
@@ -301,5 +303,23 @@ public class QuestionTool
   public void setContent(String content)
   {
     this.content = content;
+  }
+
+  /**
+   * get logger
+   * @return Returns the logger.
+   */
+  public Log getLogger()
+  {
+    return logger;
+  }
+
+  /**
+   * set logger
+   * @param logger The logger to set.
+   */
+  public void setLogger(Log logger)
+  {
+    this.logger = logger;
   }
 }

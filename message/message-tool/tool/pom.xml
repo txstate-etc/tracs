@@ -5,7 +5,7 @@
     <parent>
         <artifactId>message</artifactId>
         <groupId>org.sakaiproject.message</groupId>
-        <version>11.3</version>
+        <version>11.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -47,6 +47,10 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
         </dependency>
     </dependencies>
 

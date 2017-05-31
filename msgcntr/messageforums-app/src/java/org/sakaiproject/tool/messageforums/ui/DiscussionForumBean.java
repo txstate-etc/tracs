@@ -31,8 +31,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.api.app.messageforums.Attachment;
 import org.sakaiproject.api.app.messageforums.DiscussionForum;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
@@ -46,7 +46,8 @@ import org.sakaiproject.util.ResourceLoader;
  */
 public class DiscussionForumBean
 {
-  private static final Logger LOG = LoggerFactory.getLogger(DiscussionForumBean.class);
+  private static final Log LOG = LogFactory
+  .getLog(DiscussionForumBean.class);
   private DiscussionForum forum;
   private boolean markForDeletion;
   private boolean markForDuplication;

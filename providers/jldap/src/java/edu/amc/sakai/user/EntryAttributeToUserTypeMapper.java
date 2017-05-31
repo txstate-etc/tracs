@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPEntry;
@@ -46,7 +46,7 @@ import com.novell.ldap.LDAPEntry;
 public class EntryAttributeToUserTypeMapper implements UserTypeMapper {
 	
 	/** Class-specific logger */
-	private static Logger M_log = LoggerFactory.getLogger(EntryAttributeToUserTypeMapper.class);
+	private static Log M_log = LogFactory.getLog(EntryAttributeToUserTypeMapper.class);
 	
 	/** map of attribute values to Sakai user types */
 	private Map<String,String> attributeValueToSakaiUserTypeMap = new HashMap<String,String>();

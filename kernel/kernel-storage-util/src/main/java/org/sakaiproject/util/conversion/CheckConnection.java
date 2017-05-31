@@ -28,8 +28,8 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.util.ByteStorageConversion;
 
 /**
@@ -38,7 +38,7 @@ import org.sakaiproject.util.ByteStorageConversion;
  */
 public class CheckConnection
 {
-	private static final Logger log = LoggerFactory.getLogger(CheckConnection.class);
+	private static final Log log = LogFactory.getLog(CheckConnection.class);
 
 	public void check(DataSource tds) throws Exception
 	{

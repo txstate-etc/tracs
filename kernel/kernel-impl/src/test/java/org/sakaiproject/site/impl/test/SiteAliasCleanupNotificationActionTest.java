@@ -22,7 +22,7 @@ package org.sakaiproject.site.impl.test;
 
 import java.lang.reflect.Field;
 
-import org.slf4j.Logger;
+import org.apache.commons.logging.Log;
 import org.jmock.Expectations;
 import org.jmock.integration.junit3.MockObjectTestCase;
 import org.sakaiproject.alias.api.AliasService;
@@ -48,7 +48,7 @@ public class SiteAliasCleanupNotificationActionTest extends MockObjectTestCase {
 	private Event inboundEvent;
 	private AliasService aliasService;
 	private NotificationService notificationService;
-	private Logger log;
+	private Log log;
 	
 	protected void setUp() throws Exception {
 		aliasService = mock(AliasService.class);
@@ -56,7 +56,7 @@ public class SiteAliasCleanupNotificationActionTest extends MockObjectTestCase {
 		cleanupActionWrappingNotificationEdit = mock(NotificationEdit.class);
 		inboundNotification = mock(Notification.class);
 		inboundEvent = mock(Event.class);
-		log = mock(Logger.class);
+		log = mock(Log.class);
 		cleanupAction = new SiteAliasCleanupNotificationAction();
 		cleanupAction.setAliasService(aliasService);
 		cleanupAction.setNotificationService(notificationService);

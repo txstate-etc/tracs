@@ -39,8 +39,8 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.event.cover.NotificationService;
@@ -106,14 +106,15 @@ import org.apache.commons.lang.StringUtils;
 public class DeliveryBean
   implements Serializable
 {
-  private static final Logger log = LoggerFactory.getLogger(DeliveryBean.class);
+  private static final Log log = LogFactory.getLog(DeliveryBean.class);
 
   //SAM-2517
   private ServerConfigurationService serverConfigurationService;
   
   private static final String MATHJAX_ENABLED = "mathJaxEnabled";
   private static final String MATHJAX_SRC_PATH_SAKAI_PROP = "portal.mathjax.src.path";
-  private static final String MATHJAX_SRC_PATH = ServerConfigurationService.getString(MATHJAX_SRC_PATH_SAKAI_PROP);
+  private static final String SRC_PATH_SAKAI_PROP_DEFAULT = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default,Safe";
+  private static final String MATHJAX_SRC_PATH = ServerConfigurationService.getString(MATHJAX_SRC_PATH_SAKAI_PROP, SRC_PATH_SAKAI_PROP_DEFAULT);
   
   private String assessmentId;
   private String assessmentTitle;

@@ -25,11 +25,11 @@ import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import javax.faces.webapp.UIComponentTag;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class FlowStateTag extends UIComponentTag {
-	private static final Logger logger = LoggerFactory.getLogger(FlowStateTag.class);
+	private static final Log logger = LogFactory.getLog(FlowStateTag.class);
 
 	private String bean;
 

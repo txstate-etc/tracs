@@ -29,11 +29,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.azeckoski.reflectutils.ArrayUtils;
-import org.azeckoski.reflectutils.ClassFields;
-import org.azeckoski.reflectutils.ClassFields.FieldsFilter;
-import org.azeckoski.reflectutils.ConstructorUtils;
-import org.azeckoski.reflectutils.ReflectUtils;
 import org.sakaiproject.entitybroker.EntityBrokerManager;
 import org.sakaiproject.entitybroker.EntityReference;
 import org.sakaiproject.entitybroker.EntityView;
@@ -62,8 +57,11 @@ import org.sakaiproject.entitybroker.entityprovider.extension.URLRedirect;
 import org.sakaiproject.entitybroker.providers.EntityPropertiesService;
 import org.sakaiproject.entitybroker.providers.EntityRequestHandler;
 import org.sakaiproject.entitybroker.util.TemplateParseUtil;
-
-import lombok.extern.slf4j.Slf4j;
+import org.azeckoski.reflectutils.ArrayUtils;
+import org.azeckoski.reflectutils.ClassFields;
+import org.azeckoski.reflectutils.ConstructorUtils;
+import org.azeckoski.reflectutils.ReflectUtils;
+import org.azeckoski.reflectutils.ClassFields.FieldsFilter;
 
 
 /**
@@ -72,7 +70,6 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-@Slf4j
 @SuppressWarnings("deprecation")
 public class EntityDescriptionManager {
 
@@ -131,7 +128,7 @@ public class EntityDescriptionManager {
 
     private EntityProvider describeEP = null;
     public void init() {
-        log.info("EntityDescriptionManager: init()");
+        System.out.println("INFO: EntityDescriptionManager: init()");
         // register the describe prefixes to load up descriptions
         describeEP = new DescribePropertiesable() {
             public String getEntityPrefix() {
@@ -148,13 +145,13 @@ public class EntityDescriptionManager {
     }
 
     public void destroy() {
-        log.info("EntityDescriptionManager: destroy()");
+        System.out.println("INFO: EntityDescriptionManager: destroy()");
         // NOTE: do not try to unregister describe
 //        if (describeEP != null) {
 //            try {
 //                entityProviderManager.unregisterEntityProvider(describeEP);
 //            } catch (RuntimeException e) {
-//                log.warn("EntityDescriptionManager: Unable to unregister the describe description provider: " + e);
+//                System.out.println("WARN: EntityDescriptionManager: Unable to unregister the describe description provider: " + e);
 //            }
 //        }
     }

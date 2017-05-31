@@ -47,8 +47,8 @@ import java.net.URLEncoder;
 import org.sakaiproject.db.cover.SqlService;
 import org.sakaiproject.db.api.SqlReader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.component.cover.ComponentManager;
@@ -61,6 +61,10 @@ import org.sakaiproject.site.cover.SiteService;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.tool.cover.SessionManager;
+
+import org.sakaiproject.memory.api.Cache;
+import org.sakaiproject.memory.api.CacheRefresher;
+import org.sakaiproject.memory.api.MemoryService;
 
 import uk.org.ponder.messageutil.MessageLocator;
 
@@ -89,7 +93,7 @@ import org.sakaiproject.assignment2.model.AssignmentAttachment;
 
 public class Assignment2Export extends AssignmentExport {
 
-    private static Logger log = LoggerFactory.getLogger(AssignmentExport.class);
+    private static Log log = LogFactory.getLog(AssignmentExport.class);
 
     private static SimplePageToolDao simplePageToolDao;
 
@@ -117,7 +121,7 @@ public class Assignment2Export extends AssignmentExport {
 
 	if (ComponentManager.get("org.sakaiproject.assignment2.service.api.Assignment2Service") != null)
 	    haveA2 = true;
-	log.info("Assignment2Export init: haveA2 = " + haveA2);
+	System.out.println("Assignment2Export init: haveA2 = " + haveA2);
 
 	log.info("init()");
 
@@ -254,7 +258,7 @@ public class Assignment2Export extends AssignmentExport {
 	    ret.attachments = SqlService.dbRead(connection, sql, fields, null);
 
 	} catch (Exception e) {
-	    log.info("error reading assignment2 " + e);
+	    System.out.println("error reading assignment2 " + e);
 	    // leave ret as null list
 	} finally {
 	    try {
@@ -269,3 +273,367 @@ public class Assignment2Export extends AssignmentExport {
     // use outputEntity from super
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -18,14 +18,13 @@ package org.sakaiproject.profile2.logic;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import lombok.Setter;
+
+import org.apache.log4j.Logger;
 import org.sakaiproject.memory.api.Cache;
 import org.sakaiproject.profile2.cache.CacheManager;
 import org.sakaiproject.profile2.dao.ProfileDao;
 import org.sakaiproject.profile2.hbm.model.ProfileKudos;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import lombok.Setter;
 
 /**
  * Implementation of ProfileKudosLogic API
@@ -35,7 +34,7 @@ import lombok.Setter;
  */
 public class ProfileKudosLogicImpl implements ProfileKudosLogic {
 
-	private static final Logger log = LoggerFactory.getLogger(ProfileKudosLogicImpl.class);
+	private static final Logger log = Logger.getLogger(ProfileKudosLogicImpl.class);
 
 	private Cache cache;
 	private final String CACHE_NAME = "org.sakaiproject.profile2.cache.kudos";
@@ -44,7 +43,6 @@ public class ProfileKudosLogicImpl implements ProfileKudosLogic {
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public int getKudos(String userUuid){
 		
 		ProfileKudos k = null;
@@ -55,7 +53,7 @@ public class ProfileKudosLogicImpl implements ProfileKudosLogic {
 			if(k == null) {
 				// This means that the cache has expired. evict the key from the cache
 				log.debug("Kudos cache appears to have expired for " + userUuid);
-				this.cacheManager.evictFromCache(this.cache, userUuid);
+				evictFromCache(userUuid);
 			}
 		}
 		if(k == null) {
@@ -76,7 +74,6 @@ public class ProfileKudosLogicImpl implements ProfileKudosLogic {
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public BigDecimal getRawKudos(String userUuid){
 		ProfileKudos k = dao.getKudos(userUuid);
 		if(k == null){
@@ -88,7 +85,6 @@ public class ProfileKudosLogicImpl implements ProfileKudosLogic {
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public boolean updateKudos(String userUuid, int score, BigDecimal percentage) {
 		ProfileKudos k = new ProfileKudos();
 		k.setUserUuid(userUuid);
@@ -102,6 +98,15 @@ public class ProfileKudosLogicImpl implements ProfileKudosLogic {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Helper to evict an item from a cache. 
+	 * @param cacheKey	the id for the data in the cache
+	 */
+	private void evictFromCache(String cacheKey) {
+		cache.remove(cacheKey);
+		log.debug("Evicted data in cache for key: " + cacheKey);
 	}
 
 	public void init() {

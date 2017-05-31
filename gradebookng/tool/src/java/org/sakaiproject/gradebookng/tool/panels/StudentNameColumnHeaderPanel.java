@@ -68,7 +68,7 @@ public class StudentNameColumnHeaderPanel extends Panel {
 				gradebookPage.setUiSettings(settings);
 
 				// refresh
-				setResponsePage(GradebookPage.class);
+				setResponsePage(new GradebookPage());
 			}
 		};
 
@@ -103,7 +103,7 @@ public class StudentNameColumnHeaderPanel extends Panel {
 				gradebookPage.setUiSettings(settings);
 
 				// refresh
-				setResponsePage(GradebookPage.class);
+				setResponsePage(new GradebookPage());
 
 			}
 		};

@@ -117,7 +117,7 @@ function DynamicList(baseId_, templateId_, className_, anchor_)
 		}
 	}
 	
-	this.getObject = function(value_, checked_,new_)
+	this.getObject = function(value_, checked_)
 	{	
 		//var clonedObj = $('#'+this.templateId).clone();
 		var tempClone = document.getElementById(this.templateId).cloneNode(true);
@@ -126,13 +126,7 @@ function DynamicList(baseId_, templateId_, className_, anchor_)
 		
 		var valueObj = clonedObj.find('input[name^=value_]');
 		valueObj.attr('id', 'value_'+this.row+this.count);
-		if (new_){
-			valueObj.attr('placeholder', (value_ != undefined) ? value_ : '');
-		}else if (value_ == "null"){
-			valueObj.attr('placeholder', '');		
-		}else{
-			valueObj.attr('value', (value_ != undefined) ? value_ : '');
-		}
+		valueObj.attr('placeholder', (value_ != undefined) ? value_ : '');
 		
 		var buttonObj = clonedObj.find('#btnSelect_');
 		buttonObj.attr('id', 'btnSelect_'+this.row+this.count);
@@ -156,7 +150,7 @@ function DynamicList(baseId_, templateId_, className_, anchor_)
 		return clonedObj;
 	}
 	
-	this.addElement = function(value_, checked_,new_)
+	this.addElement = function(value_, checked_)
 	{
 		var newSelection = new selectionAuthor('sel_'+this.row+this.count, this.className, this.anchor);
 		this_.selectionList['sel_'+this.row+this.count] = newSelection;
@@ -174,7 +168,7 @@ function DynamicList(baseId_, templateId_, className_, anchor_)
 			}
 		}
 		
-		var clonedObj = this.getObject(value_, checked_,new_);
+		var clonedObj = this.getObject(value_, checked_);
 		$('#'+this.lastId).after(clonedObj);
 		this.lastId = clonedObj.attr('id');		
 		this.count++;

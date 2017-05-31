@@ -23,8 +23,8 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.SecurityService;
@@ -71,7 +71,7 @@ public class ExternalLogic {
     public String serverId = "UNKNOWN_SERVER_ID";
     public final static String NO_LOCATION = "noLocationAvailable";
 
-    private final static Logger log = LoggerFactory.getLogger(ExternalLogic.class);
+    private final static Log log = LogFactory.getLog(ExternalLogic.class);
 
     protected AuthzGroupService authzGroupService;
     public void setAuthzGroupService(AuthzGroupService authzGroupService) {

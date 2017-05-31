@@ -26,8 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.user.api.UserNotificationPreferencesRegistration;
 import org.sakaiproject.user.api.UserNotificationPreferencesRegistrationService;
 
@@ -69,7 +69,7 @@ public abstract class UserNotificationPreferencesRegistrationImpl implements Use
 
 	private UserNotificationPreferencesRegistrationService userNotificationPreferencesRegistrationService;
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Log logger = LogFactory.getLog(getClass());
 
 	private String sectionTitle = "";
 	private String sectionDescription = "";

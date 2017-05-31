@@ -27,9 +27,6 @@ import java.sql.SQLException;
 import org.sakaiproject.dash.model.Context;
 import org.springframework.jdbc.core.RowMapper;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class ContextMapper implements RowMapper
 {
 
@@ -41,7 +38,8 @@ public class ContextMapper implements RowMapper
 			context.setContextTitle(rs.getString("site_context_title"));
 			context.setContextUrl(rs.getString("site_context_url"));
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			System.out.println("=============== " + e + " ===============");
+			e.printStackTrace(System.out);
 			if(e instanceof SQLException) {
 				throw (SQLException) e;
 			}

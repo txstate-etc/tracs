@@ -4,14 +4,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import lombok.extern.slf4j.Slf4j;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import edu.indiana.lib.twinpeaks.util.*;
 
-@Slf4j
+
 public class CqlParser extends org.xml.sax.helpers.DefaultHandler {
+
+private static org.apache.commons.logging.Log	_log = LogUtils.getLog(CqlParser.class);
   //
 	// Index mappings (CQL -> Sirsi)
 	//
@@ -70,11 +71,11 @@ public class CqlParser extends org.xml.sax.helpers.DefaultHandler {
 		}
 		catch (org.xml.sax.SAXException e)
 		{
-			log.error("SAX exception: " + e);
+			_log.error("SAX exception: " + e);
 		}
 		catch (ParserConfigurationException e)
 		{
-			log.error("Parse failed: " + e);
+			_log.error("Parse failed: " + e);
 		}
 	}
 
@@ -104,11 +105,11 @@ public class CqlParser extends org.xml.sax.helpers.DefaultHandler {
 		}
 		catch( java.io.IOException ioe )
 		{
-			log.error("CQL parse exception: " + ioe);
+			_log.error("CQL parse exception: " + ioe);
 		}
 		catch( org.z3950.zing.cql.CQLParseException e )
 		{
-			log.error("CQL parse exception: " + e);
+			_log.error("CQL parse exception: " + e);
 		}
 		
 		if (root == null)
@@ -118,8 +119,8 @@ public class CqlParser extends org.xml.sax.helpers.DefaultHandler {
 
 		String cqlXml = root.toXCQL( 0 );
 
-		log.debug("CQL XML:");
-		log.debug(cqlXml);
+		_log.debug("CQL XML:");
+		_log.debug(cqlXml);
 
 		// get cqlXml as a stream
 		java.io.ByteArrayInputStream byteInputStream = null;
@@ -130,7 +131,7 @@ public class CqlParser extends org.xml.sax.helpers.DefaultHandler {
 		}
 		catch( java.io.UnsupportedEncodingException uee )
 		{
-			log.error("Encoding exception: " + uee);
+			_log.error("Encoding exception: " + uee);
 		}
 
 		if (byteInputStream == null)
@@ -149,11 +150,11 @@ public class CqlParser extends org.xml.sax.helpers.DefaultHandler {
 		}
 		catch( java.io.IOException ioe )
 		{
-			log.error("IO exception: " + ioe);
+			_log.error("IO exception: " + ioe);
 		}
 		catch( org.xml.sax.SAXException spe )
 		{
-			log.error("SAX exception: " + spe);
+			_log.error("SAX exception: " + spe);
 		}
 
 		String cqlResult = ( String ) cqlStack.pop();
@@ -325,7 +326,7 @@ public class CqlParser extends org.xml.sax.helpers.DefaultHandler {
 
 		if (sirsiIndex == null || sirsiIndex.equals( "" ))
 		{
-			log.error("translateIndex(): bad index, using KEYWORD");
+			_log.error("translateIndex(): bad index, using KEYWORD");
 			sirsiIndex = (String) INDEX_MAP.get("keyword");
 		}
 
@@ -343,7 +344,7 @@ public class CqlParser extends org.xml.sax.helpers.DefaultHandler {
 
 		if (sirsiBoolean == null || sirsiBoolean.equals( "" ))
 		{
-			log.error("translateBooleanRelation(): bad boolean relation, using AND" );
+			_log.error("translateBooleanRelation(): bad boolean relation, using AND" );
 			sirsiBoolean = (String) BOOL_RELATION_MAP.get("and");
 		}
 		return sirsiBoolean;

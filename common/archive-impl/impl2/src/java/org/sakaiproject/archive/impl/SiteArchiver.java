@@ -29,8 +29,8 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.archive.api.ArchiveService;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
@@ -58,7 +58,7 @@ import org.w3c.dom.NodeList;
 
 public class SiteArchiver {
 	
-	private static Logger M_log = LoggerFactory.getLogger(SiteArchiver.class);
+	private static Log M_log = LogFactory.getLog(SiteArchiver.class);
 	
 	/** Dependency: ServerConfigurationService. */
 	protected ServerConfigurationService m_serverConfigurationService = null;
@@ -105,7 +105,8 @@ public class SiteArchiver {
 	{
 		StringBuilder results = new StringBuilder();
 
-		M_log.debug("archive(): site: {}", siteId);
+		if (M_log.isDebugEnabled())
+			M_log.debug("archive(): site: " + siteId);
 
 		Site theSite = null;
 		try
@@ -322,7 +323,7 @@ public class SiteArchiver {
 		}
 		catch(Exception any)
 		{
-			M_log.warn("archve: exception archiving site: {}: {}", site.getId(), any);
+			M_log.warn("archve: exception archiving site: "+ site.getId() + ": ", any);
 		}
 	
 		stack.pop();
@@ -362,16 +363,16 @@ public class SiteArchiver {
 			}
 			catch (GroupNotDefinedException e)
 			{
-				M_log.warn(e.getMessage(), e);
+				M_log.warn(e, e);
 			}
 			catch (Exception any) {
-				M_log.warn(any.getMessage(), any);
+				M_log.warn(any,any);
 			}
 	
 		}
 		catch (Exception any)
 		{
-			M_log.warn(any.getMessage(), any);
+			M_log.warn(any,any);
 		}
 	
 		stack.pop();

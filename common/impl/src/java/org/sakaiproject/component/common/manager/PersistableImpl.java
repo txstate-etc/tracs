@@ -23,8 +23,8 @@ package org.sakaiproject.component.common.manager;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.api.common.manager.Persistable;
 
 /**
@@ -32,7 +32,7 @@ import org.sakaiproject.api.common.manager.Persistable;
  */
 public abstract class PersistableImpl implements Persistable
 {
-	private static final Logger LOG = LoggerFactory.getLogger(PersistableImpl.class);
+	private static final Log LOG = LogFactory.getLog(PersistableImpl.class);
 
 	protected Long id;
 

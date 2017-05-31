@@ -50,9 +50,6 @@ body.#{$namespace}toolMenu-collapsed{
 							display: none;
 						}
 					}
-					span.#{$namespace}toolsNav__menuitem--title{
-						white-space: pre;
-					}
 				}
 				.#{$namespace}toolsNav__menuitem--title{
 					display: none;
@@ -75,9 +72,6 @@ body.#{$namespace}toolMenu-collapsed{
 }
 
 #toolMenuWrap{
-	#toolMenu {
-		position: relative;
-	}
 	background: $tool-menu-background-color;
 	display: block;
 	min-width: $tool-menu-width;
@@ -158,26 +152,13 @@ body.#{$namespace}toolMenu-collapsed{
 }
 
 nav#subSites{
-	width: #{$tool-menu-width };
-	position: relative;
+	max-width: #{$tool-menu-width * 2 };
 	z-index: 9999;
-	@media #{$desktop}{
-		min-width: 7em;
-	}
 	&.floating{
-		min-width: #{$tool-menu-width * 2 };
-		max-width: #{$tool-menu-width * 2 };
-		margin: 3.4em 0 0 7px;
-		transform: translateY(-100%);
-		&.ontop{
-			ul{
-				max-height: 240px;
-				overflow: auto;
-			}
-		}
+		margin: 0 0 0 7px;
 		&:after{
 			right: 100%;
-			top: calc(100% - 25px);
+			top: 25%;
 			border: solid transparent;
 			content: " ";
 			height: 0;
@@ -259,9 +240,10 @@ nav#subSites{
 				}
 				.#{$namespace}toolsNav__menuitem--title{
 					display: block;
+					max-width: 100%;
 					width: 100%;
 					text-overflow: ellipsis;
-					white-space: pre-wrap;
+					white-space: pre;
 					overflow: hidden;
 				}
 				&.is-invisible {
@@ -305,7 +287,7 @@ nav#subSites{
 				li{
 					border-bottom: 1px solid $tool-sub-menu-border-color;
 					a{
-			  			padding: 0.6em 0 0.6em 0em;
+			  			padding: 0.6em 0 0.6em 2em;
 						background: $tool-sub-menu-background-color;
 						&:hover{
 							background: $tool-sub-menu-hover-background-color;
@@ -331,7 +313,12 @@ nav#subSites{
 				}
 			}
 			.#{$namespace}toolsNav__category {
-				background-color: darken( $tool-sub-menu-background-color, 5% );
+				background-color: darken( $text-color, 5% );
+				&::after{
+				   	content: url('images/arrow-down.png');
+					float: right;
+					margin-top : 2px;
+				}
 				@media #{$phone}{
 					display: none;
 				}

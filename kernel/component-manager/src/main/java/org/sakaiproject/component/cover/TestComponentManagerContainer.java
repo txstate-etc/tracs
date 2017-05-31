@@ -21,8 +21,8 @@
 
 package org.sakaiproject.component.cover;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.impl.SpringCompMgr;
 import org.springframework.beans.factory.config.PropertyOverrideConfigurer;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -48,7 +48,7 @@ public class TestComponentManagerContainer {
 	/**
 	 * The logger
 	 */
-	private static final Logger log = LoggerFactory.getLogger(TestComponentManagerContainer.class);
+	private static final Log log = LogFactory.getLog(TestComponentManagerContainer.class);
 	
 	/**
 	 * The current component manager
@@ -204,7 +204,7 @@ public class TestComponentManagerContainer {
 		try {			
 			return componentManager.get(beanId);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			log.error(e);
 			return null;
 		}
 	}

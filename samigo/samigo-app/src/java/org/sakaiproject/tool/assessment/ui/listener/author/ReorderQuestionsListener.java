@@ -32,8 +32,8 @@ import javax.faces.event.PhaseId;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.event.ValueChangeListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.tool.assessment.facade.AgentFacade;
 import org.sakaiproject.tool.assessment.facade.AssessmentFacade;
 import org.sakaiproject.tool.assessment.facade.ItemFacade;
@@ -54,7 +54,7 @@ import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 public class ReorderQuestionsListener implements ValueChangeListener
 {
 
-    private static Logger log = LoggerFactory.getLogger(ReorderQuestionsListener.class);
+    private static Log log = LogFactory.getLog(ReorderQuestionsListener.class);
 
   /**
    * Standard process action method.

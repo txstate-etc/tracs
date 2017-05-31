@@ -29,8 +29,8 @@ import java.util.Vector;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.component.cover.ServerConfigurationService;
@@ -87,7 +87,8 @@ public class SiteEmailNotificationRWiki extends SiteEmailNotification {
 
 	}
 
-	private static Logger log = LoggerFactory.getLogger(SiteEmailNotificationRWiki.class);
+	private static Log log = LogFactory
+			.getLog(SiteEmailNotificationRWiki.class);
 
 	private RenderService renderService = null;
 
@@ -216,7 +217,7 @@ public class SiteEmailNotificationRWiki extends SiteEmailNotification {
 			.append(rl.getString("SiteEmailNotificationRWiki.4"))
 			.append(mc.content)
 			.append("\n"); 
-		log.debug("Message is {}", message.toString());
+		log.debug("Message is " + message);
 		return message.toString();
 	}
 
@@ -252,7 +253,7 @@ public class SiteEmailNotificationRWiki extends SiteEmailNotification {
 			.append(mc.content)
 			.append("\n"); 
 		String message = formattedText.escapeHtml(sb.toString(), true);
-		log.debug("Message is {}", message.toString());
+		log.debug("Message is " + message);
 		return message;
 	}
 
@@ -303,7 +304,7 @@ public class SiteEmailNotificationRWiki extends SiteEmailNotification {
 			messageContent.content = DigestHtml.digest(messageContent.contentHTML);
 
 		} catch (Exception ex) {
-			log.error(ex.getMessage(), ex);
+
 		}
 		return messageContent;
 	}

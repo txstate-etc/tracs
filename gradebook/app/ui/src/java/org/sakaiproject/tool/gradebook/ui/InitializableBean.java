@@ -22,12 +22,12 @@
 
 package org.sakaiproject.tool.gradebook.ui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.jsf.model.PhaseAware;
 
 public abstract class InitializableBean implements PhaseAware {
-	private static final Logger logger = LoggerFactory.getLogger(InitializableBean.class);
+	private static final Log logger = LogFactory.getLog(InitializableBean.class);
 
 	private transient boolean notValidated;
 

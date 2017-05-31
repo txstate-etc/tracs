@@ -1,8 +1,9 @@
 package org.sakaiproject.gradebookng.framework;
 
-import lombok.extern.slf4j.Slf4j;
 import org.sakaiproject.entity.api.ContextObserver;
 import org.sakaiproject.service.gradebook.shared.GradebookNotFoundException;
+
+import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * Sakai context observer that responds to changes in the site (ie tools added/deleted etc) so that we can respond and ensure everything is
@@ -10,7 +11,7 @@ import org.sakaiproject.service.gradebook.shared.GradebookNotFoundException;
  *
  * Note that we must also be an EntityProducer so we extend GradebookNgEntityProducer which handles that.
  */
-@Slf4j
+@CommonsLog
 public class GradebookNgContextObserver extends GradebookNgEntityProducer implements ContextObserver {
 
 	@Override

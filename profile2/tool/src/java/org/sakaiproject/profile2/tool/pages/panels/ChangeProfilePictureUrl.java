@@ -16,8 +16,7 @@
 package org.sakaiproject.profile2.tool.pages.panels;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
@@ -49,7 +48,7 @@ import org.sakaiproject.profile2.util.ProfileConstants;
 public class ChangeProfilePictureUrl extends Panel{
     
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory.getLogger(ChangeProfilePictureUrl.class);
+	private static final Logger log = Logger.getLogger(ChangeProfilePictureUrl.class);
 
 	@SpringBean(name="org.sakaiproject.profile2.logic.SakaiProxy")
 	private SakaiProxy sakaiProxy;

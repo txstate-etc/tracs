@@ -4,7 +4,7 @@
   <parent>
     <artifactId>podcasts-base</artifactId>
     <groupId>org.sakaiproject</groupId>
-    <version>11.3</version>
+    <version>11.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <name>sakai-podcasts-impl</name>
@@ -43,6 +43,10 @@
     <dependency>
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-podcasts-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
     </dependency>
 <!--		Needed to construct the actual feed -->
     <dependency>

@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.apachecommons.CommonsLog;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -29,7 +30,7 @@ import org.sakaiproject.tool.api.SessionManager;
  * @author Steve Swinsburg (steve.swinsburg@gmail.com)
  *
  */
-@Slf4j
+@CommonsLog
 public class DownloadServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;

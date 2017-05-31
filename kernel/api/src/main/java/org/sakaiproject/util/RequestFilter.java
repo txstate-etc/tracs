@@ -26,9 +26,8 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.cluster.api.ClusterNode;
 import org.sakaiproject.cluster.api.ClusterService;
 import org.sakaiproject.cluster.api.ClusterService.Status;
@@ -36,13 +35,13 @@ import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.event.api.UsageSession;
 import org.sakaiproject.event.api.UsageSessionService;
-import org.sakaiproject.thread_local.api.ThreadLocalManager;
+import org.sakaiproject.thread_local.cover.ThreadLocalManager;
 import org.sakaiproject.tool.api.ClosingException;
 import org.sakaiproject.tool.api.RebuildBreakdownService;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.tool.api.ToolSession;
-import org.sakaiproject.tool.api.SessionManager;
+import org.sakaiproject.tool.cover.SessionManager;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -185,7 +184,7 @@ public class RequestFilter implements Filter
 	protected static final String SAKAI_CLUSTER_REDIRECT_RANDOM = "cluster.redirect.random.node";
 
 	/** Our log (commons). */
-	private static Logger M_log = LoggerFactory.getLogger(RequestFilter.class);
+	private static Log M_log = LogFactory.getLog(RequestFilter.class);
 	/** If true, we deliver the Sakai end user enterprise id as the remote user in each request. */
 	protected boolean m_sakaiRemoteUser = true;
 
@@ -235,18 +234,6 @@ public class RequestFilter implements Filter
                                                                                                               
     protected String cookieDomain = null; 
 
-    private ThreadLocalManager threadLocalManager;
-    private SessionManager sessionManager;
-    private ServerConfigurationService serverConfigurationService;
-	private RebuildBreakdownService rebuildBreakdownService;
-
-	public RequestFilter() {
-		threadLocalManager = ComponentManager.get(ThreadLocalManager.class);
-		sessionManager = ComponentManager.get(SessionManager.class);
-		serverConfigurationService = ComponentManager.get(ServerConfigurationService.class);
-		rebuildBreakdownService = ComponentManager.get(RebuildBreakdownService.class);
-	}
-
 	/** Set the HttpOnly attribute on the cookie */
 	protected boolean m_cookieHttpOnly = true;
 
@@ -279,11 +266,19 @@ public class RequestFilter implements Filter
 
 		// if force.url.secure is set (to a https port number), use https and this port
 		String forceSecure = System.getProperty("sakai.force.url.secure");
-		int forceSecureInt = NumberUtils.toInt(forceSecure);
-		if (forceSecureInt > 0 && forceSecureInt <= 65535) {
-			transport = "https";
-			port = forceSecureInt;
-			secure = true;
+		if (forceSecure != null && !"".equals(forceSecure)) {
+		    // allow the value to be forced to 0 or blank to disable this
+            int portNum;
+            try {
+                portNum = Integer.parseInt(forceSecure);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("force.url.secure must be set to the port number which should be a numeric value > 0 (or set it to 0 to disable secure urls)", e);
+            }
+            if (portNum > 0) {
+                transport = "https";
+                port = portNum;
+                secure = true;
+            }
 		} else {
 	        // otherwise use the request scheme and port
 			transport = req.getScheme();
@@ -330,11 +325,11 @@ public class RequestFilter implements Filter
 		long startTime = System.currentTimeMillis();
 
 		// bind some preferences as "current"
-		Boolean curRemoteUser = (Boolean) threadLocalManager.get(CURRENT_REMOTE_USER);
-		Integer curHttpSession = (Integer) threadLocalManager.get(CURRENT_HTTP_SESSION);
-		String curContext = (String) threadLocalManager.get(CURRENT_CONTEXT);
-		ServletRequest curRequest = (ServletRequest) threadLocalManager.get(CURRENT_HTTP_REQUEST);
-		ServletResponse curResponse = (ServletResponse) threadLocalManager.get(CURRENT_HTTP_RESPONSE);
+		Boolean curRemoteUser = (Boolean) ThreadLocalManager.get(CURRENT_REMOTE_USER);
+		Integer curHttpSession = (Integer) ThreadLocalManager.get(CURRENT_HTTP_SESSION);
+		String curContext = (String) ThreadLocalManager.get(CURRENT_CONTEXT);
+		ServletRequest curRequest = (ServletRequest) ThreadLocalManager.get(CURRENT_HTTP_REQUEST);
+		ServletResponse curResponse = (ServletResponse) ThreadLocalManager.get(CURRENT_HTTP_RESPONSE);
 		boolean cleared = false;
 
 		// keep track of temp files with this request that need to be deleted on the way out
@@ -342,12 +337,12 @@ public class RequestFilter implements Filter
 
 		try
 		{
-			threadLocalManager.set(CURRENT_REMOTE_USER, Boolean.valueOf(m_sakaiRemoteUser));
-			threadLocalManager.set(CURRENT_HTTP_SESSION, Integer.valueOf(m_sakaiHttpSession));
-			threadLocalManager.set(CURRENT_CONTEXT, m_contextId);
+			ThreadLocalManager.set(CURRENT_REMOTE_USER, Boolean.valueOf(m_sakaiRemoteUser));
+			ThreadLocalManager.set(CURRENT_HTTP_SESSION, Integer.valueOf(m_sakaiHttpSession));
+			ThreadLocalManager.set(CURRENT_CONTEXT, m_contextId);
 
 			// make the servlet context available
-			threadLocalManager.set(CURRENT_SERVLET_CONTEXT, m_servletContext);
+			ThreadLocalManager.set(CURRENT_SERVLET_CONTEXT, m_servletContext);
 
 			// we are expecting HTTP stuff
 			if (!((requestObj instanceof HttpServletRequest) && (responseObj instanceof HttpServletResponse)))
@@ -405,8 +400,8 @@ public class RequestFilter implements Filter
 			if (req.getAttribute(ATTR_FILTERED) != null)
 			{
 				// set the request and response for access via the thread local
-				threadLocalManager.set(CURRENT_HTTP_REQUEST, req);
-				threadLocalManager.set(CURRENT_HTTP_RESPONSE, resp);
+				ThreadLocalManager.set(CURRENT_HTTP_REQUEST, req);
+				ThreadLocalManager.set(CURRENT_HTTP_RESPONSE, resp);
 
 				chain.doFilter(req, resp);
 			}
@@ -414,7 +409,19 @@ public class RequestFilter implements Filter
 			// filter the request
 			else
 			{
-				M_log.debug("http-request: {} {}?{}", req.getMethod(), req.getRequestURL(), req.getQueryString());
+				if (M_log.isDebugEnabled())
+				{
+					sb = new StringBuffer("http-request: ");
+					sb.append(req.getMethod());
+					sb.append(" ");
+					sb.append(req.getRequestURL());
+					if (req.getQueryString() != null)
+					{
+						sb.append("?");
+						sb.append(req.getQueryString());
+					}
+					M_log.debug(sb);
+				}
 
 				try
 				{
@@ -422,7 +429,7 @@ public class RequestFilter implements Filter
 					req.setAttribute(ATTR_FILTERED, ATTR_FILTERED);
 
 					// some useful info
-					threadLocalManager.set(ServerConfigurationService.CURRENT_SERVER_URL, serverUrl(req));
+					ThreadLocalManager.set(ServerConfigurationService.CURRENT_SERVER_URL, serverUrl(req));
 
 					// make sure we have a session
 					Session s = assureSession(req, resp);
@@ -437,13 +444,13 @@ public class RequestFilter implements Filter
 					resp = preProcessResponse(s, req, resp);
 
 					// set the request and response for access via the thread local
-					threadLocalManager.set(CURRENT_HTTP_REQUEST, req);
-					threadLocalManager.set(CURRENT_HTTP_RESPONSE, resp);
+					ThreadLocalManager.set(CURRENT_HTTP_REQUEST, req);
+					ThreadLocalManager.set(CURRENT_HTTP_RESPONSE, resp);
 
 					// set the portal into thread local
 					if (m_contextId != null && m_contextId.length() > 0)
 					{
-						threadLocalManager.set(ServerConfigurationService.CURRENT_PORTAL_PATH, "/" + m_contextId);
+						ThreadLocalManager.set(ServerConfigurationService.CURRENT_PORTAL_PATH, "/" + m_contextId);
 					}
 
 					// Only synchronize on session for Terracotta. See KNL-218, KNL-75.
@@ -513,7 +520,7 @@ public class RequestFilter implements Filter
 				finally
 				{
 					// clear any bound current values
-					threadLocalManager.clear();
+					ThreadLocalManager.clear();
 					cleared = true;
 				}
 			}
@@ -524,11 +531,11 @@ public class RequestFilter implements Filter
 			if (!cleared)
 			{
 				// restore the "current" bindings
-				threadLocalManager.set(CURRENT_REMOTE_USER, curRemoteUser);
-				threadLocalManager.set(CURRENT_HTTP_SESSION, curHttpSession);
-				threadLocalManager.set(CURRENT_CONTEXT, curContext);
-				threadLocalManager.set(CURRENT_HTTP_REQUEST, curRequest);
-				threadLocalManager.set(CURRENT_HTTP_RESPONSE, curResponse);
+				ThreadLocalManager.set(CURRENT_REMOTE_USER, curRemoteUser);
+				ThreadLocalManager.set(CURRENT_HTTP_SESSION, curHttpSession);
+				ThreadLocalManager.set(CURRENT_CONTEXT, curContext);
+				ThreadLocalManager.set(CURRENT_HTTP_REQUEST, curRequest);
+				ThreadLocalManager.set(CURRENT_HTTP_RESPONSE, curResponse);
 			}
 
 			// delete any temp files
@@ -643,22 +650,23 @@ public class RequestFilter implements Filter
 
 		// Requesting the ServerConfigurationService here also triggers the promotion of certain
 		// sakai.properties settings to system properties - see SakaiPropertyPromoter()
+		ServerConfigurationService configService = org.sakaiproject.component.cover.ServerConfigurationService.getInstance();
 
 
 		// knl-640
-		appUrl = serverConfigurationService.getString("serverUrl", null);
-		chsDomain = serverConfigurationService.getString("content.chs.serverName", null);
-		chsUrl = serverConfigurationService.getString("content.chs.serverUrl", null);
-		useContentHostingDomain = serverConfigurationService.getBoolean("content.separateDomains", false);
-		contentPaths = serverConfigurationService.getStrings("content.chs.urlprefixes");
+		appUrl = configService.getString("serverUrl", null);
+		chsDomain = configService.getString("content.chs.serverName", null);
+		chsUrl = configService.getString("content.chs.serverUrl", null);
+		useContentHostingDomain = configService.getBoolean("content.separateDomains", false);
+		contentPaths = configService.getStrings("content.chs.urlprefixes");
 		if (contentPaths == null) {
 			contentPaths = new String[] { "/access/", "/web/"};
 		}
-		loginPaths = serverConfigurationService.getStrings("content.login.urlprefixes");
+		loginPaths = configService.getStrings("content.login.urlprefixes");
 		if (loginPaths == null) {
 			loginPaths = new String[] { "/access/login", "/sakai-login-tool", "/access/require", "/access/accept" };
 		}
-		contentExceptions = serverConfigurationService.getStrings("content.chsexception.urlprefixes");
+		contentExceptions = configService.getStrings("content.chsexception.urlprefixes");
 		if (contentExceptions == null) {
 			// add in default exceptions here, if desired
 			contentExceptions = new String[] { "/access/calendar/", "/access/citation/export_ris_sel/", "/access/citation/export_ris_all/" };
@@ -806,16 +814,16 @@ public class RequestFilter implements Filter
 			cookieDomain = System.getProperty(SAKAI_COOKIE_DOMAIN);
 		}
 
-		m_sessionParamAllow = serverConfigurationService.getBoolean(SAKAI_SESSION_PARAM_ALLOW, false);
+		m_sessionParamAllow = configService.getBoolean(SAKAI_SESSION_PARAM_ALLOW, false);
 
 		// retrieve option to enable or disable cookie HttpOnly
-		m_cookieHttpOnly = serverConfigurationService.getBoolean(SAKAI_COOKIE_HTTP_ONLY, true);
+		m_cookieHttpOnly = configService.getBoolean(SAKAI_COOKIE_HTTP_ONLY, true);
 
-		m_UACompatible = serverConfigurationService.getString(SAKAI_UA_COMPATIBLE, null);
+		m_UACompatible = configService.getString(SAKAI_UA_COMPATIBLE, null);
 
-		isLTIProviderAllowed = (serverConfigurationService.getString(SAKAI_BLTI_PROVIDER_TOOLS,null)!=null);
+		isLTIProviderAllowed = (configService.getString(SAKAI_BLTI_PROVIDER_TOOLS,null)!=null);
 
-		m_redirectRandomNode = serverConfigurationService.getBoolean(SAKAI_CLUSTER_REDIRECT_RANDOM, true);
+		m_redirectRandomNode = configService.getBoolean(SAKAI_CLUSTER_REDIRECT_RANDOM, true);
 
 	}
 
@@ -1067,18 +1075,18 @@ public class RequestFilter implements Filter
 		if (m_checkPrincipal && (principal != null) && (principal.getName() != null))
 		{
 			// set our session id to the remote user id
-			sessionId = sessionManager.makeSessionId(req, principal);
+			sessionId = SessionManager.makeSessionId(req, principal);
 
 			// don't supply this cookie to the client
 			allowSetCookieEarly = false;
 
 			// find the session
-			s = sessionManager.getSession(sessionId);
+			s = SessionManager.getSession(sessionId);
 
 			// if not found, make a session for this user
 			if (s == null)
 			{
-				s = sessionManager.startSession(sessionId);
+				s = SessionManager.startSession(sessionId);
 			}
 
 			// Make these sessions expire after 10 minutes
@@ -1115,7 +1123,7 @@ public class RequestFilter implements Filter
 				}
 
 				// find the session
-				s = sessionManager.getSession(sessionId);
+				s = SessionManager.getSession(sessionId);
 			}
 
 			// ignore the session id provided in a request parameter
@@ -1134,9 +1142,9 @@ public class RequestFilter implements Filter
 		}
 		if (s == null && sessionId != null) {
 			// check to see if this session has already been built.  If not, rebuild
-
+			RebuildBreakdownService rebuildBreakdownService = (RebuildBreakdownService) ComponentManager.get(RebuildBreakdownService.class);
 			if (rebuildBreakdownService != null) {
-				s = sessionManager.startSession(sessionId);
+				s = SessionManager.startSession(sessionId);
 				if (!rebuildBreakdownService.rebuildSession(s)) {
 					s.invalidate();
 					s = null;
@@ -1147,12 +1155,12 @@ public class RequestFilter implements Filter
 		// if missing, make one
 		if (s == null)
 		{
-			s = sessionManager.startSession();
+			s = SessionManager.startSession();
 
 			// if we have a cookie, but didn't find the session and are creating a new one, mark this
 			if (c != null)
 			{
-				threadLocalManager.set(SessionManager.CURRENT_INVALID_SESSION, SessionManager.CURRENT_INVALID_SESSION);
+				ThreadLocalManager.set(SessionManager.CURRENT_INVALID_SESSION, SessionManager.CURRENT_INVALID_SESSION);
 			}
 		}
 
@@ -1160,7 +1168,7 @@ public class RequestFilter implements Filter
 		req.setAttribute(ATTR_SESSION, s);
 
 		// set this as the current session
-		sessionManager.setCurrentSession(s);
+		SessionManager.setCurrentSession(s);
 
 		// Now that we know the session exists, regardless of whether it's new or not, lets see if there
 		// is a UsageSession.  If so, we want to check it's serverId
@@ -1170,9 +1178,10 @@ public class RequestFilter implements Filter
 			us = (UsageSession)s.getAttribute(UsageSessionService.USAGE_SESSION_KEY);
 			if (us != null) {
 				// check the server instance id
-				String serverInstanceId = serverConfigurationService.getServerIdInstance();
+				ServerConfigurationService configService = org.sakaiproject.component.cover.ServerConfigurationService.getInstance();
+				String serverInstanceId = configService.getServerIdInstance();
 				if ((serverInstanceId != null) && (!serverInstanceId.equals(us.getServer()))) {
-					// Logger that the UsageSession server value is changing
+					// Log that the UsageSession server value is changing
 					M_log.info("UsageSession: Server change detected: Old Server=" + us.getServer() +
 							"    New Server=" + serverInstanceId);
 					// set the new UsageSession server value
@@ -1247,7 +1256,7 @@ public class RequestFilter implements Filter
 			req.setAttribute(Tool.TOOL_SESSION, toolSession);
 
 			// set as the current tool session
-			sessionManager.setCurrentToolSession(toolSession);
+			SessionManager.setCurrentToolSession(toolSession);
 
 			// put the placement id in the request attribute
 			req.setAttribute(Tool.PLACEMENT_ID, placementId);
@@ -1315,6 +1324,7 @@ public class RequestFilter implements Filter
 	 */
 	protected void postProcessResponse(Session s, HttpServletRequest req, HttpServletResponse res)
 	{
+		RebuildBreakdownService rebuildBreakdownService = (RebuildBreakdownService) ComponentManager.get(RebuildBreakdownService.class);
 		if (rebuildBreakdownService != null) {
 		    rebuildBreakdownService.storeSession(s, req);
 		}
@@ -1328,7 +1338,8 @@ public class RequestFilter implements Filter
 	 */
 	private boolean isSessionClusteringEnabled()
 	{
-	    return TERRACOTTA_CLUSTER || rebuildBreakdownService != null && rebuildBreakdownService.isSessionHandlingEnabled();
+        RebuildBreakdownService rebuildBreakdownService = (RebuildBreakdownService) ComponentManager.get(RebuildBreakdownService.class);
+	    return TERRACOTTA_CLUSTER || rebuildBreakdownService.isSessionHandlingEnabled();
 	}
 
 	/**
@@ -1480,7 +1491,7 @@ public class RequestFilter implements Filter
 		public String getRemoteUser()
 		{
 			// use the "current" setting for this
-			boolean remoteUser = ((Boolean) threadLocalManager.get(CURRENT_REMOTE_USER)).booleanValue();
+			boolean remoteUser = ((Boolean) ThreadLocalManager.get(CURRENT_REMOTE_USER)).booleanValue();
 
 			if (remoteUser && (m_session != null) && (m_session.getUserEid() != null))
 			{
@@ -1500,8 +1511,8 @@ public class RequestFilter implements Filter
 			HttpSession rv = null;
 
 			// use the "current" settings for this
-			int curHttpSession = ((Integer) threadLocalManager.get(CURRENT_HTTP_SESSION)).intValue();
-			String curContext = (String) threadLocalManager.get(CURRENT_CONTEXT);
+			int curHttpSession = ((Integer) ThreadLocalManager.get(CURRENT_HTTP_SESSION)).intValue();
+			String curContext = (String) ThreadLocalManager.get(CURRENT_CONTEXT);
 
 			switch (curHttpSession)
 			{
@@ -1525,7 +1536,7 @@ public class RequestFilter implements Filter
 
 				case TOOL_SESSION:
 				{
-					rv = (HttpSession) sessionManager.getCurrentToolSession();
+					rv = (HttpSession) SessionManager.getCurrentToolSession();
 					if (rv == null)
 					{
 						rv = (HttpSession) m_session.getContextSession(curContext);

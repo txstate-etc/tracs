@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.announcement.api.AnnouncementChannel;
 import org.sakaiproject.announcement.api.AnnouncementMessage;
 import org.sakaiproject.announcement.api.AnnouncementMessageEdit;
@@ -73,7 +73,7 @@ public class SiteEmailNotificationAnnc extends SiteEmailNotification
 	private static final String PORTLET_CONFIG_PARM_MERGED_CHANNELS = "mergedAnnouncementChannels";
 
 	/** Our logger. */
-	private static Logger M_log = LoggerFactory.getLogger(SiteEmailNotificationAnnc.class);
+	private static Log M_log = LogFactory.getLog(SiteEmailNotificationAnnc.class);
 
 	private EntityManager entityManager;
 	private SecurityService securityService;
@@ -376,7 +376,7 @@ public class SiteEmailNotificationAnnc extends SiteEmailNotification
 		// SAK-20988 - emailFromReplyable@org.sakaiproject.event.api.NotificationService is deprecated
 		boolean notificationEmailFromReplyable = ServerConfigurationService.getBoolean("notify.email.from.replyable", false);
 		if (notificationEmailFromReplyable 
-		        && from.contains(userEmail)
+		        && from.contains("no-reply@") 
 		        && userId != null) 
 		{
 				try
@@ -423,42 +423,38 @@ public class SiteEmailNotificationAnnc extends SiteEmailNotification
 	{
 		// get the message
 		final Reference ref = entityManager.newReference(opaqueContext);
-		try {
-			// needed to access the message
-			enableSecurityAdvisorToGetAnnouncement();
-			
-			final AnnouncementMessage msg = (AnnouncementMessage) ref.getEntity();
-			if (msg!=null) {
-				final AnnouncementMessageHeader hdr = (AnnouncementMessageHeader) msg.getAnnouncementHeader();
 		
-				// read the notification options
-				final String notification = msg.getProperties().getProperty("notificationLevel");
+		// needed to access the message
+		enableSecurityAdvisorToGetAnnouncement();
 		
-				int noti = NotificationService.NOTI_OPTIONAL;
-				if ("r".equals(notification))
-				{
-					noti = NotificationService.NOTI_REQUIRED;
-				}
-				else if ("n".equals(notification))
-				{
-					noti = NotificationService.NOTI_NONE;
-				}
-					
-				final Event delayedNotificationEvent = eventTrackingService.newEvent("annc.schInv.notify", msg.getReference(), true, noti);
-				//eventTrackingService.post(event);
-		
-				NotificationEdit notify = notificationService.addTransientNotification();
-				
-				super.notify(notify, delayedNotificationEvent);
-			}
-			
-		} finally {
-			// since we build the notification by accessing the
-			// message within the super class, can't remove the
-			// SecurityAdvisor until this point
-			// done with access, need to remove from stack
-			disableSecurityAdvisor();
+		final AnnouncementMessage msg = (AnnouncementMessage) ref.getEntity();
+		final AnnouncementMessageHeader hdr = (AnnouncementMessageHeader) msg.getAnnouncementHeader();
+
+		// read the notification options
+		final String notification = msg.getProperties().getProperty("notificationLevel");
+
+		int noti = NotificationService.NOTI_OPTIONAL;
+		if ("r".equals(notification))
+		{
+			noti = NotificationService.NOTI_REQUIRED;
 		}
+		else if ("n".equals(notification))
+		{
+			noti = NotificationService.NOTI_NONE;
+		}
+			
+		final Event delayedNotificationEvent = eventTrackingService.newEvent("annc.schInv.notify", msg.getReference(), true, noti);
+//		eventTrackingService.post(event);
+
+		NotificationEdit notify = notificationService.addTransientNotification();
+		
+		super.notify(notify, delayedNotificationEvent);
+
+		// since we build the notification by accessing the
+		// message within the super class, can't remove the
+		// SecurityAdvisor until this point
+		// done with access, need to remove from stack
+		disableSecurityAdvisor();
 	}
 
 	/**

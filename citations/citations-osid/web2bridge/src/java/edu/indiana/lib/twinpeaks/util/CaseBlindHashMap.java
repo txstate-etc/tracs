@@ -26,8 +26,6 @@ in this Software without prior written authorization from Stanford University.
 
 package edu.indiana.lib.twinpeaks.util;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.*;
 import java.util.*;
 
@@ -40,8 +38,10 @@ import java.util.*;
  * Two methods have been added to facilitate working with Sets of key strings.
  * See <code>stringKeySet()</code> and <code>stringKeyIterator()</code>.
  */
-@Slf4j
 public class CaseBlindHashMap extends HashMap {
+
+private static org.apache.commons.logging.Log	_log = LogUtils.getLog(CaseBlindHashMap.class);
+
   /**
    * Constructors
    */

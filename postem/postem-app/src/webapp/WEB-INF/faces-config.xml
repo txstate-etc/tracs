@@ -65,6 +65,7 @@
     <navigation-case>
       <from-outcome>main</from-outcome>
       <to-view-id>/postem/main.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -72,6 +73,7 @@
     <navigation-case>
       <from-outcome>create_gradebook</from-outcome>
       <to-view-id>/postem/create_gradebook.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -79,6 +81,7 @@
     <navigation-case>
       <from-outcome>delete_confirm</from-outcome>
       <to-view-id>/postem/delete_confirm.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -86,6 +89,7 @@
     <navigation-case>
       <from-outcome>main_student</from-outcome>
       <to-view-id>/postem/main_student.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -93,6 +97,7 @@
     <navigation-case>
       <from-outcome>permission_error</from-outcome>
       <to-view-id>/postem/permission_error.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -100,6 +105,7 @@
     <navigation-case>
       <from-outcome>preview_gradebook</from-outcome>
       <to-view-id>/postem/preview_gradebook.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -107,6 +113,7 @@
     <navigation-case>
       <from-outcome>update_gradebook</from-outcome>
       <to-view-id>/postem/update_gradebook.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -114,6 +121,7 @@
     <navigation-case>
       <from-outcome>upload_template</from-outcome>
       <to-view-id>/postem/upload_template.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -121,6 +129,7 @@
     <navigation-case>
       <from-outcome>view_gradebook</from-outcome>
       <to-view-id>/postem/view_gradebook.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -128,6 +137,7 @@
     <navigation-case>
       <from-outcome>view_grades</from-outcome>
       <to-view-id>/postem/view_grades.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -135,6 +145,7 @@
     <navigation-case>
       <from-outcome>main</from-outcome>
       <to-view-id>/postem/main.jsp</to-view-id>
+      <redirect/>
     </navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -142,6 +153,7 @@
   	<navigation-case>
   		<from-outcome>download_csv</from-outcome>
   		<to-view-id>/postem/download_csv.jsp</to-view-id>
+  		<redirect/>
   	</navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -149,6 +161,7 @@
   	<navigation-case>
   		<from-outcome>download_template</from-outcome>
   		<to-view-id>/postem/download_template.jsp</to-view-id>
+  		<redirect/>
   	</navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -156,6 +169,7 @@
   	<navigation-case>
   		<from-outcome>verify</from-outcome>
   		<to-view-id>/postem/verify.jsp</to-view-id>
+  		<redirect/>
   	</navigation-case>
   </navigation-rule>
   <navigation-rule>
@@ -163,6 +177,7 @@
   	<navigation-case>
   		<from-outcome>view_student</from-outcome>
   		<to-view-id>/postem/view_student.jsp</to-view-id>
+  		<redirect/>
   	</navigation-case>
   </navigation-rule>
  

@@ -21,8 +21,8 @@
 
 package uk.ac.cam.caret.sakai.rwiki.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A really simple coverage utility, prints a record of the calling method
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SimpleCoverage
 {
-	private static Logger logger = LoggerFactory.getLogger(SimpleCoverage.class);
+	private static Log logger = LogFactory.getLog(SimpleCoverage.class);
 
 	private static long last = System.currentTimeMillis();
 

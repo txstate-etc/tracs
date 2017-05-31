@@ -24,11 +24,9 @@ package uk.ac.cam.caret.sakai.rwiki.component.model.impl;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 import uk.ac.cam.caret.sakai.rwiki.service.api.dao.RWikiPropertyDao;
 import uk.ac.cam.caret.sakai.rwiki.service.api.model.DataMigrationAgent;
 import uk.ac.cam.caret.sakai.rwiki.service.api.model.DataMigrationController;
@@ -42,8 +40,8 @@ import uk.ac.cam.caret.sakai.rwiki.service.api.model.RWikiProperty;
 
 public class DataMigrationSpecification implements DataMigrationController
 {
-	private static Logger log = LoggerFactory.getLogger(DataMigrationSpecification.class);
-	private static final Marker fatal = MarkerFactory.getMarker("FATAL");
+	private static Log log = LogFactory
+			.getLog(DataMigrationSpecification.class);
 
 	private RWikiProperty targetVersion;
 
@@ -78,7 +76,8 @@ public class DataMigrationSpecification implements DataMigrationController
 		if (currentVersionString != null
 				&& currentVersionString.equals(targetVersionString))
 		{
-			log.info("No data migration performed, target version present {}", targetVersionString);
+			log.info("No data migration performed, target version present "
+					+ targetVersionString);
 			return;
 		}
 
@@ -103,14 +102,18 @@ public class DataMigrationSpecification implements DataMigrationController
 			if (currentVersionString != null
 					&& currentVersionString.equals(targetVersionString))
 			{
-				log.info("RWiki Data migrated to version {} successfully", currentVersionString);
+				log.info("RWiki Data migrated to version "
+						+ currentVersionString + " sucessfuly");
 				// SUCCESS!!
 				return;
 			}
 		}
-		log.error(fatal, "RWiki Data has NOT been migrated to the current version, "
-				+ "you MUST investigate before using the RWiki Tool\n currentVersion: "
-				+ "{} targetVersion: {}", currentVersionString, targetVersionString);
+		log
+				.fatal("RWiki Data has NOT been migrated to the current version, "
+						+ "you MUST investigate before using the RWiki Tool\n currentVersion: "
+						+ currentVersionString
+						+ " targetVersion: "
+						+ targetVersionString);
 		throw new RuntimeException(
 				"RWiki Data has NOT been migrated to the current version, "
 						+ "you MUST investigate before using the RWiki Tool\n currentVersion: "

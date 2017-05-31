@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sakaiproject.assignment</groupId>
         <artifactId>assignment</artifactId>
-        <version>11.3</version>
+        <version>11.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -79,6 +79,10 @@
         <dependency>
             <groupId>org.sakaiproject.taggable</groupId>
             <artifactId>sakai-taggable-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>

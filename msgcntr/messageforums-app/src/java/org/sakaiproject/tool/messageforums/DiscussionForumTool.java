@@ -62,8 +62,8 @@ import net.sf.json.JsonConfig;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.api.app.messageforums.AnonymousManager;
 import org.sakaiproject.api.app.messageforums.Area;
 import org.sakaiproject.api.app.messageforums.AreaManager;
@@ -154,7 +154,7 @@ import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureExcep
  */
 public class DiscussionForumTool
 {
-  private static final Logger LOG = LoggerFactory.getLogger(DiscussionForumTool.class);
+  private static final Log LOG = LogFactory.getLog(DiscussionForumTool.class);
 
   /**
    * List individual forum details
@@ -4278,14 +4278,14 @@ public class DiscussionForumTool
 	    try{
 	    	messageId = Long.valueOf(messageIdStr);
 	    }catch (NumberFormatException e) {
-	    	LOG.error(e.getMessage());
+	    	LOG.error(e);
 	    	setErrorMessage(getResourceBundleString(MESSAGE_REFERENCE_NOT_FOUND));
 	    	return gotoMain();
 		}
 	    try{
 	    	topicId = Long.valueOf(topicIdStr);
 	    }catch (NumberFormatException e) {
-	    	LOG.error(e.getMessage());
+	    	LOG.error(e);
 	    	setErrorMessage(getResourceBundleString(TOPC_REFERENCE_NOT_FOUND));
 	    	return gotoMain();
 		}
@@ -4512,8 +4512,7 @@ public class DiscussionForumTool
 		  GradeDefinition gradeDef = gradebookService.getGradeDefinitionForStudentForItem(gradebookUid, assign.getId(), studentId);
 
 		  if (gradeDef.getGrade() != null) {
-		      String decSeparator = FormattedText.getDecimalSeparator();
-		      gbItemScore = StringUtils.replace(gradeDef.getGrade(), (",".equals(decSeparator)?".":","), decSeparator);
+		      gbItemScore = gradeDef.getGrade();
 		  }
 
 		  if (gradeDef.getGradeComment() != null) {
@@ -6565,7 +6564,9 @@ public class DiscussionForumTool
     		lrss.registerStatement(getStatementForGrade(studentUid, lrss.getEventActor(event), selectedTopic.getTopic().getTitle(), 
     				gradeAsDouble), "msgcntr");
     	} catch (Exception e) {
-            LOG.debug(e.getMessage());
+    		if (LOG.isDebugEnabled()) {
+    			LOG.debug(e);
+    		}
     	}
     }
     
@@ -7235,7 +7236,10 @@ public class DiscussionForumTool
    */
   private void setSelectedForumForCurrentTopic(DiscussionTopic topic)
   {
-    DiscussionForumBean oldSelectedForum = selectedForum;
+    if (selectedForum != null)
+    {
+      return;
+    }
     DiscussionForum forum = (DiscussionForum) topic.getBaseForum();
     if (forum == null)
     {
@@ -7243,20 +7247,17 @@ public class DiscussionForumTool
       String forumId = getExternalParameterByKey(FORUM_ID);
       if (forumId == null || forumId.trim().length() < 1)
       {
-        selectedForum = oldSelectedForum;
+        selectedForum = null;
         return;
       }
       forum = forumManager.getForumById(Long.valueOf(forumId));
       if (forum == null)
       {
-        selectedForum = oldSelectedForum;
+        selectedForum = null;
         return;
       }
     }
     selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
-    if (selectedForum == null) {
-    	selectedForum = oldSelectedForum;
-    }
     if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
     {
     	selectedForum.setReadFullDesciption(true);
@@ -8374,7 +8375,7 @@ public class DiscussionForumTool
 			url = developerHelperService.getToolViewURL("sakai.forums", path, params, context);
 			LOG.debug("url: " + url);
 		}catch (Exception e) {
-			LOG.warn(e.getMessage());
+			LOG.warn(e);
 		}
 		return url;
 	}

@@ -41,12 +41,12 @@ import org.sakaiproject.util.StringUtil;
 ///import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class AssignmentServiceTest extends TestCase
 {
-	private static final Logger log = LoggerFactory.getLogger(AssignmentServiceTest.class);
+	private static final Log log = LogFactory.getLog(AssignmentServiceTest.class);
 
 	// test interation number
 	int testNumber = 5;

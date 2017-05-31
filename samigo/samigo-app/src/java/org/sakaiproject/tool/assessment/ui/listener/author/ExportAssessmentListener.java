@@ -29,8 +29,8 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.tool.assessment.facade.AgentFacade;
 import org.sakaiproject.tool.assessment.facade.AssessmentFacade;
 import org.sakaiproject.tool.assessment.services.assessment.AssessmentService;
@@ -48,7 +48,7 @@ import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 
 public class ExportAssessmentListener implements ActionListener
 {
-  private static Logger log = LoggerFactory.getLogger(ExportAssessmentListener.class);
+  private static Log log = LogFactory.getLog(ExportAssessmentListener.class);
 
   public ExportAssessmentListener()
   {

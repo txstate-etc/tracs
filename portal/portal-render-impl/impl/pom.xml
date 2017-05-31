@@ -5,7 +5,7 @@
     <parent>
         <artifactId>portal</artifactId>
         <groupId>org.sakaiproject.portal</groupId>
-        <version>11.3</version>
+        <version>11.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -49,6 +49,10 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+        <dependency>
             <groupId>jtidy</groupId>
             <artifactId>jtidy</artifactId>
         </dependency>
@@ -80,13 +84,5 @@
             </resource>
         </resources>
         <sourceDirectory>src/java</sourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>${basedir}/src/test</directory>
-                <includes>
-                   <include>log4j.properties</include>
-                </includes>
-            </testResource>
-       </testResources>
     </build>
 </project>

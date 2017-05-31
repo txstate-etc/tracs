@@ -23,8 +23,8 @@ package org.sakaiproject.springframework.orm.hibernate.impl;
 
 import java.io.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Configuration;
 import org.sakaiproject.springframework.orm.hibernate.AdditionalHibernateMappings;
@@ -33,7 +33,7 @@ import org.springframework.core.io.Resource;
 
 public class AdditionalHibernateMappingsImpl implements AdditionalHibernateMappings, Comparable<AdditionalHibernateMappings>
 {
-	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+	protected final transient Log logger = LogFactory.getLog(getClass());
 
 	private Resource[] mappingLocations;
 

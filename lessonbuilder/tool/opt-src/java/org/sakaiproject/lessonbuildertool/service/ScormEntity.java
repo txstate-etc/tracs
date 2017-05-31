@@ -38,8 +38,8 @@ import java.util.Map;
 import java.util.Iterator;
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -101,7 +101,7 @@ import java.sql.ResultSet;
 
 public class ScormEntity implements LessonEntity, AssignmentInterface {
 
-    private static Logger log = LoggerFactory.getLogger(ScormEntity.class);
+    private static Log log = LogFactory.getLog(ScormEntity.class);
 
     private SimplePageBean simplePageBean;
 
@@ -246,7 +246,7 @@ public class ScormEntity implements LessonEntity, AssignmentInterface {
 	String siteId = ToolManager.getCurrentPlacement().getContext();
 
 	List<ContentPackage> packages = dao.find(siteId);
-	log.info("pckages " + packages.size());
+	System.out.println("pckages " + packages.size());
 
 	for (ContentPackage contentPackage: packages) {
 	    if (contentPackage.isDeleted())
@@ -288,7 +288,7 @@ public class ScormEntity implements LessonEntity, AssignmentInterface {
 	    assignment = getAssignment(id);
 	if (assignment == null)
 	    return null;
-	log.info("title " + assignment.getTitle());
+	System.out.println("title " + assignment.getTitle());
 	return assignment.getTitle();
     }
 
@@ -299,10 +299,10 @@ public class ScormEntity implements LessonEntity, AssignmentInterface {
 	if (assignment == null)
 	    return null;
 
-	log.info("simplepagebean " + simplePageBean);
-	log.info(simplePageBean.getCurrentTool("sakai.scorm.tool"));
-	log.info(assignment.getResourceId());
-	log.info(assignment.getTitle());
+	System.out.println("simplepagebean " + simplePageBean);
+	System.out.println(simplePageBean.getCurrentTool("sakai.scorm.tool"));
+	System.out.println(assignment.getResourceId());
+	System.out.println(assignment.getTitle());
 	return ServerConfigurationService.getToolUrl() + "/" + simplePageBean.getCurrentTool("sakai.scorm.tool") + "/?wicket:bookmarkablePage=ScormPlayer:org.sakaiproject.scorm.ui.player.pages.PlayerPage&contentPackageId=" + id + "&resourceId=" + assignment.getResourceId() + "&title=" + assignment.getTitle();
     }
 

@@ -25,20 +25,17 @@ import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.tool.api.ToolSession;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.util.Web;
-import org.sakaiproject.component.cover.ComponentManager;
-import org.sakaiproject.component.api.ServerConfigurationService;
 
 /**
  * <p>
@@ -51,7 +48,7 @@ import org.sakaiproject.component.api.ServerConfigurationService;
 public class JsfTool extends HttpServlet
 {
 	/** Our log (commons). */
-	private static Logger M_log = LoggerFactory.getLogger(JsfTool.class);
+	private static Log M_log = LogFactory.getLog(JsfTool.class);
 
 	/** The file extension to get to JSF. */
 	protected static final String JSF_EXT = ".jsf";
@@ -280,15 +277,7 @@ public class JsfTool extends HttpServlet
 	public void init(ServletConfig config) throws ServletException
 	{
 		super.init(config);
-		ServerConfigurationService scs = ComponentManager.get(ServerConfigurationService.class);
-		ServletContext context = config.getServletContext();
-		String customJsfState = scs.getString("jsf.state_saving_method."+config.getServletName(), null);
-		String defaultJsfState = scs.getString("jsf.state_saving_method", "client");
-		if (customJsfState != null) {
-			context.setInitParameter("javax.faces.STATE_SAVING_METHOD", customJsfState);
-		} else if (defaultJsfState != null) {
-			context.setInitParameter("javax.faces.STATE_SAVING_METHOD", defaultJsfState);
-		}
+
 		m_default = config.getInitParameter("default");
 		m_path = config.getInitParameter("path");
 		m_defaultToLastView = "true".equals(config.getInitParameter("default.last.view"));
@@ -299,7 +288,7 @@ public class JsfTool extends HttpServlet
 			m_path = m_path.substring(0, m_path.length() - 1);
 		}
 
-		M_log.info("init: "+config.getServletName()+"["+context.getInitParameter("javax.faces.STATE_SAVING_METHOD")+"]"+" default: " + m_default + " path: " + m_path);
+		M_log.info("init: default: " + m_default + " path: " + m_path);
 	}
 
 	/**

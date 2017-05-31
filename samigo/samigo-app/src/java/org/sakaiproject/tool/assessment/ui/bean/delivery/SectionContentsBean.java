@@ -38,9 +38,9 @@ import java.util.Set;
 import javax.faces.model.SelectItem;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.math.util.MathUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -63,7 +63,7 @@ public class SectionContentsBean
 	 * 
 	 */
 	private static final long serialVersionUID = 5959692528847396966L;
-	private static Logger log = LoggerFactory.getLogger(SectionContentsBean.class);
+	private static Log log = LogFactory.getLog(SectionContentsBean.class);
 	private String text;
 	private String nonDefaultText;
   private java.util.ArrayList itemContents;
@@ -182,7 +182,7 @@ public class SectionContentsBean
   {
     // only show 2 decimal places 
     
-    return Precision.round(maxPoints, 2);
+    return MathUtils.round(maxPoints, 2);
   }
 
   /**
@@ -671,7 +671,7 @@ public class SectionContentsBean
     String pointsDisplayString = "";
     if (showStudentQuestionScore)
     {
-      pointsDisplayString = Precision.round(points, 2) + "/";
+      pointsDisplayString = MathUtils.round(points, 2) + "/";
     }
     return pointsDisplayString;
   }

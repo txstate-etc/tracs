@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.sakaiproject.tool.assessment.data.dao.shared.TypeD;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.AnswerIfc;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.ItemAttachmentIfc;
@@ -26,7 +25,7 @@ import org.sakaiproject.tool.assessment.data.ifc.shared.TypeIfc;
 public class ItemData
     implements java.io.Serializable,
     ItemDataIfc, Comparable<ItemDataIfc> {
-  static Logger errorLogger = LoggerFactory.getLogger("errorLogger");
+  static Logger errorLogger = Logger.getLogger("errorLogger");
   static ResourceBundle rb = ResourceBundle.getBundle("org.sakaiproject.tool.assessment.bundle.Messages");
 
   private static final long serialVersionUID = 7526471155622776147L;
@@ -787,7 +786,7 @@ public ItemData() {}
     
    if(wyzText!=null){
       int index=0;
-      String t=(wyzText.replaceAll("(?i)<(?!img|/img).*?>", " ")).trim();
+      String t=(wyzText.replaceAll("<.*?>", " ")).trim();
       while(index<t.length()){ 
         char c=t.charAt(index);
         if(Character.isLetterOrDigit(c)){

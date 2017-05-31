@@ -36,7 +36,7 @@ import javax.faces.event.ActionListener;
 
 public class RemoveQuestionListener implements ActionListener
 {
-  //private static Logger log = LoggerFactory.getLogger(RemoveQuestionListener.class);
+  //private static Log log = LogFactory.getLog(RemoveQuestionListener.class);
   public RemoveQuestionListener()
   {
   }

@@ -16,8 +16,7 @@
 
 package org.sakaiproject.delegatedaccess.tool.pages;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.AttributeAppender;
@@ -51,7 +50,7 @@ import org.sakaiproject.entitybroker.DeveloperHelperService;
  */
 public class BasePage extends WebPage implements IHeaderContributor {
 
-	private static final Logger log = LoggerFactory.getLogger(BasePage.class); 
+	private static final Logger log = Logger.getLogger(BasePage.class); 
 
 	@SpringBean(name="org.sakaiproject.delegatedaccess.logic.SakaiProxy")
 	protected SakaiProxy sakaiProxy;

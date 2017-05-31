@@ -27,8 +27,8 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -40,7 +40,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public class SakaiBasicDataSource extends HikariDataSource
 {
     /** Our logger. */
-    private static Logger M_log = LoggerFactory.getLogger(SakaiBasicDataSource.class);
+    private static Log M_log = LogFactory.getLog(SakaiBasicDataSource.class);
 
     /** Configuration: to rollback each connection when returned to the pool. */
     //TODO: Is this a data source property?

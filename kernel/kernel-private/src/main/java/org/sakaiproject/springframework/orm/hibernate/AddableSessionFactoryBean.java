@@ -33,8 +33,8 @@ import org.hibernate.dialect.function.ClassicAvgFunction;
 import org.hibernate.dialect.function.ClassicCountFunction;
 import org.hibernate.dialect.function.ClassicSumFunction;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -42,7 +42,7 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 public class AddableSessionFactoryBean extends LocalSessionFactoryBean implements ApplicationContextAware
 {
-	protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+	protected final transient Log logger = LogFactory.getLog(getClass());
 
 	private ApplicationContext applicationContext;
 

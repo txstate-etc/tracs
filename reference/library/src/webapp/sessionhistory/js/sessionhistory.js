@@ -18,8 +18,9 @@ jQuery.ui || (function(t){"function"==typeof define&&define.amd?define(["jquery"
 
 
 
-jQuery(document).ready(function($) {
+$(document).ready(function() {
     $.get("/rest/session-history", function (data) {
+        console.log("got data")
         var $more = $('<button id="history-button" type="button" role="button" title="view recent login activity">').text("View recent login activity");
         var $modal = loadHistory(data);
         $more.click(function() {

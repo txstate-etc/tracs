@@ -24,16 +24,14 @@
 
 package org.sakaiproject.pasystem.api;
 
-import java.util.Locale;
-
 public enum AcknowledgementType {
     TEMPORARY, PERMANENT;
 
     public String dbValue() {
-        return toString().toLowerCase(Locale.ROOT);
+        return toString().toLowerCase();
     }
 
     public static AcknowledgementType of(String value) {
-        return valueOf(value.toUpperCase(Locale.ROOT));
+        return valueOf(value.toUpperCase());
     }
 }

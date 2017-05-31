@@ -39,7 +39,7 @@ import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 
 public class ConfirmRemoveMediaListener implements ActionListener
 {
-  //private static Logger log = LoggerFactory.getLogger(ConfirmRemoveMediaListener.class);
+  //private static Log log = LogFactory.getLog(ConfirmRemoveMediaListener.class);
 
   public ConfirmRemoveMediaListener()
   {

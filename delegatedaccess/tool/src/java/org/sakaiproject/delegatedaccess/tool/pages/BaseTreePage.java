@@ -24,8 +24,7 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -51,7 +50,7 @@ import org.sakaiproject.delegatedaccess.util.DelegatedAccessMutableTreeNode;
 
 public abstract class BaseTreePage extends BasePage
 {
-	private static final Logger log = LoggerFactory.getLogger(BaseTreePage.class);
+	private static final Logger log = Logger.getLogger(BaseTreePage.class);
 
 	/**
 	 * Returns the tree on this pages. This is used to collapse, expand, ect

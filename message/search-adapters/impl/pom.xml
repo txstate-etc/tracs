@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sakaiproject.message</groupId>
         <artifactId>message</artifactId>
-        <version>11.3</version>
+        <version>11.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -44,6 +44,17 @@
             <groupId>org.sakaiproject.search</groupId>
             <artifactId>search-util</artifactId>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
         </dependency>
     </dependencies>
 

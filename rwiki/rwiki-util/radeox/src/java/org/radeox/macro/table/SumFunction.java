@@ -23,8 +23,8 @@
 
 package org.radeox.macro.table;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A function that summerizes table cells
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 public class SumFunction implements Function
 {
-	private static Logger log = LoggerFactory.getLogger(SumFunction.class);
+	private static Log log = LogFactory.getLog(SumFunction.class);
 
 	public String getName()
 	{

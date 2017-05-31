@@ -52,7 +52,7 @@ public class ZeroUngradedItemsPanel extends Panel {
 				}
 
 				ZeroUngradedItemsPanel.this.window.close(target);
-				setResponsePage(GradebookPage.class);
+				setResponsePage(new GradebookPage());
 			}
 		};
 		add(submit);

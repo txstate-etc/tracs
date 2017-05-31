@@ -60,8 +60,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -191,7 +191,7 @@ public class AssignmentAction extends PagedResourceActionII
 	private static ResourceLoader rb = new ResourceLoader("assignment");
 	
 	/** Our logger. */
-	private static Logger M_log = LoggerFactory.getLogger(AssignmentAction.class);
+	private static Log M_log = LogFactory.getLog(AssignmentAction.class);
 
 	private static final String ASSIGNMENT_TOOL_ID = "sakai.assignment.grades";
 	
@@ -1472,11 +1472,7 @@ public class AssignmentAction extends PagedResourceActionII
 				if (!contentReviewService.allowAllContent() && assignmentSubmissionTypeTakesAttachments(assignment))
 				{
 					context.put("plagiarismFileTypes", rb.getFormattedMessage("gen.onlythefoll", getContentReviewAcceptedFileTypesMessage()));
-
-					// SAK-31649 commenting this out to remove file picker filters, as the results vary depending on OS and browser.
-					// If in the future browser support for the 'accept' attribute on a file picker becomes more robust and 
-					// ubiquitous across browsers, we can re-enable this feature.
-					//context.put("content_review_acceptedMimeTypes", getContentReviewAcceptedMimeTypes());
+					context.put("content_review_acceptedMimeTypes", getContentReviewAcceptedMimeTypes());
 				}
 			}
 			if (assignment.getContent().getTypeOfSubmission() == Assignment.NON_ELECTRONIC_ASSIGNMENT_SUBMISSION)
@@ -3908,7 +3904,7 @@ public class AssignmentAction extends PagedResourceActionII
 		}
 		catch( NumberFormatException ex )
 		{
-			M_log.debug(ex.getMessage());
+			M_log.debug( ex );
 		}
 		
 		if( pageSize <= 1 )
@@ -5411,7 +5407,7 @@ public class AssignmentAction extends PagedResourceActionII
 				String userId = u == null ? "" : u.getId();
 				addAlert(state, rb.getFormattedMessage("cannotfin_submission_1", new String[]{assignmentReference, userId}));
 			}
-			if (submission != null && a.getContent().getTypeOfSubmission() != Assignment.NON_ELECTRONIC_ASSIGNMENT_SUBMISSION)
+			if (submission != null)
 			{
 				String submissionReference = submission.getReference();
 				prepareStudentViewGrade(state, submissionReference);
@@ -7630,7 +7626,7 @@ public class AssignmentAction extends PagedResourceActionII
 								}
 							}
 						} catch (IdUnusedException | PermissionException e) {
-							M_log.error(e.getMessage());
+							M_log.error(e);
 						}
 						
 						validPointGrade(state, gradePoints, scaleFactor);
@@ -8167,7 +8163,7 @@ public class AssignmentAction extends PagedResourceActionII
 		String aOldAccessString = null;
 		
 		// assignment old group setting
-		Collection<String> aOldGroups = null;
+		Collection aOldGroups = null;
 		
 		// assignment old open date setting
 		Time oldOpenTime = null;
@@ -8335,7 +8331,7 @@ public class AssignmentAction extends PagedResourceActionII
 			// set group property
 			String range = (String) state.getAttribute(NEW_ASSIGNMENT_RANGE);
 			
-			Collection<Group> groups = new ArrayList<Group>();
+			Collection groups = new ArrayList();
 			try
 			{
 				Site site = SiteService.getSite(siteId);
@@ -8412,66 +8408,6 @@ public class AssignmentAction extends PagedResourceActionII
 				// comment the changes to Assignment object
 				commitAssignmentEdit(state, post, ac, a, title, visibleTime, openTime, dueTime, closeTime, enableCloseDate, section, range, groups, isGroupSubmit, 
 						usePeerAssessment,peerPeriodTime, peerAssessmentAnonEval, peerAssessmentStudentViewReviews, peerAssessmentNumReviews, peerAssessmentInstructions);
-
-				// Locking and unlocking groups   
-				List<String> lockedGroupsReferences = new ArrayList<String>();
-				if (isGroupSubmit && !groups.isEmpty()) {
-					for (Group group : groups) {
-						String groupAssignmentReference = group.getReference() + "/assignment/" + a.getId();
-
-						M_log.debug("Getting groups from reference: {}", groupAssignmentReference);
-						lockedGroupsReferences.add(group.getReference());
-						M_log.debug("Adding group: {}", group.getReference());
-
-						if (!aOldGroups.contains(group.getReference()) || !group.isLocked(groupAssignmentReference)) {
-							M_log.debug("locking group: {}", group.getReference());
-							group.lockGroup(groupAssignmentReference);
-							M_log.debug("locked group: {}", group.getReference());
-
-							try {
-								SiteService.save(group.getContainingSite());
-							}
-							catch (IdUnusedException e)
-							{
-								M_log.warn(":doUpdate_options  Cannot find site with id {}", siteId);
-								addAlert(state, rb.getFormattedMessage("options_cannotFindSite", new Object[]{siteId}));
-							}
-							catch (PermissionException e)
-							{
-								M_log.warn(":doUpdate_options Do not have permission to edit site with id {}", siteId);
-								addAlert(state, rb.getFormattedMessage("options_cannotEditSite", new Object[]{siteId}));
-							}
-						}
-					}
-				}
-
-				if (!aOldGroups.isEmpty()) {
-					try {
-						Site site = SiteService.getSite(siteId);
-
-						for (String reference : aOldGroups) {
-								if (!lockedGroupsReferences.contains(reference)) {
-									M_log.debug("Not contains: {}", reference);
-									Group group = site.getGroup(reference);
-									if (group != null) {
-										String groupReferenceAssignment = group.getReference() + "/assignment/" + a.getId();
-										group.unlockGroup(groupReferenceAssignment);
-										SiteService.save(group.getContainingSite());
-									}
-								}
-						}
-					}
-					catch (IdUnusedException e)
-					{
-						M_log.warn(":doUpdate_options  Cannot find site with id {}", siteId);
-						addAlert(state, rb.getFormattedMessage("options_cannotFindSite", new Object[]{siteId}));
-					}
-					catch (PermissionException e)
-					{
-						M_log.warn(":doUpdate_options Do not have permission to edit site with id {}", siteId);
-						addAlert(state, rb.getFormattedMessage("options_cannotEditSite", new Object[]{siteId}));
-					}
-				}
 
 				if (post)
 				{
@@ -9666,7 +9602,7 @@ public class AssignmentAction extends PagedResourceActionII
             contentReviewService.createAssignment(assign.getContext(), assignmentRef, opts);
 			return true;
         } catch (Exception e) {
-            M_log.error(e.getMessage());
+            M_log.error(e);
 			String uiService = ServerConfigurationService.getString("ui.service", "Sakai");
 			String[] args = new String[]{contentReviewService.getServiceName(), uiService, e.toString()};
             state.setAttribute("alertMessage", rb.getFormattedMessage("content_review.error.createAssignment", args));
@@ -10446,31 +10382,6 @@ public class AssignmentAction extends PagedResourceActionII
 				// we use to check "assignment.delete.cascade.submission" setting. But the implementation now is always remove submission objects when the assignment is removed.
 				// delete assignment and its submissions altogether
 				deleteAssignmentObjects(state, aEdit, true);
-
-				Collection<String> groups = aEdit.getGroups();
-				String siteId = (String) state.getAttribute(STATE_CONTEXT_STRING);
-
-				try {
-					Site site = SiteService.getSite(siteId);
-
-					for (String reference : groups) {
-						Group group = site.getGroup(reference);
-						if (group != null) {
-							group.unlockGroup(group.getReference() + "/assignment/" + aEdit.getId());
-							SiteService.save(group.getContainingSite());
-						}
-					}
-				}
-				catch (IdUnusedException e)
-				{
-					M_log.warn(this + ":doDelete_assignment Cannot find site with id {}", siteId);
-					addAlert(state, rb.getFormattedMessage("options_cannotFindSite", new Object[]{}));
-				}
-				catch (PermissionException e)
-				{
-					M_log.warn(this + ":doDelete_assignment Do not have permission to edit site with id {}", siteId);
-					addAlert(state, rb.getFormattedMessage("options_cannotEditSite", new Object[]{}));
-				}
 			}
 		} // for
 
@@ -11174,7 +11085,7 @@ public class AssignmentAction extends PagedResourceActionII
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
 		String actualGradeSubmissionId = (String) params.getString("submissionId");
 
-	 	M_log.debug("actualGradeSubmissionId = {}", actualGradeSubmissionId);
+		Log.debug("chef", "doAssignment_form(): actualGradeSubmissionId = " + actualGradeSubmissionId);
 		
 		String option = (String) params.getString("option");
 		String fromView = (String) state.getAttribute(FROM_VIEW);
@@ -11401,10 +11312,10 @@ public class AssignmentAction extends PagedResourceActionII
 	// added by Branden Visser - Check that the state is consistent
 	boolean checkSubmissionStateConsistency(SessionState state, String actualGradeSubmissionId) {
 		String stateGradeSubmissionId = (String)state.getAttribute(GRADE_SUBMISSION_SUBMISSION_ID);
-	 	M_log.debug("stateGradeSubmissionId = {}", stateGradeSubmissionId);
+		Log.debug("chef", "checkSubmissionStateConsistency(): stateGradeSubmissionId = " + stateGradeSubmissionId);
 		boolean is_good = stateGradeSubmissionId.equals(actualGradeSubmissionId);
 		if (!is_good) {
-		    M_log.warn("State is inconsistent! Aborting grade save.");
+		    Log.warn("chef", "checkSubissionStateConsistency(): State is inconsistent! Aborting grade save.");
 		    addAlert(state, rb.getString("grading.alert.multiTab"));
 		}
 		return is_good;
@@ -14511,7 +14422,7 @@ public class AssignmentAction extends PagedResourceActionII
 			}
 
 			if ( assignment != null && assignment.isGroup()) {
-				allOrOneGroup =  MODE_INSTRUCTOR_GRADE_ASSIGNMENT.equals(mode)?"all":allOrOneGroup;
+
 				Collection<Group> submitterGroups = AssignmentService.getSubmitterGroupList("false", allOrOneGroup, "", aRef, contextString);
 
 				// construct the group-submission list

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>hierarchy</artifactId>
         <groupId>org.sakaiproject</groupId>
-        <version>11.3</version>
+        <version>11.1</version>
     </parent>
 
     <name>Sakai Hierarchy Implementation</name>
@@ -26,6 +26,11 @@
                     <artifactId>hibernate-core</artifactId>
                 </dependency>
                 <!-- needed by hibernate unit tests -->
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                    <scope>test</scope>
+                </dependency>
                 <dependency>
                     <groupId>org.javassist</groupId>
                     <artifactId>javassist</artifactId>
@@ -101,6 +106,10 @@
         <dependency>
             <groupId>org.sakaiproject.kernel</groupId>
             <artifactId>sakai-kernel-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>
@@ -200,7 +209,6 @@
                 <includes>
                     <include>hibernate-test.xml</include>
                     <include>hibernate.properties</include>
-                    <include>log4j.properties</include>
                 </includes>
             </testResource>
         </testResources>

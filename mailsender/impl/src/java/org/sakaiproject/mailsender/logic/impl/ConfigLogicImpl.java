@@ -303,7 +303,6 @@ public class ConfigLogicImpl implements ConfigLogic
 	private boolean isSendMeACopy(Properties props)
 	{
 		String sendmecopy = props.getProperty(ConfigParams.sendmecopy.name());
-		if (sendmecopy == null) sendmecopy = "true"; // sendmecopy should default to true bugid 5336
 		boolean sendMeACopy = parseConfigBoolean(sendmecopy);
 		return sendMeACopy;
 	}

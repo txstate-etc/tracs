@@ -1,7 +1,7 @@
 package org.sakaiproject.site.impl.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,7 +11,6 @@ import org.sakaiproject.site.api.SiteService.SelectionType;
 import org.sakaiproject.test.SakaiKernelTestBase;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,16 +23,15 @@ import java.util.UUID;
  * @author buckett
  *
  */
-@DirtiesContext
 public class SiteSearchTest extends SakaiKernelTestBase {
-	private static Logger log = LoggerFactory.getLogger(SiteSearchTest.class);
+	private static Log log = LogFactory.getLog(SiteSearchTest.class);
 	
 	@BeforeClass
 	public static void beforeClass() {
 		try {
 			oneTimeSetup("sitesearch");
 		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
+			log.warn(e);
 		}
 	}
 				
@@ -75,20 +73,15 @@ public class SiteSearchTest extends SakaiKernelTestBase {
 		Map stringMap = Collections.singletonMap("key", "value");
 
 		// Need to switch user so we're not a member of the site.
-		session.setUserEid("someuser");
-		session.setUserId("someuser");
+		session.setUserEid("");
+		session.setUserId("");
+		// First test search for any.
 		List<Site> sites;
-		// First test search for any with properties.
 		sites = siteService.getSites(SelectionType.ANY, type, null, stringMap, SiteService.SortType.TITLE_ASC, null);
 		Assert.assertEquals(1, sites.size());
-		// Then test that it's joinable with properties
+		// Then test that it's joinable
 		sites = siteService.getSites(SelectionType.JOINABLE, type, null, stringMap, SiteService.SortType.TITLE_ASC, null);
 		Assert.assertEquals(1, sites.size());
-		// Then test that it's joinable and with criteria
-		sites = siteService.getSites(SelectionType.JOINABLE, type, "Site", null, SiteService.SortType.TITLE_ASC, null);
-		Assert.assertEquals(1, sites.size());
-		// Then test that it's joinable and with criteria and properties
-		sites = siteService.getSites(SelectionType.JOINABLE, type, "Site", stringMap, SiteService.SortType.TITLE_ASC, null);
-		Assert.assertEquals(1, sites.size());
+
 	}
 }

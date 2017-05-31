@@ -82,6 +82,10 @@ public class RosterBean extends CourseDependentBean implements Serializable {
     private List<CourseSection> availableSections;
     private List<SelectItem> sectionFilterSelectItems;
 
+    //Added for ticket#314 -Qu
+    private List<CourseSection> availableSections;
+    private List<SelectItem> sectionFilterSelectItems;
+
     public void init() {
 		// Determine whether this course is externally managed
 		externallyManaged = getSectionManager().isExternallyManaged(getCourse().getUuid());

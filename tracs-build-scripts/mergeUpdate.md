@@ -50,7 +50,7 @@
 |	oauth	|		|
 |	pack	|		|
 |	pasystem	|		|
-|	podcasts	|		|
+|	podcasts	|    DONE    |
 |	polls	|	DONE	|
 |	portal	|		|
 |	postem	|		|
@@ -67,7 +67,7 @@
 |	rwiki	|		|
 |	samigo	|		|
 |	search	|		|
-|	sections	|		|
+|	sections	|    DONE    |
 |	shortenedurl	|		|
 |	signup	|	DONE	|
 |	simple-rss-portlet	|		|

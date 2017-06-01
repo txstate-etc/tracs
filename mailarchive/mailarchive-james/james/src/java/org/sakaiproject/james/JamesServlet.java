@@ -205,6 +205,7 @@ public class JamesServlet extends HttpServlet
 		String dns2 = StringUtils.trimToNull(ServerConfigurationService.getString("smtp.dns.2"));
 		String smtpPort = StringUtils.trimToNull(ServerConfigurationService.getString("smtp.port"));
 		boolean enabled = ServerConfigurationService.getBoolean("smtp.enabled", false);
+		String smtpGateway = StringUtils.trimToNull(ServerConfigurationService.getString("smtp@org.sakaiproject.email.api.EmailService"));
 		
 		String postmasterAddress = null;
 		String postmasterLocalPart = StringUtils.trimToNull(ServerConfigurationService.getString("smtp.postmaster.address.local-part"));
@@ -249,7 +250,7 @@ public class JamesServlet extends HttpServlet
 		m_phoenixHome = getServletContext().getRealPath(homeRelative);
 
 		try {
-			customizeConfig(host, dns1, dns2, smtpPort, logDir, postmasterAddress);
+			customizeConfig(host, dns1, dns2, smtpPort, smtpGateway, logDir, postmasterAddress);
 		} catch(JamesConfigurationException e) {
 			M_log.error("init(): James could not be configured, aborting");
 			return;
@@ -259,7 +260,7 @@ public class JamesServlet extends HttpServlet
 		m_runner = new JamesRunner();
 	}
 
-	protected void customizeConfig(String host, String dns1, String dns2, String smtpPort, String logDir, String postmasterAddress)
+	protected void customizeConfig(String host, String dns1, String dns2, String smtpPort, String smtpGateway, String logDir, String postmasterAddress)
 	    throws JamesConfigurationException
 	{
 		String configPath = m_phoenixHome + "/apps/james/SAR-INF/config.xml";
@@ -289,6 +290,7 @@ public class JamesServlet extends HttpServlet
 			nodeValues.put("/config/dnsserver/servers/server[3]", dns2);
 			nodeValues.put("/config/James/postmaster", postmasterAddress);
 			nodeValues.put("/config/smtpserver/port", smtpPort);
+			nodeValues.put("/config/spoolmanager/processor[3]/mailet[5]/gateway", smtpGateway);
 
 			// loop through the hashmap, setting each value, or failing if one can't be found
 			for(String nodePath : nodeValues.keySet()) {

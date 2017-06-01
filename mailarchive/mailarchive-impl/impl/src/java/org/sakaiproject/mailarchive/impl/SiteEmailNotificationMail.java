@@ -111,7 +111,7 @@ public class SiteEmailNotificationMail extends SiteEmailNotification
 			
 		if (shouldUseHtml) {
 			buf.append("<br/><hr/><br/>");
-			String portalUrl = "<a href=\"" + ServerConfigurationService.getPortalUrl() + "\" >" + ServerConfigurationService.getPortalUrl() + "<a/>"; 
+			String portalUrl = "<a href=\"" + ServerConfigurationService.getPortalUrl() + "\" >" + ServerConfigurationService.getPortalUrl() + "</a>"; 
 			buf.append( MessageFormat.format( rb.getString("automsg1"),  
 														 new Object[]{ServerConfigurationService.getString("ui.service", "Sakai"), 
 																		  portalUrl, title} ));

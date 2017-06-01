@@ -318,14 +318,8 @@ public class SakaiMailet extends GenericMailet
 					// eat the no-reply
 					if ("no-reply".equalsIgnoreCase(mailId))
 					{
-						mail.setState(Mail.GHOST);
-                        if (M_log.isInfoEnabled()) {
-                            M_log.info("Incoming message mailId ("+mailId+") set to no-reply, mail processing cancelled");
-                        }
-                        /* NOTE: this doesn't make a lot of sense to me, once the mail is ghosted 
-                         * then it won't be processed anymore so continuing is kind of a waste of time,
-                         * shouldn't this just break instead?
-                         */
+                        mail.setState(Mail.ERROR);
+                        mail.setErrorMessage("This email address is not delivered to anyone. Please contact the site owner directly to receive a response. You can find the site owner's email address in Site Info.");
 						continue;
 					}
 

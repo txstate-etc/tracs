@@ -85,6 +85,7 @@
     <sakai.commons.lang3.version>3.4</sakai.commons.lang3.version>
     <sakai.commons.fileupload.version>1.3.2</sakai.commons.fileupload.version>
     <sakai.commons-math3.version>3.6.1</sakai.commons-math3.version>
+    <sakai.commons-logging.version>1.2</sakai.commons-logging.version>
     <sakai.ehcache.groupId>net.sf.ehcache</sakai.ehcache.groupId>
     <sakai.ehcache.artifactId>ehcache-core</sakai.ehcache.artifactId>
     <sakai.ehcache.version>2.6.11</sakai.ehcache.version>

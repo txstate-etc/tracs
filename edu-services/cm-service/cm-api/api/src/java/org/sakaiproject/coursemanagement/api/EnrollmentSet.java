@@ -80,4 +80,11 @@ public interface EnrollmentSet {
 	 */
 	public Set<String> getOfficialInstructors();
 	public void setOfficialInstructors(Set<String> officialInstructors);
+
+	/**
+	 * The course offering for this EnrollmentSet
+	 * @return
+	 */
+	public CourseOffering getCourseOffering();
+	public void setCourseOffering(CourseOffering courseOffering);
 }

@@ -50,4 +50,7 @@ public interface Enrollment {
 
 	public Date getDropDate();
 	public void setDropDate(Date dropDate);
+
+	public EnrollmentSet getEnrollmentSet();
+	public void setEnrollmentSet(EnrollmentSet enrollmentSet);
 }

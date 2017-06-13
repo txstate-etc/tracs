@@ -471,8 +471,8 @@ public class SkinnableLogin extends HttpServlet implements Login {
 		rcontext.put("passwordResetUrl", passwordResetUrl);
 		rcontext.put("passwordResetWording", passwordResetWording);
 
-		String eid = StringEscapeUtils.escapeHtml(request.getParameter("eid"));
-		String pw = StringEscapeUtils.escapeHtml(request.getParameter("pw"));
+		String eid = StringEscapeUtils.escapeHtml(request.getParameter("eid").trim().toLowerCase());
+		String pw = StringEscapeUtils.escapeHtml(request.getParameter("pw").trim());
 
 		if (eid == null)
 			eid = "";

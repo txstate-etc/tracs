@@ -17,8 +17,8 @@
   .icon-sakai--sakai-aliases {                              @extend .fa-tags; }
   .icon-sakai--sakai-announcements {                        @extend .fa-bullhorn; }
   .icon-sakai--sakai-archive {                              @extend .fa-archive; }
-  .icon-sakai--sakai-assignment-grades {                    @extend .fa-file-text; }
-  .icon-sakai--sakai-basiclti {                             @extend .fa-globe; }
+  .icon-sakai--sakai-assignment-grades {                    @extend .fa-edit; }
+  .icon-sakai--sakai-basiclti {                             @extend .fa-exchange; }
   .icon-sakai--sakai-basiclti-admin {                       @extend .fa-globe; }
   .icon-sakai--sakai-chat {                                 @extend .fa-comments-o; }
   .icon-sakai--sakai-createuser {                           @extend .fa-user-plus; }
@@ -31,17 +31,17 @@
   .icon-sakai--sakai-gradebook-tool {                       @extend .fa-book; }
   .icon-sakai--sakai-gradebookng {                          @extend .fa-book; }
   .icon-sakai--sakai-help {                                 @extend .fa-question-circle; }
-  .icon-sakai--sakai-iframe {                               @extend .fa-globe; }
+  .icon-sakai--sakai-iframe {                               @extend .fa-window-maximize; }
   .icon-sakai--sakai-iframe-site {                          @extend .fa-list-ul; }
   .icon-sakai--sakai-lessonbuildertool {                    @extend .fa-leanpub; }
   .icon-sakai--sakai-mailbox {                              @extend .fa-envelope-o; }
   .icon-sakai--sakai-mailtool {                             @extend .fa-envelope-o; }
-  .icon-sakai--sakai-membership {                           @extend .fa-users; }
+  .icon-sakai--sakai-membership {                           @extend .fa-address-card-o; }
   .icon-sakai--sakai-memory {                               @extend .fa-hdd-o; }
-  .icon-sakai--sakai-message-bundle-manager {               @extend .fa-gear; }
+  .icon-sakai--sakai-message-bundle-manager {               @extend .fa-briefcase; }
   .icon-sakai--sakai-messages {                             @extend .fa-inbox; }
   .icon-sakai--sakai-motd {                                 @extend .fa-list-ul; }
-  .icon-sakai--sakai-news {                                 @extend .fa-rss; }
+  .icon-sakai--sakai-news {                                 @extend .fa-newspaper; }
   .icon-sakai--sakai-oauth {                                @extend .fa-key; }
   .icon-sakai--sakai-online {                               @extend .fa-server; }
   .icon-sakai--sakai-pasystem {                             @extend .fa-bell; }
@@ -53,14 +53,14 @@
   .icon-sakai--sakai-realms {                               @extend .fa-sitemap; }
   .icon-sakai--sakai-resetpass {                            @extend .fa-user; }
   .icon-sakai--sakai-resources {                            @extend .fa-folder-open; }
-  .icon-sakai--sakai-rwiki {                                @extend .fa-edit; }
-  .icon-sakai--sakai-samigo {                               @extend .fa-check-square-o; }
+  .icon-sakai--sakai-rwiki {                                @extend .fa-file-text; }
+  .icon-sakai--sakai-samigo {                               @extend .fa-pencil; }
   .icon-sakai--sakai-schedule {                             @extend .fa-calendar; }
   .icon-sakai--sakai-scheduler {                            @extend .fa-clock-o; }
   .icon-sakai--sakai-sections {                             @extend .fa-user; }
   .icon-sakai--sakai-search {                               @extend .fa-search; }
   .icon-sakai--sakai-signup {                               @extend .fa-calendar-check-o; }
-  .icon-sakai--sakai-simple-rss {                           @extend .fa-newspaper-o; }
+  .icon-sakai--sakai-simple-rss {                           @extend .fa-rss; }
   .icon-sakai--sakai-singleuser {                           @extend .fa-user; }
   .icon-sakai--sakai-site-roster2 {                         @extend .fa-users; }
   .icon-sakai--sakai-sitebrowser {                          @extend .fa-globe; }
@@ -81,9 +81,9 @@
   .icon-sakai--kaltura-my-media {                           @extend .fa-file-video-o; }
   .icon-sakai--sakai-bbb {                                  @extend .fa-video-camera; }
   .icon-sakai--sakai-rsf-evaluation {                       @extend .fa-commenting; }
-  .icon-sakai-melete{                                       @extend .fa-leanpub;}
-  .icon-sakai-blogwow{                                      @extend .fa-commenting-o;}
-  .icon-sakai-irubric{                                      @extend .fa-list;}
+  .icon-sakai--sakai-melete{                                @extend .fa-cubes; }
+  .icon-sakai--sakai-blogwow{                               @extend .fa-commenting-o;}
+  .icon-sakai--sakai-irubric{                               @extend .fa-list;}
 
   // other icons
   .icon-sakai--check {                                      @extend .fa-check; }
@@ -91,7 +91,7 @@
   .icon-sakai--default-tool {                               @extend .fa-puzzle-piece; }
   .icon-sakai--delete {                                     @extend .fa-times; }
   .icon-sakai--help {                                       @extend .fa-question-circle; }
-  .icon-sakai--home {                                       @extend .fa-university; }
+  .icon-sakai--home {                                       @extend .fa-home; }
   .icon-sakai--pdf {                                        @extend .fa-file-pdf-o; }
   .icon-sakai--subsite {                                    @extend .fa-level-up; }
   .icon-sakai--subsites-list {                              @extend .fa-level-down; }

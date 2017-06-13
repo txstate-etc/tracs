@@ -38,7 +38,7 @@
 |	jsf	|		|
 |	kernel	|		|
 |	lessonbuilder	|		|
-|	login	|		|
+|	login	|	DONE	|
 |	lticontact	|		|
 |	mailarchive	|		|
 |	mailsender	|	DONE	|

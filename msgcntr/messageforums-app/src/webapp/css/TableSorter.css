@@ -5,16 +5,24 @@ padding-top:8px !important;
 cursor:pointer;
 }
 .headerSortUp {
-background: url(../images/sortascending.gif) no-repeat left;
-background-position: 85%;
-height:auto;
-padding-top:8px !important;
+  background: url(../images/sortascending.gif) no-repeat 85%, -moz-linear-gradient(top, #f3f3f3 0%, #e7e7e7 100%) !important;
+  background: url(../images/sortascending.gif) no-repeat 85%, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f3f3f3), color-stop(100%,#e7e7e7)) !important;
+  background: url(../images/sortascending.gif) no-repeat 85%, -webkit-linear-gradient(top, #f3f3f3 0%,#e7e7e7 100%) !important;
+  background: url(../images/sortascending.gif) no-repeat 85%, -o-linear-gradient(top, #f3f3f3 0%,#e7e7e7 100%) !important;
+  background: url(../images/sortascending.gif) no-repeat 85%, -ms-linear-gradient(top, #f3f3f3 0%,#e7e7e7 100%) !important;
+  background: url(../images/sortascending.gif) no-repeat 85%, linear-gradient(#f3f3f3 0%,#e7e7e7 100%) !important;
+  height:auto;
+  padding-top:8px !important;
 }
 .headerSortDown {
-background: url(../images/sortdescending.gif) no-repeat left;
-background-position: 85%;
-height:auto;
-padding-top:8px !important;
+  background: url(../images/sortdescending.gif) no-repeat 85%, -moz-linear-gradient(top, #f3f3f3 0%, #e7e7e7 100%) !important;
+  background: url(../images/sortdescending.gif) no-repeat 85%, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f3f3f3), color-stop(100%,#e7e7e7)) !important;
+  background: url(../images/sortdescending.gif) no-repeat 85%, -webkit-linear-gradient(top, #f3f3f3 0%,#e7e7e7 100%) !important;
+  background: url(../images/sortdescending.gif) no-repeat 85%, -o-linear-gradient(top, #f3f3f3 0%,#e7e7e7 100%) !important;
+  background: url(../images/sortdescending.gif) no-repeat 85%, -ms-linear-gradient(top, #f3f3f3 0%,#e7e7e7 100%) !important;
+  background: url(../images/sortdescending.gif) no-repeat 85%, linear-gradient(#f3f3f3 0%,#e7e7e7 100%) !important;
+  height:auto;
+  padding-top:8px !important;
 }
 
 .rightAlignColumn{

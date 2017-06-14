@@ -64,7 +64,7 @@
 |	roster2	|		|
 |	roster_legacy	|		|
 |	rsf	| NO LOCAL CHANGES |
-|	rwiki	|		|
+|	rwiki	|   DONE    |
 |	samigo	|		|
 |	search	|		|
 |	sections	|    DONE    |

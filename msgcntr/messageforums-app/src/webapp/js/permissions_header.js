@@ -176,6 +176,9 @@ function setCorrespondingCheckboxes(checkBox){
 		}
 	}
   }
+
+  //Make sure moderate is unchecked when moderate is disabled
+  uncheckModerateBoxWhenModerateIsDisabled();
 }
 
 
@@ -228,7 +231,40 @@ $(function(){
     });
 });
 
+//Get moderate postings the saved or default value when enable/disable moderate forum
+//This need is triggered by greyout and uncheck when disabled as per bugid:3553  -Qu 8/24/2010
+function setModerateCheckboxWhenModerateEnabled(checkBox){
+  var2 = checkBox.split(":");
+  selectLevel = getTheElement(var2[0]+":"+ var2[1]+":"+ var2[2]+":level");
+  moderatePostings=getTheElement(var2[0]+":"+ var2[1]+":"+ var2[2]+":moderatePostings");
 
+    if(selectLevel.options[selectLevel.selectedIndex].value==owner){
+      setModerateCheckBox( moderatePostings, ownerLevelArray);
+    }
+    else if(selectLevel.options[selectLevel.selectedIndex].value==author){
+      setModerateCheckBox( moderatePostings, authorLevelArray);
+    }
+    else if(selectLevel.options[selectLevel.selectedIndex].value==nonEditingAuthor){
+      setModerateCheckBox( moderatePostings, noneditingAuthorLevelArray);
+    }
+    else if(selectLevel.options[selectLevel.selectedIndex].value==reviewer){
+      setModerateCheckBox( moderatePostings, reviewerLevelArray);
+    }
+    else if(selectLevel.options[selectLevel.selectedIndex].value==none){
+      setModerateCheckBox( moderatePostings, noneLevelArray);
+    }
+    else if(selectLevel.options[selectLevel.selectedIndex].value==contributor){
+      setModerateCheckBox( moderatePostings, contributorLevelArray);
+    }
+  else  
+      setModerateCheckBox( moderatePostings,noneLevelArray);
+}
+
+function setModerateCheckBox( moderatePostings,arrayLevel){
+  moderatePostings.checked= arrayLevel[10];
+}
+
+//modified by -Qu bugid:3553 8/24/2010
 function disableOrEnableModeratePerm() {
 	moderateSelection = getTheElement("revise:moderated");
 	user_input = getRadioButtonCheckedValue(moderateSelection);		
@@ -236,15 +272,24 @@ function disableOrEnableModeratePerm() {
 	if (user_input) {
 		var i = 0;
 		while (true) {
+      var permissionLevelId = "revise:perm:" + i + ":level";
+      var moderatePostingId = "revise:perm:" + i + ":moderatePostings";
 			moderatePostings = getTheElement("revise:perm:" + i + ":moderatePostings");
 			if (moderatePostings) {
 				if (user_input == "true") {
 					// if the user has enabled moderating, we need to enable the moderate perm checkbox
 					moderatePostings.disabled = false;
+          //text should be black
+          $("label.greyout").css("color","black");
+          //when moderate is enabled, make sure get the saved or default right permissions for moderate postings
+          setModerateCheckboxWhenModerateEnabled(permissionLevelId);
 				}
 				else {
 					// if it is disabled, disable the checkbox
 					moderatePostings.disabled = true;
+          // uncheck the checkbox, grey out the text too
+          $("label.greyout").css("color","#bbbbbb");
+          document.getElementById(moderatePostingId).checked=false;
 				}
 			}
 			else {
@@ -253,4 +298,33 @@ function disableOrEnableModeratePerm() {
 			i++;
 		}
 	}
+}
+
+function uncheckModerateBoxWhenModerateIsDisabled(){
+  moderateSelection = getTheElement("revise:moderated");
+  user_input = getRadioButtonCheckedValue(moderateSelection);
+
+  if (user_input) {
+    var i = 0;
+    while (true) {
+      var permissionLevelId = "revise:perm:" + i + ":level";
+      var moderatePostingId = "revise:perm:" + i + ":moderatePostings";
+      moderatePostings = getTheElement("revise:perm:" + i + ":moderatePostings");
+      if (moderatePostings) {
+        if (user_input == "false") {
+          //make sure uncheck the moderate postings checkbox if moderate is disabled
+          document.getElementById(moderatePostingId).checked=false;
+          $("label.greyout").css("color","#bbbbbb");
+        }
+        else {
+          // if it is disabled, disable the checkbox
+          // do nothing
+        }
+      }
+      else {
+        break;
+      }
+      i++;
+    }
+  }
 }

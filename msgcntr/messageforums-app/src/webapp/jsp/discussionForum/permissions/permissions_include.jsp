@@ -7,6 +7,12 @@
     out.print(dft.generatePermissionScript());
 %>
 <!--jsp/discussionForum/permissions/permissions_include.jsp-->
+<%--check at page loading, uncheck & greyout when moderate is disabled bugid:3553 -Qu 8/24/10 --%>
+<script>
+  $(document).ready(function(){
+     uncheckModerateBoxWhenModerateIsDisabled();
+  })
+</script>
 <mf:forumHideDivision title="#{msgs.cdfm_permissions}" id="cntrl_perm" hideByDefault="#{ForumTool.collapsePermissionPanel}">
   <%--
   <f:verbatim><p class="act"></f:verbatim>
@@ -82,7 +88,7 @@
         </h:panelGroup>
         <h:panelGroup styleClass="checkbox">
           <h:selectBooleanCheckbox id="moderatePostings" value="#{permission.moderatePostings}" onclick="javascript:setCorrespondingLevel(this.id);" disabled="#{(not ForumTool.editMode) || ForumTool.disableModeratePerm}"/>
-          <h:outputLabel for="moderatePostings"><h:outputText value="#{msgs.perm_moderate_postings}" /></h:outputLabel>
+          <h:outputLabel styleClass="greyout" for="moderatePostings"><h:outputText value="#{msgs.perm_moderate_postings}" /></h:outputLabel>
         </h:panelGroup>
         <h:panelGroup styleClass="checkbox" style="display: #{ForumTool.anonymousEnabled ? '' : 'none'}">
           <h:selectBooleanCheckbox id="identifyAnonAuthors" value="#{permission.identifyAnonAuthors}" onclick="setCorrespondingLevel(this.id);" disabled="#{not ForumTool.editMode}"/>

@@ -410,8 +410,8 @@ public class SynopticMsgcntrManagerImpl extends HibernateDaoSupport implements S
 														"Group By USER_ID";
 		
 		String RETURN_ALL_FORUMS_AND_TOPICS_SQL = "select forum.ID as FORUM_ID, topic.ID as TOPIC_ID, forum.DRAFT as isForumDraft, topic.DRAFT as isTopicDraft, topic.MODERATED as isTopicModerated, forum.LOCKED as isForumLocked, topic.LOCKED as isTopicLocked, forum.CREATED_BY as forumCreatedBy, topic.CREATED_BY as topicCreatedBy, forum.AVAILABILITY as forumAvailability, topic.AVAILABILITY as topicAvailability  " +
-														"from MFR_AREA_T area, MFR_OPEN_FORUM_T forum, MFR_TOPIC_T topic " + 
-														"Where area.ID = forum.surrogateKey and forum.ID = topic.of_surrogateKey " +
+														"from MFR_AREA_T area, MFR_OPEN_FORUM_T forum, MFR_TOPIC_T topic, MFR_TOPIC_OPEN_FORUM_T ttof " + 
+														"Where area.ID = forum.surrogateKey and forum.ID = ttof.OPEN_FORUM_ID and topic.ID = ttof.TOPIC_ID " +
 														"and area.CONTEXT_ID = ?";
 		Connection clConnection = null;  	
 		//Statement statement = null;
@@ -496,8 +496,8 @@ public class SynopticMsgcntrManagerImpl extends HibernateDaoSupport implements S
 	public HashMap<String, Integer> getUserToNewMessagesForForumMap(String siteId, Long forumId, Long topicId){
 		HashMap<String, Integer> returnHM = new HashMap<String, Integer>();
 		String RETURN_ALL_TOPICS_FOR_FORUM_SQL = "select forum.ID as FORUM_ID, topic.ID as TOPIC_ID, forum.DRAFT as isForumDraft, topic.DRAFT as isTopicDraft, topic.MODERATED as isTopicModerated, forum.LOCKED as isForumLocked, topic.LOCKED as isTopicLocked, forum.CREATED_BY as forumCreatedBy, topic.CREATED_BY as topicCreatedBy, forum.AVAILABILITY as forumAvailability, topic.AVAILABILITY as topicAvailability  " +
-													"from MFR_AREA_T area, MFR_OPEN_FORUM_T forum, MFR_TOPIC_T topic " + 
-													"Where area.ID = forum.surrogateKey and forum.ID = topic.of_surrogateKey " +
+													"from MFR_AREA_T area, MFR_OPEN_FORUM_T forum, MFR_TOPIC_T topic, MFR_TOPIC_OPEN_FORUM_T ttof " + 
+													"Where area.ID = forum.surrogateKey and forum.ID = ttof.OPEN_FORUM_ID and topic.ID = ttof.TOPIC_ID " +
 													"and area.CONTEXT_ID = ? and forum.ID = ?";
 		if(topicId != null){
 			RETURN_ALL_TOPICS_FOR_FORUM_SQL = RETURN_ALL_TOPICS_FOR_FORUM_SQL + " and topic.ID = ?"; 
@@ -746,8 +746,8 @@ public class SynopticMsgcntrManagerImpl extends HibernateDaoSupport implements S
 										"Group By USER_ID";
 		
 		String RETURN_ALL_FORUMS_AND_TOPICS_SQL = "select forum.ID as FORUM_ID, topic.ID as TOPIC_ID, forum.DRAFT as isForumDraft, topic.DRAFT as isTopicDraft, topic.MODERATED as isTopicModerated, forum.LOCKED as isForumLocked, topic.LOCKED as isTopicLocked, forum.CREATED_BY as forumCreatedBy, topic.CREATED_BY as topicCreatedBy, forum.AVAILABILITY as forumAvailability, topic.AVAILABILITY as topicAvailability  " +
-													"from MFR_AREA_T area, MFR_OPEN_FORUM_T forum, MFR_TOPIC_T topic " + 
-													"Where area.ID = forum.surrogateKey and forum.ID = topic.of_surrogateKey " +
+													"from MFR_AREA_T area, MFR_OPEN_FORUM_T forum, MFR_TOPIC_T topic, MFR_TOPIC_OPEN_FORUM_T ttof " + 
+													"Where area.ID = forum.surrogateKey and forum.ID = ttof.OPEN_FORUM_ID and topic.ID = ttof.TOPIC_ID " +
 													"and area.CONTEXT_ID = ?";
 		
 		Connection clConnection = null;  	

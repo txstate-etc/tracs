@@ -1214,7 +1214,7 @@ public class ForumEntity extends HibernateDaoSupport implements LessonEntity, Fo
 	// should be this:
 	// return topic.getBaseForum().getArea().getContextId();
 	// but requires a hibernate session, which doesn't exit.
-	String sql = "select c.context_id from MFR_TOPIC_T a,MFR_OPEN_FORUM_T b,MFR_AREA_T c where a.id=? and a.of_surrogateKey=b.id and b.surrogatekey=c.id";
+	String sql = "select c.context_id from MFR_OPEN_FORUM_T b,MFR_TOPIC_OPEN_FORUM_T ttof,MFR_AREA_T c where ttof.TOPIC_ID=? and ttof.OPEN_FORUM_ID=b.ID and b.surrogatekey=c.id";
 
 	Object fields[] = new Object[1];
 	fields[0] = id;

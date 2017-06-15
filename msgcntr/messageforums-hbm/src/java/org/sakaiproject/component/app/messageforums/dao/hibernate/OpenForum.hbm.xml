@@ -194,6 +194,15 @@
     where forum.typeUuid = :typeUuid and forum.area.contextId = :contextId             
   ]]></query>
 
+  <query name="findOpenForumsForSite">
+    <![CDATA[
+       select forum.id from org.sakaiproject.component.app.messageforums.dao.hibernate.OpenForumImpl forum
+       join forum.area as area
+       where
+       area.id IN (:areaId)
+   ]]>
+  </query>
+
   <query name="findForumByTypeAndContextWithAllInfo">
     <![CDATA[select f from org.sakaiproject.component.app.messageforums.dao.hibernate.OpenForumImpl as f
              join f.area as a

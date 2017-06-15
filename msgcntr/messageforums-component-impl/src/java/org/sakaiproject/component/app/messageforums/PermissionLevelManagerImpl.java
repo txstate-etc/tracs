@@ -72,6 +72,8 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 	private static final String QUERY_GET_ALL_TOPICS = "findAllTopicsForSite";
 	private static final String QUERY_BY_TOPIC_IDS_ALL_TOPIC_MEMBERSHIP = "findAllMembershipItemsForTopicsForSite";
 	private static final String QUERY_BY_AREA_ID_ALL_MEMBERSHIP =	"findAllMembershipItemsForSite";
+	private static final String QUERY_GET_OPEN_FORUMS =	"findOpenForumsForSite";
+	private static final String QUERY_GET_TOPICS_FOR_FORUMLIST =	"findAllTopicsByForumIds";
 	
 	private Boolean autoDdl;
 	
@@ -631,9 +633,13 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		{
       public Object doInHibernate(Session session) throws HibernateException, SQLException 
       {
-        Query q = session.getNamedQuery(QUERY_GET_ALL_TOPICS);
-        q.setParameter("areaId", areaId, Hibernate.LONG);
-        return q.list();
+        Query q1 = session.getNamedQuery(QUERY_GET_OPEN_FORUMS);
+        q1.setParameter("areaId", areaId, Hibernate.LONG);
+        if(q1.list().isEmpty())
+        	return q1.list();
+        Query q2 = session.getNamedQuery(QUERY_GET_TOPICS_FOR_FORUMLIST);
+        q2.setParameterList("forumList", q1.list(), Hibernate.LONG);
+        return q2.list();
       }
     };
     List topicList = (List) getHibernateTemplate().execute(hcb);

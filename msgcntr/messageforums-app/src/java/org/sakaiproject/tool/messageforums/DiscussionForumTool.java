@@ -5376,25 +5376,30 @@ public class DiscussionForumTool
   {
 	  if (displayPendingMsgQueue == null){
 		  List membershipList = uiPermissionsManager.getCurrentUserMemberships();
-		  int numModTopicWithPerm = forumManager.getNumModTopicsWithModPermissionByPermissionLevel(membershipList);
-		  
-		  if (numModTopicWithPerm < 1)
-		  {
-			  numModTopicWithPerm = forumManager.getNumModTopicsWithModPermissionByPermissionLevelName(membershipList);
-			  
-			  if (numModTopicWithPerm < 1)
-			  {
-				  displayPendingMsgQueue = false;
-			  }
-			  else
-			  {
-				  displayPendingMsgQueue = true;
-			  }
-		  }
-		  else
-		  {		  
-			  displayPendingMsgQueue = true;
-		  }
+      int numModTopic = forumManager.getModeratedTopicsInSite().size();
+      if (numModTopic < 1)
+          displayPendingMsgQueue = false;
+      else{
+		    int numModTopicWithPerm = forumManager.getNumModTopicsWithModPermissionByPermissionLevel(membershipList);
+
+		    if (numModTopicWithPerm < 1)
+        {
+          numModTopicWithPerm = forumManager.getNumModTopicsWithModPermissionByPermissionLevelName(membershipList);
+
+          if (numModTopicWithPerm < 1)
+          {
+            displayPendingMsgQueue = false;
+          }
+          else
+          {
+            displayPendingMsgQueue = true;
+          }
+        }
+        else
+        {
+          displayPendingMsgQueue = true;
+        }
+      }
 	  }
 	  
 	  if (refreshPendingMsgs && displayPendingMsgQueue.booleanValue()) {
@@ -6324,6 +6329,9 @@ public class DiscussionForumTool
     gradeNotify = false; 
     selectedAssign = DEFAULT_GB_ITEM; 
     resetGradeInfo();
+
+    //added by -Qu revert back any grade item selection change to its original bugid:4746 1/20/2012
+    resetSelectedMessage();
     
     getThreadFromMessage();
     return MESSAGE_VIEW;
@@ -6361,8 +6369,10 @@ public class DiscussionForumTool
 				  if(selectedMessage == null && selectedGradedUserId != null && !"".equals(selectedGradedUserId)){
 					  studentId = selectedGradedUserId;
 				  }else{
-					  studentId = UserDirectoryService.getUser(selectedMessage.getMessage().getCreatedBy()).getId();  
-				  }				   
+					  studentId = UserDirectoryService.getUser(selectedMessage.getMessage().getCreatedBy()).getId();
+            //Added by -QU for bugid:4742 updating message for Grade item name after selecting grading item 1/19/2012
+            selectedMessage.getMessage().setGradeAssignmentName(selAssignName);
+				  }
 				  
 				  setUpGradeInformation(gradebookUid, selAssignName, studentId);
 			  } else {
@@ -9115,6 +9125,13 @@ public class DiscussionForumTool
 	public boolean getShowProfileLink() {
 		return showProfileLink;
 	}
+
+  //Added this to set back the selected message gradeAssignmentName to what it is in db bugid:4746 -Qu 1/20/2012
+  private void resetSelectedMessage(){
+    String gradeAssignmentName = messageManager.getMessageById(selectedMessage.getMessage().getId()).getGradeAssignmentName();
+      selectedMessage.getMessage().setGradeAssignmentName(gradeAssignmentName);
+  }
+
 	public Locale getUserLocale(){
 		return new ResourceLoader().getLocale();
 	}

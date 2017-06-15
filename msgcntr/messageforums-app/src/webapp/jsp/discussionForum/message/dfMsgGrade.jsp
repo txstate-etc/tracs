@@ -128,15 +128,15 @@
 			</f:verbatim>
 			</h:panelGroup>
 
-			
-			<h:panelGroup styleClass="instruction" rendered="#{ForumTool.allowedToGradeItem}">
+			<%--Fix bugid:4742 taking away unnecessary check for gradable perm -Qu 1/19/2012 --%> 
+			<h:panelGroup styleClass="instruction">
 				<h:outputText value="#{msgs.cdfm_required}" /> 
 				<h:outputText value="#{msgs.pvt_star}" styleClass="reqStarInline"/>
 			</h:panelGroup>
    
 			<h:panelGrid id="grade-message-options" styleClass="jsfFormTable" columns="1" columnClasses="shorttext spinnerBesideContainer" border="0">
 				<h:panelGroup>
-					<h:outputLabel for="assignment"  rendered="#{ForumTool.allowedToGradeItem}">
+					<h:outputLabel for="assignment">
 						<h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStarInline" style="padding-right:3px"/>
 						<h:outputText  value="#{msgs.cdfm_assignments}"/>
 					</h:outputLabel>	

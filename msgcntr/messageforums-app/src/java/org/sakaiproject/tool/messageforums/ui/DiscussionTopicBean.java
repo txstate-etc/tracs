@@ -272,6 +272,18 @@ public class DiscussionTopicBean
     return false;
   }
 
+  public boolean getHasShortDescription()
+  {
+    LOG.debug("getHasShortDesciption()");
+    if (topic.getShortDescription() != null
+        && topic.getShortDescription().trim().length() > 0
+        )
+    {
+      return true;
+    }
+    return false;
+  }
+
   /**
    * @return Returns the readFullDesciption.
    */

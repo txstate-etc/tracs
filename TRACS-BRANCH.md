@@ -8,7 +8,7 @@ TRACS uses git branches for development and releases.
 
 ***$feature-branch*** is a branch that branched off from ***tracs*** branch at certain time and focused on a particular feature.  Naming convention for feature branch is **$projectName-feature-name**  eg: forums-query-performance-fix
 
-***$tracs-release-branch***  eg: 11.x will be tracs 11 release branch; will use tags for each release, eg: 11.4.1 
+***$tracs-release-branch***  eg: 11.x will be tracs 11 release branch; will use tags for each release, eg: 11.4.1
 
 ## Feature branch
 We use feature branch to manage our local features development and also with consideration for potential contribution back to sakai community.
@@ -18,7 +18,7 @@ We use feature branch to manage our local features development and also with con
 
  *  Go to ***tracs*** branch
 
-	 `git checkout tracs`
+	  `git checkout tracs`
 
  * Create a new feature branch called ***kernel***
 
@@ -27,7 +27,7 @@ We use feature branch to manage our local features development and also with con
  * Do the work
  * Add changes
 
-		`git add -u`
+    `git add -u`
 
  * Make local commit
 

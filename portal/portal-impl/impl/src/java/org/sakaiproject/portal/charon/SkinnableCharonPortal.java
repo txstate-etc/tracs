@@ -231,13 +231,36 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 
 	private PageFilter pageFilter = new PageFilter() {
 
+		// Filter Site Stats out of placements, so it doesn't appear in the tool menu.
+		// We show Site Stats as a tab within Site Info, so it shouldn't be in the menu.
+		// We were simply hiding it in the vm template, but since it's still technically
+		// in the menu it was causing problems if Site Stats happened to be the
+		// first tool in the list. See #6650
 		public List filter(List newPages, Site site)
 		{
+			for (int i = 0; i < newPages.size(); i++) {
+				if (newPages.get(i) instanceof SitePage) {
+					SitePage page = (SitePage) newPages.get(i);
+					if ("Site Stats".equals(page.getTitle())) {
+						newPages.remove(i);
+						break;
+					}
+				}
+			}
+
 			return newPages;
 		}
 
 		public List<Map> filterPlacements(List<Map> l, Site site)
 		{
+			for (int i = 0; i < l.size(); i++) {
+				Map m = l.get(i);
+				if ("Site Stats".equals(m.get("pageTitle"))) {
+					l.remove(i);
+					break;
+				}
+			}
+
 			return l;
 		}
 

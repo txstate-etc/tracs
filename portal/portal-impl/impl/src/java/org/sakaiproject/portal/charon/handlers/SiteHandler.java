@@ -576,6 +576,8 @@ public class SiteHandler extends WorksiteHandler
 		}
 		doSendResponse(rcontext, res, null);
 
+		EventTrackingService.post(EventTrackingService.newEvent("sakai.page.view", "siteId="+site.getId()+" pageId="+page.getId()+" pageTitle="+page.getTitle(), false));
+
 		StoredState ss = portalService.getStoredState();
 		if (ss != null && toolContextPath.equals(ss.getToolContextPath()))
 		{

@@ -52,7 +52,8 @@
 |	pasystem	| NO LOCAL CHANGES |
 |	podcasts	|    DONE    |
 |	polls	|	DONE	|
-|	portal	|		|
+|	portal	|	DONE	|
+|	portal-skin	|		|
 |	postem	|		|
 |	presence	| NO LOCAL CHANGES |
 |	profile2	|		|

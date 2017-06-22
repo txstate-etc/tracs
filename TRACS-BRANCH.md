@@ -56,7 +56,7 @@ We use feature branch to manage our local features development and also with con
  * Tag the feature branch ***kernel***
    We use ***archive/$feature-branch*** as naming convention for taging feature branch, mainly for contributing purpose.
 
-    `git tag archive/kernel`
+    `git tag archive/kernel kernel`
 
  * Close/Remove feature branch ***kernel***
 

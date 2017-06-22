@@ -34,18 +34,28 @@ $tool-title-nav-link-color-hover: $primary-color !default;
 
 // //mobile
 // $mobile-background: linear-gradient( to bottom, #b6c3d4, #d9cdcd, #c4ccd7, #a6c2df ) fixed !default;
-// $mobile-tools-and-sites-bar-background: lighten($tool-menu-color, 15% ) !default;
+$mobile-tools-and-sites-bar-background: lighten($tool-menu-color, 15% ) !default;
 // $mobile-tools-and-sites-bar-color: $background-color !default;
-// $mobile-breadcrumbs-bar-background: $primary-color !default;
-// $mobile-breadcrumbs-bar-color: $background-color !default;
+$mobile-breadcrumbs-bar-background: $primary-color !default;
+$mobile-breadcrumbs-bar-color: $background-color !default;
 
 .Mrphs-topHeader {
   a{
     color: $top-header-text-color;
   }
-  .top-header-link {
-    flex-shrink: 0;
-  }
+  // @media (max-width: $break-small-end){
+  //    height: $header-size;
+  // }
+  // .Mrphs-headerLogo {
+  //   @media (max-width: $break-small-end){
+  //      flex-basis: 50%;
+  //   }
+  //   .Mrphs-headerLogo--institution {
+  //     @media (max-width: $break-small-end){
+        
+  //     }
+  //   }
+  // }
 }
 
 .Mrphs-userNav__submenuitem--profilepicture{
@@ -78,6 +88,23 @@ $tool-title-nav-link-color-hover: $primary-color !default;
    background: $info-background-color !important;
    border-color: $info-color !important;
    color: #000 !important;
+}
+
+//Change default color of Tools and Sites bar on mobile
+.Mrphs-skipNav__menu{
+  @media (max-width: $break-small-end){
+     background: $mobile-tools-and-sites-bar-background;
+  }
+}
+
+//Change default color of Breadcrumbs bar on mobile
+.Mrphs-siteHierarchy{
+  @media (max-width: $break-small-end){
+    background: $mobile-breadcrumbs-bar-background;
+    a{
+      color: $mobile-breadcrumbs-bar-color;
+    }
+  }
 }
 
 
@@ -144,11 +171,11 @@ $tool-title-nav-link-color-hover: $primary-color !default;
 // }
 
 // //get rid of background gradient used on mobile
-// body.Mrphs-portalBody{
-//   @media (max-width: $break-small-end){
-//      background: $mobile-background;
-//   }
-// }
+body.Mrphs-portalBody{
+  @media (max-width: $break-small-end){
+     background: none;
+  }
+}
 
 // //Change default color of Tools and Sites bar on mobile
 // .Mrphs-skipNav__menu{

@@ -20,10 +20,11 @@ $black:         #000000;
 /* Top Header */
 $top-header-background: none;
 $top-header-text-color: $maroon;
+//$header-size : 50px;
 
-$logo: 'images/tracslogo.png';
-$logo-height: 95px ;
-$logo-width: 390px ;
+$logo: 'images/logo.png';
+// $logo-height: 95px ;
+// $logo-width: 390px ;
 
 $avatar-border-color: $granite;
 
@@ -62,7 +63,7 @@ $button-color-background-secondary-color: mix($maroon, $black, 70);
 $tool-title-nav-link-background: $white;
 $tool-title-nav-link-color: $charcoal;
 $tool-title-nav-link-border: $maroon;
-$tool-title-nav-link-background-hover: linear-gradient($white, $aluminum);
+$tool-title-nav-link-background-hover: $sandstone;
 $tool-title-nav-link-color-hover: $charcoal;
 
 // /* Color palette */
@@ -194,7 +195,7 @@ $tool-title-nav-link-color-hover: $charcoal;
 
 // //mobile
 // $mobile-background: none;
-// //$mobile-tools-and-sites-bar-background: $gold;
+$mobile-tools-and-sites-bar-background: $maroon;
 // $mobile-tools-and-sites-bar-color: $white;
-// $mobile-breadcrumbs-bar-background: $sandstone;
-// $mobile-breadcrumbs-bar-color: $maroon;
+$mobile-breadcrumbs-bar-background: $sandstone;
+$mobile-breadcrumbs-bar-color: $maroon;

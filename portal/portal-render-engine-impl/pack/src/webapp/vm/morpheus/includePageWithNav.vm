@@ -70,6 +70,13 @@
             </a>
             #end
         #end
+        <div class="tracs-sites">
+        #if (${tabsSites})
+            ## tabs
+            #parse("/vm/morpheus/includeTabs.vm")
+
+        #end ## END of IF (${tabsSites})
+        </div>
     </nav>
 
     <div id="pageBody">

@@ -25,11 +25,15 @@
                 ## Header
                 <div class="Mrphs-topHeader">
                     #parse("/vm/morpheus/snippets/header-snippet.vm")
+                    ## Anne commented this out 6/22/17, moving site tabs to siteHierarchy Bar **
+                    #**
                     #if (${tabsSites})
                         ## tabs
                         #parse("/vm/morpheus/includeTabs.vm")
 
                     #end ## END of IF (${tabsSites})
+                    *#
+
                     #parse("/vm/morpheus/includeLoginNav.vm")
                 </div>
                 

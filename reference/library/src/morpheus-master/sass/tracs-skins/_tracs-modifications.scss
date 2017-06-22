@@ -12,6 +12,8 @@ $tool-tab-background: #F0F0F0 !default;
 $tool-tab-border: silver !default;
 $tool-tab-background-hover: #f0f0f0 !default;
 
+$site-hierarchy-separator-color: $swapped-view-text-color !default;
+
 // $sites-nav-submenu-item-hover: $sites-nav-submenu-item-background !default;
 // $sites-nav-submenu-item-border-top: none !default;
 // $sites-nav-submenu-item-border-bottom: none !default;
@@ -99,11 +101,29 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
 
 //Change default color of Breadcrumbs bar on mobile
 .Mrphs-siteHierarchy{
+  min-height: 55px;
+  .Mrphs-hierarchy--siteName, .Mrphs-hierarchy--siteNameSeparator, .Mrphs-hierarchy--toolName{
+    display: none;
+    @media (max-width: $break-small-end){
+      display: inline-block;
+    }
+  }
+  .Mrphs-hierarchy--siteNameSeparator{
+    color: $site-hierarchy-separator-color;
+  }
   @media (max-width: $break-small-end){
     background: $mobile-breadcrumbs-bar-background;
     a{
       color: $mobile-breadcrumbs-bar-color;
     }
+  }
+}
+
+.tracs-sites #linkNav ul.Mrphs-sitesNav__menu {
+  li.Mrphs-sitesNav__menuitem {
+    margin: 0 0.75em 0.75em 0;
+    padding: .2em;
+    position: relative;
   }
 }
 

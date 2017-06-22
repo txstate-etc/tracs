@@ -1,137 +1,201 @@
 /* TRACS default skin Customization*/
 
-/* Some of these values are still the defaults. This file is based on the customization files found in the examples directory */
-
-
 /* Color palette */
+$maroon:        #501214;
+$sandstone:     #eae3db;
+$aluminum:      #eae9e8;
+$river:         #8baea1;
+$charcoal:      #363534;
+$blue:          #005481;
+$granite:       #646464;
+$platinum:      #e5e5e5;
+$white:         #ffffff;
+$sapphire:      #15597e;  //what is this used for?
+$medium-blue:   #326B97;  //not sure about this one either
+$khaki:         #bdab91;
+$snow:          #fafafa;
+$black:         #000000;
 
-$maroon: #501214;
-$gold: #6a5638;
-$sandstone: #e8e3db;
-$dark-sandstone: #ddd5c9;
-$oldgold: #deb407;
-$river: #8baea1;
-$white: #fff;
-$black: #000;
-$blue: #005481;
-$charcoal: #363534;
 
-$primary-color:          $gold;
-$primary-color-shadow:       $gold;
-$secondary-color:        #F00 !default;
-$alt-colour:         #d36f00 !default;
+/* Top Header */
+$top-header-background: none;
+$top-header-text-color: $maroon;
+//$header-size : 50px;
 
-$text-color:         #212121 !default;
+$logo: 'images/logo.png';
+// $logo-height: 95px ;
+// $logo-width: 390px ;
 
-$tool-menu-background-color:       $sandstone;
-$tool-menu-color:        $maroon;
-$tool-tab-background-color:        $sandstone;
-$tool-menu-hover-color: $white;
-$tool-menu-hover-background-color: $primary-color;
-$tool-menu-current-background-color: $background-color;
+$avatar-border-color: $granite;
+
+$selected-tool-border: 1px solid $blue;
+$selected-tool-background: $white;
+
+/* This is the gradient in the header of the page, but we don't want a gradient. */
+$header-gradient-a: $maroon;
+$header-gradient-b: $maroon;
+$header-gradient-c: $maroon;
+$header-gradient-d: $maroon;
+
+/* Tool Menu */
+$tool-menu-width: 10em;
+$tool-menu-background-color: $sandstone;
+$tool-menu-color: $charcoal;
+$tool-menu-current-background-color: $white;
 $tool-menu-current-color: $maroon;
 $tool-menu-current-border-color: $maroon;
 
-$main-content-background: $background-color;
-$top-header-background: $maroon;
-$sites-nav-background: $top-header-background;
+/* Information section */
+$info-color:                $river;
+$info-background-color:     mix($river, $white, 30);
 
-$breadcrumbs-tool-color:     $maroon;
-
-/* Link colors */
-$link-color: $blue;
-$link-active-color: $blue;
-$link-hover-color: $blue;
-
-/* Linknav button colors */
-$button-text-color:  #494949;
-$button-border-color: #bbab92; 
-$button-background-color: $sandstone;
-$button-background-secondary-color: $white;
+/* Intratool Nav */
+$tool-tab-background: $aluminum;
+$tool-tab-border: $khaki;
+$tool-tab-background-hover: $snow;
 
 /* General button colors */
 $button-color-text-color: $white;
-$button-color-border-color: mix($primary-color, $black, 80);
-$button-color-background-color:  $primary-color;
-$button-color-background-secondary-color: mix($primary-color, $white, 90);
-/* ///////////// */
+$button-color-border-color: $maroon;
+$button-color-background-color: $maroon;
+$button-color-background-secondary-color: mix($maroon, $black, 70);
 
-$info-color:                $river;//$primary-color  !default;
-$info-background-color:     mix($river, $white, 30);
-
-/* This is the gradient in the header of the page */
-$header-gradient-a: #d1c7b7;
-$header-gradient-b: #d1c7b7;
-$header-gradient-c: #c7baa5;
-$header-gradient-d: #c7baa5;
-
- $sites-nav-menu-item-background:            $sandstone;
- $sites-nav-menu-item-color:                 $maroon;
- $sites-nav-menu-item-color-hover:           $sites-nav-menu-item-color;
-
-$sites-nav-menu-item-selected-background:   $sandstone;
-$sites-nav-menu-item-selected-color:        $maroon;
-$sites-nav-menu-item-selected-color-hover:  $sites-nav-menu-item-selected-color;
-
-$sites-nav-submenu-background:              $sites-nav-menu-item-background;
-$sites-nav-submenu-item-background:         $sites-nav-menu-item-background;
-$sites-nav-submenu-item-background-hover:   $sites-nav-menu-item-background;
-$sites-nav-submenu-item-color:              $maroon;
-$sites-nav-submenu-item-color-hover:        $sites-nav-submenu-item-color;
-
-$sites-nav-submenu-selected-background:     $sites-nav-submenu-background;
-$sites-nav-submenu-item-selected-background: $sites-nav-submenu-background;
-$sites-nav-submenu-item-selected-color:     $sites-nav-menu-item-selected-color;
-
-
-//there's a variable called sites-nav-submenu-item-background-hover but it doesn't do anything
-$sites-nav-submenu-item-hover: #d1c7b7;
-$sites-nav-submenu-item-border-top: 1px solid #f4f1ed;
-$sites-nav-submenu-item-border-bottom: 1px solid $dark-sandstone;
-
-$tool-tab-color: $charcoal;
-
-$tool-title-nav-link-background: $sandstone;
+$tool-title-nav-link-background: $white;
 $tool-title-nav-link-color: $charcoal;
-$tool-title-nav-link-border: mix($sandstone, $black, 70);
-$tool-title-nav-link-background-hover: mix($sandstone, $black, 90);
+$tool-title-nav-link-border: $maroon;
+$tool-title-nav-link-background-hover: $sandstone;
 $tool-title-nav-link-color-hover: $charcoal;
 
-/* User Menu */
-$user-menu-background: mix($sandstone, $white);
-$user-menu-color: $text-color;
-$user-menu-background-hover: mix($sandstone, $white);
-$user-menu-color-hover: $text-color;
-$user-menu-userdata-separator: #bbab92;
+// /* Color palette */
 
-/* small action buttons */
-$small-action-button-color: $charcoal;
+// $maroon: #501214;
+// // $gold: #6a5638;
+// $sandstone: #EAE3DB;
+// $aluminum: #EAE9E8;
+// $dark-sandstone: #ddd5c9;
+// $oldgold: #deb407;
+// $river: #8baea1;
+// $white: #fff;
+// $black: #000;
+// $blue: #005481;
+// $charcoal: #363534;
 
-/* Tool Menu */
-$tool-menu-width: 7.5em !default;
+// // $primary-color:          $gold;
+// // $primary-color-shadow:       $gold;
+// $secondary-color:        #F00 !default;
+// $alt-colour:         #d36f00 !default;
 
-/* Navigation Hierarchy */
-$hierarchy-size: 3.5em;
+// $text-color:         #212121 !default;
 
-/* Golden Ratio width for 16px font http://www.pearsonified.com/typography/ */
-$measure: 960px !default;
+// $tool-menu-background-color:       $sandstone;
+// $tool-menu-color:        $maroon;
+// $tool-tab-background-color:        $sandstone;
+// $tool-menu-hover-color: $white;
+// $tool-menu-hover-background-color: $primary-color;
+// $tool-menu-current-background-color: $background-color;
+// $tool-menu-current-color: $maroon;
+// $tool-menu-current-border-color: $maroon;
 
-/* Logo location */
-$logo: 'images/logo.png' !default;
-$logo-height: 30px !default;
-$logo-width: 50px !default;
+// $main-content-background: $background-color;
 
-/* Tool icons */
-$skin-with-icons: true !default;
-$icon-size: 20px !default;
+// $sites-nav-background: $top-header-background;
 
-/* Footer */
-$footer-background: transparent !default;
-$footer-color: $background-color-secondary !default;
+// $breadcrumbs-tool-color:     $maroon;
 
-//mobile
-$mobile-background: none;
-$mobile-tools-and-sites-bar-background: $gold;
-$mobile-tools-and-sites-bar-color: $white;
+// /* Link colors */
+// $link-color: $blue;
+// $link-active-color: $blue;
+// $link-hover-color: $blue;
+
+// /* Linknav button colors */
+// $button-text-color:  #494949;
+// $button-border-color: #bbab92; 
+// $button-background-color: $sandstone;
+// $button-background-secondary-color: $white;
+
+// /* General button colors */
+// $button-color-text-color: $white;
+// $button-color-border-color: mix($primary-color, $black, 80);
+// $button-color-background-color:  $primary-color;
+// $button-color-background-secondary-color: mix($primary-color, $white, 90);
+// /* ///////////// */
+
+// $info-color:                $river;//$primary-color  !default;
+// $info-background-color:     mix($river, $white, 30);
+
+// /* This is the gradient in the header of the page */
+// $header-gradient-a: #d1c7b7;
+// $header-gradient-b: #d1c7b7;
+// $header-gradient-c: #c7baa5;
+// $header-gradient-d: #c7baa5;
+
+//  $sites-nav-menu-item-background:            $sandstone;
+//  $sites-nav-menu-item-color:                 $maroon;
+//  $sites-nav-menu-item-color-hover:           $sites-nav-menu-item-color;
+
+// $sites-nav-menu-item-selected-background:   $sandstone;
+// $sites-nav-menu-item-selected-color:        $maroon;
+// $sites-nav-menu-item-selected-color-hover:  $sites-nav-menu-item-selected-color;
+
+// $sites-nav-submenu-background:              $sites-nav-menu-item-background;
+// $sites-nav-submenu-item-background:         $sites-nav-menu-item-background;
+// $sites-nav-submenu-item-background-hover:   $sites-nav-menu-item-background;
+// $sites-nav-submenu-item-color:              $maroon;
+// $sites-nav-submenu-item-color-hover:        $sites-nav-submenu-item-color;
+
+// $sites-nav-submenu-selected-background:     $sites-nav-submenu-background;
+// $sites-nav-submenu-item-selected-background: $sites-nav-submenu-background;
+// $sites-nav-submenu-item-selected-color:     $sites-nav-menu-item-selected-color;
+
+
+// //there's a variable called sites-nav-submenu-item-background-hover but it doesn't do anything
+// $sites-nav-submenu-item-hover: #d1c7b7;
+// $sites-nav-submenu-item-border-top: 1px solid #f4f1ed;
+// $sites-nav-submenu-item-border-bottom: 1px solid $dark-sandstone;
+
+// $tool-tab-color: $charcoal;
+
+// $tool-title-nav-link-background: $sandstone;
+// $tool-title-nav-link-color: $charcoal;
+// $tool-title-nav-link-border: mix($sandstone, $black, 70);
+// $tool-title-nav-link-background-hover: mix($sandstone, $black, 90);
+// $tool-title-nav-link-color-hover: $charcoal;
+
+// /* User Menu */
+// $user-menu-background: mix($sandstone, $white);
+// $user-menu-color: $text-color;
+// $user-menu-background-hover: mix($sandstone, $white);
+// $user-menu-color-hover: $text-color;
+// $user-menu-userdata-separator: #bbab92;
+
+// /* small action buttons */
+// $small-action-button-color: $charcoal;
+
+// /* Tool Menu */
+// $tool-menu-width: 7.5em !default;
+
+// /* Navigation Hierarchy */
+// $hierarchy-size: 3.5em;
+
+// /* Golden Ratio width for 16px font http://www.pearsonified.com/typography/ */
+// $measure: 960px !default;
+
+// /* Logo location */
+// $logo: 'images/tracslogo.png';
+// $logo-height: 95px ;
+// $logo-width: 390px ;
+
+// /* Tool icons */
+// $skin-with-icons: true !default;
+// $icon-size: 20px !default;
+
+// /* Footer */
+// $footer-background: transparent !default;
+// $footer-color: $background-color-secondary !default;
+
+// //mobile
+// $mobile-background: none;
+$mobile-tools-and-sites-bar-background: $maroon;
+// $mobile-tools-and-sites-bar-color: $white;
 $mobile-breadcrumbs-bar-background: $sandstone;
 $mobile-breadcrumbs-bar-color: $maroon;

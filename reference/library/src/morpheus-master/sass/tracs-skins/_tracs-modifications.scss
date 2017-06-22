@@ -111,6 +111,7 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
   .Mrphs-hierarchy--siteNameSeparator{
     color: $site-hierarchy-separator-color;
   }
+
   @media (max-width: $break-small-end){
     background: $mobile-breadcrumbs-bar-background;
     a{
@@ -126,7 +127,6 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
     position: relative;
   }
 }
-
 
 // //the variables provided for the submenu do not provide enough customization
 // .Mrphs-sitesNav__submenuitem{

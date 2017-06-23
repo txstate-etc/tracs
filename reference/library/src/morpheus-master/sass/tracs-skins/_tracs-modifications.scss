@@ -126,6 +126,11 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
     padding: .2em;
     position: relative;
   }
+  .Mrphs-sitesNav__submenuitem {
+    a {
+      margin: 0 0 0 0;
+    }
+  }
 }
 
 // //the variables provided for the submenu do not provide enough customization

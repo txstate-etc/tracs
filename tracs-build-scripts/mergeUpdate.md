@@ -11,11 +11,11 @@
 |	blogwow	|		|
 |	calendar	|    DONE       |
 |	chat	|    DONE       |
-|	citations	|		|
-|	cloud-content	|		|
-|	cmprovider	|		|
-|	common	|		|
-|	config	|		|
+|	citations	| NO LOCAL CHANGES		|
+|	cloud-content	|	NO LOCAL CHANGES	|
+|	cmprovider	|	DONE |
+|	common	|	DONE	|
+|	config	|	DONE	|
 |	content	|		|
 |	content-review	|		|
 |	courier	| NO LOCAL CHANGES |

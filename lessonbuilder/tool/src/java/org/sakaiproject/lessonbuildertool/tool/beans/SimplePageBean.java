@@ -187,6 +187,7 @@ public class SimplePageBean {
 	private Long currentPageId = null;
 	private Long currentPageItemId = null;
 	private String currentUserId = null;
+	private User currentUser = null;
 	private long previousPageId = -1;
 
     // Item-specific variables. These are set by setters which are called
@@ -4564,6 +4565,12 @@ public class SimplePageBean {
 	    if (currentUserId == null)
 	    	currentUserId = UserDirectoryService.getCurrentUser().getId();
 	    return currentUserId;
+	}
+
+	public User getCurrentUser() {
+		if (currentUser == null)
+			currentUser = UserDirectoryService.getCurrentUser();
+		return currentUser;
 	}
 	    
     // page is complete, update gradebook entry if any

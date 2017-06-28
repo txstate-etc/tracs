@@ -113,6 +113,7 @@ import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.tool.api.ToolSession;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.tool.cover.SessionManager;
+import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.cover.UserDirectoryService;
@@ -3053,7 +3054,8 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 					}
 
 					if(canSeeAll || simplePageBean.isItemAvailable(i)) {
-					    UIVerbatim.make(tableRow, "content", (i.getHtml() == null ? "" : i.getHtml()));
+					    String itemText = personalizeText(i.getHtml());
+					    UIVerbatim.make(tableRow, "content", (itemText == null ? "" : itemText));
 					} else {
 					    UIComponent unavailableText = UIOutput.make(tableRow, "content", messageLocator.getMessage("simplepage.textItemUnavailable"));
 					    unavailableText.decorate(new UIFreeAttributeDecorator("class", "disabled-text-item"));
@@ -4991,4 +4993,36 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 		UIOutput.make(peerReviewRows, "peer-eval-sample-text", messageLocator.getMessage("simplepage.peer-eval.sample.4"));
 	}
 
+	private String personalizeText(String itemText) {
+		if (itemText != null && !itemText.isEmpty()) {
+			User currentUser = simplePageBean.getCurrentUser();
+			if (currentUser != null) {
+				// replace all first name calls
+				String firstName = currentUser.getFirstName();
+				if (firstName == null) {
+					firstName = "";
+				}
+				itemText = itemText.replaceAll("\\{\\{firstname\\}\\}", firstName);
+
+				// replace all last name calls
+				String lastName = currentUser.getLastName();
+				if (lastName == null) {
+					lastName = "";
+				}
+				itemText = itemText.replaceAll("\\{\\{lastname\\}\\}", lastName);
+
+				// replace all full name calls
+				String fullName = currentUser.getDisplayName();
+				if (fullName == null) {
+					fullName = "";
+				}
+				itemText = itemText.replaceAll("\\{\\{fullname\\}\\}", fullName);
+
+			} else {
+				// Current user is null so replace all with blank
+				itemText = itemText.replaceAll("\\{\\{.*\\}\\}", "");
+			}
+		}
+		return itemText;
+	}
 }

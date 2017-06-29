@@ -30,9 +30,9 @@ $top-header-background: none;
 $top-header-text-color: $maroon;
 //$header-size : 50px;
 
-$logo: 'images/logo.png';
-// $logo-height: 95px ;
-// $logo-width: 390px ;
+$logo: 'images/TRACS_logo.svg';
+$logo-height: 55px ;
+$logo-width: 180px ;
 
 $avatar-border-color: $granite;
 
@@ -103,7 +103,7 @@ $topNav-text-color: $maroon;
 
 
 /* Tool customizations */
-$calendar-event-background-color: #9d7f5c;
+$calendar-event-background-color: darken($sandstone, 40%);
 $calendar-event-text-color: $charcoal;
 
 // /* Color palette */

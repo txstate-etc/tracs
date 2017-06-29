@@ -45,19 +45,20 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
   a{
     color: $top-header-text-color;
   }
-  // @media (max-width: $break-small-end){
-  //    height: $header-size;
-  // }
-  // .Mrphs-headerLogo {
-  //   @media (max-width: $break-small-end){
-  //      flex-basis: 50%;
-  //   }
-  //   .Mrphs-headerLogo--institution {
-  //     @media (max-width: $break-small-end){
-        
-  //     }
-  //   }
-  // }
+  .Mrphs-headerLogo .Mrphs-headerLogo--institution {
+    margin: 15px 0px;
+    @media (max-width: $break-small-end){
+      margin: 0px;
+      height: 40px;
+    }
+  }
+}
+
+//Change default color of Tools and Sites bar on mobile
+.Mrphs-skipNav__menu{
+  @media (max-width: $break-small-end){
+     background: $mobile-tools-and-sites-bar-background;
+  }
 }
 
 .Mrphs-userNav__submenuitem--profilepicture{
@@ -90,13 +91,6 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
    background: $info-background-color !important;
    border-color: $info-color !important;
    color: #000 !important;
-}
-
-//Change default color of Tools and Sites bar on mobile
-.Mrphs-skipNav__menu{
-  @media (max-width: $break-small-end){
-     background: $mobile-tools-and-sites-bar-background;
-  }
 }
 
 //Change default color of Breadcrumbs bar on mobile
@@ -133,27 +127,6 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
   }
 }
 
-// //the variables provided for the submenu do not provide enough customization
-// .Mrphs-sitesNav__submenuitem{
-//     border-bottom: $sites-nav-submenu-item-border-bottom !important;
-//     border-top: $sites-nav-submenu-item-border-top !important;
-//     &:first-child{
-//         border-top-color: transparent !important;
-//     }
-//     &:last-child{
-//         border-bottom-color: transparent !important;
-//     }
-// }
-// .Mrphs-sitesNav__submenuitem:hover{
-//     background: $sites-nav-submenu-item-hover !important;
-//     .Mrphs-sitesNav__submenuitem-icon{
-//         background: $sites-nav-submenu-item-hover !important;
-//     }
-//     .Mrphs-sitesNav__submenuitem-title{
-//         background: $sites-nav-submenu-item-hover !important;
-//     }
-// }
-
 .navIntraTool li span a{
   background-color: $tool-tab-background;
   border: 1px solid $tool-tab-border;
@@ -174,27 +147,6 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
   }
 }
 
-// //user menu: sakai provided no variables for customizing this
-// #mastLogin #loginLinks ul{
-//     background-color: $user-menu-background;
-//     a{
-//         color: $user-menu-color;
-//         &:hover{
-//             background: $user-menu-background-hover;
-//             color: $user-menu-color-hover;
-//         }
-//     }
-//     .Mrphs-userData{
-//         border-color: $user-menu-userdata-separator;
-//     }
-// }
-
-// .btn.btn-default {
-//     &#copy-button, &#delete-button, &#move-button, &#show-button{
-//         color: $small-action-button-color !important;
-//     }
-// }
-
 // //get rid of background gradient used on mobile
 body.Mrphs-portalBody{
   @media (max-width: $break-small-end){
@@ -202,21 +154,10 @@ body.Mrphs-portalBody{
   }
 }
 
-// //Change default color of Tools and Sites bar on mobile
-// .Mrphs-skipNav__menu{
-//   @media (max-width: $break-small-end){
-//      background: $mobile-tools-and-sites-bar-background;
-//      margin-top: -1px;
-//   }
-// }
-
-// //Change default color of Breadcrumbs bar on mobile
-// .Mrphs-siteHierarchy{
-//   @media (max-width: $break-small-end){
-//     background: $mobile-breadcrumbs-bar-background;
-//     a{
-//       color: $mobile-breadcrumbs-bar-color;
-//     }
-//   }
-// }
+#mastLogin ul#quickLinks {
+  display: none;
+  @media (max-width: $break-small-end){
+     display: block;
+  }
+}
 

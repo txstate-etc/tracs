@@ -2,6 +2,9 @@
 // VARIABLES: For Modules specific styles
 //////////////////////////////
 
+// Anne commented these out because the calendar tool is lightening the button-border-color to 
+// create new colors.  In our case, this resulted in a bright reddish-coral color in the default
+// TRACS skin.  That's what happens when you lighten #501214.
 
-$calendar-event-background-color: $button-color-border-color;
-$calendar-event-text-color: $button-color-text-color;
+// $calendar-event-background-color: $button-color-border-color;
+// $calendar-event-text-color: $button-color-text-color;

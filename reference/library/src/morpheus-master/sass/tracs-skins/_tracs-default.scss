@@ -3,6 +3,7 @@
 /* Color palette */
 $maroon:        #501214;
 $sandstone:     #eae3db;
+$dust-storm:    #ddd2c6;
 $aluminum:      #eae9e8;
 $river:         #8baea1;
 $charcoal:      #363534;
@@ -15,6 +16,13 @@ $medium-blue:   #326B97;  //not sure about this one either
 $khaki:         #bdab91;
 $snow:          #fafafa;
 $black:         #000000;
+$lapis-lazuli:  #217496;
+$light-gray:    #d7d5d5;
+
+/* Link colors */
+$link-color: $lapis-lazuli;
+$link-active-color: $lapis-lazuli;
+$link-hover-color: $lapis-lazuli;
 
 
 /* Top Header */
@@ -44,6 +52,8 @@ $tool-menu-color: $charcoal;
 $tool-menu-current-background-color: $white;
 $tool-menu-current-color: $maroon;
 $tool-menu-current-border-color: $maroon;
+$tool-menu-hover-color: $charcoal;
+$tool-menu-hover-background-color: $dust-storm;
 
 /* Information section */
 $info-color:                $river;
@@ -82,6 +92,12 @@ $sites-nav-menu-item-selected-border-top:   1px solid $platinum;
 $sites-nav-menu-item-selected-border-right: 1px solid $platinum;
 $sites-nav-menu-item-selected-border-bottom:1px solid $platinum;
 $sites-nav-menu-item-selected-border-left:  1px solid $platinum;
+
+$sites-nav-submenu-background:              $light-gray;
+$sites-nav-submenu-item-background:         $light-gray;
+$sites-nav-submenu-item-background-hover:   $light-gray;
+$sites-nav-submenu-item-color:              $charcoal;
+$sites-nav-submenu-item-color-hover:        $charcoal;
 
 $topNav-text-color: $maroon;
 

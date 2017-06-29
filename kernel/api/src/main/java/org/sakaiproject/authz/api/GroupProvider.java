@@ -54,6 +54,13 @@ public interface GroupProvider
 	Map<String, String> getUserRolesForGroup(String id);
 
 	/**
+	 * Access the user id - enrollment status  map for all users in the external group.
+	 * @param id  The external group id.
+	 * @return the user id - enrollment status map for all users in the external group (may be empty).
+	 */
+	Map<String, String> getUserStatusForGroup(String id);
+
+	/**
 	 * Access the external group id - role name map for this user in all external groups.
 	 * 
 	 * @param userId

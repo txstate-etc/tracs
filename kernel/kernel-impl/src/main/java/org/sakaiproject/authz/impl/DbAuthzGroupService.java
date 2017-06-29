@@ -2583,6 +2583,8 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 
 			// get the latest userEid -> role name map from the provider
 			Map<String,String> target = m_provider.getUserRolesForGroup(realm.getProviderGroupId());
+			// get the latest userEid -> status map from the provider within this authzgroup
+			Map statusMap = m_provider.getUserStatusForGroup(realm.getProviderGroupId());
 
 			// read the realm's grants
 			List<UserAndRole> grants = getGrants(realm);
@@ -2625,7 +2627,7 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 				}
 			}
 
-			// compute the records we need to delete: every existing not in target or not matching target's role
+			// compute the records we need to delete: every existing not in target or not matching target's role, or not matching target's status
 			List<String> toDelete = new Vector<String>();
 			for (Map.Entry<String,String> entry : existing.entrySet())
 			{
@@ -2636,6 +2638,8 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 				{
 					String userEid = userDirectoryService().getUserEid(userId);
 					String targetRole = (String) target.get(userEid);
+					String targetStatus = (String) statusMap.get(userEid);
+					Member member = realm.getMember(userId);
 					
 					Member cMember = null;
 					if (containingRealm != null)
@@ -2652,7 +2656,7 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 					}
 					else
 					{
-						if ((targetRole == null) || (!targetRole.equals(role)))
+						if ((targetRole == null) || (!targetRole.equals(role)) || (!targetStatus.equalsIgnoreCase("true") == member.isActive()))
 						{
 							toDelete.add(userId);
 						}
@@ -2661,11 +2665,14 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 				catch (UserNotDefinedException e)
 				{
 					M_log.warn("refreshAuthzGroupInternal() cannot find eid for user: " + userId);
+					//if user data is in consistent, remove user from the realm
+					toDelete.add(userId);
+					continue;
 				}
 			}
 
-			// compute the records we need to add: every target not in existing, or not matching's existing's role
-			// we don't insert target grants that would override internal grants
+			// compute the records we need to add: every target not in existing, or not matching's existing's role, or not matching target's status
+			// we do need realm to reflect status of enrollments, target grants will override internal grants in TRACS
 			List<UserAndRole> toInsert = new Vector<UserAndRole>();
 			for (Map.Entry<String,String> entry : target.entrySet())
 			{
@@ -2678,6 +2685,21 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 					boolean active = true;
 					String existingRole = (String) existing.get(userId);
 					String nonProviderRole = (String) nonProvider.get(userId);
+					Member member = realm.getMember(userId);
+
+					//This should be where authz members are added from course managementgroup
+					//provider. We need to get the enrollment status from enrollment table
+					//so that the member status in the authz group will be same as
+					//what in the enrollment table
+					//Notice that statusMap is keyed on userEid like ar1096 instead of uuid
+					String targetStatus = (String)statusMap.get(userEid);
+
+					//Get user initial status match with status from enrollment record
+					if ( targetStatus != null )
+					{
+						active = targetStatus.equalsIgnoreCase("true") ? true : false;
+					}
+
 
 					Member cMember = null;
 					if (containingRealm != null)
@@ -2698,10 +2720,12 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 						if (existingRole != null)
 						{
 							boolean roleEqual = existingRole.equals(cMemberRoleId);
-							
+							/*
 							// user is currently active if not in the providedInactive map
 							boolean currentlyActive = providedInactive.get(userId) == null;
 							boolean activeEqual = currentlyActive == cMemberActive;
+							*/
+							boolean activeEqual = targetStatus.equalsIgnoreCase("true") == cMemberActive;
 							
 							insertRequired = !roleEqual || !activeEqual;
 							
@@ -2725,14 +2749,14 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 					}
 					else
 					{
-						if ((nonProviderRole == null) && ((existingRole == null) || (!existingRole.equals(role))))
+						if ((nonProviderRole == null) && ((existingRole == null) || (!existingRole.equals(role))) || (!targetStatus.equalsIgnoreCase("true") == member.isActive()))
 						{
-							// Check whether this user was inactive in the site previously, if so preserve status
+/*							// Check whether this user was inactive in the site previously, if so preserve status
 							if (providedInactive.get(userId) != null)
 							{
 								active = false;
 							}
-
+*/
 							// this is either at site level or at the group level but no need to synchronize
 							toInsert.add(new UserAndRole(userId, role, active, true));
 						}

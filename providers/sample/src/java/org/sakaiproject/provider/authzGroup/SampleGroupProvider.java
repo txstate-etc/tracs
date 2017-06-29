@@ -313,6 +313,17 @@ public class SampleGroupProvider implements GroupProvider
 
 	/**
 	 * {@inheritDoc}
+	 * return a map for user enrollment status
+	 */
+	public Map getUserStatusForGroup(String id){
+		//This is just a stub
+		Map<String, String> userStatusMap = new HashMap<String, String>();
+		//Here to implement the method
+		return userStatusMap;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 */
 	public Map getGroupRolesForUser(String userId)
 	{

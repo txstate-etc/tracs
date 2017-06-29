@@ -57,6 +57,9 @@ public class CourseManagementGroupProvider implements GroupProvider {
 	/** The role resolvers to use when looking for CM roles in the hierarchy*/
 	List<RoleResolver> roleResolvers;
 	
+	/** The status resolvers to use when looking for CM status in the hierarchy*/
+	List<SectionStatusResolver> statusResolvers;
+
 	/** The ordered list of role preferences.  Roles earlier in the list are preferred to those later in the list. */
 	List<String> rolePreferences;
 	
@@ -125,6 +128,57 @@ public class CourseManagementGroupProvider implements GroupProvider {
 		}
 		if(log.isDebugEnabled()) log.debug("_____________getUserRolesForGroup=" + userRoleMap);
 		return userRoleMap;
+	}
+
+	/**
+	 * Provides a Map of user ids to enrollment status for a given group (course) which can be
+	 * used for the AuthzGroup user status map.  Since a
+	 * user maybe enrolled in several sections that mapped to this authz group, a user
+	 * status to this group will be true if he/she has true status in any of the mapped sections.
+	 */
+	public Map getUserStatusForGroup(String id) {
+		if(log.isDebugEnabled()) log.debug("------------------CMGP.getUserStatusForGroup(" + id + ")");
+		Map<String, String> userStatusMap = new HashMap<String, String>();
+
+		String[] sectionEids = unpackId(id);
+		if(log.isDebugEnabled()) log.debug(id + " is mapped to " + sectionEids.length + " sections");
+
+		for(Iterator<SectionStatusResolver> ssrIter = statusResolvers.iterator(); ssrIter.hasNext();) {
+			SectionStatusResolver ssr = ssrIter.next();
+
+			for(int i=0; i < sectionEids.length; i++) {
+				String sectionEid = sectionEids[i];
+				Section section = cmService.getSection(sectionEid);
+				if(log.isDebugEnabled()) log.debug("Looking for status in section " + sectionEid);
+
+				Map<String, String> ssrUserStatusMap = ssr.getUserStatusFromEnrollment(cmService, section);
+				// Only add the roles if the user isn't already in the map.  Earlier resolvers take precedence.
+				for(Iterator<String> ssrStatusIter = ssrUserStatusMap.keySet().iterator(); ssrStatusIter.hasNext();) {
+					String userEid = ssrStatusIter.next();
+					String existingStatus = userStatusMap.get(userEid);
+					String ssrStatus = ssrUserStatusMap.get(userEid);
+
+					// The Status Resolver has found no status for this user
+					if(ssrStatus == null) {
+						continue;
+					}
+
+					// Add or replace the status in the map if previous status is null or false
+					if(existingStatus == null) {
+						if(log.isDebugEnabled()) log.debug("Adding "+ userEid + " to userStatusMap with status = " + ssrStatus);
+						userStatusMap.put(userEid, ssrStatus);
+					}
+					else if(existingStatus.equals("true")) continue;
+					else if(existingStatus.equals("false"))
+					{
+						if(log.isDebugEnabled()) log.debug("Changing "+ userEid + "'s status in userStatusMap from " + existingStatus + " to " + ssrStatus + " for section " + sectionEid);
+						userStatusMap.put(userEid, ssrStatus);
+					}
+				}
+			}
+		}
+		if(log.isDebugEnabled()) log.debug("_____________getUserStatusForGroup=" + userStatusMap);
+		return userStatusMap;
 	}
 
 	/**
@@ -237,6 +291,10 @@ public class CourseManagementGroupProvider implements GroupProvider {
 		this.roleResolvers = roleResolvers;
 	}
 	
+	public void setStatusResolvers(List<SectionStatusResolver> statusResolvers) {
+		this.statusResolvers = statusResolvers;
+	}
+
 	public String preferredRole(String one, String other) {
 		int oneIndex = rolePreferences.indexOf(one);
 		int otherIndex = rolePreferences.indexOf(other);

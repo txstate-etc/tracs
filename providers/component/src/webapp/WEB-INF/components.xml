@@ -105,6 +105,13 @@
 						</bean>
 					</list>
 				</property>
+        <property name="statusResolvers">
+          <list>
+            <bean class="org.sakaiproject.coursemanagement.impl.provider.SectionStatusResolver" init-method="init">
+              <property name="configuration" ref="org.sakaiproject.coursemanagement.GroupProviderConfiguration"/>
+            </bean>
+          </list>
+        </property>
 			</bean>
 		</property>
 	</bean>
@@ -157,7 +164,7 @@
 -->
 
 <!-- Uncomment and configure to use the JLDAPDirectoryProvider -->
-	<import resource="jldap-beans.xml" />
+<	<import resource="jldap-beans.xml" />
 
 <!--	Uncomment and configure to use the Kerberos Provider.
 

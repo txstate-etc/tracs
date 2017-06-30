@@ -14,30 +14,14 @@ $tool-tab-background-hover: #f0f0f0 !default;
 
 $site-hierarchy-separator-color: $swapped-view-text-color !default;
 
-// $sites-nav-submenu-item-hover: $sites-nav-submenu-item-background !default;
-// $sites-nav-submenu-item-border-top: none !default;
-// $sites-nav-submenu-item-border-bottom: none !default;
-
-// $tool-tab-color: #666 !default;
-
 $tool-title-nav-link-background: $tool-tab-background-color !default;
 $tool-title-nav-link-color: $primary-color !default;
 $tool-title-nav-link-border: $tool-border-color !default;
 $tool-title-nav-link-background-hover: $tool-background-color !default;
 $tool-title-nav-link-color-hover: $primary-color !default;
 
-// $user-menu-background: $tool-tab-background-color !default;
-// $user-menu-color: $primary-color !default;
-// $user-menu-background-hover: $tool-tab-background-color !default;
-// $user-menu-color-hover: lighten( $primary-color, 10% ) !default;
-// $user-menu-userdata-separator: $tool-border-color !default;
-
-// $small-action-button-color: $tool-tab-background-color !default;
-
-// //mobile
-// $mobile-background: linear-gradient( to bottom, #b6c3d4, #d9cdcd, #c4ccd7, #a6c2df ) fixed !default;
+//mobile
 $mobile-tools-and-sites-bar-background: lighten($tool-menu-color, 15% ) !default;
-// $mobile-tools-and-sites-bar-color: $background-color !default;
 $mobile-breadcrumbs-bar-background: $primary-color !default;
 $mobile-breadcrumbs-bar-color: $background-color !default;
 
@@ -52,6 +36,11 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
       height: 40px;
     }
   }
+}
+
+// This is the separator between the Sites and Sakai menus in the top right corner
+.is-maximized #loginLinks {
+  border-color: $top-header-text-color;
 }
 
 //Change default color of Tools and Sites bar on mobile
@@ -117,6 +106,10 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
       color: $mobile-breadcrumbs-bar-color;
     }
   }
+}
+
+.Mrphs-skipNav__menu .Mrphs-skipNav__menuitem .Mrphs-skipNav__link {
+  color: $mobile-breadcrumbs-bar-color
 }
 
 .tracs-sites #linkNav ul.Mrphs-sitesNav__menu {

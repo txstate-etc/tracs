@@ -39,6 +39,7 @@ import org.w3c.dom.Element;
 
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
+import org.owasp.validator.html.InternalPolicy;
 import org.owasp.validator.html.Policy;
 import org.owasp.validator.html.PolicyException;
 import org.owasp.validator.html.ScanException;
@@ -83,6 +84,9 @@ public class FormattedTextImpl implements FormattedText
      * This is the low level html cleaner object
      */
     private AntiSamy antiSamyLow = null;
+
+    private Policy policyHigh;
+    private Policy policyLow;
 
     /* KNL-1075 - content.cleaner.errors.handling = none|logged|return|notify|display
      * - none - errors are completely ignored and not even stored at all
@@ -136,6 +140,9 @@ public class FormattedTextImpl implements FormattedText
                     M_log.warn("FormattedText error handling option invalid: "+errorsHandling+", defaulting to 'none'");
                 }
             }
+
+            returnErrorToTool = serverConfigurationService.getBoolean("content.cleaner.errors.return", returnErrorToTool);
+
             // allow one extra option to control logging if desired
             logErrors = serverConfigurationService.getBoolean("content.cleaner.errors.logged", logErrors);
             M_log.info("FormattedText error handling: "+errorsHandling+
@@ -176,9 +183,9 @@ public class FormattedTextImpl implements FormattedText
                 highPolicyURL = highFile.toURI().toURL();
                 M_log.info("AntiSamy found override for high policy file at: "+highPolicyURL);
             }
-            Policy policyHigh = Policy.getInstance(highPolicyURL);
+            policyHigh = Policy.getInstance(highPolicyURL);
             antiSamyHigh = new AntiSamy(policyHigh);
-            Policy policyLow = Policy.getInstance(lowPolicyURL);
+            policyLow = Policy.getInstance(lowPolicyURL);
             antiSamyLow = new AntiSamy(policyLow);
             // TODO should we attempt to fallback to internal files if the parsing/init fails of external ones?
             M_log.info("AntiSamy INIT default security level ("+(defaultLowSecurity()?"LOW":"high")+"), policy files: high="+highPolicyURL+", low="+lowPolicyURL);
@@ -382,9 +389,16 @@ public class FormattedTextImpl implements FormattedText
             if (checkForEvilTags) {
                 // use the owasp antisamy processor
                 AntiSamy as = antiSamyHigh;
+                Policy asPolicy = policyHigh;
                 if (Level.LOW.equals(level)) {
                     as = antiSamyLow;
+                    asPolicy = policyLow;
                 }
+                if (((InternalPolicy)asPolicy).getMaxInputSize() < strFromBrowser.length()) {
+                    M_log.warn("processFormattedText: Scan failed because input is larger than maxInputSize: {maxInputSize=" + ((InternalPolicy)asPolicy).getMaxInputSize() + ", inputSize=" + strFromBrowser.length() + "}");
+                    formattedTextErrors.append("Input text is too large.<br/>");
+                    val = "";
+                } else {
                 try {
                     CleanResults cr = as.scan(val);
                     if (cr.getNumberOfErrors() > 0) {
@@ -411,6 +425,7 @@ public class FormattedTextImpl implements FormattedText
                     // this is an unrecoverable failure
                     throw new RuntimeException("Unable to access the antiSamy policy file: "+e, e);
                 }
+            }
             }
 
             // deal with hardcoded empty space character from Firefox 1.5

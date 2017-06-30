@@ -1,5 +1,6 @@
 package org.sakaiproject.content.impl;
 
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.content.api.FileSystemHandler;
 
 import java.io.File;
@@ -8,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.springframework.util.FileCopyUtils;
 
@@ -18,6 +21,7 @@ import org.springframework.util.FileCopyUtils;
  */
 public class DefaultFileSystemHandler implements FileSystemHandler {
     private boolean useIdForFilePath = false;
+    private ServerConfigurationService serverConfigurationService;
 
     /**
      * Default constructor.
@@ -67,7 +71,9 @@ public class DefaultFileSystemHandler implements FileSystemHandler {
 
         // delete the old
         if (file.exists()) {
-            file.delete();
+          SimpleDateFormat dateFormatter = new SimpleDateFormat(".yyyy-MM-dd-HH-mm-ss");
+          String fileSuffix = dateFormatter.format(new Date());
+          file.renameTo(new File(file.getPath() + fileSuffix));
         }
 
         // add the new
@@ -88,6 +94,17 @@ public class DefaultFileSystemHandler implements FileSystemHandler {
         // delete
         if (file.exists()) {
             return file.delete();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteDeleted(String id, String root, String filePath){
+        File file = getFile(id, root, filePath);
+        if (file.exists()) {
+                SimpleDateFormat dateFormatter = new SimpleDateFormat(".yyyy-MM-dd-HH-mm-ss");
+                String fileSuffix = dateFormatter.format(new Date());
+                return file.renameTo(new File(file.getPath() + fileSuffix));
         }
         return false;
     }

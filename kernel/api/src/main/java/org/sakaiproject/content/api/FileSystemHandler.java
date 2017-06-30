@@ -52,4 +52,14 @@ public interface FileSystemHandler {
      * @return If the path was deleted.
      */
     public boolean delete(String id, String root, String filePath);
+    
+    /**
+     * Delete the deleted file from the path.
+     * 
+     * @param id The id of the resource. Will not be null or empty.
+     * @param root The root of the storage. Could be null or empty.
+     * @param filePath The path to delete. Will not be null or empty.
+     * @return If the path was deleted.
+     */
+    public boolean deleteDeleted(String id, String root, String filePath);
 }

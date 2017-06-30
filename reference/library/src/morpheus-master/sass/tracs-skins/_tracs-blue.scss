@@ -3,20 +3,15 @@
 @import "tracs-skins/tracs-all";
 
 /* Color palette */
-$aluminum:      #eae9e8;
-$charcoal:      #363534;
 $blue:          #005481;
 $silver:        #f0f0f0;
 $warm-silver:   #a9afa1;
 $azulito:       #d6f1ff;
-$white:         #ffffff;
-$black:         #000000;
 $arsenic:       #3A4448;
 $medium-blue:   #326B97;
 $bubbles:       #e7f7ff;
 $sea-blue:      #005c8E;
 $snow:          #fafafa;
-$granite:       #646464;
 $barely-gray:   #f0f0f0;
 
 /* Top Header */
@@ -41,6 +36,7 @@ $tool-menu-current-color: $blue;
 $tool-menu-current-border-color: $blue;
 $tool-menu-hover-color: $blue;
 $tool-menu-hover-background-color: $light-gray;
+$tool-tab-background-color: $silver;
 
 /* Information section */
 $info-color:                $sea-blue;

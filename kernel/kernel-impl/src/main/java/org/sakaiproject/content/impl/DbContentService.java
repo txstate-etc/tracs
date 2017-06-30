@@ -1935,7 +1935,7 @@ public class DbContentService extends BaseContentService
                    // if we have been configured to use an external file system
                    if (m_bodyPath != null)
                    {
-                       delResourceBodyFilesystem(m_bodyPathDeleted, edit);
+                       delDeletedResourceBodyFilesystem(m_bodyPathDeleted, edit);
                    }
 
                    // otherwise use the database
@@ -2563,6 +2563,18 @@ public class DbContentService extends BaseContentService
         {
             fileSystemHandler.delete(((BaseResourceEdit) resource).m_id, rootFolder, ((BaseResourceEdit) resource).m_filePath);
         }
+
+        /**
+         * Delete the resource body from the external file system. The file name is the m_bodyPath with the resource id appended.
+         * 
+         * @param resource
+         *        The resource whose body is being written.
+         */
+        protected void delDeletedResourceBodyFilesystem(String rootFolder, ContentResourceEdit resource)
+        {
+            fileSystemHandler.deleteDeleted(((BaseResourceEdit) resource).m_id, rootFolder, ((BaseResourceEdit) resource).m_filePath);
+        }
+
 
         public int getMemberCount(String collectionId)
         {

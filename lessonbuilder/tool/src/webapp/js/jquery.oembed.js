@@ -366,7 +366,7 @@
               * If parent div width greater thans embed iframe use the max widht
               * - works on youtubes and vimeo
               */
-              if(settings.maxWidth){
+              /*if(settings.maxWidth){
                   var post_width =  oembedContainer.parent().width();
                   if(post_width < settings.maxWidth)
                   {
@@ -383,7 +383,7 @@
                           $('iframe',oembedContainer).height(settings.maxHeight);
                       }
                   }
-              }
+              } */
               break;
         }
     };

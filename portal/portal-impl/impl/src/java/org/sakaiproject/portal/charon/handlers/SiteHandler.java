@@ -694,6 +694,17 @@ public class SiteHandler extends WorksiteHandler
 
 			String skin = getSiteSkin(siteId);
 			String skinRepo = ServerConfigurationService.getString("skin.repo");
+
+			// Anne added this to put quick links in the top header for larger screens.
+			// We are using the built-in quick links feature for smaller screens.
+			String[] tracsHeaderHrefs = ServerConfigurationService.getStrings("portal.quicklink.url");
+			String[] tracsHeaderLinkTexts = ServerConfigurationService.getStrings("portal.quicklink.name");
+			String[] tracsHeaderLinks = new String[tracsHeaderHrefs.length];
+			for(int i=0; i<tracsHeaderHrefs.length; i++){
+				tracsHeaderLinks[i] = "<a class='qlink' target='_blank' href='" + tracsHeaderHrefs[i] + "'>" + tracsHeaderLinkTexts[i] + "</a>";
+			}
+			rcontext.put("tracsHeaderLinks", tracsHeaderLinks);
+
 			rcontext.put("logoSkin", skin);
 			rcontext.put("logoSkinRepo", skinRepo);
 			String siteType = portal.calcSiteType(siteId);

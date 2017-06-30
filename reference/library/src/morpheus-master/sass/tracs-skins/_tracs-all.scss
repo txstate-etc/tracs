@@ -1,0 +1,32 @@
+// These values are the same across all TRACS skins
+
+$white:         #ffffff;
+$black:         #000000;
+$light-gray:    #d7d5d5;
+$charcoal:      #363534;
+$granite:       #646464;
+$aluminum:      #eae9e8;
+$lapis-lazuli:  #217496;
+
+// links
+$link-color: $lapis-lazuli;
+$link-active-color: $lapis-lazuli;
+$link-hover-color: $lapis-lazuli;
+
+// logo
+$logo: 'images/TRACS_logo.svg';
+$logo-height: 55px ;
+$logo-width: 180px ;
+
+// avatar
+$avatar-border-color: $granite;
+
+// tool menu
+$tool-menu-width: 10em;
+
+// sites nav menu
+$sites-nav-submenu-background:              $light-gray;
+$sites-nav-submenu-item-background:         $light-gray;
+$sites-nav-submenu-item-background-hover:   $light-gray;
+$sites-nav-submenu-item-color:              $charcoal;
+$sites-nav-submenu-item-color-hover:        $charcoal;

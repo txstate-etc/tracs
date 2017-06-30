@@ -1,0 +1,94 @@
+/* TRACS blue skin Customization*/
+
+@import "tracs-skins/tracs-all";
+
+/* Color palette */
+$aluminum:      #eae9e8;
+$charcoal:      #363534;
+$blue:          #005481;
+$silver:        #f0f0f0;
+$warm-silver:   #a9afa1;
+$azulito:       #d6f1ff;
+$white:         #ffffff;
+$black:         #000000;
+$arsenic:       #3A4448;
+$medium-blue:   #326B97;
+$bubbles:       #e7f7ff;
+$sea-blue:      #005c8E;
+$snow:          #fafafa;
+$granite:       #646464;
+$barely-gray:   #f0f0f0;
+
+/* Top Header */
+$top-header-background: none;
+$top-header-text-color: $arsenic;
+
+//? what are these for ?
+$selected-tool-border: 1px solid $blue;
+$selected-tool-background: $white;
+
+/* This is the gradient in the header of the page, but we don't want a gradient. */
+$header-gradient-a: $blue;
+$header-gradient-b: $blue;
+$header-gradient-c: $blue;
+$header-gradient-d: $blue;
+
+/* Tool Menu */
+$tool-menu-background-color: $silver;
+$tool-menu-color: $charcoal;
+$tool-menu-current-background-color: $white;
+$tool-menu-current-color: $blue;
+$tool-menu-current-border-color: $blue;
+$tool-menu-hover-color: $blue;
+$tool-menu-hover-background-color: $light-gray;
+
+/* Information section */
+$info-color:                $sea-blue;
+$info-background-color:     $bubbles;
+
+/* Intratool Nav */
+$tool-tab-background: $aluminum;
+$tool-tab-border: $warm-silver;
+$tool-tab-background-hover: $snow;
+
+/* General button colors */
+$button-color-text-color: $white;
+$button-color-border-color: $white;
+$button-color-background-color: $blue;
+$button-color-background-secondary-color: mix($blue, $black, 70);
+
+$tool-title-nav-link-background: none;
+$tool-title-nav-link-color: $charcoal;
+$tool-title-nav-link-border: $blue;
+$tool-title-nav-link-background-hover: $azulito;
+$tool-title-nav-link-color-hover: $charcoal;
+
+$site-hierarchy-separator-color: $arsenic;
+
+$sites-nav-menu-item-background:            $silver;
+$sites-nav-menu-item-color:                 $charcoal;
+$sites-nav-menu-item-color-hover:           $charcoal;
+$sites-nav-menu-item-border-top:            1px solid $medium-blue; 
+$sites-nav-menu-item-border-right:          1px solid $medium-blue;
+$sites-nav-menu-item-border-bottom:         1px solid $medium-blue;
+$sites-nav-menu-item-border-left:           1px solid $medium-blue;
+$sites-nav-menu-item-selected-background:   $azulito;
+$sites-nav-menu-item-selected-color:        $charcoal;
+$sites-nav-menu-item-selected-color-hover:  $charcoal;
+$sites-nav-menu-item-selected-border-top:   1px solid $medium-blue; 
+$sites-nav-menu-item-selected-border-right: 1px solid $medium-blue;
+$sites-nav-menu-item-selected-border-bottom:1px solid $medium-blue;
+$sites-nav-menu-item-selected-border-left:  1px solid $medium-blue;
+
+$topNav-text-color: $arsenic;
+
+/* Tool customizations */
+$calendar-event-background-color: darken($barely-gray, 40%);
+$calendar-event-text-color: $charcoal;
+
+/* mobile */
+$mobile-tools-and-sites-bar-background: $blue;
+$mobile-breadcrumbs-bar-background: $silver;
+$mobile-breadcrumbs-bar-color: $blue;
+
+

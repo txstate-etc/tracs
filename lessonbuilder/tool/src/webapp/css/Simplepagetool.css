@@ -54,6 +54,14 @@
   max-width:100%;
 }
 
+div.forum a {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+div.topic {
+    margin-left: 10px !important;
+}
+
 .gradingPane {
   padding-top: 20px;
   padding-left: 10px;

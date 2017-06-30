@@ -36,35 +36,40 @@ We use feature branch to manage our local features development and also with con
  * Push feature branch ***kernel*** to origin
 
 	  `git push origin kernel`
+    
+2. Tag the feature branch
 
-2. Merge feature branch with ***tracs***
+   We need to clean up our branches list when when the feature merged back for ***tracs*** or abandon for some reason. Meanwhile, we also want to mark it somehow when time allows to work on contributing each local feature back to sakai by making pull requests.
 
  * Go to ***tracs*** branch
 
+      `git checkout tracs`
+      
+ * Tag the feature branch ***kernel***
+   We use ***archive/$feature-branch*** as naming convention for taging feature branch, mainly for contributing purpose.
+
+    `git tag archive/kernel kernel`
+
+ * Push the new archive tag to remote origin
+
+    `git push origin archive/kernel`
+
+3. Merge feature branch with ***tracs***
+
+ * Go to ***tracs*** branch
+   Right now, you are still at tracs branch after step 2. or else do
+   
     `git checkout tracs`
 
  * Merge feature branch ***kernel*** to ***tracs*** branch
 
     `git merge kernel`
 
-3. Tag and delete feature branch
-
-   We need to clean up our branches list when when the feature merged back for ***tracs*** or abandon for some reason. Meanwhile, we also want to mark it somehow when time allows to work on contributing each local feature back to sakai by making pull requests.
-
-   Right now, you are still at ***tracs*** branch after the merge is done in step 2.
-
- * Tag the feature branch ***kernel***
-   We use ***archive/$feature-branch*** as naming convention for taging feature branch, mainly for contributing purpose.
-
-    `git tag archive/kernel kernel`
+4. Delete feature branch
 
  * Close/Remove feature branch ***kernel***
 
     `git branch -d kernel`
-
- * Push the new archive tag to remote origin
-
-    `git push origin archive/kernel`
 
  * Delete the feature branch ***kernel*** in remote origin
 

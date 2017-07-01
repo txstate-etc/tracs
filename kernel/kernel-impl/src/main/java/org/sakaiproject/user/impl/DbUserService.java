@@ -488,6 +488,7 @@ public abstract class DbUserService extends BaseUserDirectoryService
 			fields[1] = eid;
 
 			if ( m_sql.dbWrite(statement, fields) ) {
+				id = tracsUserIdTreatment(id, eid);
 				cache.put(IDCACHE+eid,id);
 				cache.put(EIDCACHE+id,eid);
 				return true;
@@ -532,6 +533,7 @@ public abstract class DbUserService extends BaseUserDirectoryService
 			fields[1] = id;
 
 			if ( m_sql.dbWrite(statement, fields) ) {
+				id = tracsUserIdTreatment(id, eid);
 				cache.put(IDCACHE+eid,id);
 				cache.put(EIDCACHE+id,eid);
 				return true;
@@ -592,6 +594,7 @@ public abstract class DbUserService extends BaseUserDirectoryService
 			if (rv.size() > 0)
 			{
 				String eid = (String) rv.get(0);
+				id = tracsUserIdTreatment(id, eid);
 				cache.put(IDCACHE+eid,id);
 				cache.put(EIDCACHE+id,eid);
 				return eid;
@@ -612,6 +615,7 @@ public abstract class DbUserService extends BaseUserDirectoryService
 		public String checkMapForId(String eid)
 		{
 			String id = getCachedIdByEid(eid);
+			id = tracsUserIdTreatment(id, eid);
 			if (id != null)
 			{
 				return id;
@@ -625,6 +629,10 @@ public abstract class DbUserService extends BaseUserDirectoryService
 			if (rv.size() > 0)
 			{
 				id = (String) rv.get(0);
+				//shouldn't get different case between user_id and eid from here
+				//since in SAKAI_USER_ID_MAP, they are always with same case for
+				//user_id=eid; but we'll add treatment here to be safe
+				id = tracsUserIdTreatment(id, eid);
 				cache.put(EIDCACHE+id,eid);
 				cache.put(IDCACHE+eid,id);
 				return id;
@@ -767,11 +775,37 @@ public abstract class DbUserService extends BaseUserDirectoryService
 			// Update ID-EID mapping cache.
 			String id = user.getId();
 			String eid = user.getEid();
+			id = tracsUserIdTreatment(id, eid);
 			cache.put(EIDCACHE+id, eid);
 			cache.put(IDCACHE+eid, id);
 
 			// Update user record cache.
 			putCachedUser(userReference(id), user);
+		}
+
+		/**
+		 * In our SAKAI_USER_ID_MAP, old users, we always have user_id=eid
+		 * with same letter case. Either both upper case(9 users as of 9/1/2011),
+		 * or like most(13421 users as of 9/1/2011), have both as lower case
+		 *
+		 * We tried to avoid cache those user_id(which came from existed user_id in old sites)
+		 * whose letter case is different
+		 * with the actually user_id saved in SAKAI_USER_ID_MAP; and  in the table,
+		 * user_id=eid
+		 * Therefore, we can stop user_id case inconsistency between SAKAI_USER_ID_MAP
+		 * and realms or other tables. for bugid:4621
+		 * We always see eid is case consistent in the system.
+		 * id should be same case as eid
+		 * @param id
+		 * @param eid
+		 * @return id
+		 */
+		public String tracsUserIdTreatment(String id,String eid){
+			if(eid.equalsIgnoreCase(id) && !eid.equals(id)){
+				//set id same case as eid
+				id = eid;
+			}
+			return id;
 		}
 
 		/**
@@ -839,7 +873,10 @@ public abstract class DbUserService extends BaseUserDirectoryService
 				try
 				{
 					String idFromMap = result.getString(1);
-					String eidFromMap = cleanEid(result.getString(2));
+					//get the eid from the user id map table and enforce it to lower case;
+					//this will prevent uppper case eid inconsistent problem bugid:3853, bugid:3883 -Qu 10/8/10
+					String eidFromMap = result.getString(2).toLowerCase();
+					//String eidFromMap = cleanEid(result.getString(2));
 
 					// If it's a provided user, then all these will be null.
 					String idFromSakaiUser = result.getString(3);

@@ -3657,6 +3657,11 @@ SiteContentAdvisorProvider, SiteContentAdvisorTypeRegistry, EntityTransferrerRef
 			id = id.substring(0, id.length() - 1);
 		}
 
+		if (id.length() > MAXIMUM_RESOURCE_ID_LENGTH)
+		{
+			throw new IdInvalidException(id);
+		}
+
 		// check security
 		checkExplicitLock(id);
 		unlock(AUTH_RESOURCE_ADD, id);

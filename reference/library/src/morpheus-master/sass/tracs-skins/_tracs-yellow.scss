@@ -90,7 +90,7 @@ $calendar-event-background-color: darken($corn, 40%);
 $calendar-event-text-color: $charcoal;
 
 $samigo-info-background:                    $soft-color;
-$samigo-info-border-color:                  $soft-accent;
+$samigo-info-border-color:                  darken($soft-color, 10%);
 $samigo-info-color:                         $black;
 
 $lessons-checklist-background:              $soft-color;

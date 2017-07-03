@@ -42,7 +42,7 @@ $tool-tab-background-color: $sandstone;
 
 /* Information section */
 $info-color:                $river;
-$info-background-color:     mix($river, $white, 30);
+$info-background-color:     mix($river, $white, 10);
 
 $soft-color:                $rain;
 $soft-accent:               $gold;
@@ -92,7 +92,7 @@ $calendar-event-background-color: darken($sandstone, 40%);
 $calendar-event-text-color: $charcoal;
 
 $samigo-info-background:                    $soft-color;
-$samigo-info-border-color:                  $soft-accent;
+$samigo-info-border-color:                  darken($soft-color, 10%);
 $samigo-info-color:                         $black;
 
 $lessons-checklist-background:              $soft-color;

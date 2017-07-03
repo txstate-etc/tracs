@@ -207,11 +207,26 @@ $(document).ready(function() {
 //	}else {
 		//$(".evolved-box").hide();
 	//}
+	// Mediaflo and techsmith relay oembed providers
+	var last = $.fn.oembed.providers.pop();
+	$.fn.oembed.providers.push( new $.fn.oembed.OEmbedProvider("techsmithrelay", "video", ["camrelay-stream\\.its\\.txstate\\.edu\\/users\\/.*"], "https://secure.its.txstate.edu/mediaflo_oembed/mediaflo_oembed", {dataType: 'json'}) );
+	$.fn.oembed.providers.push( new $.fn.oembed.OEmbedProvider("mediaflo", "video", ["mediaflo(\\.qual)?\\.txstate\\.edu\\/Watch\\/.*"], "https://secure.its.txstate.edu/mediaflo_oembed/mediaflo_oembed", {dataType: 'json'}) );
+	$.fn.oembed.providers.push(last);
+
+	/* This code resized the tool iframe after all oembeds were processed, but there is no tool iFrame in Sakaii 11 */
+	// var oembedsRemaining = $("a.oembed").length;
+	// var onOembedFinished = function() { if (--oembedsRemaining === 0) resizeFrame(); };
 
         $("a.oembed").each(function(){
                 var width = $(this).attr("maxWidth");
                 var height = $(this).attr("maxHeight");
                 $(this).oembed(null, {maxWidth: width, maxHeight: height});
+         //        $(this).oembed(null, {
+									// maxWidth: width,
+									// maxHeight: height,
+									// afterEmbed: onOembedFinished,
+									// onError: function() { return onOembedFinished; }
+         //        });
             });
 
 	// We don't need to run all of this javascript if the user isn't an admin

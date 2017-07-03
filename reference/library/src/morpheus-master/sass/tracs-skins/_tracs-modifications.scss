@@ -25,6 +25,12 @@ $mobile-tools-and-sites-bar-background: lighten($tool-menu-color, 15% ) !default
 $mobile-breadcrumbs-bar-background: $primary-color !default;
 $mobile-breadcrumbs-bar-color: $background-color !default;
 
+$soft-color: #d9eef7 !default;
+$soft-accent: #85c8e4 !default;
+
+//tools
+$lessons-checklist-background: $soft-color;
+
 .Mrphs-topHeader {
   a{
     color: $top-header-text-color;
@@ -84,7 +90,12 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
 .instruction{
    background: $info-background-color !important;
    border-color: $info-color !important;
-   color: #000 !important;
+   color: $black !important;
+}
+
+.bs-callout-primary, .bs-callout-info, .messageInformation, .messageInstruction, .messageProgress {
+  color: $black;
+  background: $soft-color;
 }
 
 //Change default color of Breadcrumbs bar on mobile
@@ -117,6 +128,7 @@ $mobile-breadcrumbs-bar-color: $background-color !default;
     margin: 0 0.75em 0.75em 0;
     padding: .2em;
     position: relative;
+    font-weight: 500;
   }
   .Mrphs-sitesNav__submenuitem {
     a {
@@ -174,6 +186,25 @@ body.Mrphs-portalBody{
       text-decoration: underline;
       color: $top-header-text-color;
     }
+  }
+}
+
+// samigo
+.Mrphs-sakai-samigo{
+  #samigo-create-new-box, #samigo-create-import-box {
+    background-color: $samigo-info-background;
+    border-left-color: $samigo-info-border-color;
+    color: $samigo-info-color;
+    h4 {
+      color: $samigo-info-color;
+    }
+  }
+}
+
+// lessons
+.Mrphs-sakai-lessonbuildertool {
+  .checklistDiv {
+    background-color: $lessons-checklist-background;
   }
 }
 

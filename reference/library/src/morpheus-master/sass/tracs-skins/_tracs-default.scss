@@ -13,6 +13,9 @@ $sapphire:      #15597e;  //what is this used for?
 $medium-blue:   #326B97;  //not sure about this one either
 $khaki:         #bdab91;
 $snow:          #fafafa;
+$sandstone-orig: #e8e3db;
+$rain:          #e8efed;
+$gold:          #8d734a;
 
 /* Top Header */
 $top-header-background: none;
@@ -40,6 +43,9 @@ $tool-tab-background-color: $sandstone;
 /* Information section */
 $info-color:                $river;
 $info-background-color:     mix($river, $white, 30);
+
+$soft-color:                $rain;
+$soft-accent:               $gold;
 
 /* Intratool Nav */
 $tool-tab-background: $aluminum;
@@ -75,11 +81,21 @@ $sites-nav-menu-item-selected-border-right: 1px solid $platinum;
 $sites-nav-menu-item-selected-border-bottom:1px solid $platinum;
 $sites-nav-menu-item-selected-border-left:  1px solid $platinum;
 
+$sites-nav-submenu-selected-background:     $sandstone-orig;
+$sites-nav-submenu-item-selected-background:$sandstone-orig;
+$sites-nav-submenu-item-selected-color:     $charcoal;
+
 $topNav-text-color: $maroon;
 
 /* Tool customizations */
 $calendar-event-background-color: darken($sandstone, 40%);
 $calendar-event-text-color: $charcoal;
+
+$samigo-info-background:                    $soft-color;
+$samigo-info-border-color:                  $soft-accent;
+$samigo-info-color:                         $black;
+
+$lessons-checklist-background:              $soft-color;
 
 /* mobile */
 $mobile-tools-and-sites-bar-background: $maroon;

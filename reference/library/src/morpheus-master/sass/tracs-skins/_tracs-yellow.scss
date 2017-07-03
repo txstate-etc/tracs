@@ -15,6 +15,7 @@ $off-white:     #EAE9E8;
 $warm-silver:   #a9afa1;
 $snow:          #fafafa;
 $gold:          #8D734A;
+$sunlight:      #fef8e5;
 
 /* Top Header */
 $top-header-background: $yellow;
@@ -39,6 +40,9 @@ $tool-tab-background-color: $yellow;
 /* Information section */
 $info-color:                $dark-teal;
 $info-background-color:     $platinum;
+
+$soft-color:                $sunlight;
+$soft-accent:               $arsenic;
 
 /* Intratool Nav */
 $tool-tab-background: $off-white;
@@ -74,11 +78,22 @@ $sites-nav-menu-item-selected-border-right: 1px solid darken($dark-teal, 20%);
 $sites-nav-menu-item-selected-border-bottom:1px solid darken($dark-teal, 20%);
 $sites-nav-menu-item-selected-border-left:  1px solid darken($dark-teal, 20%);
 
+$sites-nav-submenu-item-color:              $arsenic;
+$sites-nav-submenu-selected-background:     $platinum;
+$sites-nav-submenu-item-selected-background:$platinum;
+$sites-nav-submenu-item-selected-color:     $arsenic;
+
 $topNav-text-color: $arsenic;
 
 /* Tool customizations */
 $calendar-event-background-color: darken($corn, 40%);
 $calendar-event-text-color: $charcoal;
+
+$samigo-info-background:                    $soft-color;
+$samigo-info-border-color:                  $soft-accent;
+$samigo-info-color:                         $black;
+
+$lessons-checklist-background:              $soft-color;
 
 /* mobile */
 $mobile-tools-and-sites-bar-background: $white;

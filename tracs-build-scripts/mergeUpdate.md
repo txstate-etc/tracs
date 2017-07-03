@@ -37,7 +37,7 @@
 | jobscheduler                 |                  |
 | jsf                          |                  |
 | kernel                       |                  |
-| lessonbuilder                |                  |
+| lessonbuilder                | DONE             |
 | login                        | DONE             |
 | lticontact                   | DONE             |
 | mailarchive                  |                  |

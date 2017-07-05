@@ -346,6 +346,13 @@ public class SwiftFileSystemHandler implements FileSystemHandler {
             return true;
         }
     }
+    @Override
+    public boolean deleteDeleted(String id, String root, String filePath) {
+     // This api is added for TRACS file deletion preference
+     // Put a stub here
+        return false;
+    }
+
     
     /**
      * Checks the space used for the account against the space available.

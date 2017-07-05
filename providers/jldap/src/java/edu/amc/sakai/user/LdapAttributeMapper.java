@@ -71,6 +71,15 @@ public interface LdapAttributeMapper {
 	public String getFindUserByAidFilter(String aid);
 	
 	/**
+	 * Output a filter string for searching the directory with
+	 * the specified user plid as a key.
+	 *
+	 * @param plid a user plid to search on
+	 * @return an LDAP search filter
+	 */
+	public String getFindUserByPlidFilter(String plid);
+
+	/**
 	 * Maps attribites from the specified <code>LDAPEntry</code> onto
 	 * a {@link LdapUserData}.
 	 * 

@@ -55,6 +55,7 @@ public class EntityUser implements User {
     private String id;
     @EntityFieldRequired
     private String eid;
+    private String plid;
     private String password;
     private String email;
     private String firstName;
@@ -323,5 +324,13 @@ public class EntityUser implements User {
             return user.compareTo(o);
         }
         throw new UnsupportedOperationException();
+    }
+
+    public void setPlid(String plid){
+        this.plid= plid;
+    }
+
+    public String getPlid(){
+        return plid;
     }
 }

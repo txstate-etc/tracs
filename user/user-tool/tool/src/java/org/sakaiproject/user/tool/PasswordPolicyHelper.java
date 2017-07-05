@@ -152,5 +152,6 @@ public class PasswordPolicyHelper {
         @Override public Time 				getCreatedTime() 							{ return null; }
         @Override public Time 				getModifiedTime() 							{ return null; }
         @Override public int 				compareTo(Object o) 						{ return 0; }
+        @Override public String             getPlid()                                   { return null; }
     }
 }

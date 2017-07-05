@@ -42,6 +42,9 @@ import com.novell.ldap.LDAPSearchConstraints;
 import com.novell.ldap.LDAPSearchResults;
 import com.novell.ldap.LDAPSocketFactory;
 
+import org.sakaiproject.memory.api.Cache;
+import org.sakaiproject.memory.api.MemoryService;
+
 /**
  * <p>
  * An implementation of a Sakai UserDirectoryProvider that authenticates/retrieves 
@@ -179,6 +182,18 @@ public class JLDAPDirectoryProvider implements UserDirectoryProvider, LdapConnec
 	 */
 	private Map<String,String> attributeMappings;
 
+    private MemoryService memoryService;
+
+
+	/**
+	 * Cache of {@link LdapUserData} objects, keyed by plid.
+	 * {@link cacheTtl} controls TTL.
+	 *
+	 * TODO: This is a naive implementation: cache
+	 * is completely isolated on each app node.
+	 */
+	private Cache userPlidCache;
+
 	/** Handles LDAPConnection allocation */
 	private LdapConnectionManager ldapConnectionManager;
 
@@ -200,6 +215,7 @@ public class JLDAPDirectoryProvider implements UserDirectoryProvider, LdapConnec
 		// yields multiple records
 		public Object mapLdapEntry(LDAPEntry searchResult, int resultNum) {
 			LdapUserData cacheRecord = mapLdapEntryOntoUserData(searchResult);
+			cacheUserDataByPlid(cacheRecord);
 			return cacheRecord;
 		}
 
@@ -236,6 +252,7 @@ public class JLDAPDirectoryProvider implements UserDirectoryProvider, LdapConnec
 		if ( M_log.isDebugEnabled() ) {
 			M_log.debug("init()");
 		}
+		userPlidCache = memoryService.newCache(getClass().getName()+".userPlidCache");
 
 		// We don't want to allow people to break their config by setting the batch size to be more than the maxResultsSize.
 		if (batchSize > maxResultSize) {
@@ -348,6 +365,18 @@ public class JLDAPDirectoryProvider implements UserDirectoryProvider, LdapConnec
 			M_log.debug("destroy()");
 		}
 
+		clearCache();
+	}
+
+	/**
+	 * Resets the internal {@link LdapUserData} cache
+	 */
+	public void clearCache() {
+		if ( M_log.isDebugEnabled() ) {
+			M_log.debug("clearCache()");
+		}
+
+		userPlidCache.clear();
 	}
 
 	/**
@@ -1139,6 +1168,24 @@ public class JLDAPDirectoryProvider implements UserDirectoryProvider, LdapConnec
 			userEdit.setEid(StringUtils.lowerCase(userData.getEid()));
 	}
 
+	protected void cacheUserDataByPlid(LdapUserData user){
+		String plid = user.getPlid();
+
+		if ( plid != null ) {
+			// No longer in LdapUserData, need to check!!
+			// user.setTimeStamp(System.currentTimeMillis());
+
+			if ( M_log.isDebugEnabled() ) {
+				M_log.debug("cacheUserData(): [user record = " + user + "]");
+			}
+
+				plid = StringUtils.lowerCase(plid);
+
+			userPlidCache.put(plid, user);
+		}
+
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -1619,12 +1666,38 @@ public class JLDAPDirectoryProvider implements UserDirectoryProvider, LdapConnec
 		}
 	}
 
+	//Added by -Qu for search user by plid from imported file
+	protected LdapUserData getUserByPlid(String plid, LDAPConnection conn)
+	throws LDAPException {
+		if ( M_log.isDebugEnabled() ) {
+			M_log.debug("getUserByPlid(): [plid = " + plid + "]");
+		}
+		LdapUserData cachedUserData = getCachedUserEntryByPlid(plid);
+		boolean foundCachedUserData = cachedUserData != null;
+		if ( foundCachedUserData ) {
+			if ( M_log.isDebugEnabled() ) {
+				M_log.debug("getUserByPlid(): found cached user [plid = " + plid + "]");
+			}
+			return cachedUserData;
+		}
+		String filter = ldapAttributeMapper.getFindUserByPlidFilter(plid);
+
+		// takes care of caching and everything
+		return (LdapUserData)searchDirectoryForSingleEntry(filter, conn, null, null, null);
+	}
+
+	public MemoryService getMemoryService() {
+			return memoryService;
+	}
+
 	/**
 	 * User caching is done centrally in the UserDirectoryService.callCache
 	 * @deprecated
 	**/
-	public void setMemoryService(org.sakaiproject.memory.api.MemoryService ignore) {
-		M_log.warn("DEPRECATION WARNING: memoryService is deprecated. Please remove it from your jldap-beans.xml configuration.");
+	//We still use memory service to get plidUserCache -Qu 2/20/2014
+	public void setMemoryService(MemoryService memoryService) {
+		//M_log.warn("DEPRECATION WARNING: memoryService is deprecated. Please remove it from your jldap-beans.xml configuration.");
+		this.memoryService = memoryService;
 	}
 
 	/** 
@@ -1735,6 +1808,28 @@ public class JLDAPDirectoryProvider implements UserDirectoryProvider, LdapConnec
 	public void setSearchAliases(boolean searchAliases)
 	{
 		this.searchAliases = searchAliases;
+	}
+
+	/** Retieve a user record from the cache.
+	 *
+	 * @param plid the cache key
+	 * @return a user cache record, or null if a cache miss
+	 */
+	protected LdapUserData getCachedUserEntryByPlid(String plid) {
+		if ( M_log.isDebugEnabled() ) {
+			M_log.debug("getCachedUserEntry(): [plid = " + plid + "]");
+		}
+		plid = StringUtils.lowerCase(plid);
+		LdapUserData cachedUserEntry = (LdapUserData) userPlidCache.get(plid);
+
+		if(cachedUserEntry != null){
+			if ( M_log.isDebugEnabled() ) {
+				M_log.debug("getCachedUserEntry(): [found entry = " + cachedUserEntry.toString() + "]");
+			}
+		}
+
+		return cachedUserEntry;
+
 	}
 
 }

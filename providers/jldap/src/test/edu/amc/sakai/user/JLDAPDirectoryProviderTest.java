@@ -29,6 +29,7 @@ import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.Stub;
+import org.sakaiproject.memory.api.MemoryService;
 import org.sakaiproject.user.api.UserEdit;
 
 import com.novell.ldap.LDAPConnection;
@@ -57,6 +58,8 @@ public class JLDAPDirectoryProviderTest extends MockObjectTestCase {
 	private LDAPEntry entry;
 	private Mock mockEntry;
 	private LdapUserData userData;
+	private MemoryService memoryService;
+	private Mock mockMemoryService;
 	
 	protected void setUp() {
 		// we need control over the LdapUserData returned from searches so
@@ -68,6 +71,7 @@ public class JLDAPDirectoryProviderTest extends MockObjectTestCase {
 				return userData;
 			}
 		};
+
 		mockEidValidator = mock(EidValidator.class);
 		eidValidator = (EidValidator)mockEidValidator.proxy();
 		provider.setEidValidator(eidValidator);
@@ -83,7 +87,12 @@ public class JLDAPDirectoryProviderTest extends MockObjectTestCase {
 		searchResults = (LDAPSearchResults) mockSearchResults.proxy();
 		mockEntry = mock(LDAPEntry.class);
 		entry = (LDAPEntry)mockEntry.proxy();
-		
+
+		mockMemoryService = mock(MemoryService.class);
+		memoryService = (MemoryService) mockMemoryService.proxy();
+		provider.setMemoryService(memoryService);
+		mockMemoryService.expects(once()).method("newCache");
+
 		mockConnManager.expects(once()).method("setConfig").with(same(provider));
 		mockConnManager.expects(once()).method("init");
 		provider.init();

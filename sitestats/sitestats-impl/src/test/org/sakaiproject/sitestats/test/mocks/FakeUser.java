@@ -32,6 +32,7 @@ public class FakeUser implements User {
 	String lastName = "Last";
 	String id = "id";
 	String eid = "eid";
+	String plid = "plid";
 	String email = "some@email.com";
 
 	public boolean checkPassword(String arg0) {
@@ -143,4 +144,7 @@ public class FakeUser implements User {
 		return null;
 	}
 
+	public String getPlid() {
+		return plid;
+}
 }

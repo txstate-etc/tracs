@@ -134,4 +134,6 @@ public interface User extends Entity, Comparable
 	 * @return The user's display id string.
 	 */
 	String getDisplayId();
+
+	String getPlid();
 }

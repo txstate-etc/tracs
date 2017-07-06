@@ -8,7 +8,7 @@
 | assignment                   |                  |
 | authz                        | NO LOCAL CHANGES |
 | basiclti                     |                  |
-| blogwow                      |                  |
+| blogwow                      | DONE             |
 | calendar                     | DONE             |
 | chat                         | DONE             |
 | citations                    | NO LOCAL CHANGES |
@@ -40,7 +40,7 @@
 | lessonbuilder                | DONE             |
 | login                        | DONE             |
 | lticontact                   | DONE             |
-| mailarchive                  |                  |
+| mailarchive                  | DONE             |
 | mailsender                   | DONE             |
 | master                       |                  |
 | melete                       | DONE             |
@@ -67,7 +67,7 @@
 | rsf                          | NO LOCAL CHANGES |
 | rwiki                        | DONE             |
 | samigo                       |                  |
-| search                       |                  |
+| search                       | DONE             |
 | sections                     | DONE             |
 | shortenedurl                 | NO LOCAL CHANGES |
 | signup                       | DONE             |
@@ -84,6 +84,5 @@
 | userauditservice             | NO LOCAL CHANGES |
 | usermembership               | NO LOCAL CHANGES |
 | velocity                     | NO LOCAL CHANGES |
-| web                          |                  |
+| web                          | DONE             |
 | webservices                  |                  |
-

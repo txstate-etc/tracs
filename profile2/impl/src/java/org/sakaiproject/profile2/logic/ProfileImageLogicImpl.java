@@ -21,7 +21,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
+import java.util.Formatter;
 import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -670,7 +674,11 @@ public class ProfileImageLogicImpl implements ProfileImageLogic {
 	public String getUnavailableImageThumbnailURL() {
 		return getUnavailableImageURL(ProfileConstants.UNAVAILABLE_IMAGE_THUMBNAIL);
 	}
-	
+
+	public String getUnavailableImageOfficialURL() {
+		return getUnavailableImageURL(ProfileConstants.UNAVAILABLE_IMAGE_OFFICIAL);
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -810,28 +818,36 @@ public class ProfileImageLogicImpl implements ProfileImageLogic {
 	/**
 	 * Get the URL to a user's official profile image
 	 * @param userUuid		uuid of user
-	 * 
 	 * @return url or a default image if none
 	 */
 	private String getOfficialImageUrl(final String userUuid) {
-		
+
 		//get external image record for this user
 		ProfileImageOfficial official = dao.getOfficialImageRecordForUser(userUuid);
-		
+
 		//setup default
-		String defaultImageUrl = getUnavailableImageURL();
-		
-		//if none, return null
-    	if(official == null) {
-    		return defaultImageUrl;
-    	}
-    	
-    	if(StringUtils.isBlank(official.getUrl())) {
-        	log.info("ProfileLogic.getOfficialImageUrl. No URL for userUuid: " + userUuid + ". Returning default.");  
-			return defaultImageUrl;
+		String defaultImageUrl = getUnavailableImageOfficialURL();
+
+		if(official == null || StringUtils.isBlank(official.getUrl())) {
+
+			String plid = null;
+			try {
+				plid = sakaiProxy.getUserById(userUuid).getPlid();
+			} catch(Exception e){
+				log.info("Failed to find plid for user " + userUuid + " in getOfficialImageUrl.");
+			}
+			//if guest user
+			if(plid == null) {
+				log.info("ProfileLogic.getOfficialImageUrl. No URL for userUuid: " + userUuid + ". Returning default.");
+				return defaultImageUrl;
+			}
+			//then compute the url and save to the database
+			String url = computeOfficialImageUrlFromPlid(plid);
+			if (url != null)
+				saveOfficialImageUrl(userUuid, url); //save url to database
+			return url;
 		}
-    	
-    	return official.getUrl();
+		return official.getUrl();
 	}
 	
 	/**
@@ -996,4 +1012,60 @@ public class ProfileImageLogicImpl implements ProfileImageLogic {
 	@Setter
 	private ProfileDao dao;
 	
+	/**
+	 * This is where we compute official url from user plid
+	 * Added by -Qu bugid:5191  11/28/2012
+	 * @param userPlid :  ex:A00572388
+	 * @return  url:  official photo url
+	 */
+	public String computeOfficialImageUrlFromPlid (String userPlid){
+		String imageUrl = null;
+		String seed = null;
+		if(userPlid.startsWith("A")){
+			seed = userPlid.substring(1);
+			//Make sure it is with 8 numbers and pad 0s in the beginning if not
+			if (seed.length() != 8)
+			seed = StringUtils.leftPad(seed,8,'0');
+
+			String Key = sakaiProxy.getServerConfigurationParameter("tracs.official.photo.key", "") + '\0';
+			String algorithm = sakaiProxy.getServerConfigurationParameter("tracs.official.photo.url.key.algorithm", "DES");
+			String transformation = sakaiProxy.getServerConfigurationParameter("tracs.official.photo.url.cipher.transformation", "DES/CBC/PKCS5Padding");
+			byte[] KeyData = Key.getBytes();
+			SecretKeySpec KS = new SecretKeySpec(KeyData, algorithm);
+			Cipher cipher;
+			try {
+				cipher = Cipher.getInstance(transformation);
+				cipher.init(Cipher.ENCRYPT_MODE, KS);
+				byte[] encrypted = cipher.doFinal(seed.getBytes());
+				String urlBase = bytesToHexString(encrypted);
+				imageUrl = buildUrlFromEncryption(urlBase);
+			} catch (Exception e) {
+				log.info("Exception happened in computeOfficialImageUrlFromPlid " + e);
+}
+		}
+		return imageUrl;
+	}
+
+	//Helpers
+	//added by -Qu bugid:5191  11/28/2012
+	private String bytesToHexString(byte[] bytes) {
+		StringBuilder sb = new StringBuilder(bytes.length * 2);
+		Formatter formatter = new Formatter(sb);
+		for (byte b : bytes) {
+			formatter.format("%02x", b);
+		}
+		return sb.toString();
+	}
+	//added by -Qu bugid:5191  11/28/2012
+	//first hex char is a directory, the second hex char is a subdirectory, then the entire hex plus .jpg
+	private String buildUrlFromEncryption(String urlBase){
+		String url = null;
+		String[] param = new String[2];
+		param[0] = urlBase.substring(0,1);
+		param[1] = urlBase.substring(1, 2);
+		String URL_PREFIX= sakaiProxy.getServerConfigurationParameter("tracs.official.photo.baseUrl","");
+		String URL_SUFFIX = ".jpg";
+		url = URL_PREFIX + param[0] + "/" + param[1] + "/" + urlBase + URL_SUFFIX;
+		return url;
+	}
 }

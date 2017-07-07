@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="org.sakaiproject.user.api.TracsUserDirectoryProvider"
+	<bean id="org.sakaiproject.user.api.UserDirectoryProvider"
 		class="edu.amc.sakai.user.TracsJLDAPDirectoryProvider" init-method="init"
 		destroy-method="destroy">
 		

@@ -169,6 +169,7 @@ public class ProfileEntityProvider extends AbstractEntityProvider implements Cor
         }
 		
 		if(image == null) {
+			image = imageLogic.getBlankProfileImage();
 			throw new EntityNotFoundException("No profile image for " + id, ref.getReference());
 		}
 		

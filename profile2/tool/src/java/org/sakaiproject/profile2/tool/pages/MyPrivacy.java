@@ -312,7 +312,8 @@ public class MyPrivacy extends BasePage {
 		//myStatus privacy
 		WebMarkupContainer myStatusContainer = new WebMarkupContainer("myStatusContainer");
 		myStatusContainer.add(new Label("myStatusLabel", new ResourceModel("privacy.mystatus")));
-		DropDownChoice myStatusChoice = new DropDownChoice("myStatus", dropDownModelRelaxed, new HashMapChoiceRenderer(privacySettingsRelaxed));
+		//Add ONLYME to the status choice which is a strict privacy setting -Qu #491
+		DropDownChoice myStatusChoice = new DropDownChoice("myStatus", dropDownModelStrict, new HashMapChoiceRenderer(privacySettingsStrict));
 		myStatusChoice.setMarkupId("statusprivacyinput");
 		myStatusChoice.setOutputMarkupId(true);
 		myStatusContainer.add(myStatusChoice);

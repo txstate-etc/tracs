@@ -380,7 +380,11 @@ public class ProfilePrivacyLogicImpl implements ProfilePrivacyLogic {
 	        	
 				break;
 			case PRIVACY_OPTION_MYSTATUS:
-	    		
+	        	//if restricted to only self, not allowed
+	        	if(profilePrivacy.getMyStatus() == ProfileConstants.PRIVACY_OPTION_ONLYME) {
+	        		result = false; break;
+	        	}
+
 	    		//if user is friend and friends are allowed
 	        	if(isConnected && profilePrivacy.getMyStatus() == ProfileConstants.PRIVACY_OPTION_ONLYFRIENDS) {
 	        		result = true; break;

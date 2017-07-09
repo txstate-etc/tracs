@@ -61,6 +61,8 @@ public interface UserDirectoryProvider
 	 */
 	boolean findUserByEmail(UserEdit edit, String email);
 
+	String getEidByPlid(String plid);
+
 	/**
 	 * Access a user object. Update the object with the information found.
 	 * 

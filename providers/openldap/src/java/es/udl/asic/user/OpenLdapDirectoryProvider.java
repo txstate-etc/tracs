@@ -381,4 +381,9 @@ public class OpenLdapDirectoryProvider implements UserDirectoryProvider
         return escapedStr;
     }
     
+	public String getEidByPlid(String plid){
+		//stub for tracs local api change
+		return null;
+	}
+
 }

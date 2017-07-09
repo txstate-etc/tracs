@@ -616,6 +616,10 @@ public class FilterUserDirectoryProvider implements UserDirectoryProvider, Exter
 		return false;
 	}
 
+	public String getEidByPlid(String plid){
+		//stub for tracs local api change
+		return null;
+	}
 
 } // FilterUserDirectoryProvider
 

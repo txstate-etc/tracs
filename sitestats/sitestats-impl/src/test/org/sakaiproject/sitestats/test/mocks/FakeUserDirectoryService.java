@@ -274,4 +274,9 @@ public class FakeUserDirectoryService implements UserDirectoryService {
 		return null;
 	}
 
+	@Override
+	public String getEidByPlid(String plid) {
+		return null;
+	}
+
 }

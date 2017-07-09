@@ -54,9 +54,9 @@
 | polls                        | DONE             |
 | portal                       | DONE             |
 | portal-skin                  |                  |
-| postem                       |                  |
+| postem                       | DONE             |
 | presence                     | NO LOCAL CHANGES |
-| profile2                     |                  |
+| profile2                     | DONE             |
 | providers                    |                  |
 | reference                    |                  |
 | reset-pass                   |                  |

@@ -71,12 +71,16 @@ import org.sakaiproject.util.ResourceLoader;
 
 import org.sakaiproject.user.api.User;
 
-import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
+import org.sakaiproject.user.api.UserDirectoryService;
+
 
 public class PostemTool {
 	
 	protected GradebookManager gradebookManager;
+
+	protected UserDirectoryService userDirectoryService;
+
 	protected ArrayList gradebooks;
 
 	protected Gradebook currentGradebook;
@@ -160,7 +164,7 @@ public class PostemTool {
 			
 			if (userId != null) {
 				try {
-					userEid = UserDirectoryService.getUserEid(userId);
+					userEid = userDirectoryService.getUserEid(userId);
 				} catch (UserNotDefinedException e) {
 					LOG.error("UserNotDefinedException", e);
 				}
@@ -657,9 +661,15 @@ public class PostemTool {
 				Iterator si = slist.iterator();
 				while (si.hasNext()) {
 					List ss = (List) si.next();
-					String uname = ((String) ss.remove(0)).trim();
+					String uname = null;
+					String plid = ((String) ss.remove(0)).trim();
+					if (plid != null) {
+							uname = getUserEid(plid);
 					// logger.info("[POSTEM] processCreate -- adding student " +
 					// uname);
+					}
+					else
+						continue;
 					gradebookManager.createStudentGradesInGradebook(uname, ss,
 							currentGradebook);
 					if (currentGradebook.getStudents().size() == 1) {
@@ -1140,16 +1150,18 @@ public class PostemTool {
 		Placement placement = ToolManager.getCurrentPlacement();
 		return placement.getContext();
 	}
-	
+
 	//Returns getUser and getUserByEid on the input string
 	//@return Either the id of the user, or the same string if not defined
 	private String getUserDefined(String usr)
 	{
+	    usr = getUserEid(usr);
+
 		//Set the original user id
 		String userId = usr;
 		User userinfo;
 		try	{
-			userinfo = UserDirectoryService.getUser(usr);
+			userinfo = userDirectoryService.getUser(usr);
 			userId = userinfo.getId();
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("getUserDefined: username for " + usr + " is " + userId);
@@ -1160,7 +1172,7 @@ public class PostemTool {
 			try
 			{
 				// try with the user eid
-				userinfo = UserDirectoryService.getUserByEid(usr);
+				userinfo = userDirectoryService.getUserByEid(usr);
 				userId = userinfo.getId();
 			}
 			catch (UserNotDefinedException ee)
@@ -1174,6 +1186,27 @@ public class PostemTool {
 		return userId;
 	}
 	
+	//Helper bugid:5235 -Qu 1/8/2013
+	private String getUserEid (String usr) {
+		String eid = null;
+		//if usr is plid, map with eid; plid starts with 'A' or possible NETID like 'AY24'
+		if(usr.startsWith("A"))
+			try {
+				eid = userDirectoryService.getEidByPlid(usr);
+			} catch (UserNotDefinedException e) {
+				LOG.debug("Didn't find eid for provided user with plid = " + "plid");
+			}
+		//if not found in ldap, then treat id as eid to check in sakai user system.
+		if(eid == null)
+			//assume usr is eid
+			eid = usr;
+		return eid;
+	}
+
+	public void setUserDirectoryService(UserDirectoryService userDirectoryService){
+		this.userDirectoryService = userDirectoryService;
+	}
+
 	private List getSiteMembers() {
 		List siteMembers = new ArrayList();
 		try	{

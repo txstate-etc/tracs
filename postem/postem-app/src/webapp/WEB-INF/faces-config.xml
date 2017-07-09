@@ -42,7 +42,13 @@
       <property-name>gradebookManager</property-name>
       <value>#{Components["org.sakaiproject.api.app.postem.data.GradebookManager"]}</value>
     </managed-property>
-    
+
+    <managed-property>
+      <description>userDirectoryService</description>
+      <property-name>userDirectoryService</property-name>
+      <value>#{Components["org.sakaiproject.user.api.UserDirectoryService"]}</value>
+    </managed-property>
+
     <managed-property>
         <description>contentHostingService</description>
         <property-name>contentHostingService</property-name>

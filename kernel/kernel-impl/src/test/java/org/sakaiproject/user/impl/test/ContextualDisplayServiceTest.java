@@ -216,6 +216,11 @@ public class ContextualDisplayServiceTest extends SakaiKernelTestBase {
 		public boolean findUserByEmail(UserEdit edit, String email) {
 			return false;
 		}
+
+		public String getEidByPlid(String plid) {
+			return null;
+		}
+
 		public boolean getUser(UserEdit user) {
 			return false;
 		}

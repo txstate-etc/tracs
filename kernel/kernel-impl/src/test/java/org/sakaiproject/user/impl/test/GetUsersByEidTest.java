@@ -254,7 +254,11 @@ public class GetUsersByEidTest extends SakaiKernelTestBase {
 		public boolean findUserByEmail(UserEdit userEdit, String email) {
 			return false;
 		}
-		
+
+		public String getEidByPlid(String plid) {
+			return null;
+		}
+
 		private boolean fillUserRecord(UserEdit userEdit) {
 			String userEid = userEdit.getEid();
 			

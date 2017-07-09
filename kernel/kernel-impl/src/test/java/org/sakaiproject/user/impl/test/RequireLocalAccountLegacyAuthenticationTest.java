@@ -152,6 +152,10 @@ public class RequireLocalAccountLegacyAuthenticationTest extends SakaiKernelTest
 			return false;
 		}
 
+		public String getEidByPlid(String plid) {
+			return null;
+		}
+
 		public boolean getUser(UserEdit user) {
 			if (requireLocalAccount) {
 				return false;

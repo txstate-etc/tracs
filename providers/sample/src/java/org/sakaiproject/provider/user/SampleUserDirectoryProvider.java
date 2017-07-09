@@ -371,4 +371,8 @@ public class SampleUserDirectoryProvider implements UserDirectoryProvider, Users
 		// punt
 		return null;
 	}
+
+	public String getEidByPlid(String plid){
+		return null;
+	};
 }

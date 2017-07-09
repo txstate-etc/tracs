@@ -1666,8 +1666,19 @@ public class JLDAPDirectoryProvider implements UserDirectoryProvider, LdapConnec
 		}
 	}
 
-	//Added by -Qu for search user by plid from imported file
-	protected LdapUserData getUserByPlid(String plid, LDAPConnection conn)
+	//Added by -Qu for getting user by plid from imported file
+	public String getEidByPlid(String plid)
+	{
+		try {
+			return getEidByPlid(plid, null);
+		} catch ( Exception e ) {
+			M_log.error("getEidByPlid(): failed [plid = " + plid + "]");
+			M_log.debug("Exception: ", e);
+			return null;
+		}
+	}
+
+	protected String getEidByPlid(String plid, LDAPConnection conn)
 	throws LDAPException {
 		if ( M_log.isDebugEnabled() ) {
 			M_log.debug("getUserByPlid(): [plid = " + plid + "]");
@@ -1678,12 +1689,13 @@ public class JLDAPDirectoryProvider implements UserDirectoryProvider, LdapConnec
 			if ( M_log.isDebugEnabled() ) {
 				M_log.debug("getUserByPlid(): found cached user [plid = " + plid + "]");
 			}
-			return cachedUserData;
+			return cachedUserData.getEid();
 		}
 		String filter = ldapAttributeMapper.getFindUserByPlidFilter(plid);
 
 		// takes care of caching and everything
-		return (LdapUserData)searchDirectoryForSingleEntry(filter, conn, null, null, null);
+		cachedUserData = (LdapUserData)searchDirectoryForSingleEntry(filter, conn, null, null, null);
+		return cachedUserData.getEid();
 	}
 
 	public MemoryService getMemoryService() {

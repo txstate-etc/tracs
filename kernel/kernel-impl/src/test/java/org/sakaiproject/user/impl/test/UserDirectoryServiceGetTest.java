@@ -116,6 +116,7 @@ public class UserDirectoryServiceGetTest extends SakaiKernelTestBase {
 		user.setFirstName("J. " + eid);
 		user.setLastName("de " + eid);
 		user.setPassword(eid + "pwd");
+		user.setPlid("plidNo");
 		String type = isLocal ? "Guest" : "Student";
 		user.setType(type);
 		String source = isLocal ? "local" : "provided";
@@ -407,6 +408,10 @@ public class UserDirectoryServiceGetTest extends SakaiKernelTestBase {
 			} else {
 				return false;
 			}
+		}
+		
+		public String getEidByPlid(String plid) {
+			return null;
 		}
 
 		public boolean getUser(UserEdit userEdit) {

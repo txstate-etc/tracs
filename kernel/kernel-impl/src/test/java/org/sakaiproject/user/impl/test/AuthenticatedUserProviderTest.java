@@ -173,6 +173,10 @@ public class AuthenticatedUserProviderTest extends SakaiKernelTestBase {
 			return false;
 		}
 
+		public String getEidByPlid(String plid) {
+			return null;
+		}
+
 		public boolean getUser(UserEdit user) {
 			String eid = user.getEid();
 			if (!eid.startsWith("provide")) {

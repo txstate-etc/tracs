@@ -719,6 +719,23 @@ public abstract class BaseUserDirectoryService implements UserDirectoryService, 
 
 		return null;
 	}
+	
+	protected String getProvidedUserEidByPlid(String plid)
+	{
+		if (m_provider != null)
+		{
+			if (plid == null) {
+				//there's no point in asking a provider if we have no plid
+				return null;
+			}
+
+			// check with the provider
+			String eid = m_provider.getEidByPlid(plid);;
+			return eid;
+		}
+		return null;
+	}
+
 
 	//enforcing all lowercase in the user id map, bugid:3853 -Qu 10/8/10
 	protected void ensureMappedIdForProvidedUser(UserEdit user)
@@ -842,6 +859,23 @@ public abstract class BaseUserDirectoryService implements UserDirectoryService, 
 		putCachedUser(userReference(user.getId()), user);
 
 		return user;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public String getEidByPlid(String plid) throws UserNotDefinedException
+	{
+		UserEdit user = null;
+
+		// clean up the plid
+		plid = cleanEid(plid);
+		if (plid == null) throw new UserNotDefinedException("null");
+
+			String eid = getProvidedUserEidByPlid(plid);
+			if (eid == null) throw new UserNotDefinedException(plid);
+
+		return eid;
 	}
 
 	/**

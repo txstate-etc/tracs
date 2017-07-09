@@ -412,5 +412,9 @@ public class KerberosUserDirectoryProvider implements UserDirectoryProvider
 		return false;
 	}
 
+	public String getEidByPlid(String plid){
+		//stub for tracs local api change
+		return null;
+	}
 } // KerberosUserDirectoryProvider
 

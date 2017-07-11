@@ -22,6 +22,7 @@ $tool-title-nav-link-color-hover: $primary-color !default;
 
 //mobile
 $mobile-tools-and-sites-bar-background: lighten($tool-menu-color, 15% ) !default;
+$mobile-tools-and-sites-bar-color: black !default;
 $mobile-breadcrumbs-bar-background: $primary-color !default;
 $mobile-breadcrumbs-bar-color: $background-color !default;
 
@@ -50,9 +51,10 @@ $lessons-checklist-background: $soft-color;
 }
 
 //Change default color of Tools and Sites bar on mobile
-.Mrphs-skipNav__menu{
+.Mrphs-skipNav__menu .Mrphs-skipNav__menuitem .Mrphs-skipNav__link{
   @media (max-width: $break-small-end){
      background: $mobile-tools-and-sites-bar-background;
+     color: $mobile-tools-and-sites-bar-color;
   }
 }
 
@@ -117,10 +119,6 @@ $lessons-checklist-background: $soft-color;
       color: $mobile-breadcrumbs-bar-color;
     }
   }
-}
-
-.Mrphs-skipNav__menu .Mrphs-skipNav__menuitem .Mrphs-skipNav__link {
-  color: $mobile-breadcrumbs-bar-color
 }
 
 .tracs-sites #linkNav ul.Mrphs-sitesNav__menu {

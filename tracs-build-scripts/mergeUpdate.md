@@ -25,7 +25,7 @@
 | deploy                       | NO LOCAL CHANGES |
 | edu-services                 |                  |
 | emailtemplateservice         | NO LOCAL CHANGES |
-| entitybroker                 |                  |
+| entitybroker                 | DONE             |
 | etudes-util                  | DONE             |
 | external-calendaring-service | NO LOCAL CHANGES |
 | feedback                     | NO LOCAL CHANGES |

@@ -894,7 +894,7 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 
 		UIComponent titlediv = UIOutput.make(tofill, "titlediv");
 		if (inline)
-		    titlediv.decorate(new UIFreeAttributeDecorator("style", "display:none"));
+		    titlediv.decorate(new UIFreeAttributeDecorator("style", "display:block"));
 		// we need to do special CSS for old portal
 		else if (helpurl == null)
 		    titlediv.decorate(new UIStyleDecorator("oldPortal"));		
@@ -1074,7 +1074,7 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 			UILink.make(tofill, "pagetitlelink", reseturl);
 			UIOutput.make(tofill, "pagetitletext", currentPage.getTitle());
 		    } else if (true || !inline) {
-			UIOutput.make(tofill, "pagetitle", currentPage.getTitle());
+			UIOutput.make(tofill, "pagetitle", currentPage.getTitle()).decorate(new UIFreeAttributeDecorator("style", "display:none"));
 		    }
 		}
 

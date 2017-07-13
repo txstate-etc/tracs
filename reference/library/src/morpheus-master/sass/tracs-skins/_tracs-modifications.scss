@@ -117,8 +117,10 @@ $lessons-checklist-background: $soft-color;
   background: $soft-color;
 }
 
-//Change default color of Breadcrumbs bar on mobile
 .Mrphs-siteHierarchy{
+  @media (max-width: $break-small-end){
+    flex-wrap: wrap;
+  }
   min-height: 55px;
   .Mrphs-hierarchy--siteName, .Mrphs-hierarchy--siteNameSeparator, .Mrphs-hierarchy--toolName{
     display: none;
@@ -126,14 +128,29 @@ $lessons-checklist-background: $soft-color;
       display: inline-block;
     }
   }
+  a.Mrphs-hierarchy--toolName {
+    &:hover {
+      border-bottom: 0px;
+      span {
+        text-decoration:underline;
+        &.Mrphs-breadcrumb--icon {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
   .Mrphs-hierarchy--siteNameSeparator{
     color: $site-hierarchy-separator-color;
   }
-
+  //Change default color of Breadcrumbs bar on mobile
   @media (max-width: $break-small-end){
     background: $mobile-breadcrumbs-bar-background;
     a{
       color: $mobile-breadcrumbs-bar-color;
+      &:hover {
+        color: $mobile-breadcrumbs-bar-color;
+      }
     }
   }
 }
@@ -220,6 +237,33 @@ body.Mrphs-portalBody{
 .Mrphs-sakai-lessonbuildertool {
   .checklistDiv {
     background-color: $lessons-checklist-background;
+  }
+  .neoPortletTitleWrap {
+    .title .breadcrumbs h2 {
+      font-size: 1.5rem;
+      .Mrphs-breadcrumb--icon {
+        font-size: 1.5rem;
+        margin-right: 3px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.addedCrumbs {
+  .Mrphs-hierarchy--separator {
+    color: $site-hierarchy-separator-color;
+  }
+  span a {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  .lessons-siteHierarchy-title {
+    color: $mobile-breadcrumbs-bar-color;
+    &:hover {
+      color: $mobile-breadcrumbs-bar-color;
+    }
   }
 }
 

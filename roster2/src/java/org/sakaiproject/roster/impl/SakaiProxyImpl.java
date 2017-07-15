@@ -786,10 +786,9 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
             membersMap = new HashMap<String, List<RosterMember>>();
             cache.put(siteId, membersMap);
         }
-
         if (membersMap.containsKey(enrollmentSetId + "#all")
-                && membersMap.containsKey(enrollmentSetId + "#wait")
-                && membersMap.containsKey(enrollmentSetId + "#enrolled")) {
+                && membersMap.containsKey(enrollmentSetId + "#true")
+                && membersMap.containsKey(enrollmentSetId + "#false")) {
             if (log.isDebugEnabled()) {
                 log.debug("Cache hit on '" + enrollmentSetId + "'");
             }
@@ -871,8 +870,8 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
             }
 
             membersMap.put(enrollmentSetId + "#all", members);
-            membersMap.put(enrollmentSetId + "#wait", waiting);
-            membersMap.put(enrollmentSetId + "#enrolled", enrolled);
+            membersMap.put(enrollmentSetId + "#false", waiting);
+            membersMap.put(enrollmentSetId + "#true", enrolled);
 
             return membersMap;
         }

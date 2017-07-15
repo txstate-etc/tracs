@@ -24,6 +24,7 @@
       lang="${language}">
     <head>
         <link rel="stylesheet" media="screen, tty, tv, handheld, projection" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
+        <link rel="stylesheet" media="screen, tty, tv, handheld, projection" type="text/css" href="/sakai-roster2-tool/css/roster.css" media="all" />
         <link rel="stylesheet" media="print" type="text/css" href="/sakai-roster2-tool/css/print.css" />
         <link rel="stylesheet" media="screen, tty, tv, handheld, projection" type="text/css" href="/library/js/jquery/cluetip/1.2.10/css/jquery.cluetip.css" />
 
@@ -92,6 +93,7 @@
 <script type="text/javascript" src="/library/js/jquery/cluetip/1.2.10/jquery.cluetip.min.js"></script>
 <script type="text/javascript" src="/library/js/jquery/hoverIntent/r7/jquery.hoverIntent.minified.js"></script>
 <script type="text/javascript" src="/sakai-roster2-tool/js/roster_permissions.js"></script>
+<script type="text/javascript" src="/sakai-roster2-tool/js/tracsRoster.js"></script>
 <script type="text/javascript" src="/sakai-roster2-tool/js/roster.js"></script>
 
 </body>

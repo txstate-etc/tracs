@@ -93,20 +93,26 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 	public final static String KEY_ENROLLMENT_STATUS	= "enrollmentStatus";
 	public final static String KEY_FACET_NAME			= "facetName";
 	public final static String KEY_FACET_USER_ID		= "facetUserId";
+	public final static String KEY_FACET_PLID			= "facetPlid";
+	public final static String KEY_FACET_CONF			= "facetConfidential";
 	public final static String KEY_FACET_EMAIL			= "facetEmail";
 	public final static String KEY_FACET_ROLE			= "facetRole";
 	public final static String KEY_FACET_GROUPS			= "facetGroups";
 	public final static String KEY_FACET_STATUS			= "facetStatus";
 	public final static String KEY_FACET_CREDITS		= "facetCredits";
+	public final static String KEY_FACET_DROPDATE		= "facetDropDate";
 		
 	// defaults to use if any keys are not specified
 	public final static String DEFAULT_FACET_NAME		= "Name";
 	public final static String DEFAULT_FACET_USER_ID	= "User ID";
+	public final static String DEFAULT_FACET_PLID		= "Texas State ID";
+	public final static String DEFAULT_FACET_CONF		= "Confidential";
 	public final static String DEFAULT_FACET_EMAIL		= "Email Address";
 	public final static String DEFAULT_FACET_ROLE		= "Role";
 	public final static String DEFAULT_FACET_GROUPS		= "Groups";
 	public final static String DEFAULT_FACET_STATUS		= "Status";
 	public final static String DEFAULT_FACET_CREDITS	= "Credits";
+	public final static String DEFAULT_FACET_DROPDATE	= "Drop Date";
 	public final static String DEFAULT_GROUP_ID			= "all";
 	public final static String DEFAULT_ENROLLMENT_STATUS= "All";
 	public final static String DEFAULT_VIEW_TYPE		= VIEW_OVERVIEW;
@@ -222,8 +228,8 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 		String enrollmentSetId = getEnrollmentSetIdValue(parameters);
 		String enrollmentStatus = getEnrollmentStatusValue(parameters);
 
-		String enrollmentSetTitle = null;
-		if (null != enrollmentSetId) {
+		String enrollmentSetTitle = "All Sections";
+		if (!StringUtils.isBlank(enrollmentSetId)) {
 			for (RosterEnrollment enrollmentSet : site.getSiteEnrollmentSets()) {
 				if (enrollmentSetId.equals(enrollmentSet.getId())) {
 					enrollmentSetTitle = enrollmentSet.getTitle();
@@ -320,7 +326,9 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 		for (RosterMember member : rosterMembers) {
 
 			List<String> row = new ArrayList<String>();
-
+			
+			row.add(member.isConfidential() ? "yes" : "no");
+			
 			if (sakaiProxy.getFirstNameLastName()) {
 				row.add(member.getDisplayName());
 			} else {
@@ -329,6 +337,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			
 			if (sakaiProxy.getViewUserDisplayId()) {
 				row.add(member.getDisplayId());
+				row.add(member.getPlid());
 			}
 
 			if (sakaiProxy.getViewEmail(siteId)) {
@@ -351,6 +360,8 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 
 			List<String> row = new ArrayList<String>();
 
+			row.add(member.isConfidential() ? "yes" : "no");
+
 			if (sakaiProxy.getFirstNameLastName()) {
 				row.add(member.getDisplayName());
 			} else {
@@ -359,6 +370,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			
 			if (sakaiProxy.getViewUserDisplayId()) {
 				row.add(member.getDisplayId());
+				row.add(member.getPlid());
 			}
 			
 			row.add(member.getRole());
@@ -389,6 +401,8 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 
 					List<String> row = new ArrayList<String>();
 
+					row.add(member.isConfidential() ? "yes" : "no");
+
 					if (sakaiProxy.getFirstNameLastName()) {
 						row.add(member.getDisplayName());
 					} else {
@@ -397,6 +411,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 					
 					if (sakaiProxy.getViewUserDisplayId()) {
 						row.add(member.getDisplayId());
+						row.add(member.getPlid());
 					}
 					
 					row.add(member.getRole());
@@ -438,6 +453,8 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 
 			List<String> row = new ArrayList<String>();
 
+			row.add(member.isConfidential() ? "yes" : "no");
+
 			if (sakaiProxy.getFirstNameLastName()) {
 				row.add(member.getDisplayName());
 			} else {
@@ -446,6 +463,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			
 			if (sakaiProxy.getViewUserDisplayId()) {
 				row.add(member.getDisplayId());
+				row.add(member.getPlid());
 			}
 
 			if (sakaiProxy.getViewEmail(siteId)) {
@@ -454,6 +472,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			
 			row.add(member.getEnrollmentStatusText());
 			row.add(member.getCredits());
+			row.add(member.getDropDate());
 			
 			dataInRows.add(row);
 		}
@@ -514,12 +533,18 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			String viewType, String siteId) {
 		
 		List<String> header = new ArrayList<String>();
+		
+		header.add(parameters.get(KEY_FACET_CONF) != null ? parameters.get(
+				KEY_FACET_CONF).toString() : DEFAULT_FACET_CONF);
+		
 		header.add(parameters.get(KEY_FACET_NAME) != null ? parameters.get(
 				KEY_FACET_NAME).toString() : DEFAULT_FACET_NAME);
 		
 		if (sakaiProxy.getViewUserDisplayId()) {
 			header.add(parameters.get(KEY_FACET_USER_ID) != null ? parameters.get(
 					KEY_FACET_USER_ID).toString() : DEFAULT_FACET_USER_ID);
+			header.add(parameters.get(KEY_FACET_PLID) != null ? parameters.get(
+					KEY_FACET_PLID).toString() : DEFAULT_FACET_PLID);
 		}
 
 		if (VIEW_OVERVIEW.equals(viewType)) {
@@ -546,6 +571,10 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 
 			header.add(parameters.get(KEY_FACET_CREDITS) != null ? parameters
 					.get(KEY_FACET_CREDITS).toString() : DEFAULT_FACET_CREDITS);
+			
+			header.add(parameters.get(KEY_FACET_DROPDATE) != null ? parameters
+					.get(KEY_FACET_DROPDATE).toString() : DEFAULT_FACET_DROPDATE);
+
 		}
 
 		return header;

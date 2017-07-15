@@ -390,9 +390,8 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 
         // Build a map of userId to role
         for (Member member : members) {
-            if (member.isActive()) {
+        	//Add all members, not only active -Qu
 				userIds.add(member.getUserId());
-	        }
         }
 
         // Get the user objects
@@ -589,6 +588,10 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 
 		rosterMember.setEmail(user.getEmail());
 		rosterMember.setDisplayName(user.getDisplayName());
+		rosterMember.setPlid(user.getPlid());
+		rosterMember.setActive(member.isActive());
+		rosterMember.setConfidential(true);
+
 		rosterMember.setSortName(user.getSortName());
 
 		for (Group group : groups) {
@@ -821,9 +824,9 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
                 member.setEnrollmentStatusId(enrollmentStatusId);
                 //member.setEnrollmentStatus(statusCodes.get(enrollmentStatusId));
 
-                if (enrollmentStatusId.equals("wait")) {
+                if (enrollmentStatusId.equals("false")) {
                     waiting.add(member);
-                } else if (enrollmentStatusId.equals("enrolled")) {
+                } else if (enrollmentStatusId.equals("true")) {
                     enrolled.add(member);
                 }
 

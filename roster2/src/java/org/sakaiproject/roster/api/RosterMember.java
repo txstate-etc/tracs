@@ -19,6 +19,7 @@
 
 package org.sakaiproject.roster.api;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,6 +45,8 @@ public class RosterMember {
 	@Getter @Setter
 	private String displayId;
 	@Getter @Setter
+	private String plid;
+	@Getter @Setter
 	private String displayName;
 	@Getter @Setter
 	private String sortName;
@@ -57,6 +60,12 @@ public class RosterMember {
 	private String enrollmentStatusText;
 	@Getter @Setter
 	private String credits;	
+	@Getter @Setter
+	private String dropDate;
+	@Getter @Setter
+	private boolean active;
+	@Getter @Setter
+	private boolean confidential;
 	@Getter
 	private Map<String, String> groups = new HashMap<String, String>();
 	@Getter @Setter

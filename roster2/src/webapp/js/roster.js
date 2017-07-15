@@ -19,6 +19,31 @@
  * Adrian Fish (a.fish@lancaster.ac.uk)
  */
 
+ // Avoid `console` errors in browsers that lack a console.
+ // Taken from html5-boilerplate to fix problems with roster loading in IE
+ // see https://github.com/h5bp/html5-boilerplate
+ (function() {
+     var method;
+     var noop = function () {};
+     var methods = [
+         'assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error',
+         'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log',
+         'markTimeline', 'profile', 'profileEnd', 'table', 'time', 'timeEnd',
+         'timeline', 'timelineEnd', 'timeStamp', 'trace', 'warn'
+     ];
+     var length = methods.length;
+     var console = (window.console = window.console || {});
+
+     while (length--) {
+         method = methods[length];
+
+         // Only stub undefined methods.
+         if (!console[method]) {
+             console[method] = noop;
+         }
+     }
+ }());
+
 (function ($) {
 
     roster.setupPrintButton = function () {
@@ -170,6 +195,7 @@
                 roster.readySearchButton();
                 roster.readySearchField();
                 roster.readyClearButton(state);
+                roster.readyHideUnhide();
 
                 // We don't want parallel membership requests
                 $('#navbar_overview_link > span > a').off('click');

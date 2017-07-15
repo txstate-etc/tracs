@@ -18,7 +18,7 @@
     {{/if}}
 
     {{#unless ../hideNames}}
-        <div class="roster-table-cell ">
+        <div class="roster-table-cell">
         <div class="roster-mobile-label">{{translate 'facet_name'}}</div>
         {{#if confidential}}
             <i class="fa fa-lock" style="color:#0a5566" aria-hidden="true" aria-label="Information about this person is confidential" title="Information about this person is confidential"></i>
@@ -65,6 +65,14 @@
         <div class="roster-table-cell">
             <div class="roster-mobile-label">{{translate 'facet_credits'}}</div>
             {{credits}}
+        </div>
+        <div class="roster-table-cell">
+            <div class="roster-mobile-label">{{translate 'facet_dropDate'}}</div>
+        {{#if dropDate }}
+            {{dropDate}}
+        {{else}}
+            {{translate 'nullValue'}}
+        {{/if}}
         </div>
     {{else}}
         <div class="roster-table-cell">

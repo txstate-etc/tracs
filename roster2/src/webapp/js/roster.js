@@ -195,12 +195,12 @@
                 roster.readySearchButton();
                 roster.readySearchField();
                 roster.readyClearButton(state);
-                roster.readyHideUnhide();
 
                 // We don't want parallel membership requests
                 $('#navbar_overview_link > span > a').off('click');
 
                 roster.renderMembership({ forceOfficialPicture: showOfficialPictures, replace: true });
+                roster.readyHideUnhide();
             });
 
             $(window).off('scroll.roster').on('scroll.roster', roster.getScrollFunction(showOfficialPictures));
@@ -408,7 +408,7 @@
                 var members = data.members;
 
                 if (roster.nextPage === 0) {
-                    var membersTotalString = roster.i18n.currently_displaying_participants.replace(/\{0\}/, data.membersTotal);
+                    var membersTotalString = roster.i18n.currently_displaying_participants.replace(/\{0\}/, data.membersTotal) + "( " + data.membersActiveTotal + " active,  " + data.membersInactiveTotal + " inactive" + ")";
                     $('#roster-members-total').html(membersTotalString);
                     var roleFragments = roster.getRoleFragments(data.roleCounts);
                     $('#roster-role-totals').html(roleFragments);

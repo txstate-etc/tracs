@@ -819,10 +819,37 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 
             for (Enrollment enrollment : courseManagementService.getEnrollments(enrollmentSet.getEid())) {
                 RosterMember member = membership.get(enrollment.getUserId());
+                //taking care of students who enrolled previously, but dropped later
+                if(null == member) {
+                   User user = null;
+                   String userId;
+                   try {
+                       userId = userDirectoryService.getUserId(enrollment.getUserId());
+                       user = userDirectoryService.getUser(userId);
+                       member = new RosterMember(userId);
+                       member.setEid(user.getEid());
+                       member.setPlid(user.getPlid());
+                       member.setActive(true);
+                       member.setEmail(user.getEmail());
+                       member.setDisplayName(user.getDisplayName());
+                       member.setSortName(user.getSortName());
+                       member.setConfidential(true);
+                   } catch(UserNotDefinedException e) {
+                     log.info("Could not find user " + enrollment.getUserId() + " in the system.");
+                     continue;
+                   }
+               }
+
                 member.setCredits(enrollment.getCredits());
                 String enrollmentStatusId = enrollment.getEnrollmentStatus();
                 member.setEnrollmentStatusId(enrollmentStatusId);
                 //member.setEnrollmentStatus(statusCodes.get(enrollmentStatusId));
+                if(enrollment.getDropDate() != null) {
+                    member.setDropDate(enrollment.getDropDate().toString());
+                    member.setActive(false);
+                } else {
+                    member.setDropDate(null);
+                }
 
                 if (enrollmentStatusId.equals("false")) {
                     waiting.add(member);

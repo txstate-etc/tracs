@@ -582,4 +582,9 @@ public class MockSite implements Site {
 
 	}
 
+	@Override
+	public Set getAllUsersHasRole(String role) {
+		return null;
+}
+
 }

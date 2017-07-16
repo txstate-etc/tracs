@@ -300,6 +300,8 @@ public class BaseAuthzGroup implements AuthzGroup
 			{
 				String userId = StringUtil.trimToNullLower(element.getAttribute("user"));
 				String roleId = StringUtils.trimToNull(element.getAttribute("role"));
+				String active = StringUtils.trimToNull(element.getAttribute("active"));
+				String provided = StringUtils.trimToNull(element.getAttribute("provided"));
 				String lock = StringUtils.trimToNull(element.getAttribute("lock"));
 				String anon = StringUtils.trimToNull(element.getAttribute("anon"));
 				String auth = StringUtils.trimToNull(element.getAttribute("auth"));
@@ -377,7 +379,8 @@ public class BaseAuthzGroup implements AuthzGroup
 						}
 						else
 						{
-							grant = new BaseMember(role, true, false, userId, userDirectoryService);
+							//Since we also have inactive member, should pass member status here too, comment out current line
+							grant = new BaseMember(role, Boolean.valueOf(active).booleanValue(), Boolean.valueOf(provided).booleanValue(), userId, userDirectoryService);
 							m_userGrants.put(userId, grant);
 						}
 					}
@@ -857,6 +860,9 @@ public class BaseAuthzGroup implements AuthzGroup
 
 	/**
 	 * {@inheritDoc}
+	 * This really should be called getActiveUserHasRole, sakai use this method all over
++	 * sakai tools and since sakai seems only get active users whenever they get any list,
++	 * we won't change their method name but be aware of this.
 	 */
 	public Set getUsersHasRole(String role)
 	{
@@ -869,6 +875,30 @@ public class BaseAuthzGroup implements AuthzGroup
 			String user = (String) entry.getKey();
 			BaseMember grant = (BaseMember) entry.getValue();
 			if (grant.active && grant.role.getId().equals(role))
+			{
+				rv.add(user);
+			}
+		}
+
+		return rv;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * This method get all the users including active and inactive users who
++	 * have this role.
+	 */
+	public Set getAllUsersHasRole(String role)
+	{
+		if (m_lazy) baseAuthzGroupService.m_storage.completeGet(this);
+
+		Set rv = new HashSet();
+		for (Iterator it = m_userGrants.entrySet().iterator(); it.hasNext();)
+		{
+			Map.Entry entry = (Map.Entry) it.next();
+			String user = (String) entry.getKey();
+			BaseMember grant = (BaseMember) entry.getValue();
+			if (grant.role.getId().equals(role))
 			{
 				rv.add(user);
 			}

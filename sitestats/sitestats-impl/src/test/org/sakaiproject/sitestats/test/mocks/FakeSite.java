@@ -463,6 +463,11 @@ public class FakeSite implements Site {
 		return null;
 	}
 
+	public Set getAllUsersHasRole(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public Set getUsersIsAllowed(String arg0) {
 		// TODO Auto-generated method stub
 		return null;

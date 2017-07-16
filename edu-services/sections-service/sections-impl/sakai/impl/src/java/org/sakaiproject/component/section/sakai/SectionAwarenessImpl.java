@@ -40,8 +40,10 @@ import org.sakaiproject.section.api.coursemanagement.User;
 import org.sakaiproject.section.api.facade.Role;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.FunctionManager;
+import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.SecurityService;
+import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.component.section.sakai.facade.SakaiUtil;
 import org.sakaiproject.coursemanagement.api.CourseManagementService;
 import org.sakaiproject.coursemanagement.api.SectionCategory;
@@ -72,6 +74,7 @@ public class SectionAwarenessImpl implements SectionAwareness {
     protected FunctionManager functionManager;
     protected UserDirectoryService userDirectoryService;
     protected CourseManagementService courseManagementService;
+    protected AuthzGroupService authzGroupService;
 
     /**
 	 * Bean initialization (called by spring) registers authorization functions
@@ -174,15 +177,26 @@ public class SectionAwarenessImpl implements SectionAwareness {
         	log.error("Could not find course site " + siteContext);
         	return new ArrayList();
         }
+        // -Qu
+        AuthzGroup realm = getRealm(siteContext);
         List sakaiMembers = securityService.unlockUsers(SectionAwareness.STUDENT_MARKER, course.getUuid());
-        if(log.isDebugEnabled()) log.debug("Site students size = " + sakaiMembers.size());
+        if(log.isDebugEnabled()) log.debug("getSiteEnrollments(): Site students size = " + sakaiMembers.size());
         List<EnrollmentRecordImpl> membersList = new ArrayList<EnrollmentRecordImpl>();
         for(Iterator iter = sakaiMembers.iterator(); iter.hasNext();) {
         	org.sakaiproject.user.api.User sakaiUser = (org.sakaiproject.user.api.User)iter.next();
         	User user = SakaiUtil.convertUser(sakaiUser);
+            // -Qu
+            Member member = realm.getMember(user.getUserUid());
+            // -Qu deal with historic user_id uppercase in realm bugid:4621 10/5/2011
+            if (member == null)
+                  member = realm.getMember((user.getUserUid()).toUpperCase());
+            String enrollmentStatus = new Boolean(member.isActive()).toString();
+            if(log.isDebugEnabled()) log.debug("Member " + member.getUserEid() + " status is " + enrollmentStatus + " ;\n");
+            // Need to record status since we now not only have active enrollment
+            // but also Inactive enrollment
 		if (user != null) {
- 	   		EnrollmentRecordImpl record = new EnrollmentRecordImpl(course, null, user);
-    			membersList.add(record);
+			EnrollmentRecordImpl record = new EnrollmentRecordImpl(course, enrollmentStatus, user);
+			membersList.add(record);
 		}
         }
         return membersList;
@@ -220,6 +234,27 @@ public class SectionAwarenessImpl implements SectionAwareness {
     	return new CourseImpl(site);
 	}
 	
+	private AuthzGroup getRealm(final String siteContext) {
+		if(log.isDebugEnabled()) log.debug("Getting site authz group for context " + siteContext);
+		Site site;
+		try {
+			site = siteService.getSite(siteContext);
+		} catch (IdUnusedException e) {
+			log.error("Could not find auth group for site with id = " + siteContext);
+			return null;
+		}
+		String realmId = siteService.siteReference(site.getId());
+		AuthzGroup realm;
+		try {
+			realm = authzGroupService.getAuthzGroup(realmId);
+		} catch (GroupNotDefinedException e) {
+			e.printStackTrace();
+			log.error("Could not find group for site with id = " + siteContext);
+			return null;
+		}
+	   return realm;
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -290,6 +325,7 @@ public class SectionAwarenessImpl implements SectionAwareness {
 		Set studentRoles = getSectionStudentRoles(group);
 		Set members = group.getMembers();
 		
+        if (log.isDebugEnabled()) log.debug("In getSectionMembers(): Member size is " + members.size()+ ";");
 		List<ParticipationRecord> sectionMembershipRecords = new ArrayList<ParticipationRecord>();
 		for(Iterator iter = members.iterator(); iter.hasNext();) {
 			Member member = (Member)iter.next();
@@ -300,7 +336,11 @@ public class SectionAwarenessImpl implements SectionAwareness {
 				if(taRoles.contains(roleString)) {
 					record = new TeachingAssistantRecordImpl(section, user);
 				} else if(studentRoles.contains(roleString)) {
-					record = new EnrollmentRecordImpl(section, null, user);
+					// -Qu
+					if ( log.isDebugEnabled() ) log.debug( "Member " + member.getUserEid() + " is " + member.isActive() + ";");
+					// Need to record status since we now not only have active enrollment
+					// but also Inactive enrollment
+					record = new EnrollmentRecordImpl(section, Boolean.toString(member.isActive()), user);
 				}
 				if(record != null) {
 					sectionMembershipRecords.add(record);
@@ -358,15 +398,22 @@ public class SectionAwarenessImpl implements SectionAwareness {
 		Set<String> sakaiUserUids = new HashSet<String>();
 		for(Iterator iter = studentRoles.iterator(); iter.hasNext();) {
 			String role = (String)iter.next();
-			sakaiUserUids.addAll(group.getUsersHasRole(role));
+			if (log.isDebugEnabled()) log.debug("Student role is : " + role + "for sectionUuid " + sectionUuid + " Course Section " + section + " ;");
+			sakaiUserUids.addAll(group.getAllUsersHasRole(role));
 		}
 		List sakaiUsers = userDirectoryService.getUsers(sakaiUserUids);
 
         List<EnrollmentRecord> membersList = new ArrayList<EnrollmentRecord>();
+        if (log.isDebugEnabled()) log.debug("In getSectionEnrollments Memeber size is " + sakaiUsers.size() + ";");
         for(Iterator iter = sakaiUsers.iterator(); iter.hasNext();) {
-        	User user = SakaiUtil.convertUser((org.sakaiproject.user.api.User) iter.next());
+            User user = SakaiUtil.convertUser((org.sakaiproject.user.api.User) iter.next());
+            String enrollmentStatus = Boolean.toString(group.getMember(user.getUserUid()).isActive());
+            //-Qu
+            if (log.isDebugEnabled()) log.debug(" User " + user.getDisplayId() + " is " + enrollmentStatus + " ;");
+            // Need to record status since we now not only have active enrollment
+	        // but also Inactive enrollment
 		if (user != null) {
-    			EnrollmentRecordImpl record = new EnrollmentRecordImpl(section, null, user);
+    			EnrollmentRecordImpl record = new EnrollmentRecordImpl(section, enrollmentStatus, user);
     			membersList.add(record);
 		}
         }
@@ -521,6 +568,10 @@ public class SectionAwarenessImpl implements SectionAwareness {
 
 	public void setSecurityService(SecurityService securityService) {
 		this.securityService = securityService;
+	}
+
+	public void setAuthzGroupService(AuthzGroupService authzGroupService) {
+		this.authzGroupService = authzGroupService;
 	}
 
 	public void setUserDirectoryService(UserDirectoryService userDirectoryService) {

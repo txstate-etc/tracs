@@ -532,7 +532,8 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 			String userId = member.getUserId();
 			
 			// skip if not the current user and privacy restricted or user not in group
-			if (!userId.equals(currentUserId) && ((!viewHidden && hiddenUserIds.contains(userId)) || authzGroup.getMember(userId) == null)) {
+			// we do want to show students who are in enrollment list but not a site member yet or will not be a site member
+			if (!userId.equals(currentUserId) && (!viewHidden && hiddenUserIds.contains(userId)) ) {
 				continue;
 			}
 			

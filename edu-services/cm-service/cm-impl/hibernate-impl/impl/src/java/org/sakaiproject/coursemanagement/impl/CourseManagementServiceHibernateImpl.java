@@ -476,8 +476,9 @@ public class CourseManagementServiceHibernateImpl extends HibernateDaoSupport im
 
 	public Map<String, String> getEnrollmentStatusDescriptions(Locale locale) {
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("enrolled", "Enrolled");
-		map.put("wait", "Waitlisted");
+		//We have "true" or "false" in our current database to show enrollment status.
+		map.put("true", "Enrolled");
+		map.put("false", "Dropped");
 		return map;
 	}
 

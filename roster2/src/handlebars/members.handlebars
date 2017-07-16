@@ -1,5 +1,10 @@
 {{#each members}}
-    <div class="roster-member roster-table-row">
+    {{#if active}} 
+      <div class="roster-member roster-table-row activePar" >
+    {{else}}
+      <div class="roster-member roster-table-row inactivePar" >
+    {{/if}}
+
     {{#if ../viewPicture}}
         <div class="roster-table-cell">
         {{#if ../viewProfile}}
@@ -15,6 +20,9 @@
     {{#unless ../hideNames}}
         <div class="roster-table-cell">
         <div class="roster-mobile-label">{{translate 'facet_name'}}</div>
+        {{#if confidential}}
+            <i class="fa fa-lock" style="color:#0a5566" aria-hidden="true" aria-label="Information about this person is confidential" title="Information about this person is confidential"></i>
+        {{/if}}
         {{#if ../../viewProfile}}
             <a href="javascript:;" class="profile" rel="{{formattedProfileUrl}}">
         {{/if}}
@@ -22,6 +30,9 @@
         {{#if ../../viewProfile}}
             </a>
         {{/if}}
+        {{#unless active}}
+          <i class="fa fa-ban" style="color:#990000" arial-label="Inactive Participant" title="Inactive Participant"></i>
+        {{/unless}}
         </div>
     {{/unless}}
 
@@ -36,6 +47,14 @@
         </a>
         {{/if}}
         </div>
+        <div class="roster-table-cell" style="text-align:center">
+        <div class="roster-mobile-label">{{translate 'facet_plid'}}</div>
+        {{#if plid}}
+            {{plid}}
+        {{else}}
+            {{translate 'nullValue'}}
+        {{/if}}
+      </div>
     {{/if}}
 
     {{#if ../enrollmentsMode}}
@@ -46,6 +65,14 @@
         <div class="roster-table-cell">
             <div class="roster-mobile-label">{{translate 'facet_credits'}}</div>
             {{credits}}
+        </div>
+        <div class="roster-table-cell">
+            <div class="roster-mobile-label">{{translate 'facet_dropDate'}}</div>
+        {{#if dropDate }}
+            {{dropDate}}
+        {{else}}
+            {{translate 'nullValue'}}
+        {{/if}}
         </div>
     {{else}}
         <div class="roster-table-cell">

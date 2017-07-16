@@ -19,6 +19,31 @@
  * Adrian Fish (a.fish@lancaster.ac.uk)
  */
 
+ // Avoid `console` errors in browsers that lack a console.
+ // Taken from html5-boilerplate to fix problems with roster loading in IE
+ // see https://github.com/h5bp/html5-boilerplate
+ (function() {
+     var method;
+     var noop = function () {};
+     var methods = [
+         'assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error',
+         'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log',
+         'markTimeline', 'profile', 'profileEnd', 'table', 'time', 'timeEnd',
+         'timeline', 'timelineEnd', 'timeStamp', 'trace', 'warn'
+     ];
+     var length = methods.length;
+     var console = (window.console = window.console || {});
+
+     while (length--) {
+         method = methods[length];
+
+         // Only stub undefined methods.
+         if (!console[method]) {
+             console[method] = noop;
+         }
+     }
+ }());
+
 (function ($) {
 
     roster.setupPrintButton = function () {
@@ -175,6 +200,7 @@
                 $('#navbar_overview_link > span > a').off('click');
 
                 roster.renderMembership({ forceOfficialPicture: showOfficialPictures, replace: true });
+                roster.readyHideUnhide();
             });
 
             $(window).off('scroll.roster').on('scroll.roster', roster.getScrollFunction(showOfficialPictures));
@@ -382,7 +408,7 @@
                 var members = data.members;
 
                 if (roster.nextPage === 0) {
-                    var membersTotalString = roster.i18n.currently_displaying_participants.replace(/\{0\}/, data.membersTotal);
+                    var membersTotalString = roster.i18n.currently_displaying_participants.replace(/\{0\}/, data.membersTotal) + "( " + data.membersActiveTotal + " active,  " + data.membersInactiveTotal + " inactive" + ")";
                     $('#roster-members-total').html(membersTotalString);
                     var roleFragments = roster.getRoleFragments(data.roleCounts);
                     $('#roster-role-totals').html(roleFragments);

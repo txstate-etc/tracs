@@ -390,9 +390,8 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 
         // Build a map of userId to role
         for (Member member : members) {
-            if (member.isActive()) {
+        	//Add all members, not only active -Qu
 				userIds.add(member.getUserId());
-	        }
         }
 
         // Get the user objects
@@ -533,7 +532,8 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 			String userId = member.getUserId();
 			
 			// skip if not the current user and privacy restricted or user not in group
-			if (!userId.equals(currentUserId) && ((!viewHidden && hiddenUserIds.contains(userId)) || authzGroup.getMember(userId) == null)) {
+			// we do want to show students who are in enrollment list but not a site member yet or will not be a site member
+			if (!userId.equals(currentUserId) && (!viewHidden && hiddenUserIds.contains(userId)) ) {
 				continue;
 			}
 			
@@ -589,6 +589,10 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 
 		rosterMember.setEmail(user.getEmail());
 		rosterMember.setDisplayName(user.getDisplayName());
+		rosterMember.setPlid(user.getPlid());
+		rosterMember.setActive(member.isActive());
+		rosterMember.setConfidential(true);
+
 		rosterMember.setSortName(user.getSortName());
 
 		for (Group group : groups) {
@@ -783,10 +787,9 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
             membersMap = new HashMap<String, List<RosterMember>>();
             cache.put(siteId, membersMap);
         }
-
         if (membersMap.containsKey(enrollmentSetId + "#all")
-                && membersMap.containsKey(enrollmentSetId + "#wait")
-                && membersMap.containsKey(enrollmentSetId + "#enrolled")) {
+                && membersMap.containsKey(enrollmentSetId + "#true")
+                && membersMap.containsKey(enrollmentSetId + "#false")) {
             if (log.isDebugEnabled()) {
                 log.debug("Cache hit on '" + enrollmentSetId + "'");
             }
@@ -816,14 +819,41 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 
             for (Enrollment enrollment : courseManagementService.getEnrollments(enrollmentSet.getEid())) {
                 RosterMember member = membership.get(enrollment.getUserId());
+                //taking care of students who enrolled previously, but dropped later
+                if(null == member) {
+                   User user = null;
+                   String userId;
+                   try {
+                       userId = userDirectoryService.getUserId(enrollment.getUserId());
+                       user = userDirectoryService.getUser(userId);
+                       member = new RosterMember(userId);
+                       member.setEid(user.getEid());
+                       member.setPlid(user.getPlid());
+                       member.setActive(true);
+                       member.setEmail(user.getEmail());
+                       member.setDisplayName(user.getDisplayName());
+                       member.setSortName(user.getSortName());
+                       member.setConfidential(true);
+                   } catch(UserNotDefinedException e) {
+                     log.info("Could not find user " + enrollment.getUserId() + " in the system.");
+                     continue;
+                   }
+               }
+
                 member.setCredits(enrollment.getCredits());
                 String enrollmentStatusId = enrollment.getEnrollmentStatus();
                 member.setEnrollmentStatusId(enrollmentStatusId);
                 //member.setEnrollmentStatus(statusCodes.get(enrollmentStatusId));
+                if(enrollment.getDropDate() != null) {
+                    member.setDropDate(enrollment.getDropDate().toString());
+                    member.setActive(false);
+                } else {
+                    member.setDropDate(null);
+                }
 
-                if (enrollmentStatusId.equals("wait")) {
+                if (enrollmentStatusId.equals("false")) {
                     waiting.add(member);
-                } else if (enrollmentStatusId.equals("enrolled")) {
+                } else if (enrollmentStatusId.equals("true")) {
                     enrolled.add(member);
                 }
 
@@ -841,8 +871,8 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
             }
 
             membersMap.put(enrollmentSetId + "#all", members);
-            membersMap.put(enrollmentSetId + "#wait", waiting);
-            membersMap.put(enrollmentSetId + "#enrolled", enrolled);
+            membersMap.put(enrollmentSetId + "#false", waiting);
+            membersMap.put(enrollmentSetId + "#true", enrolled);
 
             return membersMap;
         }

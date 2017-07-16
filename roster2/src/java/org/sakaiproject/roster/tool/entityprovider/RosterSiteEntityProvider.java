@@ -145,6 +145,15 @@ public class RosterSiteEntityProvider extends AbstractEntityProvider implements
         int membershipsSize = membership.size();
         log.debug("memberships.size(): {}", membershipsSize);
 
+        int membersActiveTotal=0, membersInactiveTotal=0;
+        for (RosterMember member: membership) {
+            if(member.isActive()) {
+                membersActiveTotal++;
+            }else{
+                membersInactiveTotal++;
+            }
+        }
+
         List<RosterMember> subList = null;
 
         if (returnAll) {
@@ -172,6 +181,8 @@ public class RosterSiteEntityProvider extends AbstractEntityProvider implements
         RosterData data = new RosterData();
         data.setMembers(subList);
         data.setMembersTotal(membershipsSize);
+        data.setMembersActiveTotal(membersActiveTotal);
+        data.setMembersInactiveTotal(membersInactiveTotal);
 
         boolean showVisits = sakaiProxy.getShowVisits();
 
@@ -235,12 +246,19 @@ public class RosterSiteEntityProvider extends AbstractEntityProvider implements
 
 		List<RosterMember> membership = new ArrayList();
 		Map<String, Integer> roleCounts = new HashMap(1);
+		int membersActiveTotal=0, membersInactiveTotal=0;
 
 		for (String userId : userIds) {
 			RosterMember member = sakaiProxy.getMember(siteId, userId, enrollmentSetId);
 
 			if (null == member) {
 				throw new EntityException("Unable to retrieve membership", reference.getReference());
+			}
+
+			if(member.isActive()){
+				membersActiveTotal++;
+			}else{
+				membersInactiveTotal++;
 			}
 
 			membership.add(member);
@@ -257,6 +275,8 @@ public class RosterSiteEntityProvider extends AbstractEntityProvider implements
 		data.setMembers(membership);
 		data.setMembersTotal(membership.size());
 		data.setRoleCounts(roleCounts);
+		data.setMembersActiveTotal(membersActiveTotal);
+		data.setMembersInactiveTotal(membersInactiveTotal);
 
 		return data;
 	}

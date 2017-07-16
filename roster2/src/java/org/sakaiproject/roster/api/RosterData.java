@@ -10,6 +10,8 @@ public class RosterData {
 
     private List<RosterMember> members;
     private int membersTotal;
+    private int membersActiveTotal;
+    private int membersInactiveTotal;
     private Map<String, Integer> roleCounts;
     private String status;
 }

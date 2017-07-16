@@ -16,10 +16,10 @@
 | cmprovider                   | DONE             |
 | common                       | DONE             |
 | config                       | DONE             |
-| content                      |                  |
+| content                      | Anne             |
 | content-review               |                  |
 | courier                      | NO LOCAL CHANGES |
-| dashboard                    |                  |
+| dashboard                    | Anne             |
 | dav                          | DONE             |
 | delegatedaccess              | NO LOCAL CHANGES |
 | deploy                       | NO LOCAL CHANGES |
@@ -42,7 +42,7 @@
 | lticontact                   | DONE             |
 | mailarchive                  | DONE             |
 | mailsender                   | DONE             |
-| master                       |                  |
+| master                       | Anne             |
 | melete                       | DONE             |
 | memory                       | NO LOCAL CHANGES |
 | message                      | NO LOCAL CHANGES |
@@ -58,11 +58,11 @@
 | presence                     | NO LOCAL CHANGES |
 | profile2                     | DONE             |
 | providers                    |                  |
-| reference                    |                  |
+| reference                    | Anne             |
 | reset-pass                   |                  |
-| rest                         |                  |
+| rest                         | Anne             |
 | rights                       | NO LOCAL CHANGES |
-| roster2                      |                  |
+| roster2                      | DONE             |
 | roster_legacy                |                  |
 | rsf                          | NO LOCAL CHANGES |
 | rwiki                        | DONE             |
@@ -78,9 +78,9 @@
 | syllabus                     | DONE             |
 | taggable                     | NO LOCAL CHANGES |
 | textarea                     | NO LOCAL CHANGES |
-| tool                         |                  |
+| tool                         | Anne             |
 | turningpoint                 |                  |
-| user                         |                  |
+| user                         | Anne             |
 | userauditservice             | NO LOCAL CHANGES |
 | usermembership               | NO LOCAL CHANGES |
 | velocity                     | NO LOCAL CHANGES |

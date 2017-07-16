@@ -27,17 +27,17 @@ def buildTracsApp() {
             echo " ==================== "
             echo "Building TRACS from ${params.PERSON}"
             echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-            sh "sudo docker run --rm ${REGISTRY_HOST}/tracs-build:11 -q | sudo docker build --no-cache -t tracs:nightly-test - "
+            sh "sudo docker run --rm ${REGISTRY_HOST}/tracs-build:11 -q | sudo docker build --no-cache -t tracs:nightly - "
   }
   stage ('Push') {
              echo " ==================== "
              echo '   PUSH  '
              echo " ==================== "
              echo 'Prepare for pushing docker image'
-             sh "sudo docker tag tracs:nightly-test ${REGISTRY_HOST}/tracs:nightly-test"
+             sh "sudo docker tag tracs:nightly ${REGISTRY_HOST}/tracs:nightly"
              timeout(time: 120, unit: 'MINUTES') {
                  retry(2) {
-                     sh "sudo docker push ${REGISTRY_HOST}/tracs:nightly-test"
+                     sh "sudo docker push ${REGISTRY_HOST}/tracs:nightly"
                  }
              }
   }
@@ -50,7 +50,7 @@ def buildTracsApp() {
              echo 'Stop and delete container'
              restyCall(removeContainer)
              echo 'Remove old docker image'
-             def removeImage = "DELETE /services/tracstomcat/images/${REGISTRY_HOST}/tracs:nightly-test"
+             def removeImage = "DELETE /services/tracstomcat/images/${REGISTRY_HOST}/tracs:nightly"
              restyCall(removeImage)
              sleep 10
   }
@@ -59,7 +59,7 @@ def buildTracsApp() {
              echo '   DEPLOY   '
              echo " ==================== "
              echo 'Getting new build from registry'
-             def pullImage = "POST /services/tracstomcat/images/pull '{\"image\":\"${REGISTRY_HOST}/tracs:nightly-test\"}'"
+             def pullImage = "POST /services/tracstomcat/images/pull '{\"image\":\"${REGISTRY_HOST}/tracs:nightly\"}'"
             //  retry(5) {
                  restyCall(pullImage)
                 //  sleep 3000
@@ -74,7 +74,7 @@ def buildTracsApp() {
             echo '   START  '
             echo " ==================== "
             echo "Starting tracs container "
-            def createStartContainer = "POST /services/tracstomcat/containers '{\"name\": \"bravo\", \"config\": \"default\", \"image\": \"${REGISTRY_HOST}/tracs:nightly-test\", \"database\": \"sakaidb\"}'"
+            def createStartContainer = "POST /services/tracstomcat/containers '{\"name\": \"bravo\", \"config\": \"default\", \"image\": \"${REGISTRY_HOST}/tracs:nightly\", \"database\": \"sakaidb\"}'"
             // retry(5) {
                    echo 'Creating and starting a docker container'
                    restyCall(createStartContainer)

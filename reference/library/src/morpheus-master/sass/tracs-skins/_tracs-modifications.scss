@@ -22,6 +22,7 @@ $tool-title-nav-link-color-hover: $primary-color !default;
 
 //mobile
 $mobile-tools-and-sites-bar-background: lighten($tool-menu-color, 15% ) !default;
+$mobile-tools-and-sites-bar-color: black !default;
 $mobile-breadcrumbs-bar-background: $primary-color !default;
 $mobile-breadcrumbs-bar-color: $background-color !default;
 
@@ -40,6 +41,7 @@ $lessons-checklist-background: $soft-color;
     @media (max-width: $break-small-end){
       margin: 0px;
       height: 40px;
+      width: 100%;
     }
   }
 }
@@ -50,9 +52,10 @@ $lessons-checklist-background: $soft-color;
 }
 
 //Change default color of Tools and Sites bar on mobile
-.Mrphs-skipNav__menu{
+.Mrphs-skipNav__menu .Mrphs-skipNav__menuitem .Mrphs-skipNav__link{
   @media (max-width: $break-small-end){
      background: $mobile-tools-and-sites-bar-background;
+     color: $mobile-tools-and-sites-bar-color;
   }
 }
 
@@ -63,6 +66,10 @@ $lessons-checklist-background: $soft-color;
 #toolMenu ul li a, #subSites ul li a {
     padding: 0.7em 0.5em;
     text-align: left;
+    @media (max-width: $break-small-end){
+      padding: 0.85em 0.25em 0.1em;
+      text-align: center;
+    }
 }
 
 #toolMenu ul li .Mrphs-toolsNav__menuitem--icon, #subSites ul li .Mrphs-toolsNav__menuitem--icon {
@@ -71,6 +78,12 @@ $lessons-checklist-background: $soft-color;
     width: 18%;
     height: 100%;
     padding: 0 0.2em 0 0.2em;
+    @media (max-width: $break-small-end){
+      display: block;
+      width: auto;
+      height: auto;
+      padding: 0px;
+    }
 }
 
 #toolMenu ul li a .Mrphs-toolsNav__menuitem--title, #subSites ul li a .Mrphs-toolsNav__menuitem--title{
@@ -79,6 +92,12 @@ $lessons-checklist-background: $soft-color;
   white-space: pre;
   overflow: hidden;
   vertical-align: middle;
+  @media (max-width: $break-small-end){
+    display: inline;
+    width: 100%;
+    white-space: pre-wrap;
+    vertical-align: baseline;
+  }
 }
 
 //strange blank image at top of tool menu
@@ -98,8 +117,10 @@ $lessons-checklist-background: $soft-color;
   background: $soft-color;
 }
 
-//Change default color of Breadcrumbs bar on mobile
 .Mrphs-siteHierarchy{
+  @media (max-width: $break-small-end){
+    flex-wrap: wrap;
+  }
   min-height: 55px;
   .Mrphs-hierarchy--siteName, .Mrphs-hierarchy--siteNameSeparator, .Mrphs-hierarchy--toolName{
     display: none;
@@ -107,20 +128,31 @@ $lessons-checklist-background: $soft-color;
       display: inline-block;
     }
   }
+  a.Mrphs-hierarchy--toolName {
+    &:hover {
+      border-bottom: 0px;
+      span {
+        text-decoration:underline;
+        &.Mrphs-breadcrumb--icon {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
   .Mrphs-hierarchy--siteNameSeparator{
     color: $site-hierarchy-separator-color;
   }
-
+  //Change default color of Breadcrumbs bar on mobile
   @media (max-width: $break-small-end){
     background: $mobile-breadcrumbs-bar-background;
     a{
       color: $mobile-breadcrumbs-bar-color;
+      &:hover {
+        color: $mobile-breadcrumbs-bar-color;
+      }
     }
   }
-}
-
-.Mrphs-skipNav__menu .Mrphs-skipNav__menuitem .Mrphs-skipNav__link {
-  color: $mobile-breadcrumbs-bar-color
 }
 
 .tracs-sites #linkNav ul.Mrphs-sitesNav__menu {
@@ -205,6 +237,33 @@ body.Mrphs-portalBody{
 .Mrphs-sakai-lessonbuildertool {
   .checklistDiv {
     background-color: $lessons-checklist-background;
+  }
+  .neoPortletTitleWrap {
+    .title .breadcrumbs h2 {
+      font-size: 1.5rem;
+      .Mrphs-breadcrumb--icon {
+        font-size: 1.5rem;
+        margin-right: 3px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.addedCrumbs {
+  .Mrphs-hierarchy--separator {
+    color: $site-hierarchy-separator-color;
+  }
+  span a {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  .lessons-siteHierarchy-title {
+    color: $mobile-breadcrumbs-bar-color;
+    &:hover {
+      color: $mobile-breadcrumbs-bar-color;
+    }
   }
 }
 

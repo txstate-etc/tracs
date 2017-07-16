@@ -219,12 +219,15 @@
 	// if we're in morpheus, move breadcrums into top bar, and generate an H2 with the title
 	if (jQuery(".oldPortal").size() === 0) {
 	    var title = jQuery(".title span:last").text();
-	    if (breadcrumbs.size() > 0) {
-		jQuery(".Mrphs-siteHierarchy").append(jQuery(".breadcrumbs span").slice(1));
-	    }
-	    jQuery(".Mrphs-siteHierarchy").children().wrapAll('<div class="hierarchyWrap" />');
-	    jQuery(".Mrphs-siteHierarchy").append(jQuery("span.nextprev"));
-	    jQuery(".neoPortletTitleWrap").before('<h2 class="genTitle"></h2>');
+	    //Anne commented this out for 11.  Our design removes the breadcrumbs because they are
+	    //redundant everywhere EXCEPT Lessons.  For lessons, we move them into the content area,
+	    //similar to what is done in 12.
+	 //    if (breadcrumbs.size() > 0) {
+		// jQuery(".Mrphs-siteHierarchy").append(jQuery(".breadcrumbs span").slice(1));
+	 //    }
+	 //    jQuery(".Mrphs-siteHierarchy").children().wrapAll('<div class="hierarchyWrap" />');
+	 //    jQuery(".Mrphs-siteHierarchy").append(jQuery("span.nextprev"));
+	    jQuery(".neoPortletTitleWrap").after('<h2 class="genTitle"></h2>');
 	    jQuery(".genTitle").text(title);
 	    // the top is position:fixed. The rest of the page is position static, put below the
 	    // fixed by a magic margin. However if the siteHierarchy is large, the magic margin
@@ -236,7 +239,38 @@
 		jQuery("#content").css('margin-top','0px');
 	      }
 	    }
-            resizeContent();
+	    //Anne added for 11: On mobile, add the lessons breadcrumbs to the site hierarchy.  On larger
+	    //screens, show them in the content area.  This should be removed if we upgrade to Sakai 12, 
+	    //which handles breadcrumbs better in all tools.
+	    var timer;
+	    function handleBreadCrumbs(){
+			if (window.matchMedia("only screen and (max-width: 800px)").matches) {
+				//hide lower breadcrumbs
+				$('.neoPortletTitleWrap').hide();
+				//add upper breadcrumbs after "Lessons"
+				var breadcrumbs = jQuery(".breadcrumbs h2 > span:not('.siteTitle')").clone().slice(1);
+				if(breadcrumbs.length > 0){
+					var addedCrumbs = jQuery('<div class="addedCrumbs"></div>')
+											.append('<span class="Mrphs-hierarchy--separator"><i aria-hidden="true" class="fa fa-lg fa-angle-right"></i></span>')
+											.append(breadcrumbs);
+					if(jQuery('.addedCrumbs').size() == 0)
+						jQuery(".Mrphs-siteHierarchy").append(addedCrumbs);
+				}
+			}
+			else {
+				//show lower breadcrumbs
+				$('.neoPortletTitleWrap').show();
+				//remove upper breadcrumbs after "lessons"
+				jQuery('.addedCrumbs').remove();
+			}
+		}
+	    jQuery(window).resize(function(){
+			clearTimeout(timer);
+			timer = setTimeout(handleBreadCrumbs, 250);
+		});
+		handleBreadCrumbs();
+
+        resizeContent();
 	    jQuery(window).load(resizeContent);
 	    jQuery(window).resize(resizeContent);
          }
@@ -245,6 +279,10 @@
 	 else
 	   jQuery(".neoPortletTitleWrap").before(jQuery(".action"));
 
+		//add icon to breadcrumbs
+	   jQuery(".neoPortletTitleWrap .breadcrumbs h2 span:not('.siteTitle')").first().find('a').prepend('<span class="Mrphs-breadcrumb--icon icon-sakai--sakai-lessonbuildertool "></span>')
+	   //hide the duplicate next/previous buttons
+	   jQuery("span.nextprev").hide();
 
 </script>
 

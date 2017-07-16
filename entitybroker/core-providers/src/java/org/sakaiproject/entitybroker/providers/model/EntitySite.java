@@ -908,4 +908,9 @@ public class EntitySite implements Site {
         throw new UnsupportedOperationException();
     }
 
+	public Set getAllUsersHasRole(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+}
+
 }

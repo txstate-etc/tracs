@@ -200,6 +200,13 @@ public interface AuthzGroup extends Edit, Comparable, Serializable
 	public Set<String> getUsersHasRole(String role);
 
 	/**
+	 * Access all users who have a (active/inactive) role membership with this role.
+	 *
+	 * @return The Set of user ids (String) who have a (active/inactive) role membership with this role.
+	 */
+	public Set getAllUsersHasRole(String role);
+
+	/**
 	 * Access all users who have an active role membership to a role that is allowed this function.
 	 * 
 	 * @param function

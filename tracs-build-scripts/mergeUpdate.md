@@ -60,7 +60,7 @@
 | providers                    | DONE             |
 | reference                    | DONE             |
 | reset-pass                   |                  |
-| rest                         | Anne             |
+| rest                         | DONE             |
 | rights                       | NO LOCAL CHANGES |
 | roster2                      | DONE             |
 | roster_legacy                |                  |

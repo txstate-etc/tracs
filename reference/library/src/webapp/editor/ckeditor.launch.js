@@ -210,6 +210,8 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
             CKEDITOR.plugins.addExternal('movieplayer',basePath+'movieplayer/', 'plugin.js');
             CKEDITOR.plugins.addExternal('fmath_formula',basePath+'fmath_formula/', 'plugin.js');
             CKEDITOR.plugins.addExternal('audiorecorder',basePath+'audiorecorder/', 'plugin.js');
+            CKEDITOR.plugins.addExternal('nopasteimg', basePath+'nopasteimg/', 'plugin.js');
+            CKEDITOR.plugins.addExternal('autolink', basePath+'autolink/', 'plugin.js');
             CKEDITOR.plugins.addExternal('image2',basePath+'image2/', 'plugin.js');
             //Autosave has a dependency on notification
             CKEDITOR.plugins.addExternal('autosave',webJars+'autosave/8541f541d9985cfd0859c7d8eb6be404afe95a2d/', 'plugin.js');
@@ -235,7 +237,6 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
             //ckconfig.contentsCss = [basePath+'atd-ckeditor/atd.css'];
 
             ckconfig.extraPlugins+="image2,audiorecorder,movieplayer,wordcount,fmath_formula,autosave,fontawesome,notification,nopasteimg,autolink";
-
             //SAK-29648
             ckconfig.contentsCss = [basePath+'/fontawesome/font-awesome/css/font-awesome.min.css'];
             //If the siteskin is defined, add the print.css
@@ -247,6 +248,7 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
         }
     })();
 
+      ckconfig.autoParagraph = false
 	  CKEDITOR.replace(targetId, ckconfig);
       //SAK-22505
       CKEDITOR.on('dialogDefinition', function(e) {

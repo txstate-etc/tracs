@@ -565,7 +565,7 @@ public class SiteAddParticipantHandler {
 								userAuditList.add(userAuditString);
 
 								// send notification
-								if (notify) {
+								if (notify && !entry.isNewUser) {
 									// send notification email 
 									notiProvider.notifyAddedParticipant(!isOfficialAccount(eId), user, site);
 									
@@ -672,6 +672,8 @@ public class SiteAddParticipantHandler {
 						// and save
 						userDirectoryService.commitEdit(uEdit);
 
+						entry.isNewUser = true;
+
 						boolean notifyNewUserEmail = (getServerConfigurationString("notifyNewUserEmail", Boolean.TRUE.toString()))
 								.equalsIgnoreCase(Boolean.TRUE.toString());
 						boolean validateUsers = serverConfigurationService.getBoolean("siteManage.validateNewUsers", true);
@@ -776,6 +778,10 @@ public class SiteAddParticipantHandler {
 		// check that there is something with which to work
 		officialAccounts = StringUtils.trimToNull(officialAccountParticipant);
 		nonOfficialAccounts = StringUtils.trimToNull(nonOfficialAccountParticipant);
+		// force saving user id all in lower case into sakai database to keep netid consistant accross sakai tables; -Qu
+		if ( officialAccounts != null ){
+			officialAccounts = officialAccounts.toLowerCase();
+		}
 		String updatedOfficialAccountParticipant = "";
 		String updatedNonOfficialAccountParticipant = "";
 
@@ -927,7 +933,7 @@ public class SiteAddParticipantHandler {
 			                TargettedMessage.SEVERITY_ERROR));
 					break;
 				}
-				String userEid = nonOfficialAccountParts[0].trim();
+				String userEid = nonOfficialAccountParts[0].trim().toLowerCase();
 				// get last name, if any
 				String userLastName = "";
 				if (nonOfficialAccountParts.length > 1)

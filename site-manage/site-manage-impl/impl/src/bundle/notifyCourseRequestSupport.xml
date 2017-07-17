@@ -12,8 +12,7 @@ Date:	${dateDisplay}
 I am requesting approval of a ${serverName} Course Site for  ${termTitle} for this section:
 
 ${requestSectionInfo}
-
-Name:	${currentUserDisplayName} (uniqname ${currentUserDisplayId})
+Name :	${currentUserDisplayName} (username ${currentUserDisplayId})
 Email:	${currentUserEmail}
 
 Site title:	${siteTitle}

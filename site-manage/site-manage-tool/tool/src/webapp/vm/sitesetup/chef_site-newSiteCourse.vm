@@ -85,7 +85,7 @@
 						#set($crosslisted=1)	
 					#end
 					</th>
-					<th>
+					<th class="officialDescriptionCell">
 						$tlang.getString("useOfficialDescription")
 					</th>
 					</tr>
@@ -151,7 +151,7 @@
 									#set ($courseNumber = $courseNumber +1)
 									</h5>
 								</td>
-								<td>
+								<td class="officialDescriptionCell">
 									#set($sectionDescription=false)
 									#set($sectionDescription=$!sectionObject.description)
 									#if ($!sectionDescription && !$!sectionDescription.isEmpty())
@@ -180,6 +180,9 @@
 				
 
 		#if ($authorizationRequired)
+			## Pretty sure this is only valid when site is null (i.e. creating site instead of editing existing one)
+			## currentUserId is only set if that is the case, so this is actually being shown regardless on edit class roster
+			## page because currentUserId. Thus, I'm adding a !$site check -crs #6010
 			#if ($termCourseList && $currentUserId != $userId)
 					<div class="shorttext required form-group row ">											
 						<label for="uniqname" class="col-sm-3 form-control-label">		

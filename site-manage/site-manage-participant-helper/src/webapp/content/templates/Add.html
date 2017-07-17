@@ -37,6 +37,8 @@
 			<label rsf:id="officialAccountLabel" for ="officialAccountParticipant">
 	           Official Account Label
 	        </label>
+	        <!-- Texas State user id example - AmyBoyd,10/11/06 -->
+	        (e.g. jd1234)<br/><font color="#555555">(To find an official NetID, go to <a target="wn_dir" href="http://peoplesearch.txstate.edu/peoplesearch2.pl">Catsweb</a> and login to the Business Menu.)</font>
 	        <br/>
 	        <textarea rsf:id="officialAccountParticipant" name="officialAccountParticipant" cols="35" rows="4" id="officialAccountParticipant"></textarea>
 			<a href="#" onclick="rsf:id='officialAccountPickerAction'"><h5 rsf:id="officialAccountPickerLabel"></h5></a><br />
@@ -48,6 +50,8 @@
 	           Non-Official Account Label
 	        </label>
 	        <br/>
+	        <!-- Don't do it.  I'm warning you.  I will turn this site around right now, mister! - AmyBoyd,10/11/06 -->
+	        <font color="red">Please do not add txstate email addresses here.</font><br/>
 	        <textarea rsf:id="nonOfficialAccountParticipant" name="nonOfficialAccountParticipant" cols="35" rows="4" id="nonOfficialAccountParticipant"></textarea>
 			<h5 class="textPanelFooter" rsf:id="nonOfficialAddMultiple"></h5>
 			
@@ -80,7 +84,7 @@
 			</table>
 			
 			<p class="act">
-				<input accesskey ="s" rsf:id="continue" class="active" value="Save" type="submit" onclick="SPNR.disableControlsAndSpin( this, null );" />
+				<input accesskey ="s" rsf:id="continue" class="active" value="Save" type="submit" onclick="SPNR.disableControlsAndSpin( this, null );return checkfornetid(document.getElementById('content::nonOfficialAccountParticipant').value)" />
 				<input accesskey ="x" rsf:id="cancel" value="Cancel" type="submit" onclick="SPNR.disableControlsAndSpin( this, null );" />
 			</p>
 		</form>

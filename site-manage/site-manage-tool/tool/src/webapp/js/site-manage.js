@@ -638,6 +638,13 @@ utils.resizeFrame = function(updown){
     }
 };
 
+$(document).ready(function() {
+    $('#showarchived').click(function() {
+        $('.archived').fadeIn();
+        $('#showarchived').hide();
+    });
+});
+
 // SAK-23905
 var setLTIPrefix = function(ltipref) {
         ltiPrefix = ltipref;

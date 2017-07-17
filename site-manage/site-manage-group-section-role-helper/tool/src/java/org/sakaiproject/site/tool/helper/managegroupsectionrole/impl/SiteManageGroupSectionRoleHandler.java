@@ -532,7 +532,7 @@ public class SiteManageGroupSectionRoleHandler {
     			// need to remove those inside group already
 	    		for(Participant p:rvCopy)
 	    		{
-	    			if (p.getUniqname() != null && group.getMember(p.getUniqname()) == null)
+	    			if (p.getUniqname() != null && group.getMember(p.getUniqname()) == null && p.isActive())
 	    			{
 	    				rv.add(p);
 	    			}
@@ -541,9 +541,11 @@ public class SiteManageGroupSectionRoleHandler {
     		else
     		{
     			// if the group is null, add all site members
-    			rv.addAll(rvCopy);
-    		}
-    	}
+    			for (Participant p : rvCopy) {
+    				if (p.isActive()) { rv.add(p); }
+			}
+		}
+	}
     	
     	return rv;
     }

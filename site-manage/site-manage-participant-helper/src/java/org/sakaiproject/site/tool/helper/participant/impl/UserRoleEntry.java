@@ -19,6 +19,8 @@ public class UserRoleEntry {
 	  /** The user last name **/
 	  public String lastName;
 	  
+	  public boolean isNewUser = false;
+
 	  /**
 	   * constructor with no params
 	   */

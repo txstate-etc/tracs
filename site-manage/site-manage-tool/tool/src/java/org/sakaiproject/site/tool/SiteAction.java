@@ -170,6 +170,11 @@ import org.sakaiproject.util.*;
 import org.sakaiproject.util.api.LinkMigrationHelper;
 
 
+import org.sakaiproject.user.api.PreferencesService;
+import org.sakaiproject.user.api.Preferences;
+
+import java.util.TreeSet;
+
 /**
  * <p>
  * SiteAction controls the interface for worksite setup.
@@ -228,6 +233,9 @@ public class SiteAction extends PagedResourceActionII {
 	
 	private static org.sakaiproject.sitemanage.api.UserNotificationProvider userNotificationProvider = (org.sakaiproject.sitemanage.api.UserNotificationProvider) ComponentManager
 	.get(org.sakaiproject.sitemanage.api.UserNotificationProvider.class);
+
+	//Hide archived sites by default when importing site and give user a button to show them #5942
+	private static PreferencesService preferencesService = (PreferencesService) ComponentManager.get(PreferencesService.class);
 	
 	private static ShortenedUrlService shortenedUrlService = (ShortenedUrlService) ComponentManager.get(ShortenedUrlService.class);
 
@@ -2094,6 +2102,8 @@ public class SiteAction extends PagedResourceActionII {
 						if (notStealthOrHiddenTool("sakai-site-manage-participant-helper")) {
 							b.add(new MenuEntry(rb.getString("java.addp"),
 									"doParticipantHelper"));
+							//added by amy boyd - site stats does not have it's own permissions, so i'm assuming that if you can add participants, then you can see the site stats.
+							b.add(new MenuEntry(rb.getString("java.sitestats"),"doSiteStats"));
 						}
 						
 						// show the Edit Class Roster menu
@@ -2274,7 +2284,13 @@ public class SiteAction extends PagedResourceActionII {
 						context.put("currentSortedBy", sortedBy);
 					if (sortedAsc != null)
 						context.put("currentSortAsc", sortedAsc);
+
+					int inactiveCount = 0;
+					for (Participant participant : (Collection<Participant>)participantsCollection) {
+						if (!participant.isActive()) { inactiveCount++; }
+					}
 					context.put("participantListSize", Integer.valueOf(participantsCollection.size()));
+					context.put("inactiveCount", inactiveCount);
 					context.put("participantList", prepPage(state));
 					pagingInfoToContext(state, context);
 				}
@@ -4089,9 +4105,31 @@ public class SiteAction extends PagedResourceActionII {
 		context.put("currentSite", site);
 		context.put("importSiteList", state
 				.getAttribute(STATE_IMPORT_SITES));
-		context.put("sites", SiteService.getSites(
+		List<Site> sites = SiteService.getSites(
 				org.sakaiproject.site.api.SiteService.SelectionType.UPDATE,
-				ownTypeOnly?site.getType():null, null, null, SortType.TITLE_ASC, null));
+				ownTypeOnly?site.getType():null, null, null, SortType.TITLE_ASC, null);
+
+    //Hide archived sites by default when importing site and give user a button to show them #5942
+		Preferences userPrefs = preferencesService.getPreferences(UserDirectoryService.getCurrentUser().getId());
+		boolean hasArchivedSites = userPrefs.getKeys().contains("sakai:portal:sitenav") && userPrefs.getProperties("sakai:portal:sitenav").getPropertyList("exclude") != null;
+
+		Set<Site> excludedSites = new HashSet<Site>();
+		if (hasArchivedSites) {
+			List<String> excludedSiteIds = userPrefs.getProperties("sakai:portal:sitenav").getPropertyList("exclude");
+
+			for (String siteid : excludedSiteIds) {
+				try {
+					excludedSites.add(SiteService.getSite(siteid));
+				} catch (IdUnusedException ex) {
+				}
+			}
+		}
+
+		//context.put("sites", SiteService.getSites(
+		//		org.sakaiproject.site.api.SiteService.SelectionType.UPDATE,
+		//		ownTypeOnly?site.getType():null, null, null, SortType.TITLE_ASC, null));
+		context.put("sites", sites);
+		context.put("archivedSites", excludedSites);
 	}
 
 	/**
@@ -4285,7 +4323,27 @@ public class SiteAction extends PagedResourceActionII {
 		// launch the helper
 		startHelper(data.getRequest(), "sakai-site-pageorder-helper");
 	}
-	
+
+	/**
+	 * Launch the SiteStats Tool
+	 *
+	 * @see case 12
+	 *
+	 */
+
+	public void doSiteStats(RunData data) {
+		SessionState state = ((JetspeedRunData) data)
+				.getPortletSessionState(((JetspeedRunData) data).getJs_peid());
+
+		// pass in the siteId of the site to be ordered (so it can configure
+		// sites other then the current site)
+		SessionManager.getCurrentToolSession().setAttribute(
+				HELPER_ID + ".siteId", ((Site) getStateSite(state)).getId());
+
+		// launch the helper
+		startHelper(data.getRequest(), "sakai.sitestats");
+	}
+
 	/**
 	 * Launch the participant Helper Tool -- for adding participant
 	 * 
@@ -6076,6 +6134,11 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 	// add external tools to end of toolGroup list
 	String externaltoolgroupname = getGroupName(LTI_TOOL_TITLE);
 	List externalTools = getLtiToolGroup(externaltoolgroupname, moreInfoDir, site);
+
+	//We don't want to show some system configured external tools in the tool lists under plugin tools
+	//to avoid user confusion  -Qu  8/2/2015
+	externalTools = getFilteredSysExternalTools(externalTools);
+
 	if (externalTools.size() > 0 ) 
 		toolGroup.put(externaltoolgroupname, externalTools);
 	
@@ -6106,6 +6169,26 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 
 	return toolGroup;
 }
+
+	/**
+	 * Get sys external tools that are not hidden  -Qu 8/2/2015
+	 * @param externalTools
+	 * @return externalTools (filtered--excludes the hidden ones that configured in sakai properties)
+	 */
+	private List getFilteredSysExternalTools (List<MyTool> externalTools) {
+			String[] filteredToolLists = ServerConfigurationService.getString("site.setup.sys.plugin.tools.hiddenList").split(",");
+			for (int i=0; i<filteredToolLists.length;i++){
+				filteredToolLists[i] = filteredToolLists[i].trim().toLowerCase();
+			}
+			List filteredList = Arrays.asList(filteredToolLists);
+			Iterator<MyTool> iterator = externalTools.iterator();
+			int listSize = externalTools.size();
+			while(iterator.hasNext()){
+				if(filteredList.contains(iterator.next().title.toLowerCase()))
+					iterator.remove();
+			}
+			return externalTools;
+	}
 
 	/**
 	 * Get ordered, ungrouped list of tools
@@ -7287,8 +7370,9 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 				term = (AcademicSession) state
 						.getAttribute(STATE_TERM_SELECTED);
 			}
+			//changed for tracs email notification -Qu
 			String productionSiteName = ServerConfigurationService
-					.getServerName();
+					.getString("ui.service", "");
 
 			String from = NULL_STRING;
 			String to = NULL_STRING;
@@ -7377,6 +7461,12 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 				}
 			}
 
+			//Remove the last "," -Qu 8/2013 bugid:173
+			if(!authorizerNotified.isEmpty())
+				authorizerNotified = authorizerNotified.substring(0,authorizerNotified.lastIndexOf(","));
+			if(!authorizerNotNotified.isEmpty())
+				authorizerNotNotified = authorizerNotNotified.substring(0, authorizerNotNotified.lastIndexOf(","));
+
 			// 2. email to system support team
 			String supportEmailContent = userNotificationProvider.notifyCourseRequestSupport(requestEmail, productionSiteName, request, term != null?term.getTitle():"", requestListSize, requestSectionInfo,
 						officialAccountName, title, id, additional, requireAuthorizer, authorizerNotified, authorizerNotNotified);
@@ -7438,13 +7528,15 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 			term_name = ((AcademicSession) state
 					.getAttribute(STATE_TERM_SELECTED)).getEid();
 		}
-		// get the request email from configuration
-		String requestEmail = getSetupRequestEmailAddress();
+
+		//make site creation notification different to site request auto setup in OTRS for requestMail bugid:173 -Qu 8/2013
+		String siteCreateNotifyEmail = getSiteCreateNotifyEmailAddress();
+
 		User currentUser = UserDirectoryService.getCurrentUser();
 		// read from configuration whether to send out site notification emails, which defaults to be true
 		boolean sendSiteNotificationChoice = ServerConfigurationService.getBoolean("site.setup.creation.notification", true);
-		if (requestEmail != null && currentUser != null && sendSiteNotificationChoice) {
-			userNotificationProvider.notifySiteCreation(site, notifySites, courseSite, term_name, requestEmail);
+		if (siteCreateNotifyEmail != null && currentUser != null && sendSiteNotificationChoice) {
+			userNotificationProvider.notifySiteCreation(site, notifySites, courseSite, term_name, siteCreateNotifyEmail);
 		} // if
 
 		// reset locale to user default
@@ -8975,7 +9067,7 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 		
 		// get all form inputs
 		readInputAndUpdateStateVariable(state, params, "publishunpublish", STATE_SITE_ACCESS_PUBLISH, true);
-		readInputAndUpdateStateVariable(state, params, "include", STATE_SITE_ACCESS_INCLUDE, true);
+		readInputAndUpdateStateVariable(state, params, "include", STATE_SITE_ACCESS_INCLUDE, false);
 		readInputAndUpdateStateVariable(state, params, "joinable", STATE_JOINABLE, true);
 		readInputAndUpdateStateVariable(state, params, "joinerRole", STATE_JOINERROLE, false);
 		
@@ -8987,7 +9079,7 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 		// the site publish status before update
 		boolean currentSitePublished = sEdit != null ? sEdit.isPublished():false;
 		
-		boolean include = state.getAttribute(STATE_SITE_ACCESS_INCLUDE) != null ? ((Boolean) state.getAttribute(STATE_SITE_ACCESS_INCLUDE)).booleanValue() : false;
+		boolean include = state.getAttribute(STATE_SITE_ACCESS_INCLUDE) != null ? Boolean.parseBoolean(state.getAttribute(STATE_SITE_ACCESS_INCLUDE).toString()) : false;
 
 		if (sEdit != null) {
 			// editing existing site
@@ -11975,6 +12067,17 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 		return rv;
 	}
 
+	private String getSiteCreateNotifyEmailAddress() {
+		String from = ServerConfigurationService.getString("site.notify",
+				null);
+		if (from == null) {
+			M_log.warn(this + " - no 'site.notify' in configuration");
+			from = "postmaster@".concat(ServerConfigurationService
+					.getServerName());
+		}
+		return from;
+	}
+
 	/**
 	 * addNewSite is called when the site has enough information to create a new
 	 * site
@@ -12529,8 +12632,48 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 				}
 			}
 		}
-		return rv;
 
+		// Tools should be ordered alphabetically when added to a site #6491
+		// The new tool groups and old tool order features don't work together. When using tool groups,
+		// tools will be added to the site in the order of the groupings.
+		final HashMap<String, String> titleMap = state.getAttribute(STATE_TOOL_REGISTRATION_TITLE_LIST) != null ?
+				(HashMap<String, String>)state.getAttribute(STATE_TOOL_REGISTRATION_TITLE_LIST) : new HashMap<String, String>();
+
+		// Kind of a mess, but tool titles could be in one of three collections. Combine them in one map.
+		List toolRegistrationList = (List)state.getAttribute(STATE_TOOL_REGISTRATION_LIST);
+		HashMap<String, String> multipleTitleMap = (HashMap<String, String>)state.getAttribute(STATE_MULTIPLE_TOOL_ID_TITLE_MAP);
+
+		// Map for titles of tools like lti tool, lessons, and web content that can have multiple instances.
+		if (multipleTitleMap != null) {
+			for (Map.Entry<String, String> entry : multipleTitleMap.entrySet()) {
+				titleMap.put(entry.getKey(), entry.getValue());
+			}
+		}
+
+		// The title map isn't set when creating a new site, so we have to pull the titles out of the
+		// tool registration list.
+		if (toolRegistrationList != null) {
+			for (Object toolObj : toolRegistrationList) {
+				MyTool tool = (MyTool)toolObj;
+				if (!titleMap.containsKey(tool.getId())) {
+					titleMap.put(tool.getId(), tool.getTitle());
+				}
+			}
+		}
+
+		TreeSet<String> toolSet = new TreeSet<String>(new Comparator() {
+			public int compare(Object first, Object second) {
+				String toolName1 = titleMap.get((String)first);
+				String toolName2 = titleMap.get((String)second);
+				if (toolName1 == null && toolName2 == null) return 0;
+				if (toolName1 == null) return 1;
+				if (toolName2 == null) return -1;
+				return toolName1.compareTo(toolName2);
+			}
+		});
+
+		toolSet.addAll(rv);
+		return new Vector(toolSet);
 	} // orderToolIds
 
 	private void setupFormNamesAndConstants(SessionState state) {
@@ -13228,7 +13371,7 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 
 		public boolean published = false;
 
-		public boolean include = true; // include the site in the Sites index;
+		public boolean include = false; // include the site in the Sites index;
 
 		// default is true.
 

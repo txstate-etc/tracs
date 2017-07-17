@@ -1,4 +1,9 @@
 ##<!-- $Header: /cvs/sakai2/legacy/tools/src/webapp/vm/sitesetup/chef_site-siteInfo-import.vm,v 1.4 2005/06/06 20:06:02 htripath.indiana.edu Exp $ -->
+<link rel="stylesheet" type="text/css" href="/sakai-site-manage-tool/css/site-manage.css"/>
+
+<script type="text/javascript" src="/library/js//jquery/1.7.1/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="/sakai-site-manage-tool/js/site-manage.js"></script>
+
 <div class="portletBody">
 	<h3>
 		$tlang.getString("sitinfimp.reuse")
@@ -16,10 +21,12 @@
 			<p class="instruction">
 				$tlang.getString("sitinfimp.youcan")
 			</p>
+			<a id="showarchived">Show Archived Sites</a>
 			#set ($siteIDCounter =0)
 			#foreach($site in $sites)
 			#set ($siteIDCounter = $siteIDCounter + 1)
 				#if ($!currentSite && ($site.Id != $!currentSite.Id))
+					<p class="checkbox indnt3 #if ($!archivedSites.contains($!site))archived#end">
 					<div class="checkbox">		
 						<label for="site_$siteIDCounter">
 							<input type="checkbox" name="importSites" id="site_$siteIDCounter" value="$site.getId()" 

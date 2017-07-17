@@ -11,11 +11,53 @@
     in cases 1 and 2 site should be unpublished so that user can adjust before others have access
 
 *#
-
-<script type="text/javascript" language="JavaScript">
+ <script type="text/javascript" language="JavaScript">
     $(document).ready(function(){
-        sakai.siteTypeSetup()
+        sakai.siteTypeSetup();
+        $('#appropriate').hide();
+        $('#copyright').hide();
+
+        $('#showAppropriate').click(function() {
+            if ($('#appropriate').is(':visible')) {
+                $('#appropriate').hide();
+                $('#showAppropriate').text('show');
+            } else {
+                $('#appropriate').show();
+                $('#showAppropriate').text('hide');
+                resizeFrame();
+            }
     });
+
+        $('#showCopyright').click(function() {
+            if ($('#copyright').is(':visible')) {
+                $('#copyright').hide();
+                $('#showCopyright').text('show');
+            } else {
+                $('#copyright').show();
+                $('#showCopyright').text('hide');
+                resizeFrame();
+            }
+        });
+    });
+
+    function resizeFrame() {
+        var frame;
+        if (top.location !== self.location) {
+            frame = parent.document.getElementById(window.name);
+        }
+        if (frame) {
+            var clientH = document.body.clientHeight + 30;
+            $(frame).height(clientH);
+        }
+    }
+
+    function noticeChecked() {
+        if ($('#noticeCheckbox').is(':checked')) {
+            return true;
+        }
+        alert('You must agree to the appropriate use statement and copyright policies before continuing with site creation.');
+        return false;
+    }
 </script>
 <div class ="portletBody">
 
@@ -215,6 +257,36 @@
                 </ul>
             </div>   ## end of child of  div#templateSettings
         #end
+
+        ## Copyright and appropriate use notice
+        <div id="notices">
+            <h3>Appropriate Use Statement <span id="showAppropriate">show</span></h3>
+            <div id="appropriate">
+                <p>
+                    Appropriate use of TRACS services include, but are not limited to, facilitating access to instruction, research, major events, library collections, and training.  As the owner of this TRACS account, I agree to comply with the copyright protections and licensing terms applicable to all works served from or residing in my account.  I further affirm that I am solely responsible for compliance with the applicable copyright protections and licensing terms regardless of the source of the material (e.g., self-created work, a purchased copy of another’s work, a self-recorded copy of a live performance, works placed in my account by other(s) with authorized access, etc.).
+                </p>
+            </div>
+            <h3>Copyright, Teach Act, Fair Use, Digital Millennium and Texas State Policies <span id="showCopyright">show</span></h3>
+            <div id="copyright">
+                <p>
+                    Copyright law generally prohibits the use of a complete body of work (audio or video) for online distribution without the expressed written permission from the copyright owner.
+                </p>
+                <p>
+                    If you have an entire body of work on TRACS and have not obtained proper permission to use the work in its entirety, you are likely to be in infringing on the owner’s copyright, even if you have instructed your audience to only access a portion of the work.
+                </p>
+                <p>
+                    University policy holds that the University is not responsible for copyright infringements by members of its faculty, staff, and administration, and that copyright infringements are the responsibility of the individual infringer.  Thus, if you lack written authorization from the copyright owner for your use of a work, and if you are unsure that your use of a work is a “Fair Use” under copyright law, you should remove the work.
+                </p>
+                <p>
+                    Relevant Texas State's copyright policies and Texas State University System Regents’ Rules related to copyright are available
+                    <a href="http://www.txstate.edu/about/copyright.html" target="_blank">here</a>.
+                </p>
+            </div>
+            <div id="noticeBox">
+                <input type="checkbox" id="noticeCheckbox" class="checkbox"/>
+                <label for="noticeCheckbox">I agree to the appropriate use statement and copyright policies above</label>
+            </div>
+        </div>
         ## end templates enabled
         
         ## create site from archive
@@ -289,11 +361,11 @@
              it should be set style="display:none" if user is coming back
              ot this template from building own flow
              *#
-            <input type="submit" accesskey="s" id="submitFromTemplate" disabled="disabled" style="display:none" class="active" name="submitFromTemplate" value="$tlang.getString('sitetype.done')" onclick="SPNR.disableControlsAndSpin( this, null ); document.typeform.option.value='createOnTemplate'; document.typeform.submit(); return false;" />
-            <input type="submit" accesskey="s" id="submitFromTemplateCourse" disabled="disabled" style="display:none" class="active" name="submitFromTemplateCourse" value="$tlang.getString('sitetype.donecourse')" onclick="SPNR.disableControlsAndSpin( this, null ); document.typeform.option.value='createCourseOnTemplate'; document.typeform.submit(); return false;"/>
+            <input type="submit" accesskey="s" id="submitFromTemplate" disabled="disabled" style="display:none" class="active" name="submitFromTemplate" value="$tlang.getString('sitetype.done')" onclick="if (!noticeChecked()) return false; SPNR.disableControlsAndSpin( this, null ); document.typeform.option.value='createOnTemplate'; document.typeform.submit(); return false;" />
+            <input type="submit" accesskey="s"  id="submitFromTemplateCourse" disabled="disabled" style="display:none" class="active" name="submitFromTemplateCourse" value="$tlang.getString('sitetype.donecourse')" onclick="if (!noticeChecked()) return false; SPNR.disableControlsAndSpin( this, null ); document.typeform.option.value='createCourseOnTemplate'; document.typeform.submit(); return false;"/>
             <input type="submit" accesskey="s" id="submitFromArchive" style="display:none" class="active" name="submitFromArchive" value="$tlang.getString('sitetype.con')" onclick="SPNR.disableControlsAndSpin( this, null );  document.typeform.option.value='createFromArchive'; document.typeform.submit(); return false;" />
             ## this submit should be ther normal one
-            <input type="submit" accesskey="s" id="submitBuildOwn" disabled="disabled" class="active" name="submitBuildOwn" value="$tlang.getString('sitetype.con')" onclick="SPNR.disableControlsAndSpin( this, null ); document.typeform.option.value='siteType'; document.typeform.submit(); return false;" />
+            <input type="submit" accesskey="s" id="submitBuildOwn" disabled="disabled" class="active" name="submitBuildOwn" value="$tlang.getString('sitetype.con')" onclick="if (!noticeChecked()) return false; SPNR.disableControlsAndSpin( this, null ); document.typeform.option.value='siteType'; document.typeform.submit(); return false;" />
             <input type="submit" accesskey="x" id="cancelCreate" name="cancelCreate" value="$tlang.getString('sitetype.can')" onclick="SPNR.disableControlsAndSpin( this, null );document.typeform.option.value='cancel'; document.typeform.submit(); return false;" />
         </div>
 

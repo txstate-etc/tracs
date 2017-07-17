@@ -69,8 +69,8 @@ public class UserNotificationProviderImpl implements UserNotificationProvider {
 		if (from != null) {
 			String productionSiteName = serverConfigurationService.getString(
 					"ui.service", "");
-			String productionSiteUrl = serverConfigurationService
-					.getPortalUrl();
+			//send email notification to added participant, changed to serverUrl -Qu
+			String productionSiteUrl = serverConfigurationService.getString("serverUrl", "");
 			String nonOfficialAccountUrl = serverConfigurationService.getString(
 					"nonOfficialAccount.url", null);
 			String emailId = user.getEmail();
@@ -138,7 +138,9 @@ public class UserNotificationProviderImpl implements UserNotificationProvider {
 		String from = getSetupRequestEmailAddress();
 		String productionSiteName = serverConfigurationService.getString(
 				"ui.service", "");
-		String productionSiteUrl = serverConfigurationService.getPortalUrl();
+		//String productionSiteUrl = serverConfigurationService.getPortalUrl();
+		// changed for ticket #285  -Qu
+		String productionSiteUrl = serverConfigurationService.getString("serverUrl", "");
 		
 		String newUserEmail = user.getEmail();
 		String to = newUserEmail;
@@ -161,9 +163,12 @@ public class UserNotificationProviderImpl implements UserNotificationProvider {
 			buf.append(rb.getString("java.simpleby") + " ");
 			buf.append(userDirectoryService.getCurrentUser().getDisplayName()
 					+ ". \n\n");
-			buf.append(rb.getString("java.passwordis1") + "\n"
+			buf.append(rb.getString("java.usernameis1") + " " + productionSiteName + " " + rb.getString("java.usernameis2") +" \n\n");
+			buf.append(rb.getString("java.passwordis1") + ": "
 					+ newUserPassword + "\n\n");
 			buf.append(rb.getString("java.passwordis2") + "\n\n");
+			buf.append(rb.getString("java.passwordis3") + "\n\n");
+			buf.append(rb.getString("java.passwordis4") + "\n\n");
 
 			content = buf.toString();
 			emailService.send(from, to, message_subject, content, headerTo,

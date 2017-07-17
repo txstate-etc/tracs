@@ -162,13 +162,14 @@ public class SiteParticipantHelper {
 							}
 							catch (Exception ee)
 							{
-								M_log.warn("SiteParticipantHelper.addParticipantsFromEnrollmentSet: " + ee.getMessage() + " user id = " + userId, ee);
+								M_log.warn("SiteParticipantHelper.addParticipantsFromEnrollmentSet: " + ee.getMessage() + " and user id = " + userId, ee);
 							}
 						}
 					} catch (UserNotDefinedException exception) {
 						// deal with missing user quietly without throwing a
 						// warning message
-						M_log.warn("SiteParticipantHelper.addParticipantsFromEnrollmentSet: " + exception.getMessage() + " user id = " + e.getUserId());
+						M_log.warn("SiteParticipantHelper.addParticipantsFromEnrollmentSet: " + exception.getMessage() + " user id = " + e.getUserId() +
+								" User not defined either in sakai data or provider (ldap).");
 					}
 				}
 			}
@@ -508,6 +509,16 @@ public class SiteParticipantHelper {
 						User user = UserDirectoryService.getUserByEid(userEid);
 						String userId = user.getId();
 						Member member = realm.getMember(userId);
+						//Following 4 lines handle user_id inconsistency in tracs
+						//Fix for bugid:4620, make sure to get the instructor of the site when userId shows
+						//UPPERCASE from the user directory cache and actually in the realm user_id
+						//was saved correctly as lowercase. Kind of opposite of bugid:4549
+						if (member == null)
+							member = realm.getMember(userId.toLowerCase());
+						//This handles existed realms that have user_id UPPERCASE saved and user_id is lowercase as it should
+						//from userDirectoryService. -Qu
+						if (member == null)
+							member = realm.getMember(userId.toUpperCase());
 						if (member != null)
 						{
 							// get or add provided participant

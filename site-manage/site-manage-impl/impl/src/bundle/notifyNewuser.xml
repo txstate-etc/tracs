@@ -10,9 +10,11 @@
 		${localSakaiURL}
 	
 	2) Login using:
-		User Id: 	${userEid}
+		Net Id: 	${userEid}
 		password: 	${newPassword} 
- You can change your password after you have logged in, using the Account tool in your Home.
+ You may change your password if you wish.  For more information about your account, how to change your password, and other useful items, please visit:
+
+ http://tracsfacts.its.txstate.edu/Documents/Getting-Started/tracsguest.html
  
  (This is an automated message from ${localSakaiName}.)
 </message>

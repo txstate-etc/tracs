@@ -60,6 +60,7 @@
 					#end
 				</tr>
 				#set ($toolCount=0)
+				#set ($meleteFound=false)
 				#foreach($toolId in $selectedTools)
 						#set($selectedSites = $!importSitesTools.get($toolId))
 						#set ($toolCount=$toolCount + 1)
@@ -79,8 +80,12 @@
 									#end
 								
 									#set($alternateToolTitles = $!alternateToolTitlesMap.get($toolId))
-								
-									<h5>$toolTitle
+									#set($heading="<h5>")
+									#if($toolId=="sakai.melete")
+										#set($heading="<h5 style='color:#747170;'>* ")
+										#set($meleteFound=true)
+									#end
+									$heading $toolTitle
 									
 										#if ($alternateToolTitles != "")
 											<span class="instruction">($alternateToolTitles)</span>
@@ -114,7 +119,7 @@
 												#set($toolFound = false)
     										#end
 										
-											#if ($toolFound)
+											#if ($toolFound && ($toolId!="sakai.melete"))
 												<input type="checkbox" id="toolSite$toolCount$siteCount" name="$toolId" value="$site.Id" #if($!selectedSites.contains($site.Id))checked="checked"#end />
 												<label  class="skip" for="toolSite$toolCount$siteCount">$tlang.getString('import.choose.label1')  $toolTitle $tlang.getString('import.choose.label2') $validator.escapeHtml($site.getTitle())</label>
 											#else
@@ -136,6 +141,10 @@
 		<input type="hidden" name="templateIndex" value="$!templateIndex" />
 		<input type="hidden" name="continue" value="$continue" />
 		<p class="act">
+			#if($meleteFound)
+				<h2 style='font-weight:normal; font-size:12pt;'>* To learn how to import content from Learning Modules, please view the
+				<a href='http://tracsfacts.its.txstate.edu/trainingvideos/exportimportlearningmodules/exportimportlearningmodules.htm' target='_blank'>import video</a> on TracsFacts.</h2>
+			#end
 			<input type="submit" accesskey="s" class="active" name="eventSubmit_doContinue" #if($!existingSite)value="$tlang.getString('gen.finish')"#else value="$tlang.getString('gen.continue')" #end onclick="SPNR.disableControlsAndSpin( this, null );" />
 			<input type="submit" accesskey="b" name="eventSubmit_doBack" value="$tlang.getString('gen.back')" onclick="SPNR.disableControlsAndSpin( this, null );" />
 			<input type="submit" accesskey="x" name="eventSubmit_doCancel" value="$tlang.getString('gen.cancel')" onclick="SPNR.disableControlsAndSpin( this, null );" />

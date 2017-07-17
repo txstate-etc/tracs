@@ -23,7 +23,7 @@
 | dav                          | DONE             |
 | delegatedaccess              | NO LOCAL CHANGES |
 | deploy                       | NO LOCAL CHANGES |
-| edu-services                 |                  |
+| edu-services                 | DONE             |
 | emailtemplateservice         | NO LOCAL CHANGES |
 | entitybroker                 | DONE             |
 | etudes-util                  | DONE             |
@@ -57,7 +57,7 @@
 | postem                       | DONE             |
 | presence                     | NO LOCAL CHANGES |
 | profile2                     | DONE             |
-| providers                    |                  |
+| providers                    | DONE             |
 | reference                    | Anne             |
 | reset-pass                   |                  |
 | rest                         | Anne             |
@@ -73,7 +73,7 @@
 | signup                       | DONE             |
 | simple-rss-portlet           | NO LOCAL CHANGES |
 | site                         | NO LOCAL CHANGES |
-| site-manage                  |                  |
+| site-manage                  | DONE             |
 | sitestats                    |                  |
 | syllabus                     | DONE             |
 | taggable                     | NO LOCAL CHANGES |

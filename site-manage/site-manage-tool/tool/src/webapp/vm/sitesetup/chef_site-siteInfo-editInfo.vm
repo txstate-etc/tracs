@@ -249,7 +249,7 @@
 				<label for="skin" class="col-sm-2 form-control-label">
 					$tlang.getString("sitediinf.app")
 					<span class="textPanelFooter">
-						$tlang.getString("sitediinf.sit")
+						<img src = "#imageLink("images/tracs_skins_legend.jpg")" border="0" alt ="skin color legend" />
 					</span>					
 				</label>
 				<div class="col-sm-6">

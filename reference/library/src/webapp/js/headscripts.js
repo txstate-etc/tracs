@@ -34,6 +34,30 @@ function inIframe () {
 	}
 }
 
+/* added by Amy Boyd for use in Samigo to hide or show retracted assessments */
+function toggleRetractedAssessment() {
+	var retractedAssessmentsDiv = document.getElementById("retractedAssessments");
+	var text = document.getElementById("displayText");
+	if (retractedAssessmentsDiv.style.display == "block") {
+		retractedAssessmentsDiv.style.display = "none";
+		text.innerHTML = '<img src="../../images/plus.png" alt="Show retracted Assessments" title="Show retracted Assessments">';
+	} else {
+		retractedAssessmentsDiv.style.display = "block";
+		text.innerHTML = '<img src="../../images/minus.png" alt="Hide retracted Assessments" title="Hide retracted Assessments">';
+	}
+}
+
+function checkfornetid(emailaddys)
+{
+	//search for case insensitive txstate.edu email address
+	var num = emailaddys.search(/txstate.edu/i);
+	if(num > 0) {
+			alert("Please do not add txstate.edu email addresses in the Guest Email Address box.  All NetIds should be put in the NetID box.");
+			return false;
+	}
+
+}
+
 function openWindow(url, name, options)
 {
 	var win = top.window.open(url, name.replace(/[ -]+/g, ''), options);

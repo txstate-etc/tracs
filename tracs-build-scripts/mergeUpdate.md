@@ -19,7 +19,7 @@
 | content                      | Anne             |
 | content-review               |                  |
 | courier                      | NO LOCAL CHANGES |
-| dashboard                    | Anne             |
+| dashboard                    | DONE             |
 | dav                          | DONE             |
 | delegatedaccess              | NO LOCAL CHANGES |
 | deploy                       | NO LOCAL CHANGES |
@@ -42,7 +42,7 @@
 | lticontact                   | DONE             |
 | mailarchive                  | DONE             |
 | mailsender                   | DONE             |
-| master                       | Anne             |
+| master                       | DONE             |
 | melete                       | DONE             |
 | memory                       | NO LOCAL CHANGES |
 | message                      | NO LOCAL CHANGES |
@@ -58,7 +58,7 @@
 | presence                     | NO LOCAL CHANGES |
 | profile2                     | DONE             |
 | providers                    |                  |
-| reference                    | Anne             |
+| reference                    | DONE             |
 | reset-pass                   |                  |
 | rest                         | Anne             |
 | rights                       | NO LOCAL CHANGES |

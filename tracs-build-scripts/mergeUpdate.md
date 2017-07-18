@@ -33,8 +33,8 @@
 | gradebookng                  |                  |
 | help                         | DONE             |
 | hierarchy                    | NO LOCAL CHANGES |
-| irubric                      |                  |
-| jobscheduler                 |                  |
+| irubric                      | DONE             |
+| jobscheduler                 | DONE             |
 | jsf                          |                  |
 | kernel                       |                  |
 | lessonbuilder                | DONE             |
@@ -79,7 +79,7 @@
 | taggable                     | NO LOCAL CHANGES |
 | textarea                     | NO LOCAL CHANGES |
 | tool                         | Anne             |
-| turningpoint                 |                  |
+| turningpoint                 | DONE             |
 | user                         | Anne             |
 | userauditservice             | NO LOCAL CHANGES |
 | usermembership               | NO LOCAL CHANGES |

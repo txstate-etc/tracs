@@ -132,8 +132,8 @@ public class SuTool
 
 		try
 		{
-			// try with the user id
-			userinfo = M_uds.getUser(username.trim());
+			// try with the user id; avoid getting uppercase user_id into user cache bugid:4621
+			userinfo = M_uds.getUser(username.trim().toLowerCase());
 			validatedUserId = userinfo.getId();
 			validatedUserEid = userinfo.getEid();
 		}
@@ -142,7 +142,7 @@ public class SuTool
 			try
 			{
 				// try with the user eid
-				userinfo = M_uds.getUserByEid(username.trim());
+				userinfo = M_uds.getUserByEid(username.trim().toLowerCase());
 				validatedUserId = userinfo.getId();
 				validatedUserEid = userinfo.getEid();
 			}

@@ -25,3 +25,7 @@
 	path = lticontact
 	url = https://github.com/txstate-etc/lticontact.git
 	branch = tracs
+[submodule "tracs-tk20"]
+	path = tracs-tk20
+	url = https://git.txstate.edu/its/tracs-tk20.git
+	branch = tracs

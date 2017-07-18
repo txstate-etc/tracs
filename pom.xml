@@ -118,20 +118,32 @@
                 <module>velocity</module>
                 <module>web</module>
                 <module>webservices</module>
+                
+                <!-- TxState Specific -->
+                <module>tracs_jdbc</module>
+                <module>tracs_pearson</module>
+                <module>tracs_tk20</module>
+          <!--      <module>tracs-admin</module>-->
+          <!--      <module>appserverpicker</module> -->
+          <!--      <module>admintools</module> -->
+                <module>rest</module>
+          <!--      <module>warehouse</module> -->
+          <!--      <module>notifications</module> -->
 
-                <!-- Contrib tools -->
+                <!-- Contrib Tools -->
+                <module>melete</module>
                 <module>blogwow</module>
+          <!--      <module>bbb</module> -->
+          <!--      <module>turningpoint</module> -->
                 <module>irubric/irubric-core</module>
                 <module>irubric/irubric-tool</module>
-                <module>melete</module>
+        <!--        <module>examity</module> -->
 
                 <!-- Contrib Dependencies -->
+                <module>roster_legacy</module>
                 <module>lticontact</module>
                 <module>etudes-util</module>
 
-                <!-- TRACS specific
-                <module>roster_legacy</module>
-                <module>turningpoint</module>-->
             </modules>
         </profile>
         <profile>

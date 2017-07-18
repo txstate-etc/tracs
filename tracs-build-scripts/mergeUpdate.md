@@ -29,8 +29,8 @@
 | etudes-util                  | DONE             |
 | external-calendaring-service | NO LOCAL CHANGES |
 | feedback                     | NO LOCAL CHANGES |
-| gradebook                    |                  |
-| gradebookng                  |                  |
+| gradebook                    | NOT USING        |
+| gradebookng                  | NO LOCAL         |
 | help                         | DONE             |
 | hierarchy                    | NO LOCAL CHANGES |
 | irubric                      | DONE             |
@@ -63,7 +63,7 @@
 | rest                         | DONE             |
 | rights                       | NO LOCAL CHANGES |
 | roster2                      | DONE             |
-| roster_legacy                |                  |
+| roster_legacy                | DONE             |
 | rsf                          | NO LOCAL CHANGES |
 | rwiki                        | DONE             |
 | samigo                       |                  |
@@ -86,3 +86,4 @@
 | velocity                     | NO LOCAL CHANGES |
 | web                          | DONE             |
 | webservices                  |                  |
+| tracs-tk20                   | DONE             |

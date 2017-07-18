@@ -78,7 +78,7 @@
 | syllabus                     | DONE             |
 | taggable                     | NO LOCAL CHANGES |
 | textarea                     | NO LOCAL CHANGES |
-| tool                         | Anne             |
+| tool                         | DONE             |
 | turningpoint                 | DONE             |
 | user                         | Anne             |
 | userauditservice             | NO LOCAL CHANGES |

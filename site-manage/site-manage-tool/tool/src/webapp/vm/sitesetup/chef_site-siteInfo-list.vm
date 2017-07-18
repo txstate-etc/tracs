@@ -15,7 +15,7 @@
 	<div class="listNav">
 		<div >
 			$tlang.getString("sitegen.siteinfolist.view") $topMsgPos - $btmMsgPos $tlang.getString("sitegen.siteinfolist.of") $allMsgNumber $tlang.getString("sitegen.siteinfolist.items")
-			<i class="fa fa-ban" style="color:#990000" aria-hidden="true", aria-label="Includes inactive participants" title="Includes inactive participants"><i>
+			<i class="fa fa-ban" style="color:#990000" aria-hidden="true", aria-label="Includes inactive participants" title="Includes inactive participants"></i>
 			<div id="pagerSpinner" class="allocatedSpinPlaceholder"></div>
 		</div>
 			#if ($pagesize != 0)
@@ -357,8 +357,19 @@
 					$!siteUnit
 				</td>
 			</tr>
+		#else
+			#if ($!siteIcon)
+				<tr>
+					<th>
+						$tlang.getString("sitegen.siteinfolist.icon")
+					</th>
+					<td>
+						<p class="textPanelFooter">$validator.escapeHtml($!siteIcon)</p>
+					</td>
+				</tr>	
+			#end
 		#end
-		## moved site icon for projects
+		#end
             #if ($isMathJaxInstalled)
             <tr>
                 <th>
@@ -643,7 +654,7 @@
 									$displayId
 								#end)
 								#if (!$participant.isActive())
-									<i class="fa fa-lock" style="color:#0a5566" aria-hidden="true" aria-label="Inactive Participant" title="Inactive Participant" />
+									<i class="fa fa-ban" style="color:#990000" aria-hidden="true" aria-label="Inactive Participant" title="Inactive Participant" />
 								#end
 						</th>
 						#if ($hasProviderSet)
@@ -754,49 +765,7 @@
 		#chef_flashnotif()
 		<h4>$tlang.getString("sitegen.siteinfolist.roledes")</h4>
 			<dl>
-			## 01/06/11 AB this section modified to show Roles in the order defined in ticket#4111.  It also changes the spelling and properly caps the roles. It's a little messy but gets the job done. ##
-
-			#set ($roleOrders = {})
-			#set ($_tmp_ = $roleOrders.put("instructor", 0))
-			#set ($_tmp_ = $roleOrders.put("maintain", 1))
-			#set ($_tmp_ = $roleOrders.put("ta", 2))
-			#set ($_tmp_ = $roleOrders.put("Site Assistant", 3))
-			#set ($_tmp_ = $roleOrders.put("Grader", 4))
-			#set ($_tmp_ = $roleOrders.put("Site Collaborator", 5))
-			#set ($_tmp_ = $roleOrders.put("student", 6))
-			#set ($_tmp_ = $roleOrders.put("access", 7))
-			#set ($_tmp_ = $roleOrders.put("Guest", 8))
-
-			#set ($newNames = {})
-			#set ($_tmp_ = $newNames.put("instructor", "Instructor"))
-			#set ($_tmp_ = $newNames.put("maintain", "Maintainer"))
-			#set ($_tmp_ = $newNames.put("ta", "TA"))
-			#set ($_tmp_ = $newNames.put("student", "Student"))
-			#set ($_tmp_ = $newNames.put("access", "Access"))
-
-			#set ($orderedRoles = {})
-			#set ($currentOrder = 8)
-
-			## Sort roles by order found in $roleOrders, placing roles not found in $roleOrders at the end.
-
-			#foreach( $role in $allowedRoles )
-				#if ($roleOrders.containsKey($role.Id))
-					#set ($order = $roleOrders.get($role.Id))
-				#else
-					#set( $currentOrder = $currentOrder + 1)
-					#set ($order = $currentOrder)
-				#end
-
-				#if ($newNames.containsKey($role.Id))
-					#set ($role.Id = $newNames.get($role.Id))
-				#end
-
-				#set ($_tmp_ = $orderedRoles.put($order, $role))
-			#end
-
-			#foreach($i in [0..$currentOrder])
-				#if ($orderedRoles.containsKey($i))
-					#set ($role = $orderedRoles.get($i))
+				#foreach( $role in $allowedRoles )
 					<dt>
 						$role.Id
 					</dt>
@@ -816,23 +785,20 @@
 
 					</dd>
 				#end
-				#end
-##end mod##
-			</dl>
+			</dl>	
 		<table class="instruction" cellpadding="0" cellspacing="0">
-		   <tbody>
-	         <tr>
-	            <td>
-	                 $tlang.getString("sitegen.siteinfolist.legend_title")
-	            </td>
-	         </tr>
-	         <tr>
-	            <td>
-	               <i class="fa fa-ban" style="color:#990000" aria-hidden="true", aria-label="Inactive Participant" title="Inactive Participant">
-	                $tlang.getString("sitegen.siteinfolist.footnote_legend1")</i>
-	            </td>
-	        </tr>
-	     </tbody>
-	   </table>
+			<tbody>
+				<tr>
+					<td>
+						$tlang.getString("sitegen.siteinfolist.legend_title")
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i class="fa fa-ban" style="color:#990000" aria-hidden="true", aria-label="Inactive Participant" title="Inactive Participant"></i>$tlang.getString("sitegen.siteinfolist.footnote_legend1")
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	#end
 </div>

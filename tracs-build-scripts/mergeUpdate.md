@@ -31,7 +31,7 @@
 | feedback                     | NO LOCAL CHANGES |
 | gradebook                    |                  |
 | gradebookng                  |                  |
-| help                         |                  |
+| help                         | DONE             |
 | hierarchy                    | NO LOCAL CHANGES |
 | irubric                      |                  |
 | jobscheduler                 |                  |

@@ -119,9 +119,9 @@
                 <module>webservices</module>
                 
                 <!-- TxState Specific -->
-                <module>tracs_jdbc</module>
-                <module>tracs_pearson</module>
-                <module>tracs_tk20</module>
+                <module>tracs-jdbc</module>
+          <!--      <module>tracs_pearson</module> -->
+                <module>tracs-tk20</module>
           <!--      <module>tracs-admin</module>-->
           <!--      <module>appserverpicker</module> -->
           <!--      <module>admintools</module> -->
@@ -139,7 +139,7 @@
         <!--        <module>examity</module> -->
 
                 <!-- Contrib Dependencies -->
-                <module>roster_legacy</module>
+                <module>roster-legacy</module>
                 <module>lticontact</module>
                 <module>etudes-util</module>
 

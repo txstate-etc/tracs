@@ -27,5 +27,5 @@
 	branch = tracs
 [submodule "tracs-tk20"]
 	path = tracs-tk20
-	url = https://git.txstate.edu/its/tracs-tk20.git
+	url = git@git.txstate.edu:its:its/tracs-tk20.git
 	branch = tracs

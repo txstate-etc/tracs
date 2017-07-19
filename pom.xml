@@ -120,7 +120,7 @@
                 
                 <!-- TxState Specific -->
                 <module>tracs-jdbc</module>
-          <!--      <module>tracs_pearson</module> -->
+          <!--      <module>tracs-pearson</module> -->
                 <module>tracs-tk20</module>
           <!--      <module>tracs-admin</module>-->
           <!--      <module>appserverpicker</module> -->

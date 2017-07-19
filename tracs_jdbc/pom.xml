@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.sakaiproject</groupId>
+        <artifactId>master</artifactId>
+        <version>11.3</version><!--MATCH_CURRENT_SAKAI-->
+        <relativePath>../master/pom.xml</relativePath>
+    </parent>
+    <name>Tracs JDBC</name>
+    <groupId>edu.txstate.tracs</groupId>
+    <artifactId>tracs-jdbc</artifactId>
+    <version>1.0</version>
+    <organization>
+        <name>Texas State University</name>
+        <url>http://www.txstate.edu</url>
+    </organization>
+    <inceptionYear>2014</inceptionYear>
+    <packaging>jar</packaging>
+    <properties>
+        <deploy.target/>
+    </properties>
+    <dependencies>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+          <version>${sakai.spring.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-jdbc</artifactId>
+          <version>${sakai.spring.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>3.1</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <sourceDirectory>src/java</sourceDirectory>
+        <resources/>
+    </build>
+</project>

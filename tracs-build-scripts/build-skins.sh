@@ -9,7 +9,9 @@ mvn clean compile  -Dsakai.skin.target=tracs-blue -Dsakai.skin.customization.fil
 mvn clean compile  -Dsakai.skin.target=tracs-yellow -Dsakai.skin.customization.file=./src/morpheus-master/sass/tracs-skins/_tracs-yellow.scss
 
 #clear the customizations so that the default sakai skin can be built
-> ./src/morpheus-master/sass/_customization.scss
+> library/src/morpheus-master/sass/_customization.scss
+
+cd $REPO_ROOT
 
 mvn clean install sakai:deploy -Dmaven.tomcat.home=$REPO_ROOT/tracs-docker/
 

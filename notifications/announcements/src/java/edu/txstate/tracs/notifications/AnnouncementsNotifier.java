@@ -67,6 +67,7 @@ public class AnnouncementsNotifier implements Observer {
       System.out.println("received "+event.getEvent()+" event for ticket " + event.getResource());
       try {
         if (updates.contains(event.getEvent())) {
+          if(notifyUtils.toolIsHidden(event.getContext(), "sakai.announcements")) return;
           Reference ref = entityManager.newReference(event.getResource());
           AnnouncementMessage m = (AnnouncementMessage) announceService.getMessage(ref);
 
@@ -90,6 +91,7 @@ public class AnnouncementsNotifier implements Observer {
             notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);
           } else notifyUtils.deleteForObject("announcement", ref.getId());
         } else if (deletes.contains(event.getEvent())) {
+          if(notifyUtils.toolIsHidden(event.getContext(), "sakai.announcements")) return;
           Reference ref = entityManager.newReference(event.getResource());
           notifyUtils.deleteForObject("announcement", ref.getId());
         }

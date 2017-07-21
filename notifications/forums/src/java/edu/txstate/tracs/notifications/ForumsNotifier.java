@@ -15,8 +15,10 @@ import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.event.api.Event;
+import org.sakaiproject.tool.cover.SessionManager;
 
 import org.sakaiproject.api.app.messageforums.DiscussionForum;
+import org.sakaiproject.api.app.messageforums.OpenForum;
 import org.sakaiproject.api.app.messageforums.DiscussionForumService;
 import org.sakaiproject.api.app.messageforums.Message;
 import org.sakaiproject.api.app.messageforums.MessageForumsMessageManager;
@@ -48,6 +50,9 @@ import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 
 public class ForumsNotifier implements Observer {
     private List<String> updates;
+    private List<String> messageEvents;
+    private List<String> topicEvents;
+    private List<String> forumEvents;
 
     private EventTrackingService eventTrackingService;
     public void setEventTrackingService(EventTrackingService service) {
@@ -80,10 +85,18 @@ public class ForumsNotifier implements Observer {
     }
 
     public void init() {
-      updates = new ArrayList<String>();
-      updates.add(DiscussionForumService.EVENT_FORUMS_ADD); //adding a conversation to a topic
-      updates.add(DiscussionForumService.EVENT_FORUMS_TOPIC_ADD); //event not sent in TRACS 10, sent in TRACS 11
-      updates.add(DiscussionForumService.EVENT_FORUMS_MESSAGE_APPROVE);
+      messageEvents = new ArrayList<String>();
+      messageEvents.add(DiscussionForumService.EVENT_FORUMS_ADD);
+      messageEvents.add(DiscussionForumService.EVENT_FORUMS_RESPONSE);
+      messageEvents.add(DiscussionForumService.EVENT_FORUMS_MESSAGE_APPROVE);
+      messageEvents.add(DiscussionForumService.EVENT_FORUMS_MESSAGE_DENY);
+      messageEvents.add(DiscussionForumService.EVENT_FORUMS_REMOVE);
+
+      topicEvents = new ArrayList<String>();
+      topicEvents.add(DiscussionForumService.EVENT_FORUMS_TOPIC_REVISE);
+
+      forumEvents = new ArrayList<String>();
+      forumEvents.add(DiscussionForumService.EVENT_FORUMS_REVISE);
 
       eventTrackingService.addObserver(this);
     }
@@ -92,17 +105,27 @@ public class ForumsNotifier implements Observer {
       return "/forums/site/"+siteid+"/forum/"+m.getTopic().getBaseForum().getId()+"/topic/"+m.getTopic().getId()+"/message/"+m.getId();
     }
 
+    //This version is used for the approve and deny moderation events.  For some reason, getBaseForum() returns null for those.
+    public String getMessageId(String siteid, OpenForum f, Topic t, Message m){
+        return "/forums/site/" + siteid + "/forum/" + f.getId() + "/topic/" + t.getId() + "/message/" + m.getId();
+    }
+
+    //Really just guessing here.  I don't know what the app is expecting.
+    public String getTopicId(String siteid, Topic t) {
+      return "/forums/site/"+siteid+"/forum/"+t.getBaseForum().getId()+"/topic/"+t.getId();
+    }
+
     public void update(Observable o, Object arg) {
         Event event = (Event) arg;
-
         //If the event pertains to forums
-        if (updates.contains(event.getEvent())) {
+        if (messageEvents.contains(event.getEvent())) {
             String eventType = event.getEvent();
             String siteid = event.getContext();
+            //If the tool is hidden (in site info) we don't want to send any notifications
+            if(notifyUtils.toolIsHidden(siteid, DiscussionForumService.FORUMS_TOOL_ID)) return;
             switch(eventType){
                 case DiscussionForumService.EVENT_FORUMS_ADD:
                     try{
-                        System.out.println("A conversation was added. " + "reference: " +  event.getResource());
                         long messageId = getMessageIdFromEvent(event);
                         Message m = messageManager.getMessageById(messageId);
 
@@ -113,12 +136,26 @@ public class ForumsNotifier implements Observer {
                         DiscussionForum discussionForum = discussionForumManager.getForumById(Long.parseLong(forumIdForMessage));
                         Calendar releaseDate = getReleaseDate(discussionForum, topic);
 
-                        //This will send a notification for every single message.
-                        //Should contenthash just contain "You have a new message in forums?"
                         String contenthash = notifyUtils.hashContent(m.getTitle(), m.getBody());
 
-                        //Get list of users to notify
-                        List<String> userids = getNotifyList(siteid, topic.getId(), event.getUserId());
+                        //Get list of users who have read access to this topic, minus the author
+                        List<String> usersWithReadAccess = getNotifyList(siteid, topic.getId(), event.getUserId());
+
+                        List<String> sendList = new ArrayList<String>();
+
+                        //If the instructor or TA is creating a new thread, notify users with read access
+                        if(isNewThread(m)){
+                            if(authorIsInstructor() || authorIsTA()) {
+                                sendList = usersWithReadAccess;
+                            }
+                        }
+                        else {
+                            //This is not the first message in the thread.  Notify people who have 
+                            //already commented in the thread.
+                            sendList = getThreadParticipants(siteid, m);
+                        }
+
+                        if(sendList.size() == 0) break;
 
                         //check if either topic or forum is a draft
                         Boolean forumIsDraft = discussionForum.getDraft();
@@ -130,18 +167,38 @@ public class ForumsNotifier implements Observer {
                             //delete any scheduled notifications for this message?  How?
                         }
                         else if(null == m.getApproved()){
-                            System.out.println("*** Message not approved yet ***");
                             //notifications should not be sent when a new message is created in a moderated forum
                         }
                         else if(releaseDate.compareTo(now) <= 0){
                             //if the release date is now or in the past, send notification
-                            notifyUtils.sendNotification("discussion", "creation", getMessageId(siteid, m), event.getContext(), userids, releaseDate, contenthash, false);
+                            notifyUtils.sendNotification("discussion", "creation", getMessageId(siteid, m), event.getContext(), sendList, releaseDate, contenthash, false);
                         }
                         else if(releaseDate.after(now)){
                             //it's scheduled for the future
                             //don't we still send it and Dispatch will push it out at the appropriate time?
-                            notifyUtils.sendNotification("discussion", "creation", getMessageId(siteid, m), event.getContext(), userids, releaseDate, contenthash, false);
+                            //Could this result in the student getting a bunch of messages from the instructor all at once?
+                            notifyUtils.sendNotification("discussion", "creation", getMessageId(siteid, m), event.getContext(), sendList, releaseDate, contenthash, false);
                         }
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                    }
+                    break;
+                case DiscussionForumService.EVENT_FORUMS_RESPONSE:
+                    //In this case, the instructor or TA revised someone's post
+                    //Can students revise each other's posts?  I don't think they can...
+                    try{
+                        long messageId = getMessageIdFromEvent(event);
+                        Message m = messageManager.getMessageById(messageId);
+                        //get the message's topic
+                        Topic topic = m.getTopic();
+                        List<String> sendList = new ArrayList<String>();
+                        sendList.add(m.getCreatedBy());
+                        Calendar releaseDate = Calendar.getInstance();
+                        String contenthash = notifyUtils.hashContent("Your forums post has been modified");
+                        //TODO: This is not working because this event is also sent when someone responds to a post.
+                        //We might need to add another new event to tracs, specifically for revisions.
+                        //notifyUtils.sendNotification("discussion", "update", getMessageId(siteid, m), event.getContext(), notifyUtils.convertUserIdsInSite(siteid, sendList), releaseDate, contenthash, false);
                     }
                     catch(Exception e){
                         e.printStackTrace();
@@ -152,27 +209,104 @@ public class ForumsNotifier implements Observer {
                         long messageId = getMessageIdFromEvent(event);
                         Message m = messageManager.getMessageById(messageId);
                         Topic topic = m.getTopic();
+                        String objectId = getMessageId(siteid, topic.getOpenForum(), topic, m);
                         //If a non-admin wrote a message, the topic and forum must be visible already
                         //Admin messages in moderated forums are not held for moderation
                         Calendar releaseDate = Calendar.getInstance();
-
                         String contenthash = notifyUtils.hashContent(m.getTitle(), m.getBody());
-
-                        //Note: In order to make this work, I had to set lazy loading to false on the Topic in
-                        //$TRACS_REPO_PATH/msgcntr/messageforums-hbm/src/java/org/sakaiproject/component/app/messageforums/dao/hibernate/MessageImpl.java
-                        //because a hibernate proxy was being returned for the Topic instead of a usable object
-                        List<String> userids = getNotifyList(siteid, topic.getId(), event.getUserId());
-
-                        notifyUtils.sendNotification("discussion", "creation", getMessageId(siteid, m), event.getContext(), userids, releaseDate, contenthash, false);
+                        List<String> sendList = new ArrayList<String>();
+                        sendList.add(m.getCreatedBy());
+                        notifyUtils.sendNotification("discussion", "approval", objectId, event.getContext(), notifyUtils.convertUserIdsInSite(siteid, sendList), releaseDate, contenthash, false);
                     }
                     catch(Exception e){
                         e.printStackTrace();
                     }
                     break;
-                case DiscussionForumService.EVENT_FORUMS_TOPIC_ADD:
-                    System.out.println("new topic added");
-
+                case DiscussionForumService.EVENT_FORUMS_MESSAGE_DENY:
+                    try {
+                        long messageId = getMessageIdFromEvent(event);
+                        Message m = messageManager.getMessageById(messageId);
+                        Topic topic = m.getTopic();
+                        String objectId = getMessageId(siteid, topic.getOpenForum(), topic, m);
+                        Calendar releaseDate = Calendar.getInstance();
+                        String contenthash = notifyUtils.hashContent(m.getTitle(), m.getBody());
+                        List<String> sendList = new ArrayList<String>();
+                        sendList.add(m.getCreatedBy());
+                        notifyUtils.sendNotification("discussion", "rejection", objectId, event.getContext(), notifyUtils.convertUserIdsInSite(siteid, sendList), releaseDate, contenthash, false);
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                    }
                     break;
+                case DiscussionForumService.EVENT_FORUMS_REMOVE:
+                    try {
+                        long messageId = getMessageIdFromEvent(event);
+                        Message m = messageManager.getMessageById(messageId);
+                        String loggedInUser = SessionManager.getCurrentSessionUserId();
+                        //the instructor doesn't need to be notified when deleting his/her own messages
+                        if(!loggedInUser.equals(m.getCreatedBy())){
+                            Topic topic = m.getTopic();
+                            String objectId = getMessageId(siteid, topic.getOpenForum(), topic, m);
+                            Calendar releaseDate = Calendar.getInstance();
+                            String contenthash = notifyUtils.hashContent(m.getTitle(), m.getBody());
+                            List<String> sendList = new ArrayList<String>();
+                            sendList.add(m.getCreatedBy());
+                            notifyUtils.sendNotification("discussion", "deletion", objectId, event.getContext(), sendList, releaseDate, contenthash, false);
+                        }
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                    }
+                default:
+                    //this shouldn't happen
+            }
+        }
+        else if (topicEvents.contains(event.getEvent())) {
+            String eventType = event.getEvent();
+            String siteid = event.getContext();
+            //If the tool is hidden (in site info) we don't want to send any notifications
+            if(notifyUtils.toolIsHidden(siteid, DiscussionForumService.FORUMS_TOOL_ID)) return;
+            switch(eventType){
+                case DiscussionForumService.EVENT_FORUMS_TOPIC_REVISE:
+                    //notify users if the topic has postings
+                    try {
+                        Reference ref = entityManager.newReference(event.getResource());
+                        String[] refParts = ref.getReference().split("/");
+                        String topicId = refParts[refParts.length-2];
+                        List<Message> topicMessages = messageManager.findMessagesByTopicId(Long.parseLong(topicId));
+                        if(topicMessages.size() > 0){
+                            DiscussionTopic topic = discussionForumManager.getTopicById(Long.parseLong(topicId));
+                            Long forumId = topic.getBaseForum().getId();
+                            // Commented out because there is ANOTHER hibernate problem and this is not high priority.
+                            // There are a few ways to get the forum from the topic, none have worked.
+                            // java.lang.ClassCastException: org.sakaiproject.component.app.messageforums.dao.hibernate.OpenForumImpl_$$_jvst44_37 cannot be cast to org.sakaiproject.api.app.messageforums.DiscussionForum
+                            // DiscussionForum forum = (DiscussionForum) forumManager.getForumById(true,forumId);
+                            // //Don't send notification if forum or topic are in draft mode
+                            // if(!(forum.getDraft() || topic.getDraft())){
+                            //     String objectId = getTopicId(siteid, topic);
+                            //     Calendar releaseDate = Calendar.getInstance();
+                            //     String contenthash = notifyUtils.hashContent("Topic " + topic.getTitle() + " has been updated.");
+                            //     //Get list of users who have read access to this topic
+                            //     List<String> usersWithReadAccess = getNotifyList(siteid, Long.parseLong(topicId), event.getUserId());
+                            //     //Not sure what the notification type should actually be
+                            //     notifyUtils.sendNotification("discussion_topic", "creation", objectId, event.getContext(), usersWithReadAccess, releaseDate, contenthash, false);
+                            // }
+                        }
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
+                default:
+                    //this shouldn't happen
+            }
+        }
+        else if (forumEvents.contains(event.getEvent())) {
+            String eventType = event.getEvent();
+            String siteid = event.getContext();
+            //If the tool is hidden (in site info) we don't want to send any notifications
+            if(notifyUtils.toolIsHidden(siteid, DiscussionForumService.FORUMS_TOOL_ID)) return;
+            switch(eventType){
+                case DiscussionForumService.EVENT_FORUMS_REVISE:
+                    //Who should get this notification?  There is no forums equivalent of getUsersAllowedForTopic
                 default:
                     //this shouldn't happen
             }
@@ -208,14 +342,53 @@ public class ForumsNotifier implements Observer {
         // "read" permission for the given topic
         Set allowedUsers = discussionForumManager.getUsersAllowedForTopic(topicId, true, false);
         Iterator<String> uit = allowedUsers.iterator();
-        //put the allowed users in a list, exclude the auther of the post because they don't
+        //put the allowed users in a list, exclude the author of the post because they don't
         //need to be notified
         List<String> userids = new ArrayList<String>();
         while(uit.hasNext()){
             String userid = uit.next();
-            if(!userid.equals(author))
+            if(!userid.equals(author)){
                 userids.add(userid);
+            }
         }
         return notifyUtils.convertUserIdsInSite(siteid, userids);
+    }
+
+    //returns true if the message is the first one in its thread and false otherwise
+    public boolean isNewThread(Message m) {
+        if(null == m.getInReplyTo()){
+            //The message is not in reply to another message, so it must be the first in the thread
+            return true;
+        }
+        return false;
+    }
+
+    public boolean authorIsInstructor(){
+        return discussionForumManager.isInstructor();
+    }
+
+    public boolean authorIsTA(){
+        return discussionForumManager.isSectionTA();
+    }
+
+    public List<String> getThreadParticipants(String siteid, Message m) throws Exception {
+        List<String> participants = new ArrayList<String>();
+        //get the initial message in the thread.  The threadId is the ID of the first message.
+        Long threadId = m.getThreadId();
+        List<Message> threadMessages = new ArrayList<Message>();
+        //the child messages will include replies to replies to replies... not just first level replies
+        messageManager.getChildMsgs(threadId, threadMessages);
+        //we need the initial message too, not just its descendents
+        Message initialMessage = messageManager.getMessageById(threadId);
+        threadMessages.add(initialMessage);
+        Iterator<Message> messageIterator = threadMessages.iterator();
+        while (messageIterator.hasNext()){
+            Message mess = messageIterator.next();
+            String creator = mess.getCreatedBy();
+            if(!creator.equals(m.getCreatedBy()) && !participants.contains(creator)){
+                participants.add(creator);
+            }
+        }
+        return notifyUtils.convertUserIdsInSite(siteid, participants);
     }
 }

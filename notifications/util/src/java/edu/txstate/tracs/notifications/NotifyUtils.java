@@ -18,8 +18,11 @@ import org.hibernate.proxy.HibernateProxy;
 
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.component.api.ServerConfigurationService;
+import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
+import org.sakaiproject.tool.api.ToolManager;
+
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -225,5 +228,18 @@ public class NotifyUtils {
           return baseClass.cast(((HibernateProxy) maybeProxy).getHibernateLazyInitializer().getImplementation());
        } else
           return baseClass.cast(maybeProxy);
+    }
+
+    public boolean toolIsHidden(String siteid, String toolid){
+      boolean hidden = true;
+      try {
+        ToolManager toolManager = (ToolManager) ComponentManager.get(ToolManager.class.getName());
+        Site site = siteService.getSite(siteid);
+        hidden = toolManager.isHidden(site.getToolForCommonId(toolid));
+      } 
+      catch(Exception e){
+        e.printStackTrace();
+      }
+      return hidden;
     }
 }

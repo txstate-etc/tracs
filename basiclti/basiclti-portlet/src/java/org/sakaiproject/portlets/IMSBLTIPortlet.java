@@ -680,8 +680,14 @@ public class IMSBLTIPortlet extends GenericPortlet {
 			String allowOutcomes = ServerConfigurationService.getString(SakaiBLTIUtil.BASICLTI_OUTCOMES_ENABLED, SakaiBLTIUtil.BASICLTI_OUTCOMES_ENABLED_DEFAULT);
 			String allowSettings = ServerConfigurationService.getString(SakaiBLTIUtil.BASICLTI_SETTINGS_ENABLED, SakaiBLTIUtil.BASICLTI_SETTINGS_ENABLED_DEFAULT);
 			String allowRoster = ServerConfigurationService.getString(SakaiBLTIUtil.BASICLTI_ROSTER_ENABLED, SakaiBLTIUtil.BASICLTI_ROSTER_ENABLED_DEFAULT);
+			String useExternalGbAssign = getSakaiProperty(sakaiProperties, "imsti.useExternalGbAssign");
+
 			if ( "true".equals(allowOutcomes) && newAssignment != null && newAssignment.trim().length() > 1 ) {
-				if ( addGradeBookItem(request, newAssignment) ) {
+				if ("true".equals(useExternalGbAssign)) {
+					if (addExternalGradebookItem(request, newAssignment)) {
+						assignment = newAssignment;
+					}
+				} else if ( addGradeBookItem(request, newAssignment) ) {
 					// System.out.println("Success!");
 					assignment = newAssignment;
 				}
@@ -706,14 +712,20 @@ public class IMSBLTIPortlet extends GenericPortlet {
 				} 
 			}
 
+			GradebookExternalAssessmentService gex = (GradebookExternalAssessmentService)  ComponentManager.get("org.sakaiproject.service.gradebook.GradebookExternalAssessmentService");
+
 			if ( "true".equals(allowOutcomes) && assignment != null && assignment.trim().length() > 1 ) {
-				List<String> assignments = getGradeBookAssignments();
 				boolean found = false;
+				if ("true".equals(useExternalGbAssign)) {
+					found = gex.isAssignmentDefined(getContext(), assignment);
+				} else {
+				List<String> assignments = getGradeBookAssignments();
 				if ( assignments != null ) for ( String assn : assignments ) {
 					if ( assn.equals(assignment) ) {
 						found = true;
 						break;
 					}
+				}
 				}
 				if ( ! found ) {
 					setErrorMessage(request, rb.getString("error.gradable.badassign") + 
@@ -796,6 +808,14 @@ public class IMSBLTIPortlet extends GenericPortlet {
 				} catch (ReadOnlyException e) {
 					setErrorMessage(request, rb.getString("error.modify.prefs") );
 					return;
+				}
+			}
+
+			// Check if external gb assignment should be removed
+			if ("true".equals(useExternalGbAssign) && assignment != null && newAssignment == null) {
+				if (!"on".equals(request.getParameter("imsti.keepassign"))) {
+					gex.removeExternalAssessment(getContext(), getExternalIdForAssignment(assignment));
+					prefs.setValue("sakai:imsti.assignment", null);
 				}
 			}
 
@@ -931,6 +951,41 @@ public class IMSBLTIPortlet extends GenericPortlet {
 		return false;
 	}
 
+	protected boolean addExternalGradebookItem(ActionRequest request, String assignmentName)
+	{
+		try
+		{
+			GradebookService g = (GradebookService)  ComponentManager.get("org.sakaiproject.service.gradebook.GradebookService");
+			GradebookExternalAssessmentService gex = (GradebookExternalAssessmentService)  ComponentManager.get("org.sakaiproject.service.gradebook.GradebookExternalAssessmentService");
+
+			String gradebookUid = getContext();
+			if ( ! (g.isGradebookDefined(gradebookUid) && (g.currentUserHasEditPerm(gradebookUid) || g.currentUserHasGradingPerm(gradebookUid)) && g.currentUserHasGradeAllPerm(gradebookUid) ) ) return false;
+
+			// add assignment to gradebook
+			gex.addExternalAssessment(gradebookUid,
+																ToolManager.getCurrentPlacement().getId(),
+																null,
+																assignmentName,
+																100.0,
+																null,
+																"Attendance",
+																false);
+			return true;
+		}
+		catch (ConflictingAssignmentNameException e)
+		{
+			dPrint("Assignment already exists in gradebook: " + e.getMessage());
+			setErrorMessage(request, rb.getString("error.gradable.badcreate") + ":" + e.getMessage());
+		}
+		catch (Exception e)
+		{
+			dPrint("GradebookNotFoundException (may be because GradeBook has not yet been added to the Site) " + e.getMessage());
+			setErrorMessage(request, rb.getString("error.gradable.badcreate") + ":" + e.getMessage() );
+			M_log.warn(this + ":addGradeItem " + e.getMessage());
+		}
+		return false;
+	}
+
 	// get all assignments from the Gradebook
 	protected List<String> getGradeBookAssignments()
 	{
@@ -960,4 +1015,21 @@ public class IMSBLTIPortlet extends GenericPortlet {
 		}
 	}
 
+	protected String getExternalIdForAssignment(String assignmentName) {
+		try
+		{
+			GradebookService g = (GradebookService)  ComponentManager
+				.get("org.sakaiproject.service.gradebook.GradebookService");
+
+			Assignment assignment = g.getAssignment(getContext(), assignmentName);
+
+			if (assignment == null) return null;
+			return assignment.getExternalId();
+}
+		catch (GradebookNotFoundException e)
+		{
+			dPrint("GradebookNotFoundException (may be because GradeBook has not yet been added to the Site) " + e.getMessage());
+			return null;
+		}
+	}
 }

@@ -53,6 +53,10 @@
             <artifactId>sakai-privacy-api</artifactId>
         </dependency>
         <dependency>
+          <groupId>org.sakaiproject.edu-services.course-management</groupId>
+          <artifactId>coursemanagement-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.sakaiproject.portal</groupId>
             <artifactId>sakai-portal-util</artifactId>
             <version>${sakai.version}</version>
@@ -73,6 +77,10 @@
         <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

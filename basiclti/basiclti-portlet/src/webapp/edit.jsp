@@ -58,6 +58,10 @@ Boolean allowRoster = (Boolean) rReq.getAttribute("allowRoster");
 
 Boolean allowContentLink = (Boolean) rReq.getAttribute("allowContentLink");
 
+Boolean useExternalGbAssign = new Boolean("true".equals(sp.getProperty("imsti.useExternalGbAssign")));
+
+Boolean hideClearPreferences = new Boolean("true".equals(sp.getProperty("imsti.hideClearPreferences")));
+
 %>
 <portlet:defineObjects/>
 <div class="portletBody">
@@ -88,11 +92,13 @@ Boolean allowContentLink = (Boolean) rReq.getAttribute("allowContentLink");
 			<a href="<%=viewURL.toString()%>"><%=rb.getString("edit.exit")%></a>
 		</span>
 	</li>	
+  <% if (!hideClearPreferences) {%>
 	<li>
 		<span>
 			<a href="<%=resetURL.toString()%>"><%=rb.getString("edit.clear.prefs")%></a>
 		</span>
 	</li>
+  <% } %>
 </ul>	
 
 <form method="post" action="<%=launchURL.toString()%>">
@@ -190,7 +196,14 @@ if ( document.getElementById("UISwitcher") ) switchui();
 
 <% } %>
 
-<% if ( allowOutcomes && allow(sp,"allowoutcomes") ) { %>
+<% if (useExternalGbAssign && ov.getProperty("imsti.assignment") != null) { %>
+  <h3><%=rb.getString("gradable.information") %></h3>
+  <p>
+    <input type="checkbox" name="imsti.keepassign" value="on" checked />
+    <label for="imsti.keepassign">Keep using assignment '<%=ov.getProperty("imsti.assignment")%>'</label>
+  </p>
+  <input type="hidden" name="imsti.assignment" value="<%= ov.getProperty("imsti.assignment")%>" />
+<% } else if ( allowOutcomes && allow(sp,"allowoutcomes") ) { %>
 <h3><%=rb.getString("gradable.information") %></h3>
 <p  class="shorttext" style="clear:none;">
 <label for="imsti.newassignment"><%=rb.getString("gradable.newassignment") %></label>
@@ -200,7 +213,7 @@ if ( document.getElementById("UISwitcher") ) switchui();
 
 <% } %>
 
-<% if ( allowOutcomes && allow(sp,"allowoutcomes") && assignments != null ) { %>
+<% if ( allowOutcomes && allow(sp,"allowoutcomes") && assignments != null && !useExternalGbAssign ) { %>
 <p  class="shorttext" style="clear:none;">
 <%=rb.getString("gradable.title") %>
 <select name="imsti.assignment">

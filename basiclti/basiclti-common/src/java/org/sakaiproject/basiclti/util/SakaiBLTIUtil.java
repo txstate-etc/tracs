@@ -104,6 +104,15 @@ import net.oauth.OAuthValidator;
 import net.oauth.SimpleOAuthValidator;
 import net.oauth.signature.OAuthSignatureMethod;
 
+
+import java.util.ArrayList;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
+import org.sakaiproject.site.api.Group;
+import org.sakaiproject.coursemanagement.api.CourseManagementService;
+import org.sakaiproject.coursemanagement.api.Section;
+import org.sakaiproject.coursemanagement.api.exception.IdNotFoundException;
+
 /**
  * Some Sakai Utility code for IMS Basic LTI
  * This is mostly code to support the Sakai conventions for 
@@ -521,7 +530,73 @@ public class SakaiBLTIUtil {
 
 		// Add Placement Information
 		addPlacementInfo(props, placementId);
+		addTracsSpecificInfo(props, site, placementId);
 		return true;
+	}
+
+	public static void addTracsSpecificInfo(Properties props, Site site, String placementId) {
+		ToolConfiguration placement = SiteService.findTool(placementId);
+		Properties config = placement.getConfig();
+		String releaseproviders = toNull(getCorrectProperty(config,"releaseproviders", placement));
+		User user = UserDirectoryService.getCurrentUser();
+		String siteRealmId = SiteService.siteReference(site.getId());
+
+		CourseManagementService courseManagementService = ComponentManager.get(CourseManagementService.class);
+		AuthzGroupService authzGroupService = ComponentManager.get(AuthzGroupService.class);
+
+		String setmaxpoints = toNull(getCorrectProperty(config, "useExternalGbAssign", placement));
+
+    if ("true".equals(setmaxpoints)) {
+      String outcome_url = ServerConfigurationService.getString("basiclti.consumer.ext_ims_lis_basic_outcome_url",null);
+      if (outcome_url == null) outcome_url = getOurServerUrl() + "/imsblis/service/";
+      setProperty(props, "ext_ims_lti_set_max_points_url", outcome_url);
+    }
+
+		if ("on".equals(releaseproviders) && user != null) {
+			ArrayList<String> userProviders = new ArrayList<String>();
+
+			// Loop through the site's provider ids and add the ones this user is enrolled in
+			Set<String> providerIds = authzGroupService.getProviderIds(siteRealmId);
+			for (String providerId : providerIds) {
+		    try {
+	        Section section = courseManagementService.getSection(providerId);
+	        String enrollmentSetId = section.getEnrollmentSet().getEid();
+
+	        if (courseManagementService.isEnrolled(user.getEid(), enrollmentSetId)) {
+	            userProviders.add(providerId);
+	        }
+		    } catch (IdNotFoundException ex) {
+	        // Skip this provider id if a section can't be found.
+	        dPrint("No section found for provider id " + providerId);
+		    }
+			}
+
+			String userProvidersString = StringUtils.join(userProviders, ",");
+			setProperty(props, "ext_sakai_provider_ids", userProvidersString);
+		}
+
+		// Create a hash of the modified dates of the sites' realms, so the
+		// tool can know when a roster update is needed.
+		AuthzGroup realm = null;
+		try {
+			realm = authzGroupService.getAuthzGroup(SiteService.siteReference(site.getId()));
+		} catch(GroupNotDefinedException ex) {
+			dPrint("No realm found for site with id " + site.getId() + ". Not adding roster has to lti launch.");
+		}
+
+		if (realm != null) {
+			String modified_dates_base_string = realm.getModifiedDate().toString();
+			for (Group group : site.getGroups()) {
+		    try {
+		      String groupRealmId = SiteService.siteGroupReference(site.getId(), group.getId());
+		      AuthzGroup groupRealm = authzGroupService.getAuthzGroup(groupRealmId);
+		      modified_dates_base_string += groupRealm.getModifiedDate().toString();
+		    } catch (GroupNotDefinedException ex) {
+		      dPrint("No realm found for group with id " + group.getId());
+		    }
+			}
+			setProperty(props, "ext_sakai_roster_hash", LegacyShaUtil.sha256Hash(modified_dates_base_string));
+		}
 	}
 
 	public static void addPlacementInfo(Properties props, String placementId)
@@ -1636,7 +1711,8 @@ public class SakaiBLTIUtil {
 		// Look up the assignment so we can find the max points
 		GradebookService g = (GradebookService)  ComponentManager
 			.get("org.sakaiproject.service.gradebook.GradebookService");
-
+		GradebookExternalAssessmentService gex = (GradebookExternalAssessmentService) ComponentManager
+		  .get("org.sakaiproject.service.gradebook.GradebookExternalAssessmentService");
 
 		// Make sure the user exists in the site
 		boolean userExistsInSite = false;
@@ -1662,7 +1738,7 @@ public class SakaiBLTIUtil {
 			List gradebookAssignments = g.getAssignments(siteId);
 			for (Iterator i=gradebookAssignments.iterator(); i.hasNext();) {
 				Assignment gAssignment = (Assignment) i.next();
-				if ( gAssignment.isExternallyMaintained() ) continue;
+				//if ( gAssignment.isExternallyMaintained() ) continue;
 				if ( assignment.equals(gAssignment.getName()) ) { 
 					assignmentObject = gAssignment;
 					break;
@@ -1729,9 +1805,12 @@ public class SakaiBLTIUtil {
 					throw new Exception("Grade out of range");
 				}
 				theGrade = theGrade * assignmentObject.getPoints();
+				if (assignmentObject.isExternallyMaintained()) {
+					gex.updateExternalAssessmentScore(siteId, assignmentObject.getExternalId(), user_id, theGrade.toString());
+				} else {
 				g.setAssignmentScoreString(siteId, assignmentObject.getId(), user_id, String.valueOf(theGrade), "External Outcome");
 				g.setAssignmentScoreComment(siteId, assignmentObject.getId(), user_id, comment);
-
+				}
 
 				M_log.info("Stored Score=" + siteId + " assignment="+ assignment + " user_id=" + user_id + " score="+ theGrade);
 				message = "Result replaced";
@@ -1755,7 +1834,7 @@ public class SakaiBLTIUtil {
 		String [] fieldList = { "key", LTIService.LTI_SECRET, LTIService.LTI_PLACEMENTSECRET, 
 				LTIService.LTI_OLDPLACEMENTSECRET, LTIService.LTI_ALLOWSETTINGS, 
 				"assignment", LTIService.LTI_ALLOWROSTER, "releasename", "releaseemail", 
-				"toolsetting"};
+				"toolsetting", "releasestatus", "releaseproviders"};
 
 		Properties retval = new Properties();
 

@@ -589,6 +589,57 @@ public class BasicLTIUtil {
 		text.append("}\n");
 		text.append("</script>\n");
 
+    // iframe resize logic for attendance tool
+    if (newMap.get(BasicLTIConstants.RESOURCE_LINK_TITLE) != null && newMap.get(BasicLTIConstants.RESOURCE_LINK_TITLE).toLowerCase().equals("attendance")) {
+
+      // We add a script tag to the head section of the top document which contains
+      // the resize function and logic for hooking them up to the resize and scroll
+      // events of the top window. This was the only way to get resizing to work in
+      // all browsers. If the code is in the iframe window, it gets thrown out when
+      // the iframe is redirected to the lti launch and the resize functions gets
+      // garbage collected in IE since it was on a window that no longer exists.
+      String scriptTag = "var iframe = document.getElementById('basic-lti-iframe');\\n"
+        + " var doResize = function() {\\n"
+        + "   var viewportHeight = document.documentElement.clientHeight;\\n"
+        + "   var offset = iframe.offsetTop;\\n"
+        + "   var currObj = iframe.offsetParent;\\n"
+        + "   while (currObj) {\\n"
+        + "     offset += currObj.offsetTop;\\n"
+        + "     currObj = currObj.offsetParent\\n"
+        + "   }\\n"
+        + "   var frameHeight = viewportHeight - offset;\\n"
+        + "   var scrollAmount = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;\\n"
+        + "   if (scrollAmount > offset) scrollAmount = offset;\\n"
+        + "   var newHeight = frameHeight + scrollAmount;\\n"
+        + "   if (newHeight < 100) newHeight = 100;\\n"
+        + "   var objToResize = (iframe.style) ? iframe.style : iframe;\\n"
+        + "   objToResize.height = newHeight + 'px';\\n"
+        + " }\\n"
+        + " if (window.addEventListener) {\\n"
+        + "   window.addEventListener('resize', doResize, false);\\n"
+        + "   window.addEventListener('scroll', doResize, false);\\n"
+        + " }\\n"
+        + " else if (window.attachEvent) {\\n"
+        + "   window.attachEvent('onresize', doResize);\\n"
+        + "   window.attachEvent('onscroll', doResize);\\n"
+        + " }\\n"
+        + " else {\\n"
+        + "   window['onResize'] = doResize;\\n"
+        + "   window['onScroll'] = doResize;\\n"
+        + " }\\n"
+        + " doResize();";
+
+      text.append(" <script language=\"javascript\"> \n"
+        + " var topWindow = window.parent.parent;\n"
+        + " topWindow.document.getElementsByTagName('iframe')[0].id = 'basic-lti-iframe';\n"
+        + " var script = topWindow.document.createElement('script');\n"
+        + " script.type = \"text\\/javascript\";\n"
+        + " script.text = \"" + scriptTag + "\"\n"
+        + " topWindow.document.getElementsByTagName(\"head\")[0].appendChild(script);\n"
+        + " </script> \n");
+    }
+
+
 		// paint debug output
 		if (debug) {
 			text.append("<pre id=\"ltiLaunchDebug_");

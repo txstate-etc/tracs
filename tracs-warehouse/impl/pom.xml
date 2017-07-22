@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>edu.txstate.tracs</groupId>
+    <artifactId>warehouse</artifactId>
+    <version>11.3</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <name>Warehouse Private</name>
+  <groupId>edu.txstate.tracs</groupId>
+  <artifactId>warehouse-impl</artifactId>
+  <inceptionYear>2016</inceptionYear>
+  <packaging>sakai-component</packaging>
+  <properties>
+    <deploy.target>components</deploy.target>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>edu.txstate.tracs</groupId>
+      <artifactId>tracs-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>edu.txstate.tracs</groupId>
+      <artifactId>warehouse-api</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/bundle</directory>
+        <includes>
+          <include>**/*.sql</include>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+</project>

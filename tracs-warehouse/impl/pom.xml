@@ -29,6 +29,7 @@
     <dependency>
       <groupId>edu.txstate.tracs</groupId>
       <artifactId>warehouse-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

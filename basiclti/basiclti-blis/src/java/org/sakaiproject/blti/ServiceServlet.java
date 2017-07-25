@@ -43,6 +43,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.oauth.OAuthAccessor;
 import net.oauth.OAuthConsumer;
 import net.oauth.OAuthMessage;
@@ -69,6 +71,10 @@ import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.Role;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.component.cover.ServerConfigurationService;
+import org.sakaiproject.coursemanagement.api.CourseManagementService;
+import org.sakaiproject.coursemanagement.api.Enrollment;
+import org.sakaiproject.coursemanagement.api.Section;
+import org.sakaiproject.coursemanagement.api.exception.IdNotFoundException;
 import org.sakaiproject.event.cover.UsageSessionService;
 import org.sakaiproject.id.cover.IdManager;
 import org.sakaiproject.site.api.Group;
@@ -82,6 +88,7 @@ import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.util.ResourceLoader;
 import org.sakaiproject.basiclti.util.SakaiBLTIUtil;
@@ -94,6 +101,12 @@ import org.tsugi.pox.IMSPOXRequest;
 import org.sakaiproject.lti.api.LTIService;
 import org.sakaiproject.util.foorm.SakaiFoorm;
 import org.sakaiproject.util.foorm.FoormUtil;
+
+import org.sakaiproject.authz.api.AuthzGroupService;
+import org.sakaiproject.service.gradebook.shared.AssessmentNotFoundException;
+import org.sakaiproject.service.gradebook.shared.AssignmentHasIllegalPointsException;
+import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentService;
+import org.sakaiproject.service.gradebook.shared.GradebookNotFoundException;
 
 /**
  * Notes:
@@ -122,6 +135,9 @@ public class ServiceServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static Logger M_log = LoggerFactory.getLogger(ServiceServlet.class);
 	private static ResourceLoader rb = new ResourceLoader("blis");
+
+	private static CourseManagementService courseManagementService = (CourseManagementService) ComponentManager.get(CourseManagementService.class);
+	private static AuthzGroupService authzGroupService = (AuthzGroupService) ComponentManager.get(AuthzGroupService.class);
 
 	protected static SakaiFoorm foorm = new SakaiFoorm();
 
@@ -296,6 +312,9 @@ public class ServiceServlet extends HttpServlet {
 		} else if( BasicLTIUtil.equals(lti_message_type, "basic-lis-readmembershipsforcontext") ) {
 			sourcedid = request.getParameter("id");
 			if ( allowRoster != null ) message_type = "roster";
+			} else if (BasicLTIUtil.equals(lti_message_type, "basic-lti-setmaxpoints")) {
+				sourcedid = request.getParameter("id");
+				message_type = "maxpoints";
 		} else {
 			doError(request, response, theMap, "outcomes.invalid", "lti_message_type="+lti_message_type, null);
 			return;
@@ -451,6 +470,8 @@ public class ServiceServlet extends HttpServlet {
 		if ( "toolsetting".equals(message_type) ) processSetting(request, response, lti_message_type, site, siteId, placement_id, pitch, user_id, theMap);
 
 		if ( "roster".equals(message_type) ) processRoster(request, response, lti_message_type, site, siteId, placement_id, pitch, user_id, theMap);
+
+			if ("maxpoints".equals(message_type)) processMaxPoints(request, response, lti_message_type, site, siteId, placement_id, pitch, user_id, theMap);
 	}
 
 	protected void processSetting(HttpServletRequest request, HttpServletResponse response, 
@@ -627,6 +648,8 @@ public class ServiceServlet extends HttpServlet {
 		String roleMapProp = pitch.getProperty("rolemap");
 		String releaseName = pitch.getProperty(LTIService.LTI_SENDNAME);
 		String releaseEmail = pitch.getProperty(LTIService.LTI_SENDEMAILADDR);
+			String releaseStatus = pitch.getProperty("releasestatus");
+			String releaseproviders = pitch.getProperty("releaseproviders");
 		String assignment = pitch.getProperty("assignment");
 		String allowOutcomes = ServerConfigurationService.getString(
 				SakaiBLTIUtil.BASICLTI_OUTCOMES_ENABLED, SakaiBLTIUtil.BASICLTI_OUTCOMES_ENABLED_DEFAULT);
@@ -639,6 +662,28 @@ public class ServiceServlet extends HttpServlet {
 		try { 
 			List<Map<String,Object>> lm = new ArrayList<Map<String,Object>>();
 			Map<String, String> roleMap = SakaiBLTIUtil.convertRoleMapPropToMap(roleMapProp);
+
+				//Get providerId and sections for the site
+		    Set<String> providerIds = authzGroupService.getProviderIds(SiteService.siteReference(site.getId()));
+		    Map<String, String> userProviderIdMap = new HashMap<String, String>();
+		    for (String providerId : providerIds) {
+					try {
+						Section section = courseManagementService.getSection(providerId);
+						Set<Enrollment> enrollments = courseManagementService.getEnrollments(section.getEnrollmentSet().getEid());
+						for (Enrollment enrollment : enrollments) {
+							if (!enrollment.isDropped()) {
+								if (userProviderIdMap.containsKey(enrollment.getUserId())) {
+									userProviderIdMap.put(enrollment.getUserId(), userProviderIdMap.get(enrollment.getUserId()) + "," + providerId);
+								} else {
+									userProviderIdMap.put(enrollment.getUserId(), providerId);
+								}
+							}
+						}
+					} catch (IdNotFoundException ex) {
+						// Skip this provider id if a section can't be found.
+						M_log.warn("No section found for provider id " + providerId);
+					}
+				}
 
 			// Get users for each of the members. UserDirectoryService.getUsers will skip any undefined users.
 			Set<Member> members = site.getMembers();
@@ -658,6 +703,10 @@ public class ServiceServlet extends HttpServlet {
 				mm.put("/user_id",ims_user_id);
 				String ims_role = "Learner";
 
+					if ( roleMap.containsKey(role.getId()) ) {
+						ims_role = roleMap.get(role.getId());
+					}
+
 				// If there is a role mapping, it has precedence over site.update
 				if ( roleMap.containsKey(role.getId()) ) {
 					ims_role = roleMap.get(role.getId());
@@ -674,11 +723,22 @@ public class ServiceServlet extends HttpServlet {
 
 				mm.put("/role",ims_role);
 				mm.put("/roles",ims_role);
-				if ( "true".equals(allowOutcomes) && assignment != null ) {
+				if ( "true".equals(allowOutcomes)) {
 					String placement_secret  = pitch.getProperty(LTIService.LTI_PLACEMENTSECRET);
 					String result_sourcedid = SakaiBLTIUtil.getSourceDID(user, placement_id, placement_secret);
 					if ( result_sourcedid != null ) mm.put("/lis_result_sourcedid",result_sourcedid);
 				}
+
+				if ( SakaiBLTIUtil.isPlacement(placement_id) ) {
+					ToolConfiguration placement = SiteService.findTool(placement_id);
+					if ( "on".equals(releaseStatus) ) {
+						mm.put("/membership_is_active", Boolean.toString(member.isActive()));
+					}
+				}
+
+				if ( "on".equals(releaseproviders) ) {
+	        mm.put("/provider_ids", StringUtils.defaultString(userProviderIdMap.get(user.getEid())));
+			  }
 
 				if ( "on".equals(releaseName) || "on".equals(releaseEmail) ) {
 					if ( "on".equals(releaseName) ) {
@@ -726,6 +786,51 @@ public class ServiceServlet extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		out.println(theXml);
 		M_log.debug(theXml);
+	}
+
+	protected void processMaxPoints(HttpServletRequest request, HttpServletResponse response,
+		String lti_message_type,
+			Site site, String siteId, String placement_id, Properties pitch,
+		String user_id,  Map<String, Object> theMap)
+		throws java.io.IOException
+	{
+
+		GradebookExternalAssessmentService gex = (GradebookExternalAssessmentService) ComponentManager
+		  .get("org.sakaiproject.service.gradebook.GradebookExternalAssessmentService");
+
+		String maxPointsStr = request.getParameter("max_points");
+
+		if (maxPointsStr == null) {
+			doError(request, response, theMap, "", "Missing required parameter max_points", null);
+			return;
+		}
+
+		Double maxPoints = null;
+		try {
+			maxPoints = Double.valueOf(maxPointsStr);
+		} catch (NumberFormatException ex) {
+			doError(request, response, theMap, "", "Max points must be a valid number", ex);
+			return;
+		}
+
+		String assignmentName = pitch.getProperty("assignment");
+
+		try {
+			gex.updateExternalAssessment(siteId, placement_id, null, assignmentName, maxPoints, null, false);
+		} catch (AssignmentHasIllegalPointsException ex) {
+			doError(request, response, theMap, "", "Illegal max points, max points must be greater than 0", ex);
+			return;
+		} catch (GradebookNotFoundException ex) {
+			doError(request, response, theMap, "", "No gradebook was found for this site", ex);
+			return;
+		} catch (AssessmentNotFoundException ex) {
+			doError(request, response, theMap, "", "No external assessment was found for this tool", ex);
+			return;
+		}
+
+		theMap.put("/message_response/statusinfo/codemajor", "Success");
+		theMap.put("/message_response/statusinfo/severity", "Status");
+		theMap.put("/message_response/statusinfo/codeminor", "fullsuccess");
 	}
 
 	/* IMS POX XML versions of this service */

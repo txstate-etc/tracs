@@ -120,8 +120,7 @@
                     2. If (1.) not found/specified, load defaults from bundled config file:
                         sitestats-api/api/src/config/org/sakaiproject/sitestats.config/toolEventDef.xml
              -->
-            <!-- <property name="toolEventsDefinitionFile" value="${sakai.home}/toolEventsDef.xml" /> -->
-            
+            <property name="toolEventsDefinitionFile" value="${sakai.home}/toolEventsDef.xml" />
             <!-- Tool event definition file: add support for new tools or new events to existing tools -->
             <!-- <property name="toolEventsAddDefinitionFile" value="${sakai.home}/toolEventsAddDef.xml" /> -->
             
@@ -228,6 +227,7 @@
         <property name="entityManager" ref="org.sakaiproject.entity.api.EntityManager"/>
 		<property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService"/>
 		<property name="usageSessionService" ref="org.sakaiproject.event.api.UsageSessionService" />
+    <property name="serverConfigurationService" ref="org.sakaiproject.component.api.ServerConfigurationService"/>
 	</bean>
 	<!-- Transaction proxy: StatsUpdateManager -->
 	<bean id="org.sakaiproject.sitestats.api.StatsUpdateManagerTransactionProxyFactoryBean"
@@ -375,6 +375,9 @@
 	<bean id="org.sakaiproject.sitestats.api.EventStat"
 		class="org.sakaiproject.sitestats.impl.EventStatImpl">
 	</bean>
+  <bean id="org.sakaiproject.sitestats.api.EventDetail"
+    class="org.sakaiproject.sitestats.impl.EventDetailImpl">
+  </bean>
 	<bean id="org.sakaiproject.sitestats.api.SiteVisits"
 		class="org.sakaiproject.sitestats.impl.SiteVisitsImpl">
 	</bean>
@@ -390,7 +393,6 @@
         		<value>site.del</value>
         		<value>user.add</value>
         		<value>user.del</value>
-        		<value>user.login</value>
       		</list>      
     	</constructor-arg>
   	</bean>

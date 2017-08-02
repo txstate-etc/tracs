@@ -243,6 +243,19 @@ public class ReportManagerImpl extends HibernateDaoSupport implements ReportMana
 		// generate report
 		Report report = new Report();
 		List<Stat> data = null;
+
+		//Decide what data should we get for event-- EventStats or EventDetail
+		//Added by -Qu for bugid:3480 11/15/2010
+		boolean showED = reportDef.getReportParams().getShowEventDetailPage();
+		if (showED){
+			Date fDate = rpp.fDate;
+			//Only adjust ending date when customized period is not selected
+			if(!reportDef.getReportParams().getWhen().equals(ReportManager.WHEN_CUSTOM) && fDate != null){
+				fDate = adjustfDate(reportDef,fDate);
+			}
+			data = M_sm.getEventDetail(rpp.siteId, rpp.events, rpp.iDate, fDate, rpp.userIds, rpp.inverseUserSelection, pagingPosition, rpp.totalsBy, rpp.sortBy, rpp.sortAscending, rpp.maxResults);
+		}
+		else{
 		if (reportDef.getReportParams().getWhat().equals(ReportManager.WHAT_RESOURCES)) {
 			data = M_sm.getResourceStats(rpp.siteId, rpp.resourceAction, rpp.resourceIds, rpp.iDate, rpp.fDate, rpp.userIds, rpp.inverseUserSelection, pagingPosition, rpp.totalsBy, rpp.sortBy, rpp.sortAscending, rpp.maxResults);
 		} else if(reportDef.getReportParams().getWhat().equals(ReportManager.WHAT_VISITS)
@@ -256,6 +269,7 @@ public class ReportManagerImpl extends HibernateDaoSupport implements ReportMana
 			data = M_sm.getActivityTotalsStats(rpp.siteId, rpp.events, rpp.iDate, rpp.fDate, pagingPosition, rpp.totalsBy, rpp.sortBy, rpp.sortAscending, rpp.maxResults);
 		} else if (reportDef.getReportParams().getWhat().equals(ReportManager.WHAT_LESSONPAGES)) {
 			data = M_sm.getLessonBuilderStats(rpp.siteId, rpp.resourceAction, rpp.resourceIds, rpp.iDate, rpp.fDate, rpp.userIds, rpp.inverseUserSelection, pagingPosition, rpp.totalsBy, rpp.sortBy, rpp.sortAscending, rpp.maxResults);
+		}
 		}
 		
 		// add missing info in report and its parameters
@@ -452,6 +466,9 @@ public class ReportManagerImpl extends HibernateDaoSupport implements ReportMana
 		}else if(column.equals(StatsManager.T_EVENT)) {
 			return totalsBy.contains(StatsManager.T_EVENT) && !ReportManager.WHO_NONE.equals(params.getWho());
 			
+		}else if(column.equals(StatsManager.T_EVENT_DETAIL)) {
+			return totalsBy.contains(StatsManager.T_EVENT) && !ReportManager.WHO_NONE.equals(params.getWho());
+
 		}else if(column.equals(StatsManager.T_TOOL)) {
 			return totalsBy.contains(StatsManager.T_TOOL) && !ReportManager.WHO_NONE.equals(params.getWho());
 			
@@ -1624,4 +1641,14 @@ public class ReportManagerImpl extends HibernateDaoSupport implements ReportMana
             return siteId+",p:"+includedPredefined+",h:"+includeHidden;
         }
     }
+
+	//Added by -Qu for bugid:3480 11/15/2010
+	public Date adjustfDate(ReportDef reportDef, Date fDate){
+			// adjust final date
+			Calendar c = Calendar.getInstance();
+			c.setTime(fDate);
+			c.add(Calendar.DAY_OF_YEAR, 1);
+			Date fDate2 = c.getTime();
+			return fDate2;
+}
 }

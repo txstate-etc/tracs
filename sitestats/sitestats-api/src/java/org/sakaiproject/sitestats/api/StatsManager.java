@@ -88,6 +88,8 @@ public interface StatsManager {
 	public static final String			T_SITE						= "site";
 	public static final String			T_USER						= "user";
 	public static final String			T_EVENT						= "event";
+	public static final String			T_EVENT_DETAIL				= "eventDetail_event";
+	public static final String			T_TOOL_DETAIL				= "eventDetail_tool";
 	public static final String			T_TOOL						= "tool";
 	public static final String			T_RESOURCE					= "resource";
 	public static final String			T_RESOURCE_ACTION			= "resource-action";
@@ -100,6 +102,7 @@ public interface StatsManager {
 	public static final String			T_TOTAL						= "total";
 	public static final String			T_VISITS					= "visits";
 	public static final String			T_UNIQUEVISITS				= "unique-visits";
+	public static final String			T_ITEM						= "item";
 	public static final String			T_DURATION					= "duration";
 	public static final List<String>	TOTALSBY_EVENT_DEFAULT		= Arrays.asList(T_USER, T_EVENT, T_DATE);
 	public static final List<String>	TOTALSBY_RESOURCE_DEFAULT	= Arrays.asList(T_USER, T_RESOURCE, T_RESOURCE_ACTION, T_DATE);
@@ -338,6 +341,21 @@ public interface StatsManager {
 
 	public Map<String, SitePresenceTotal> getPresenceTotalsForSite(final String siteId);
 	
+	//Added by -Qu for bugid:3480 11/15/2010
+	public List<Stat> getEventDetail(String siteId, List<String> events);
+
+	public List<Stat> getEventDetail(
+			final String siteId,
+			final List<String> events,
+			final Date iDate, final Date fDate,
+			final List<String> userIds,
+			final boolean inverseUserSelection,
+			final PagingPosition page,
+			final List<String> totalsBy,
+			final String sortBy,
+			final boolean sortAscending,
+			final int maxResults);
+
 	// ################################################################
 	// Resource statistics related methods
 	// ################################################################
@@ -643,4 +661,7 @@ public interface StatsManager {
 	/** Logs an event using EventTrackingService. */
 	public void logEvent(Object object, String logAction, String siteId, boolean oncePerSession);
 	
+	/**Get Tool Id from associated event  Added by -Qu bugid:4065    11/19/2010 */
+	public String getToolIdFromEventId(String eventId);
+
 }

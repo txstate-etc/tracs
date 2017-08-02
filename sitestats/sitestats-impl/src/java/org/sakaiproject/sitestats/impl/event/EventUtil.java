@@ -145,9 +145,13 @@ public class EventUtil {
 			if(!foundTool){
 				// tool not found, add as unselected
 				ToolInfo toAdd = t1;
-				toAdd.setSelected(false);
+				//set default to be selected for all tools bugid:3147 -Qu 2/26/10
+				//toAdd.setSelected(false);
+				toAdd.setSelected(true);
 				for(int i = 0; i < toAdd.getEvents().size(); i++)
-					toAdd.getEvents().get(i).setSelected(false);
+					//set default to be selected for all tools bugid:3147 -Qu 2/26/10
+					//toAdd.getEvents().get(i).setSelected(false);
+					toAdd.getEvents().get(i).setSelected(true);
 				union.add(toAdd);
 			}else{
 				// tool found, add missing events as unselected
@@ -164,7 +168,9 @@ public class EventUtil {
 					}
 					if(!foundEvent){
 						EventInfo toAdd = e1;
-						e1.setSelected(false);
+						//set default to be selected for all tools bugid:3147 -Qu 2/26/10
+						//e1.setSelected(false);
+						e1.setSelected(true);
 						t2.addEvent(toAdd);
 					}
 				}

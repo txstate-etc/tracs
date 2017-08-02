@@ -3,6 +3,14 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+   <bean id="PublishedAssessmentServiceAPI"
+   class="org.sakaiproject.tool.assessment.shared.impl.assessment.PublishedAssessmentServiceImpl">
+   </bean>
+
+   <bean id="AssessmentServiceAPI"
+   class="org.sakaiproject.tool.assessment.shared.impl.assessment.AssessmentServiceImpl">
+   </bean>
+
 	<!-- Here's our 'facade' bean that we can inject a reference with -->
 	<bean id="org.sakaiproject.sitestats.tool.facade.SakaiFacade"
 		class="org.sakaiproject.sitestats.tool.facade.SakaiFacadeImpl">
@@ -22,6 +30,8 @@
         <property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService" />
         <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService" />
         <property name="timeService" ref="org.sakaiproject.time.api.TimeService" />
+        <property name="publishedAssessmentService"> <ref bean="PublishedAssessmentServiceAPI" /></property>
+        <property name="assessmentService" ref="AssessmentServiceAPI" />
 	</bean>
 
 	<!-- The id of this bean needs to match the param 'applicationBean' under your web.xml -->

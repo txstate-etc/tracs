@@ -32,7 +32,8 @@ import org.sakaiproject.time.api.TimeService;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.UserDirectoryService;
-
+import org.sakaiproject.tool.assessment.shared.api.assessment.AssessmentServiceAPI;
+import org.sakaiproject.tool.assessment.shared.api.assessment.PublishedAssessmentServiceAPI;
 
 public class SakaiFacadeImpl implements SakaiFacade {
 
@@ -53,6 +54,9 @@ public class SakaiFacadeImpl implements SakaiFacade {
 	private transient UserDirectoryService	userDirectoryService;
 	private transient ContentHostingService	contentHostingService;
 	private transient TimeService				timeService;
+	//Added by -Qu for bugid:3480 11/15/2010 to get test title
+	private transient PublishedAssessmentServiceAPI		publishedAssessmentService;
+	private transient AssessmentServiceAPI		assessmentService;
 
 	public final StatsManager getStatsManager() {
 		return statsManager;
@@ -166,4 +170,16 @@ public class SakaiFacadeImpl implements SakaiFacade {
 		this.timeService = timeService;
 	}
 
+	public final void setPublishedAssessmentService(PublishedAssessmentServiceAPI publishedAssessmentService) {
+		this.publishedAssessmentService = publishedAssessmentService;
+}
+	public final PublishedAssessmentServiceAPI getPublishedAssessmentService() {
+		return publishedAssessmentService;
+	}
+	public final void setAssessmentService(AssessmentServiceAPI assessmentService) {
+		this.assessmentService = assessmentService;
+	}
+	public final AssessmentServiceAPI getAssessmentService() {
+		return assessmentService;
+	}
 }

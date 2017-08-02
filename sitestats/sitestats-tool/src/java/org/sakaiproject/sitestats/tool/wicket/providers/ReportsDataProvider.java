@@ -32,6 +32,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.sakaiproject.sitestats.api.EventDetail;
 import org.sakaiproject.sitestats.api.EventStat;
 import org.sakaiproject.sitestats.api.PrefsData;
 import org.sakaiproject.sitestats.api.ResourceStat;
@@ -43,6 +44,7 @@ import org.sakaiproject.sitestats.api.event.EventRegistryService;
 import org.sakaiproject.sitestats.api.report.Report;
 import org.sakaiproject.sitestats.api.report.ReportDef;
 import org.sakaiproject.sitestats.tool.facade.Locator;
+import org.sakaiproject.tool.assessment.shared.api.assessment.PublishedAssessmentServiceAPI;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 
@@ -62,6 +64,11 @@ public class ReportsDataProvider extends SortableSearchableDataProvider {
 	public final static String		COL_TOTAL			= StatsManager.T_TOTAL;
 	public final static String		COL_VISITS			= StatsManager.T_VISITS;
 	public final static String		COL_UNIQUEVISITS	= StatsManager.T_UNIQUEVISITS;
+	//Added one column sorting for item  that the event happened to -Qu bugid:3480 11/15/2010
+	public final static String		COL_ITEM			= StatsManager.T_ITEM;
+	//Differentiate for event/tool column sorting in ReportEventDetailPage. -Qu
+	public final static String		COL_EVENT_DETAIL	= StatsManager.T_EVENT_DETAIL;
+	public final static String		COL_TOOL_DETAIL		= StatsManager.T_TOOL_DETAIL;
 	public final static String		COL_DURATION		= StatsManager.T_DURATION;
 
 	private boolean					log					= true;
@@ -138,11 +145,11 @@ public class ReportsDataProvider extends SortableSearchableDataProvider {
 	public void sortReport() {
 		Collections.sort(report.getReportData(), getReportDataComparator(getSort().getProperty().toString(),
 				getSort().isAscending(), Locator.getFacade().getStatsManager(),
-				Locator.getFacade().getEventRegistryService(), Locator.getFacade().getUserDirectoryService()));
+				Locator.getFacade().getEventRegistryService(), Locator.getFacade().getUserDirectoryService(), Locator.getFacade().getPublishedAssessmentService()));
 	}
 	
 	public final Comparator<Stat> getReportDataComparator(final String fieldName, final boolean sortAscending, 
-			final StatsManager SST_sm, final EventRegistryService SST_ers, final UserDirectoryService M_uds) {
+			final StatsManager SST_sm, final EventRegistryService SST_ers, final UserDirectoryService M_uds, final PublishedAssessmentServiceAPI pas) {
 		return new Comparator<Stat>() {
 			private transient Collator collator= Collator.getInstance();
 			{
@@ -185,7 +192,16 @@ public class ReportsDataProvider extends SortableSearchableDataProvider {
 					if(sortAscending)
 						return res;
 					else return -res;
-				}else if(fieldName.equals(COL_EVENT)){
+				}else if(fieldName.equals(COL_EVENT_DETAIL)){
+					EventDetail es1 = (EventDetail) r1;
+					EventDetail es2 = (EventDetail) r2;
+					String s1 = SST_ers.getEventName(es1.getEventId()).toLowerCase();
+					String s2 = SST_ers.getEventName(es2.getEventId()).toLowerCase();
+					int res = collator.compare(s1, s2);
+					if(sortAscending)
+						return res;
+					else return -res;
+				}else if(fieldName.equals(COL_TOOL)){
 					EventStat es1 = (EventStat) r1;
 					EventStat es2 = (EventStat) r2;
 					String s1 = SST_ers.getEventName(es1.getEventId()).toLowerCase();
@@ -200,6 +216,36 @@ public class ReportsDataProvider extends SortableSearchableDataProvider {
 					String s1 = SST_ers.getToolName(es1.getToolId()).toLowerCase();
 					String s2 = SST_ers.getToolName(es2.getToolId()).toLowerCase();
 					int res = collator.compare(s1, s2);
+					if(sortAscending)
+						return res;
+					else return -res;
+				}else if(fieldName.equals(COL_TOOL_DETAIL)){
+					EventDetail es1 = (EventDetail) r1;
+					EventDetail es2 = (EventDetail) r2;
+					String s1 = SST_ers.getToolName(es1.getToolId()).toLowerCase();
+					String s2 = SST_ers.getToolName(es2.getToolId()).toLowerCase();
+					int res = collator.compare(s1, s2);
+					if(sortAscending)
+						return res;
+					else return -res;
+				}else if(fieldName.equals(COL_ITEM)){
+					EventDetail ed1 = (EventDetail) r1;
+					EventDetail ed2 = (EventDetail) r2;
+					String	item1 = "-";
+					try {
+						item1 = pas.getPublishedAssessment(ed1.getItemId()).getTitle();
+					}
+					catch(Exception e){
+						LOG.info("Error for getting title from getPublishedAssessment(ed1.getItemId()) with itemId = " + ed1.getItemId());
+					}
+					String	item2 = "-";
+					try {
+						item2 = pas.getPublishedAssessment(ed2.getItemId()).getTitle();
+					}
+					catch(Exception e) {
+						LOG.info("Error for getting title from getPublishedAssessment(ed1.getItemId()) with itemId = " + ed2.getItemId());
+					}
+					int res = collator.compare(item1.toLowerCase(),item2.toLowerCase());
 					if(sortAscending)
 						return res;
 					else return -res;

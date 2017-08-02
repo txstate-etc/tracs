@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,6 +45,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 import org.sakaiproject.alias.api.AliasService;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.event.api.Event;
@@ -53,6 +55,7 @@ import org.sakaiproject.event.api.UsageSessionService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
+import org.sakaiproject.sitestats.api.EventDetail;
 import org.sakaiproject.sitestats.api.*;
 import org.sakaiproject.sitestats.api.event.EventRegistryService;
 import org.sakaiproject.sitestats.api.event.ToolInfo;
@@ -78,6 +81,7 @@ public class StatsUpdateManagerImpl extends HibernateDaoSupport implements Runna
 	/** Sakai services */
 	private StatsManager					M_sm;
 	private EventRegistryService			M_ers;
+	private ServerConfigurationService		M_scs;
 	private SiteService						M_ss;
 	private AliasService					M_as;
 	private EntityManager					M_em;
@@ -98,6 +102,7 @@ public class StatsUpdateManagerImpl extends HibernateDaoSupport implements Runna
 	private Map<String, SiteVisits>					visitsMap				= Collections.synchronizedMap(new HashMap<String, SiteVisits>());
 	private Map<String, SitePresenceConsolidation>	presencesMap			= Collections.synchronizedMap(new HashMap<String, SitePresenceConsolidation>());
 	private Map<UniqueVisitsKey, Integer>			uniqueVisitsMap			= Collections.synchronizedMap(new HashMap<UniqueVisitsKey, Integer>());
+	private Map<String, EventDetail>		eventDetailMap						= Collections.synchronizedMap(new HashMap<String, EventDetail>());
 	private Map<String, ServerStat>					serverStatMap			= Collections.synchronizedMap(new HashMap<String, ServerStat>());
 	private Map<String, UserStat>					userStatMap				= Collections.synchronizedMap(new HashMap<String, UserStat>());
 
@@ -106,6 +111,9 @@ public class StatsUpdateManagerImpl extends HibernateDaoSupport implements Runna
 	private boolean							initialized							= false;
 	
 	private final ReentrantLock				lock								= new ReentrantLock();
+	//Default events collected for SST_EVENT_DETAIL -Qu bugid:3480 11/19/2010
+	private String interestedEvents = "sam.assessment.take, sam.assessment.save.exit,sam.assessment.submit";
+	//need to have this info in the resource ref field of samigo events ex: publishedAssessmentId=5632
 	
 	/** Metrics */
 	private boolean							isIdle								= true;
@@ -190,6 +198,11 @@ public class StatsUpdateManagerImpl extends HibernateDaoSupport implements Runna
 	
 	public void setUsageSessionService(UsageSessionService uss){
 		this.M_uss = uss;
+	}
+
+	// Added by Qu
+	public void setServerConfigurationService(ServerConfigurationService scs){
+		this.M_scs = scs;
 	}
 
 	public void init(){
@@ -646,6 +659,28 @@ public class StatsUpdateManagerImpl extends HibernateDaoSupport implements Runna
 				eventStatMap.put(key, e1);
 			}
 			
+			//added by -Qu
+			if(Arrays.asList(getInterestedEvents()).contains(eventId)){
+				Date dTime = Calendar.getInstance().getTime();
+				String key1 = userId+siteId+eventId+dTime;
+				// add to eventDetailMap
+				synchronized(eventDetailMap){
+					EventDetail e1 = eventDetailMap.get(key1);
+					if(e1 == null){
+						e1 = new EventDetailImpl();
+						e1.setUserId(userId);
+						e1.setSiteId(siteId);
+						e1.setEventId(eventId);
+						e1.setDate(dTime);
+						e1.setItemId(getItemId(resourceRef));
+						e1.setItemType(getItemType(resourceRef));
+						eventDetailMap.put(key1, e1);
+					}
+					else
+						LOG.info("Duplicate event " + eventId + " for user " + userId + " at site " + siteId + " at time " + dTime);
+				}
+			}
+
 			if(!StatsManager.SITEVISIT_EVENTID.equals(eventId)){
 				// add to activityMap
 				String key2 = siteId+date+eventId;
@@ -912,6 +947,16 @@ public class StatsUpdateManagerImpl extends HibernateDaoSupport implements Runna
 							doUpdateEventStatObjects(session, tmp1);
 						}
 
+						//do: EventDetail
+						if(eventDetailMap.size() > 0) {
+							Collection<EventDetail> tmp1 = null;
+							synchronized(eventDetailMap){
+								tmp1 = eventDetailMap.values();
+								eventDetailMap = Collections.synchronizedMap(new HashMap<String, EventDetail>());
+							}
+							doUpdateEventDetailObjects(session, tmp1);
+						}
+
 						// do: ResourceStat
 						if(resourceStatMap.size() > 0) {
 							Collection<ResourceStat> tmp2 = null;
@@ -1054,6 +1099,56 @@ public class StatsUpdateManagerImpl extends HibernateDaoSupport implements Runna
 			}catch(Exception ex){
 				//If something happens, skip the event processing
 				LOG.warn("Failed to event:"+ eUpdate.getEventId(), ex);
+			}
+			if ((eExistingSiteId!=null) && (eExistingSiteId.trim().length()>0))
+					session.saveOrUpdate(eExisting);
+		}
+	}
+
+	private void doUpdateEventDetailObjects(Session session, Collection<EventDetail> objects) {
+		if(objects == null) return;
+		Iterator<EventDetail> i = objects.iterator();
+		while(i.hasNext()){
+			EventDetail eUpdate = i.next();
+			String eExistingSiteId = null;
+			EventDetail eExisting = null;
+			try{
+				Criteria c = session.createCriteria(EventDetailImpl.class);
+				c.add(Expression.eq("siteId", eUpdate.getSiteId()));
+				c.add(Expression.eq("eventId", eUpdate.getEventId()));
+				c.add(Expression.eq("userId", eUpdate.getUserId()));
+				c.add(Expression.eq("date", eUpdate.getDate()));
+				c.add(Expression.eq("itemId", eUpdate.getItemId()));
+				c.add(Expression.eq("itemType", eUpdate.getItemType()));
+				try{
+					eExisting = (EventDetail) c.uniqueResult();
+				}catch(HibernateException ex){
+					try{
+						List events = c.list();
+						if ((events!=null) && (events.size()>0)){
+							LOG.debug("More than 1 result when unique result expected.", ex);
+							eExisting = (EventDetail) c.list().get(0);
+						}else{
+							LOG.debug("No result found", ex);
+							eExisting = null;
+						}
+					}catch(Exception ex3){
+						eExisting = null;
+					}
+				}catch(Exception ex2){
+					LOG.debug("Probably ddbb error when loading data at java object", ex2);
+					System.out.println("Probably ddbb error when loading data at java object!!!!!!!!");
+
+				}
+				if(eExisting == null)
+					eExisting = eUpdate;
+				else
+					LOG.info("Event already existed.");
+
+				eExistingSiteId = eExisting.getSiteId();
+			}catch(Exception ex){
+				//If something happens, skip the event processing
+				ex.printStackTrace();
 			}
 			if ((eExistingSiteId!=null) && (eExistingSiteId.trim().length()>0))
 					session.saveOrUpdate(eExisting);
@@ -1819,4 +1914,38 @@ public class StatsUpdateManagerImpl extends HibernateDaoSupport implements Runna
 		
 	}
 	
+	//Added by -Qu for bugid:3480
+	//String example: "publishedAssessmentId=5632, agentId=3b00e736-7c97-40c3-a0f0-eb879e30a985"
+	//default:first set
+	public String getItemId(String resourceRef){
+		String delimiter = "=|,";
+		String temp[];
+		temp = resourceRef.split(delimiter);
+		for(int i=0; i<temp.length; i++){
+			if(temp[i].trim().equalsIgnoreCase(EventDetail.ITEM_TYPE_SAMIGO_PUBASSES) || temp[i].trim().equalsIgnoreCase(EventDetail.ITEM_TYPE_SAMIGO_ASSES)){
+				return temp[i+1];
+}
+		}
+		return temp[1].trim();
+	}
+
+	public String getItemType(String resourceRef){
+		String delimiter = "=|,";
+		String temp[];
+		temp = resourceRef.split(delimiter);
+		for(int i=0; i<temp.length; i++){
+			if(temp[i].trim().equalsIgnoreCase(EventDetail.ITEM_TYPE_SAMIGO_PUBASSES) || temp[i].trim().equalsIgnoreCase(EventDetail.ITEM_TYPE_SAMIGO_ASSES)){
+				return temp[i].trim();
+			}
+		}
+		return temp[0].trim();
+	}
+
+	public String[] getInterestedEvents(){
+		String[] events = M_scs.getString("sitestats.detailEvents", interestedEvents).split(",");
+		for (int i=0; i<events.length;i++){
+			events[i] = events[i].trim();
+		}
+		return events;
+	}
 }

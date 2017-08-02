@@ -132,6 +132,9 @@ public interface StatsUpdateManager {
 	/** Get date of last event processed by the last job run */
 	public Date getEventDateFromLatestJobRun() throws Exception;
 	
+	//This will give an array of events that will record into event detail table -Qu bugid:4065 11/19/2010
+	public String[] getInterestedEvents();
+
 	
 	// -----------------------------------------------------------------------
 	// --- Metrics methods ---------------------------------------------------

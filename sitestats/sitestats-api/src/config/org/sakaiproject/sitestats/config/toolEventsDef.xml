@@ -359,6 +359,7 @@
 		<event eventId="sam.student.score.update" selected="true"/>
 		<event eventId="sam.question.score.update" selected="true"/>
 		<event eventId="sam.total.score.update" selected="true"/>
+		<event eventId="sam.assessment.save.exit" selected="true"/>
 	</tool>
 	
 	

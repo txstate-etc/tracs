@@ -32,6 +32,8 @@ import org.sakaiproject.time.api.TimeService;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.UserDirectoryService;
+import org.sakaiproject.tool.assessment.shared.api.assessment.AssessmentServiceAPI;
+import org.sakaiproject.tool.assessment.shared.api.assessment.PublishedAssessmentServiceAPI;
 
 
 public interface SakaiFacade {
@@ -55,6 +57,8 @@ public interface SakaiFacade {
 	public UserDirectoryService getUserDirectoryService();
 	public ContentHostingService getContentHostingService();
 	public TimeService getTimeService();
+	public PublishedAssessmentServiceAPI getPublishedAssessmentService();
+	public AssessmentServiceAPI getAssessmentService();
 	
 	
 }

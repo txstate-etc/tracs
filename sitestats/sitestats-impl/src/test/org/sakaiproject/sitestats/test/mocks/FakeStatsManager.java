@@ -78,6 +78,22 @@ public class FakeStatsManager implements StatsManager {
 		return 0;
 	}
 
+	//following 3 stubs are added for bugid:3480 -Qu
+	public List<Stat> getEventDetail(String siteId, List<String> events, Date date, Date date2, List<String> userIds, boolean inverseUserSelection, PagingPosition page, List<String> totalsBy,
+			String sortBy, boolean sortAscending, int maxResults) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public List<Stat> getEventDetail(String siteId, List<String> events) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getToolIdFromEventId(String eventId){
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public Date getInitialActivityDate(String siteId) {
 		// TODO Auto-generated method stub
 		return null;

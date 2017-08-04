@@ -65,6 +65,7 @@ import org.sakaiproject.memory.api.Cache;
 import org.sakaiproject.memory.api.MemoryService;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.sitestats.api.EventStat;
+import org.sakaiproject.sitestats.api.EventDetail;
 import org.sakaiproject.sitestats.api.LessonBuilderStat;
 import org.sakaiproject.sitestats.api.Prefs;
 import org.sakaiproject.sitestats.api.PrefsData;
@@ -85,6 +86,7 @@ import org.sakaiproject.sitestats.api.event.EventInfo;
 import org.sakaiproject.sitestats.api.event.EventRegistryService;
 import org.sakaiproject.sitestats.api.event.ToolInfo;
 import org.sakaiproject.sitestats.api.report.ReportDef;
+import org.sakaiproject.sitestats.api.report.ReportParams;
 import org.sakaiproject.sitestats.impl.event.EventUtil;
 import org.sakaiproject.sitestats.impl.parser.DigesterUtil;
 import org.sakaiproject.tool.api.SessionManager;
@@ -1842,6 +1844,142 @@ public class StatsManagerImpl extends HibernateDaoSupport implements StatsManage
 		return totals;
 	}
 
+	// Getting Tracs event detail data
+	// ################################################################
+	// Event Detail related methods
+	// ################################################################
+	/* (non-Javadoc)
+	 * @see org.sakaiproject.sitestats.api.StatsManager#getEventDetail(java.lang.String, java.util.List)
+	 * Added by -Qu for bugid:3480 11/15/2010
+	 */
+	public List<Stat> getEventDetail(String siteId, List<String> events) {
+		return getEventDetail(siteId, events, getInitialActivityDate(siteId), null, null, false, null, null, null, true, 0);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sakaiproject.sitestats.api.StatsManager#getEventDetail(java.lang.String, java.util.List, java.util.Date, java.util.Date, java.util.List, boolean, org.sakaiproject.javax.PagingPosition, java.lang.String, java.lang.String, boolean)
+	 */
+	public List<Stat> getEventDetail(
+			final String siteId,
+			final List<String> events,
+			final Date iDate, final Date fDate,
+			final List<String> userIds,
+			final boolean inverseUserSelection,
+			final PagingPosition page,
+			final List<String> totalsBy,
+			final String sortBy,
+			boolean sortAscending,
+			final int maxResults) {
+
+		String siteIdStr ="";
+		String usersStr = "";
+		String iDateStr = "";
+		String fDateStr = "";
+		if(siteId != null)
+			siteIdStr = "and ed.siteId =:siteid ";
+		if(iDate != null)
+			iDateStr = "and ed.date >= :idate ";
+		if (fDate != null)
+			fDateStr = "and ed.date < :fdate ";
+		if(userIds != null && !userIds.isEmpty()) {
+			if(userIds.size() <= 1000) {
+				usersStr = "and ed.userId in (:users) ";
+			}else{
+				int nUsers = userIds.size();
+				int blockId = 0;
+				StringBuilder buff = new StringBuilder();
+				buff.append("(");
+				int blocks = (int) (nUsers / 1000);
+				blocks = (blocks*1000 == nUsers) ? blocks : blocks+1;
+				for(int i=0; i<blocks-1; i++) {
+					buff.append("ed.userId in (:users"+blockId+")");
+					buff.append(" OR ");
+					blockId++;
+				}
+				buff.append("ed.userId in (:users"+blockId+")");
+				buff.append(")");
+				usersStr = "and " + buff.toString();
+			}
+		}
+		final String hql = "select ed.userId,ed.itemId,ed.date,ed.eventId,ed.itemType, ed.siteId " +
+				"from EventDetailImpl as ed where ed.eventId in (:events) " + siteIdStr +
+				usersStr + iDateStr + fDateStr +
+				"order by ed.userId, ed.itemId,ed.date";
+
+		HibernateCallback hcb = new HibernateCallback() {
+			public Object doInHibernate(Session session) throws HibernateException, SQLException {
+				Query q = session.createQuery(hql);
+				if(siteId != null) {
+					q.setString("siteid", siteId);
+				}
+				if(events != null && !events.isEmpty()){
+					q.setParameterList("events", events);
+				}
+				if(userIds != null && !userIds.isEmpty()) {
+					if(userIds.size() <= 1000) {
+						q.setParameterList("users", userIds);
+					}else{
+						int nUsers = userIds.size();
+						int blockId = 0, startIndex = 0;
+						int blocks = (int) (nUsers / 1000);
+						blocks = (blocks*1000 == nUsers) ? blocks : blocks+1;
+						for(int i=0; i<blocks-1; i++) {
+							q.setParameterList("users"+blockId, userIds.subList(startIndex, startIndex+1000));
+							blockId++;
+							startIndex += 1000;
+						}
+						q.setParameterList("users"+blockId, userIds.subList(startIndex, nUsers));
+					}
+				}
+				//We need to keep time (hour/minute) for customized period selection
+				//Adjusted time for non-customized period selection in ReportManager
+				if(iDate != null)
+					q.setTimestamp("idate", iDate);
+				if(fDate != null)
+					q.setTimestamp("fdate", fDate);
+				LOG.info("getEventDetail(): " + q.getQueryString());
+				List<Object[]> records = q.list();
+				List<Stat> results = new ArrayList<Stat>();
+				Set<String> siteUserIds = null;
+				if(inverseUserSelection)
+					siteUserIds = getSiteUsers(siteId);
+				if(records.size() > 0){
+					for(Iterator<Object[]> iter = records.iterator(); iter.hasNext();) {
+						if(!inverseUserSelection){
+							Object[] s = iter.next();
+							EventDetail c = null;
+							String toolId = null;
+								c = new EventDetailImpl();
+								c.setUserId((String)s[0]);
+								c.setItemId((String)s[1]);
+								c.setEventId((String)s[3]);
+								c.setItemType((String)s[4]);
+								c.setSiteId((String)s[5]);
+								c.setDate((Date)s[2]);
+								c.setToolId(getToolIdFromEventId((String)s[3]));
+								results.add(c);
+						}
+					}
+				}
+				if(inverseUserSelection){
+					long id = 0;
+					Iterator<String> iU = siteUserIds.iterator();
+					while(iU.hasNext()){
+						String userId = iU.next();
+						EventDetail c = new EventDetailImpl();
+						c.setId(id++);
+						c.setUserId(userId);
+						c.setSiteId(siteId);
+						c.setCount(0);
+						results.add(c);
+					}
+				}
+
+				return results;
+			}
+		};
+		return (List<Stat>) getHibernateTemplate().execute(hcb);
+	}
 	
 	// ################################################################
 	// Resource related methods
@@ -4078,5 +4216,12 @@ public class StatsManagerImpl extends HibernateDaoSupport implements StatsManage
 		}else{
 			return "hsql";
 		}
+	}
+
+	public String getToolIdFromEventId(String eventId){
+		if( null != M_ers.getEventIdToolMap().get(eventId) )
+			return M_ers.getEventIdToolMap().get(eventId).getToolId();
+		else
+			return null;
 	}
 }

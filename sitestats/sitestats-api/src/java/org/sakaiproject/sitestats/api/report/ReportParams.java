@@ -57,6 +57,8 @@ public class ReportParams implements Serializable {
 	private String				howChartCategorySource	= StatsManager.T_NONE;
 	private String				howChartSeriesSource	= StatsManager.T_TOTAL;
 	private String				howChartSeriesPeriod	= StatsManager.CHARTTIMESERIES_DAY;
+	//Added for bugid:3480 -Qu 11/15/2010
+	public boolean				showEventDetailPage		= false;
 	
 	
 	public ReportParams(){		
@@ -93,6 +95,14 @@ public class ReportParams implements Serializable {
 		this.whoUserIds = whoUserIds;
 	}
 	
+	public boolean getShowEventDetailPage(){
+		return showEventDetailPage;
+	}
+
+	public void setShowEventDetailPage(boolean showEventDetailPage){
+		this.showEventDetailPage = showEventDetailPage;
+	}
+
 	/** Get the site id to report for. */
 	public String getSiteId() {
 		return siteId;

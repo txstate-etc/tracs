@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -96,6 +97,9 @@ public class ReportDataPage extends BasePage {
 	private int							selectedWidth		= 0;
 	private int							selectedHeight		= 0;
 	
+	private String[] detailToolIds = {"sakai.samigo"};
+	//private String[] detailEventIds ={"sam.assessment.take","sam.assessment.save.exit", "sam.assessment.submit"};
+
 	public ReportDataPage(final ReportDefModel reportDef) {
 		this(reportDef, null, null);
 	}
@@ -182,7 +186,9 @@ public class ReportDataPage extends BasePage {
 		add(new WebMarkupContainer("inPrintVersion").setVisible(inPrintVersion));
 
 		// Report data
-		final ReportsDataProvider dataProvider = new ReportsDataProvider(getPrefsdata(), getReportDef());
+		ReportDef reportDef = getReportDef();
+		reportDef.getReportParams().setShowEventDetailPage(false);
+		final ReportsDataProvider dataProvider = new ReportsDataProvider(getPrefsdata(), reportDef);
 		report = dataProvider.getReport();
 		
 		// Report: chart
@@ -257,7 +263,22 @@ public class ReportDataPage extends BasePage {
 		
 		add(new Label("report.localizedReportGenerationDate"));
 		
-		
+		//Make link only available when events related (tool or event) are selected in report definition
+		//Added by -Qu for bugid:3480 11/15/2010
+		final boolean showEventDetailLink = getShowEventDetailLink(reportDef);
+		add(new Link("reportEventDetailPageLink") {
+			@Override
+			public void onClick() {
+				PageParameters params = new PageParameters();
+				params.set("printVersion", "true");
+				params.set("siteId", siteId);
+				setResponsePage(new ReportEventDetailPage(reportDefModel, params));
+			}
+			public boolean isVisible() {
+				return showEventDetailLink;
+			}
+		});
+
 		// buttons
 		form.add(new Button("back") {
 			@Override
@@ -660,6 +681,56 @@ public class ReportDataPage extends BasePage {
 				LOG.error(e.getMessage());
 			}
 		}
+	}
+
+	//Only shows detail event page link when user is concerned. Bugid:3480  -Qu 11/15/2010
+	public boolean getShowEventDetailLink(ReportDef reportDef){
+		boolean showLink = false;
+		ReportParams reportParam = reportDef.getReportParams();
+		if(reportParam.getWhat().equals(ReportManager.WHAT_EVENTS)){
+			//select by tool
+			if(reportParam.getWhatEventSelType().equals(ReportManager.WHAT_EVENTS_BYTOOL)){
+				List<String> tlist = reportDef.getReportParams().getWhatToolIds();
+				if(tlist != null ){
+					return isForDetailPageSelected(tlist,getDetailToolIds());
+				}
+			}
+			//selected by events
+			else if(reportParam.getWhatEventSelType().equals(ReportManager.WHAT_EVENTS_BYEVENTS)){
+				////Third check for event is selected in report def
+				List<String> eventList = reportDef.getReportParams().getWhatEventIds();
+				if(eventList != null)
+					return isForDetailPageSelected(eventList, getDetailEventIds());
+			}
+		}
+		return showLink;
+	}
+
+	private String[] getDetailEventIds(){
+		return Locator.getFacade().getStatsUpdateManager().getInterestedEvents();
+	}
+	//get tools associated with interested events for event detail page -Qu
+	private String[] getDetailToolIds(){
+		List<String> detailToolIds = new ArrayList<String>();
+		String[] events = getDetailEventIds();
+		String toolId = null;
+		for (int i=0; i< events.length;i++){
+			toolId = Locator.getFacade().getStatsManager().getToolIdFromEventId(events[i]);
+			if(toolId != null && !detailToolIds.contains(toolId)){
+				detailToolIds.add(toolId);
+			}
+		}
+		return (String[])detailToolIds.toArray(new String[0]);
+	}
+	//A helper added by -Qu for bugid:3480 11/15/2010
+	private boolean isForDetailPageSelected(List selectedList, String[] detailArray){
+		if (selectedList.contains(ReportManager.WHAT_EVENTS_ALLEVENTS)||selectedList.contains(ReportManager.WHAT_EVENTS_ALLTOOLS))
+			return true;
+		for (int i=0; i< detailArray.length; i++){
+			if(selectedList.contains(detailArray[i]))
+				return true;
+		}
+		return false;
 	}
 
 	private PrefsData getPrefsdata() {

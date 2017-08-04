@@ -31,6 +31,8 @@ import org.sakaiproject.time.api.Time;
 import org.sakaiproject.user.api.User;
 
 public class FakeEventTrackingService extends Observable implements EventTrackingService {
+	protected EventDelayHandler delayHandler;
+
 	private List<Observer>	observers = new ArrayList<Observer>();
 
 	public void addLocalObserver(Observer o) {

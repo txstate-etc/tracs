@@ -484,4 +484,28 @@ public class MockStatsManager implements StatsManager {
 
 	}
 
+	@Override
+	public String getToolIdFromEventId(String eventId) {
+		return null;
+}
+
+	@Override
+	public List<Stat> getEventDetail(String siteId, List<String> events) {
+		return null;
+	}
+
+	@Override
+	public List<Stat> getEventDetail(
+			final String siteId,
+			final List<String> events,
+			final Date iDate, final Date fDate,
+			final List<String> userIds,
+			final boolean inverseUserSelection,
+			final PagingPosition page,
+			final List<String> totalsBy,
+			final String sortBy,
+			final boolean sortAscending,
+			final int maxResults) {
+		return null;
+	}
 }

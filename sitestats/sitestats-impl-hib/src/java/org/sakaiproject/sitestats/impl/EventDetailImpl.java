@@ -1,5 +1,6 @@
 /**********************************************************************************
  *
+
  * Added by Yuanhua Qu at Texas State University
  * for bugid:3480 on 11/15/2010
  *
@@ -140,7 +141,7 @@ public class EventDetailImpl implements EventDetail, Serializable, Comparable<Ev
 	public String getItemId() {
 		return itemId;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.sakaiproject.sitestats.api.EventDetail#setItemId()

@@ -4219,7 +4219,9 @@ public class StatsManagerImpl extends HibernateDaoSupport implements StatsManage
 	}
 
 	public String getToolIdFromEventId(String eventId){
-		String toolId = M_ers.getEventIdToolMap().get(eventId).getToolId();
-		return toolId;
+		if( null != M_ers.getEventIdToolMap().get(eventId) )
+			return M_ers.getEventIdToolMap().get(eventId).getToolId();
+		else
+			return null;
 	}
 }

@@ -1,0 +1,207 @@
+<!-- start: chef_assignments_instructor_edit_eportfolio_assignment.vm  -->
+## Assignments - Instructor edit eportfolio assignment view
+#parse("/vm/assignment/assignment_macros.vm")
+<script type="text/javascript" src="/library/js/jquery.js"></script>
+##<script type="text/javascript" src="/library/js/form.js"></script>
+<script type="text/javascript"  src="/sakai-assignment-tool/js/assignments.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#$!name_Addtogradebook').change(function() {
+      if ($('#$!name_Addtogradebook').is(':checked')) {
+        $('#extraGradingOptions').fadeIn('slow');
+      }
+      else {
+        $('#extraGradingOptions').fadeOut('slow');
+      }
+    });
+
+    $('#import_grade_field').change(function() {
+      if ($('#import_grade_field').val() == "grade")
+        $('#maxPointsField').fadeIn('slow');
+      else
+        $('#maxPointsField').fadeOut('slow');
+    });
+  });
+</script>
+<div class="portletBody"  xmlns:aaa="http://www.w3.org/2005/07/aaa">
+  <ul class="navIntraTool actionToolBar" role="menu">
+    #set($prevAction=false)
+    #if ($allowAddAssignment)
+      #set($prevAction=true)
+      <li class="firstToolBarItem" role="menuitem" aria-disabled="true">
+        <span class="current">$!tlang.getString("new")</span>
+      </li>
+    #end
+    <li #if ($prevAction==false) class="firstToolBarItem" #set($prevAction=true)  #end role="menuitem"
+      #if (!$!view.equals('lisofass1'))
+        >
+        <span><a href="#toolLinkParam("$action" "doView" "view=lisofass1")" title="$!tlang.getString('lisofass1')">$!tlang.getString('lisofass1')</a></span>
+      #else
+         aria-disabled="true">
+        <span class="current">$!tlang.getString("lisofass1")</span>
+      #end
+    </li>
+
+    #if ($withGrade && $!allowGradeSubmission)
+      <li#if ($prevAction==false) class="firstToolBarItem" #set($prevAction=true)  #end  role="menuitem">
+        <span><a href="#toolLinkParam("$action" "doView" "view=grarep")" title="$!tlang.getString("gen.grarep")">$!tlang.getString("gen.grarep")</a></span>
+      </li>
+    #end
+
+    #if ($allowAddAssignment)
+      <li  #if ($prevAction==false) class="firstToolBarItem" #set($prevAction=true)  #end role="menuitem"
+        #if (!$!view.equals('stuvie'))
+          >
+          <span><a href="#toolLinkParam("$action" "doView" "view=stuvie")" title="$!tlang.getString("gen.stuvie")">$!tlang.getString("gen.stuvie")</a></span>
+        #else
+          aria-disabled="true">
+          <span class="current">$!tlang.getString("gen.stuvie")</span>
+        #end
+      </li>
+    #end
+    #if (($allowAllGroups) && ($assignmentscheck))
+      <li #if ($prevAction==false) class="firstToolBarItem" #set($prevAction=true)  #end  role="menuitem">
+        <span><a href="#toolLink("$action" "doReorder")" title="$tlang.getString('gen.reorder')">$tlang.getString('gen.reorder')</a></span>
+      </li>
+    #end
+    #if ($allowUpdateSite)
+      <li #if ($prevAction==false) class="firstToolBarItem" #set($prevAction=true)  #end  role="menuitem">
+        <span><a href="#toolLink("$action" "doPermissions")" title="$tlang.getString('permis')">$tlang.getString('permis')</a></span>
+      </li>
+      #if ($enableViewOption)
+        <li #if ($prevAction==false) class="firstToolBarItem" #set($prevAction=true)  #end  role="menuitem">
+          <span><a href="#toolLink("$action" "doOptions")" title="$tlang.getString('options')">$tlang.getString('options')</a></span>
+        </li>
+      #end
+    #end
+  </ul>
+
+  <h3>
+    $validator.escapeHtml($assignment.getTitle()) <span class="highlight"> $tlang.getString("edit")</span>
+  </h3>
+
+  <p class="instruction">
+    This is an eportfolio assignment. These settings control how the assignment appears in TRACS. If you want to modify the assignment content, it must be done from the eportfolio site.
+  </p>
+
+  #if ($alertMessage)
+    <div class="alertMessage" style="width:80%  !important">
+      $tlang.getString("gen.alert")     $validator.escapeHtml($alertMessage)
+    </div>
+    <div style="display:block;clear:both">
+    </div>
+  #end
+
+  <form name="eportfolioAssignmentForm" action="#toolForm("AssignmentAction")" method="post" onsubmit="return true;">
+    <input type="hidden" name="assignmentId" value="$!assignment.Reference" />
+    <input type="hidden" name="option" id="option" value="" />
+    <input type="hidden" name="eventSubmit_doAssignment_form" value="" />
+    <h4>Assignment Information</h4>
+      <p class="shorttext">
+        Title: $assignment.getTitle()
+      </p>
+      <p class="shorttext">
+        Course: $assignment.getSection()
+      </p>
+    #if ($!withGrade && $!withGradebook)
+      ## show the "Add to Gradebook" choices or not
+      #if(!$!allowGroupAssignmentsInGradebook)
+        #set ($addToGBDisplay="none")
+      #else
+        #set ($addToGBDisplay="block")
+      #end
+      <h4>$tlang.getString("grading")</h4>
+      <div class="checkbox indnt">
+        <input type="radio" name="$!name_Addtogradebook" id="$!gradebookChoice_no" value="$!gradebookChoice_no" #if($gradebookChoice.equals($gradebookChoice_no))checked#end onclick="$('#categoryList').hide(); $('#assignment_title_field').hide(); $('#gbEportfolioAssignList').hide();"/>
+        <label for="$!gradebookChoice_no">Don't show assignment in gradebook</label>
+        <br/>
+
+        #if($gradebookChoice.equals($gradebookChoice_no))
+        <input type="radio" name="$!name_Addtogradebook" id="$!gradebookChoice_add" value="$!gradebookChoice_add"
+                onclick="if ($value_totalCategories > 1) $('#categoryList').show(); $('#assignment_title_field').show(); $('#gbEportfolioAssignList').hide();"/>
+        <label for="$!gradebookChoice_add">Add assignment to gradebook</label>
+        <br/>
+        #end
+
+        <p class="shorttext indnt2" id="assignment_title_field" style="display:none">
+          <label for="$name_gbtitle">
+            Name of gradebook item
+          </label>
+          <input name="$name_gbtitle" id="$name_gbtitle" type="text" value="$validator.escapeHtml($!value_gbtitle)" size="30" maxlength="100" />
+        </p>
+
+        <p id="categoryList" class="checkbox indnt2" style="display:none">
+          <label for="category">
+            $tlang.getString("grading.categorylist")
+          </label>
+          <select name="$name_Category" id="category">
+            #foreach ($i in $categoryKeys)
+              <option value="$i" #if ($i == $!value_Category)selected="selected"#end>$categoryTable.get($i)</option>
+            #end
+          </select>
+        </p>
+
+        #if($isMultiCourseSite && $showMergeOption && $gradebookChoice.equals($gradebookChoice_no))
+          <input type="radio" name="$!name_Addtogradebook" id="$!gradebookChoice_merge" value="$!gradebookChoice_merge"
+                  onclick="$('#gbEportfolioAssignList').show(); $('#categoryList').hide(); $('#assignment_title_field').hide();"/>
+          <label for="$!gradebookChoice_merge">Associate with existing ePortfolio gradebook entry</label>
+        #end
+
+        <div id="gbEportfolioAssignList" class="checkbox indnt2" style="display:none">
+          <select name="$name_gbEportfolioAssign" id="$name_gbEportfolioAssign">
+            #foreach ($gbId in $gbEportfolioAssignments.keySet())
+              <option value="$gbId">$gbEportfolioAssignments.get($gbId)</option>
+            #end
+          </select>
+        </div>
+
+        #if($gradebookChoice.equals($gradebookChoice_keep))
+          <input type="radio" name="$!name_Addtogradebook" id="$!gradebookChoice_keep" value="$!gradebookChoice_keep" checked />
+          <label for="$!gradebookChoice_keep">Continue using gradebook item "$gbAssignmentTitle"</label>
+          <br/>
+        #end
+      </div>
+
+      <div id="extraGradingOptions">
+        #if ($hasRubric)
+        <h4>Import Grade From</h4>
+        <input type="radio" name="$!name_importGrade" id="$!importFromGrade" value="$!importFromGrade" #if ($value_GradeField == 0) checked #end
+                onclick="$('#maxPointsField').show(); $('#maxPointsNote').hide();"/>
+        <label for="$!importFromGrade">ePortfolio grade field</label>
+        <br/>
+
+        <p id="maxPointsField" class="checkbox indnt2" #if ($value_GradeField == 1) style="display:none" #end>
+          <label for="$name_GradePoints">Maximum Points</label>
+          <input name="$name_GradePoints" id="$name_GradePoints" value="$!value_GradePoints" type="text" size="5" maxlength="11"/>
+        </p>
+        <input type="radio" name="$!name_importGrade" id="$!importFromScore" value="$!importFromScore" #if ($value_GradeField == 1) checked #end
+                onclick="$('#maxPointsField').hide(); $('#maxPointsNote').show();"/>
+        <label for="$!importFromScore">ePortfolio total score field</label>
+          #if ($rubricMaxPoints > 0)
+            <p class="instruction" id="maxPointsNote" #if ($value_GradeField == 0) style="display:none" #end>Note: The maximum point value for this assignment will be set to $rubricMaxPoints in the gradebook. $rubricMaxPoints is the maximum point value assigned to the rubric for this ePortfolio assignment. If you wish to enter your own value, please select the ePortfolio grade field option.</p>
+          #else
+            <p class="checkbox indnt2" id="maxPointsNote" #if ($value_GradeField == 0) style="display:none" #end>
+              <label for="$name_ScorePoints">Maximum Points</label>
+              <input name="$name_ScorePoints" id="$name_ScorePoints" value="$!value_GradePoints" type="text" size="5" maxlength="11"/>
+            </p>
+          #end
+        #else
+        <p id="maxPointsField" class="checkbox indnt" #if ($value_GradeField == 1) style="display:none" #end>
+          <label for="$name_GradePoints">Maximum Points</label>
+          <input name="$name_GradePoints" id="$name_GradePoints" value="$!value_GradePoints" type="text" size="5" maxlength="11"/>
+        </p>
+        #end
+      </div>
+    #end
+
+    <div class="act">
+      <input accesskey ="s" type="button" class="active" name="post" value="$tlang.getString("gen.pos")"
+        onclick="javascript:document.eportfolioAssignmentForm.onsubmit();showNotif('submitnotif','post','eportfolioAssignmentForm');document.getElementById('option').value='saveeportfolio';document.eportfolioAssignmentForm.submit();return false;" />
+      <input accesskey ="x" type="button" name="cancel" value="$tlang.getString("gen.can")"
+        onclick="javascript:document.eportfolioAssignmentForm.onsubmit();document.getElementById('option').value='canceledit';document.eportfolioAssignmentForm.submit();return false;" />
+      <span id="submitnotif" style="visibility:hidden">$tlang.getString("gen.proces")</span>
+    </div>
+    <input type="hidden" name="sakai_csrf_token" value="$sakai_csrf_token" />
+  </form>
+
+</div>

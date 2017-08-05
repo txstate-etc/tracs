@@ -53,11 +53,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.txstate.tracs.eportfolio.bean.EditStatus;
+import edu.txstate.tracs.eportfolio.bean.GradebookIntegrationInfo;
+import edu.txstate.tracs.eportfolio.bean.TracsAssignment;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -442,6 +446,8 @@ public class AssignmentAction extends PagedResourceActionII
 
 	/** ******************* instructor's edit assignment ***************************** */
 	private static final String EDIT_ASSIGNMENT_ID = "edit_assignment_id";
+
+	private static final String EDIT_ASSIGNMENT_REF = "edit_assignment_ref";
 
 	/** ******************* instructor's delete assignment ids ***************************** */
 	private static final String DELETE_ASSIGNMENT_IDS = "delete_assignment_ids";
@@ -1099,6 +1105,10 @@ public class AssignmentAction extends PagedResourceActionII
 
 			// build the context for the instructor's create new assignment view
 			template = build_instructor_new_edit_assignment_context(portlet, context, data, state);
+		}
+		else if (MODE_INSTRUCTOR_EDIT_EPORTFOLIO_ASSIGNMENT.equals(mode))
+		{
+			template = build_instructor_edit_eportfolio_assignment_context(portlet, context, data, state);
 		}
 		else if (MODE_INSTRUCTOR_DELETE_ASSIGNMENT.equals(mode))
 		{
@@ -2351,6 +2361,15 @@ public class AssignmentAction extends PagedResourceActionII
 		}
 		context.put("allowRemoveAssignment", Boolean.valueOf(allowRemoveAssignment));
 
+		// associated with scoringAgent(iRubric)?  #6774
+		boolean allowUpdateAssignment = AssignmentService.allowUpdateAssignment(contextString);
+		//perm needed are add/edit assignment
+		if(allowAddAssignment || allowUpdateAssignment || allowGradeSubmission){
+			Map<String, ScoringAgentInfo> scoringComponentEnabledMap = new HashMap<String, ScoringAgentInfo>();
+			scoringComponentEnabledMap = build_scoringComponentEnabledMap(assignments);
+			context.put("scoringComponentEnabledMap", scoringComponentEnabledMap);
+		}
+
 		add2ndToolbarFields(data, context);
 
 		// inform the observing courier that we just updated the page...
@@ -2375,6 +2394,18 @@ public class AssignmentAction extends PagedResourceActionII
 			if (realm != null)
 			{
 				context.put("activeUserIds", realm.getUsers());
+
+				String courseEid = realm.getProviderGroupId();
+				if (null != courseEid ) {
+					String[] courses = courseEid.split("\\+");
+					if (courses.length > 1)
+						context.put("isMultiCourseSite", true);
+					else
+						context.put("isMultiCourseSite", false);
+				}
+				else {
+					context.put("isMultiCourseSite", false);
+				}
 			}
 		}
 		catch (Exception ignore)
@@ -4471,9 +4502,18 @@ public class AssignmentAction extends PagedResourceActionII
 		
 		List assignments = prepPage(state);
 		
+		//Remove eportfolio assignments from the reorder page.
+		Iterator itr = assignments.iterator();
+		while (itr.hasNext())
+		{
+			Assignment a = (Assignment) itr.next();
+			if (a.getStatus().equals("eportfolio"))
+				itr.remove();
+		}
+
 		context.put("assignments", assignments.iterator());
 		context.put("assignmentsize", assignments.size());
-		
+
 		String sortedBy = (String) state.getAttribute(SORTED_BY);
 		String sortedAsc = (String) state.getAttribute(SORTED_ASC);
 		context.put("sortedBy", sortedBy);
@@ -5234,6 +5274,11 @@ public class AssignmentAction extends PagedResourceActionII
 												String comment = StringUtils.isNotEmpty(cm.get(submitterId)) ? cm.get(submitterId) : "";
 												g.setAssignmentScoreComment(gradebookUid, associateGradebookAssignmentId, submitterId, comment);
 											}
+										}
+										// Add comments to gradebook for internal assignment as well
+										for (Map.Entry<String, String> entry : cm.entrySet())
+										{
+											g.setAssignmentScoreComment(gradebookUid, associateGradebookAssignmentId, entry.getKey(), entry.getValue());
 										}
 									}
 								}
@@ -6360,7 +6405,11 @@ public class AssignmentAction extends PagedResourceActionII
 				{
 					if (!Boolean.valueOf(honorPledgeYes).booleanValue())
 					{
+						if (data.getParameters().getString("option").equals("save")) {
+							addAlert(state, "Draft was not saved. " + rb.getString("youarenot18"));
+						} else {
 						addAlert(state, rb.getString("youarenot18"));
+					}
 					}
 					state.setAttribute(VIEW_SUBMISSION_HONOR_PLEDGE_YES, honorPledgeYes);
 				}
@@ -9685,6 +9734,15 @@ public class AssignmentAction extends PagedResourceActionII
 		
 		List assignments = prepPage(state);
 		
+		//Remove eportfolio assignments from the reorder page.
+		Iterator itr = assignments.iterator();
+		while (itr.hasNext())
+		{
+			Assignment a = (Assignment) itr.next();
+			if (a.getStatus().equals("eportfolio"))
+				itr.remove();
+		}
+
 		Iterator it = assignments.iterator();
         
         while (it.hasNext()) // reads and writes the parameter for default ordering
@@ -11209,6 +11267,10 @@ public class AssignmentAction extends PagedResourceActionII
 			{
 				// cancel editing assignment
 				doCancel_edit_assignment(data);
+			}
+			else if ("saveeportfolio".equals(option))
+			{
+				save_eportfolio_assignment(data);
 			}
 			else if ("attach".equals(option))
 			{
@@ -12802,6 +12864,7 @@ public class AssignmentAction extends PagedResourceActionII
 		state.removeAttribute(NEW_ASSIGNMENT_SUBMISSION_TYPE);
 		state.removeAttribute(NEW_ASSIGNMENT_GRADE_TYPE);
 		state.removeAttribute(NEW_ASSIGNMENT_GRADE_POINTS);
+		state.removeAttribute(EPORTFOLIO_ASSIGNMENT_GRADE_FIELD);
 		state.removeAttribute(NEW_ASSIGNMENT_DESCRIPTION);
 		state.removeAttribute(ResourceProperties.NEW_ASSIGNMENT_CHECK_ADD_DUE_DATE);
 		state.removeAttribute(ResourceProperties.NEW_ASSIGNMENT_CHECK_AUTO_ANNOUNCE);
@@ -13180,6 +13243,81 @@ public class AssignmentAction extends PagedResourceActionII
 		}
 	}
 	
+	/*
+	 * Helper method for getting a map of associated scoringAgent like (iRubric) for each assignment
+	 * requested for txstate local added feature of straight view for assignment that has rubric associated
+	 * with in the assignments list (the assignment load page)  #6774
+	 * @param    assignments  List of assignments
+	 * @return   scoringComponentEnabledMap A Map for each assignment with associated scoringAgentInfo
+	 */
+	public Map<String, ScoringAgentInfo> build_scoringComponentEnabledMap(List<Assignment> assignments) {
+
+		Map<String, ScoringAgentInfo> scoringComponentEnabledMap = new HashMap<String, ScoringAgentInfo>();
+		ScoringService scoringService = (ScoringService)  ComponentManager.get("org.sakaiproject.scoringservice.api.ScoringService");
+		ScoringAgent scoringAgent = scoringService.getDefaultScoringAgent();
+		String gradebookUid = ToolManager.getInstance().getCurrentPlacement().getContext();
+		boolean scoringAgentEnabled = scoringAgent != null && scoringAgent.isEnabled(gradebookUid, null);
+
+		//need to iterate through all assignments and find out those that have actual scoringAgent associated with assignment through gradebook item
+		if ( scoringAgentEnabled ) {
+			//find the associated gbItem
+			//unfortunately there is no service or data that save the map of gbItemId to external app like assignment id
+			//have to find the name of gbitem
+
+			for(Assignment assignment : (List<Assignment>) assignments){
+
+				ScoringAgentInfo sai = new ScoringAgentInfo();
+				String associatedGbItem = StringUtils.trimToNull(assignment.getProperties().getProperty(AssignmentService.PROP_ASSIGNMENT_ASSOCIATE_GRADEBOOK_ASSIGNMENT));
+				if (null == associatedGbItem ) {
+					scoringComponentEnabledMap.put(assignment.getId(), sai);
+					continue;
+				}
+
+				String gbItemName;
+				if (assignment.getReference().equals(associatedGbItem)) {
+					// this gb item is controlled by this tool
+					gbItemName = assignment.getTitle();
+				} else {
+					// this assignment was associated with an existing gb item
+					gbItemName = associatedGbItem;
+				}
+
+				GradebookService gbService = (GradebookService)  ComponentManager.get("org.sakaiproject.service.gradebook.GradebookService");
+				org.sakaiproject.service.gradebook.shared.Assignment gbItem = null;
+				try {
+					gbItem = gbService.getAssignment(gradebookUid, gbItemName);
+				} catch (Exception e) {
+					M_log.info("Error to get gbItem from gradebook service  : " + e);
+				}
+
+				if (gbItem != null) {
+					String gbItemId = Long.toString(gbItem.getId());
+
+					// Determine if a scoring component (like a rubric) has been associated with this gradebook item
+					ScoringComponent component = scoringService.getScoringComponent(
+							scoringAgent.getAgentId(), gradebookUid, gbItemId);
+					boolean scoringComponentEnabled = component != null;
+
+					//this will be prepared for different scoring agents among assignments
+					sai.setScoringAgentId(scoringAgent.getAgentId());
+					sai.setScoringComponentEnabled(scoringComponentEnabled);
+
+					if (scoringComponentEnabled) {
+						sai.setScoringAgentImage(scoringAgent.getImageReference());
+						sai.setScoringAgentName(scoringAgent.getName());
+						sai.setScoringAgentMsg("This assignment is graded through " + scoringAgent.getName());
+						sai.setScoreLaunchUrl(scoringAgent.getScoreLaunchUrl(gradebookUid, gbItemId));
+					}
+				}
+
+				scoringComponentEnabledMap.put(assignment.getId(), sai);
+
+			}
+		}
+
+		return scoringComponentEnabledMap;
+	}
+
 	/**
 	 * the SubmitterSubmission clas
 	 */
@@ -13271,13 +13409,80 @@ public class AssignmentAction extends PagedResourceActionII
 		}
 	}
 
+	/*
+	 * Class for holding scoringAgentInfo like (iRubric) that assignment might associated with
+	 * helper class for  txstate local added feature of straight view for assignment that has rubric associated
+	 * with in the assignments list (the assignment load page)  #6774
+	 */
+	public class ScoringAgentInfo {
+
+		public ScoringAgentInfo(){
+		}
+
+		boolean m_scoringComponentEnabled = false;
+		String m_scoringAgentId = null;
+		String m_scoringAgentImage = null;
+		String m_scoringAgentName = null;
+		String m_scoringAgentMsg = null;
+		String m_scoreLaunchUrl = null;
+
+		private void setScoringAgentId (String agentId){
+			m_scoringAgentId = agentId;
+		}
+
+		public String getScoringAgentId (){
+			return m_scoringAgentId;
+		}
+
+		private void setScoringComponentEnabled (boolean enabled){
+			m_scoringComponentEnabled = enabled;
+		}
+
+		public boolean getScoringComponentEnabled () {
+			return m_scoringComponentEnabled;
+		}
+
+		private void setScoringAgentImage (String scoringAgentImage) {
+			m_scoringAgentImage = scoringAgentImage;
+		}
+
+		public String getScoringAgentImage () {
+			return m_scoringAgentImage;
+		}
+
+		private void setScoringAgentName (String scoringAgentName) {
+			m_scoringAgentName = scoringAgentName;
+		}
+
+		public String getScoringAgentName () {
+			return m_scoringAgentName;
+		}
+
+		private void setScoringAgentMsg (String scoringAgentMsg) {
+			m_scoringAgentMsg = scoringAgentMsg;
+		}
+
+		public String getScoringAgentMsg () {
+			return m_scoringAgentMsg;
+		}
+
+		private void setScoreLaunchUrl (String scoreLaunchUrl){
+			m_scoreLaunchUrl = scoreLaunchUrl;
+		}
+
+		public String getScoreLaunchUrl () {
+			return m_scoreLaunchUrl;
+		}
+
+	}
+
 	/**
 	 * the AssignmentComparator clas
 	 */
 	private class AssignmentComparator implements Comparator
 	{
 		Collator collator = null;
-		
+
 		/**
 		 * the SessionState object
 		 */
@@ -13382,7 +13587,7 @@ public class AssignmentAction extends PagedResourceActionII
 			return rv;
 
 		} // getAssignmentRange
-		
+
 		public void setAnon(boolean value)
 		{
 			m_anon = value;
@@ -13400,7 +13605,7 @@ public class AssignmentAction extends PagedResourceActionII
 		public int compare(Object o1, Object o2)
 		{
 			int result = -1;
-			
+
 			if (m_criteria == null)
 			{
 				m_criteria = SORTED_BY_DEFAULT;
@@ -17803,5 +18008,308 @@ public class AssignmentAction extends PagedResourceActionII
 			}
 		}
 	}
+	//TK20 integration stuff start here
+	private static final String MODE_INSTRUCTOR_EDIT_EPORTFOLIO_ASSIGNMENT = "Assignment.mode_instructor_edit_eportfolio_assignment";
+	private static final String TEMPLATE_INSTRUCTOR_EDIT_EPORTFOLIO_ASSIGNMENT = "_instructor_edit_eportfolio_assignment";
+	private static final String EPORTFOLIO_ASSIGNMENT_GRADE_FIELD = "gradeImportField";
 
+	protected String build_instructor_edit_eportfolio_assignment_context(VelocityPortlet portlet, Context context, RunData data, SessionState state)
+	{
+		String assignmentId = (String) state.getAttribute(EDIT_ASSIGNMENT_ID);
+		String assignmentRef = (String) state.getAttribute(EDIT_ASSIGNMENT_REF);
+		String assignmentTitle = "";
+		String section = "";
+
+		if (assignmentRef != null) {
+			Assignment a = getAssignment(assignmentRef, "build_instructor_edit_eportfolio_assignment_context", state);
+			if (a != null) {
+				context.put("assignment", a);
+				assignmentTitle = a.getTitle();
+				section = a.getSection();
+			}
+		}
+
+		boolean multiCourse = false;
+
+		try
+		{
+			AuthzGroup realm = authzGroupService.getAuthzGroup(SiteService.siteReference((String) state.getAttribute(STATE_CONTEXT_STRING)));
+			String courseEid = realm.getProviderGroupId();
+			String[] courses = courseEid.split("\\+");
+			multiCourse = courses.length > 1;
+		}
+		catch(Exception ex) {}
+
+		String gbTitle = "";
+
+		if (multiCourse)
+		{
+			context.put("isMultiCourseSite", true);
+			gbTitle = assignmentTitle + " (" + section + ")";
+		}
+		else
+		{
+			context.put("isMultiCourseSite", false);
+			gbTitle = assignmentTitle;
+		}
+
+		context.put("name_Category", NEW_ASSIGNMENT_CATEGORY);
+		context.put("name_GradePoints", NEW_ASSIGNMENT_GRADE_POINTS);
+		context.put("name_ScorePoints", "score_max_points");
+
+		context.put("name_GradeField", EPORTFOLIO_ASSIGNMENT_GRADE_FIELD);
+
+		// information related to gradebook categories
+		putGradebookCategoryInfoIntoContext(state, context);
+
+		String maxGrade = (String) state.getAttribute(NEW_ASSIGNMENT_GRADE_POINTS);
+		context.put("value_GradePoints", displayGrade(state, maxGrade, AssignmentService.getScaleFactor()));
+
+		context.put("value_GradeField", ((Integer)state.getAttribute(EPORTFOLIO_ASSIGNMENT_GRADE_FIELD)).intValue());
+
+		if (isGradebookDefined()) {
+			context.put("withGradebook", Boolean.TRUE);
+
+			context.put("name_Addtogradebook", AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK);
+			context.put("name_gbtitle", "gradebook_title");
+
+			if (StringUtils.trimToNull((String) state.getAttribute(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK)) == null)
+			{
+				state.setAttribute(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK, AssignmentService.GRADEBOOK_INTEGRATION_NO);
+			}
+
+			context.put("name_Addtogradebook", AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK);
+			context.put("name_AssociateGradebookAssignment", AssignmentService.PROP_ASSIGNMENT_ASSOCIATE_GRADEBOOK_ASSIGNMENT);
+			context.put("name_importGrade", EPORTFOLIO_ASSIGNMENT_GRADE_FIELD);
+			context.put("importFromGrade", "import_from_grade_field");
+			context.put("importFromScore", "import_from_score_field");
+			context.put("gradebookChoice_no", AssignmentService.GRADEBOOK_INTEGRATION_NO);
+			context.put("gradebookChoice_add", AssignmentService.GRADEBOOK_INTEGRATION_ADD);
+			context.put("gradebookChoice_associate", AssignmentService.GRADEBOOK_INTEGRATION_ASSOCIATE);
+			context.put("gradebookChoice_merge", "merge");
+			context.put("gradebookChoice_keep", "keep");
+
+			GradebookService gradebookService = (GradebookService)ComponentManager.get("org.sakaiproject.service.gradebook.GradebookService");
+			String gradebookUid = ToolManager.getInstance().getCurrentPlacement().getContext();
+
+			HashMap<String, String> gbEportfolioAssignments = new HashMap<String, String>();
+
+			List gbAssignments = gradebookService.getAssignments(gradebookUid);
+			boolean foundAssignment = false;
+
+			for (Object obj : gbAssignments)
+			{
+				org.sakaiproject.service.gradebook.shared.Assignment gbAssignment = (org.sakaiproject.service.gradebook.shared.Assignment)obj;
+
+				if (gbAssignment.isExternallyMaintained() && gbAssignment.getExternalAppName().equals("ePortfolio"))
+				{
+					gbEportfolioAssignments.put(gbAssignment.getExternalId(), gbAssignment.getName());
+
+					if (gbAssignment.getExternalId().equals(state.getAttribute("gbExternalId")))
+					{
+						context.put("gbAssignmentTitle", gbAssignment.getName());
+						gbTitle = gbAssignment.getName();
+						foundAssignment = true;
+					}
+				}
+			}
+
+			context.put("value_gbtitle", gbTitle);
+			context.put("hasRubric", state.getAttribute("hasRubric"));
+			context.put("rubricMaxPoints", state.getAttribute("rubricMaxPoints"));
+
+
+			if (!foundAssignment || state.getAttribute(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK).equals(AssignmentService.GRADEBOOK_INTEGRATION_NO))
+				context.put("gradebookChoice", AssignmentService.GRADEBOOK_INTEGRATION_NO);
+			else
+				context.put("gradebookChoice", "keep");
+
+			if(!foundAssignment && !state.getAttribute(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK).equals(AssignmentService.GRADEBOOK_INTEGRATION_NO))
+			{
+				addAlert(state, "The gradebook assignment that was previously associated with this assignment has been deleted.");
+				state.setAttribute(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK, AssignmentService.GRADEBOOK_INTEGRATION_NO);
+			}
+
+			if (gbEportfolioAssignments.isEmpty())
+				context.put("showMergeOption", false);
+			else
+				context.put("showMergeOption", true);
+
+			context.put("name_gbEportfolioAssign", "gbEportfolioAssignments");
+			context.put("gbEportfolioAssignments", gbEportfolioAssignments);
+		}
+
+		String template = (String) getContext(data).get("template");
+		return template + TEMPLATE_INSTRUCTOR_EDIT_EPORTFOLIO_ASSIGNMENT;
+	}
+
+
+	public void doEdit_eportfolio_assignment(RunData data)
+	{
+		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
+		ParameterParser params = data.getParameters();
+
+		String assignmentRef = StringUtils.trimToNull(params.getString("assignmentRef"));
+
+		if (AssignmentService.allowAddAssignment((String) state.getAttribute(STATE_CONTEXT_STRING))) {
+			//Assignment reference is <context>/<id>
+			String[] split = assignmentRef.split("/");
+
+			String assignmentId = assignmentRef;
+
+			if (split.length == 2)
+			{
+				assignmentId = split[1];
+			}
+
+			state.setAttribute(EDIT_ASSIGNMENT_ID, assignmentId);
+			state.setAttribute(EDIT_ASSIGNMENT_REF, assignmentRef);
+
+			Assignment a = getAssignment(assignmentRef, "doEdit_eportfolio_assignment", state);
+
+			state.setAttribute("the_assignment", a);
+
+			state.setAttribute(NEW_ASSIGNMENT_TITLE, a.getTitle());
+			state.setAttribute(NEW_ASSIGNMENT_GRADE_POINTS, a.getContent().getMaxGradePointDisplay());
+
+			ResourceProperties properties = a.getProperties();
+
+			state.setAttribute("gbExternalId", properties.getProperty("gbExternalId"));
+
+			state.setAttribute(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK, properties.getProperty(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK));
+
+			boolean hasRubric = Boolean.valueOf(properties.getProperty("hasRubric"));
+			state.setAttribute("hasRubric", hasRubric);
+
+			if (hasRubric)
+				state.setAttribute("rubricMaxPoints", Double.valueOf(properties.getProperty("rubricMaxPoints")));
+
+			state.setAttribute(EPORTFOLIO_ASSIGNMENT_GRADE_FIELD, Integer.parseInt(properties.getProperty(EPORTFOLIO_ASSIGNMENT_GRADE_FIELD)));
+
+			state.setAttribute(STATE_MODE, MODE_INSTRUCTOR_EDIT_EPORTFOLIO_ASSIGNMENT);
+		}
+		else {
+			addAlert(state, rb.getString("youarenot6"));
+		}
+	}
+
+	public void save_eportfolio_assignment(RunData data)
+	{
+		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
+
+		Assignment assignment = (Assignment) state.getAttribute("the_assignment");
+
+		ParameterParser params = data.getParameters();
+
+		Time dueTime = assignment.getDueTime();
+
+		String id = assignment.getId();
+
+		int gradeField = 0;
+
+		if (((Boolean)state.getAttribute("hasRubric")).booleanValue())
+			gradeField = params.get(EPORTFOLIO_ASSIGNMENT_GRADE_FIELD).equals("import_from_grade_field") ? 0 : 1;
+
+		int maxPoints = gradeField == 0 ? (int)(Double.parseDouble((String)params.get(NEW_ASSIGNMENT_GRADE_POINTS)) * 10) : (int)((Double)state.getAttribute("rubricMaxPoints") * 10);
+
+		if (gradeField == 1 && params.get("score_max_points") != null) {
+			maxPoints = (int)(Double.parseDouble((String)params.get("score_max_points")) * 10);
+		}
+
+		String gbTitle = params.get("gradebook_title");
+
+		state.setAttribute(NEW_ASSIGNMENT_GRADE_POINTS, (String)params.get(NEW_ASSIGNMENT_GRADE_POINTS));
+
+		state.setAttribute(EPORTFOLIO_ASSIGNMENT_GRADE_FIELD, gradeField);
+
+		boolean includeInGradebook = false;
+
+		Long category = params.get(NEW_ASSIGNMENT_CATEGORY) != null ? Long.parseLong(params.get(NEW_ASSIGNMENT_CATEGORY)) : null;
+
+		if (category == -1) category = null;
+
+		String oldGrading = (String)state.getAttribute(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK);
+		String grading = params.get(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK) != null ? params.get(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK) : "";
+
+		String gradebookUid = ToolManager.getInstance().getCurrentPlacement().getContext();
+
+    String gbExternalId = "";
+
+    int integrationType = GradebookIntegrationInfo.GRADEBOOK_INTEGRATION_NONE;
+
+    if (grading.equals(AssignmentService.GRADEBOOK_INTEGRATION_ADD))
+    {
+        gbExternalId = UUID.randomUUID().toString();
+        integrationType = GradebookIntegrationInfo.GRADEBOOK_INTEGRATION_ADD;
+    }
+    else if (grading.equals("merge"))
+    {
+        gbExternalId = params.get("gbEportfolioAssignments");
+        integrationType = GradebookIntegrationInfo.GRADEBOOK_INTEGRATION_MERGE;
+    }
+    else if (grading.equals("keep"))
+    {
+        gbExternalId = (String)state.getAttribute("gbExternalId");
+        integrationType = GradebookIntegrationInfo.GRADEBOOK_INTEGRATION_KEEP;
+    }
+    else
+    {
+        gbExternalId = (String)state.getAttribute("gbExternalId");
+    }
+
+    if (grading.equals(AssignmentService.GRADEBOOK_INTEGRATION_NO) && !oldGrading.equals(AssignmentService.GRADEBOOK_INTEGRATION_NO))
+    {
+        integrationType = GradebookIntegrationInfo.GRADEBOOK_INTEGRATION_REMOVE;
+    }
+
+		includeInGradebook = !grading.equals(AssignmentService.GRADEBOOK_INTEGRATION_NO);
+
+		if (maxPoints <= 0)
+		{
+			addAlert(state, "Max points must be greater than zero.");
+			return;
+		}
+
+		TracsAssignment tracsAssignment = new TracsAssignment();
+		tracsAssignment.setId(id);
+		tracsAssignment.setIncludedInGb(includeInGradebook);
+		tracsAssignment.setImportField(gradeField);
+		tracsAssignment.setMaxPoints(maxPoints);
+
+		if (integrationType == GradebookIntegrationInfo.GRADEBOOK_INTEGRATION_ADD || integrationType == GradebookIntegrationInfo.GRADEBOOK_INTEGRATION_KEEP || integrationType == GradebookIntegrationInfo.GRADEBOOK_INTEGRATION_MERGE)
+		{
+			tracsAssignment.setGbExternalId(gbExternalId);
+			tracsAssignment.setGradebookUid(gradebookUid);
+		}
+		else
+		{
+			tracsAssignment.setGbExternalId("");
+			tracsAssignment.setGradebookUid("");
+		}
+
+		GradebookIntegrationInfo gbIntegrationInfo = new GradebookIntegrationInfo();
+		gbIntegrationInfo.setIntegrationType(integrationType);
+		gbIntegrationInfo.setGbAssignmentTitle(gbTitle);
+		gbIntegrationInfo.setGbExternalId(gbExternalId);
+		gbIntegrationInfo.setAssignmentId(id);
+		gbIntegrationInfo.setGradebookUid(gradebookUid);
+		gbIntegrationInfo.setDueDate(new Date(assignment.getDueTime().getTime()));
+		gbIntegrationInfo.setCategory(category);
+		gbIntegrationInfo.setMaxPoints((double)maxPoints / 10.0);
+		gbIntegrationInfo.setImportField(gradeField);
+
+		EditStatus status = AssignmentService.editEportfolioAssignment(tracsAssignment, gbIntegrationInfo);
+
+		if (status.getAssignmentSavedSuccessfully() && status.getGbIntegrationSuccessful())
+		{
+			state.setAttribute(STATE_MODE, MODE_LIST_ASSIGNMENTS);
+			resetAssignment(state);
+		}
+
+		if (!status.getErrorMessage().equals(""))
+		{
+			addAlert(state, status.getErrorMessage());
+		}
+	}
+	//TK20 integration stuff ends here
 }	

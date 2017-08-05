@@ -23,10 +23,14 @@ package org.sakaiproject.assignment.api;
 
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import edu.txstate.tracs.eportfolio.bean.EditStatus;
+import edu.txstate.tracs.eportfolio.bean.GradebookIntegrationInfo;
+import edu.txstate.tracs.eportfolio.bean.TracsAssignment;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.exception.IdInvalidException;
 import org.sakaiproject.exception.IdUnusedException;
@@ -919,6 +923,8 @@ public interface AssignmentService extends EntityProducer
 
 	public String escapeInvalidCharsEntry(String accentedString);
 	
+	public EditStatus editEportfolioAssignment(TracsAssignment assignment, GradebookIntegrationInfo gbIntegrationInfo);
+
 	/*
 	 * If the assignment uses anonymous grading returns true, else false
 	 *

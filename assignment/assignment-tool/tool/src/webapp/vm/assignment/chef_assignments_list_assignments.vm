@@ -244,23 +244,57 @@
 											#if ($assignment.draft && $!allowUpdateAssignment )
 												<a name="asnActionLink" href="#toolLinkParam("$action" "doEdit_assignment" "assignmentId=$validator.escapeUrl($assignmentReference)")">
 											#else
-												<a name="asnActionLink" href="#toolLinkParam("$action" "doView_assignment" "assignmentId=$validator.escapeUrl($assignmentReference)")">
+												#if ($assignment.getStatus() == "eportfolio")
+													<a href="$assignment.getUrl()" target="_blank">
+												#else
+													<a name="asnActionLink" href="#toolLinkParam("$action" "doView_assignment" "assignmentId=$validator.escapeUrl($assignmentReference)")">
+												#end
 											#end
 											#if ($!assignment.draft)
 												<span class="highlight">$tlang.getString("gen.dra2") </span>
 											#end
 												$validator.escapeHtml($validator.limit($!assignment.getTitle(), 64))
+												#if ($assignment.getStatus() == "eportfolio" && $isMultiCourseSite)
+													&nbsp;($assignment.getSection())
+												#end
 
 											#if ($assignmentContent.getAllowReviewService())
 												<img alt="$reviewIndicator" title="$reviewIndicator" src="/library/image/silk/rosette.png" />
 											#end
 											</a>
+											&nbsp
+
+											#set($allowGradeAssignment=$!service.allowGradeSubmission($assignment.getReference()))
+											#if ($!allowAddAssignment || $!allowUpdateAssignment || $!allowGradeAssignment)
+													#set($scoringAgentInfo=$!scoringComponentEnabledMap.get($assignment.id))
+													#if($!scoringAgentInfo.getScoringComponentEnabled())
+															#if($!allowGradeAssignment)
+																	<a href="$scoringAgentInfo.getScoreLaunchUrl()" target="_blank">
+															#end
+															<img src="/library/image/silk/rubric-small.gif" title="$scoringAgentInfo.getScoringAgentMsg()" alt="$scoringAgentInfo.getScoringAgentMsg()"
+																	#if(!$!allowGradeAssignment)
+																	class="grayscale"
+																	#end
+															/>
+															#if($!allowGradeAssignment)
+																	</a>
+															#end
+													#end
+											#end
+
 										</strong>
 										<div class="itemAction">
 											#set($prevAction=false)
-											#if ($!allowUpdateAssignment)#set($prevAction=true)<a name="asnActionLink" onclick="SPNR.insertSpinnerInPreallocated( this, null, 'linksSpinnerPlaceholder_$validator.escapeUrl($assignmentReference)' );" href="#toolLinkParam("$action" "doEdit_assignment" "assignmentId=$validator.escapeUrl($assignmentReference)")">$!tlang.getString("gen.revi")<span class="skip"> $validator.escapeHtml($validator.limit($!assignment.getTitle(), 64))</span></a>#end
-											#if ($allowAddAssignment&&$!allowUpdateAssignment)#if($prevAction) |#else#set($prevAction=true)#end<a name="asnActionLink" onclick="duplicateLink(this);SPNR.insertSpinnerInPreallocated( this, null, 'linksSpinnerPlaceholder_$validator.escapeUrl($assignmentReference)' );return false;" href="#toolLinkParam("$action" "doDuplicate_assignment" "assignmentId=$validator.escapeUrl($assignmentReference)")">$!tlang.getString("dupli")<span class="skip"> $validator.escapeHtml($validator.limit($!assignment.getTitle(), 64))</span></a>#end
-											#if ($taggable && $allowAddAssignment)
+											#if ($!allowUpdateAssignment || ($assignment.getStatus() == "eportfolio" && $!allowAddAssignment))#set($prevAction=true)
+													#if ($assignment.getStatus() == "eportfolio")
+														<a href="#toolLinkParam("$action" "doEdit_eportfolio_assignment" "assignmentRef=$validator.escapeUrl($assignmentReference)")">
+													#else
+															<a name="asnActionLink" onclick="SPNR.insertSpinnerInPreallocated( this, null, 'linksSpinnerPlaceholder_$validator.escapeUrl($assignmentReference)' );" href="#toolLinkParam("$action" "doEdit_assignment" "assignmentId=$validator.escapeUrl($assignmentReference)")">
+													#end
+													$!tlang.getString("gen.revi")<span class="skip"> $validator.escapeHtml($validator.limit($!assignment.getTitle(), 64))</span></a>
+											#end
+											#if ($allowAddAssignment&&$!allowUpdateAssignment&&$assignment.getStatus()!="eportfolio")#if($prevAction) |#else#set($prevAction=true)#end<a name="asnActionLink" onclick="duplicateLink(this);SPNR.insertSpinnerInPreallocated( this, null, 'linksSpinnerPlaceholder_$validator.escapeUrl($assignmentReference)' );return false;" href="#toolLinkParam("$action" "doDuplicate_assignment" "assignmentId=$validator.escapeUrl($assignmentReference)")">$!tlang.getString("dupli")<span class="skip"> $validator.escapeHtml($validator.limit($!assignment.getTitle(), 64))</span></a>#end
+											#if ($taggable && $allowAddAssignment && $assignment.getStatus()!="eportfolio")
 												#foreach ($provider in $providers)
 													#set ($helperInfo = false)
 													#set ($activity = $producer.getActivity($assignment))
@@ -275,7 +309,7 @@
 													#end
 												#end
 											#end
-											#if (!$assignment.draft && $!service.allowGradeSubmission($assignment.getReference()))#if($prevAction) |#end
+											#if (!$assignment.draft && $!service.allowGradeSubmission($assignment.getReference()) && $assignment.getStatus() != "eportfolio")#if($prevAction) | #end
 											#set ($gradeScale = $assignmentContent.getTypeOfGrade())
 											## show "view submissions" link for ungraded type of assignment
 												<a name="asnActionLink" href="javascript:void(0)" onclick="if(ASN.allowClick(this)){ SPNR.insertSpinnerInPreallocated( this, null, 'linksSpinnerPlaceholder_$validator.escapeUrl($assignmentReference)' ); window.location='#toolLinkParam("$action" "doGrade_assignment" "assignmentId=$validator.escapeUrl($assignmentReference)")'; }" >#if ($withGrade && $gradeScale != 1)$!tlang.getString("gen.assign.gra")#else$!tlang.getString("viewsubmissions")#end<span class="skip"> $validator.escapeHtml($validator.limit($!assignment.getTitle(), 64))</span></a>
@@ -307,7 +341,11 @@
 												$validator.escapeHtml($validator.limit($assignment.getTitle(), 40))
 												#if ($!allowSubmit)
 													<div class="itemAction">
+														#if ($assignment.getStatus() == "eportfolio")
+															<a href="$assignment.getUrl()" target="_blank">
+														#else
 														<a name="asnActionLink" href="#toolLinkParam("AssignmentAction" "doView_submission" "assignmentReference=$validator.escapeUrl($assignment.Reference)")">
+														#end
 															$tlang.getString("subasstudent")<span class="skip">: $validator.escapeHtml($validator.limit($assignment.getTitle(), 40))</span>
 														</a>
 													</div>
@@ -345,15 +383,20 @@
 														<strong>#assignmentTitleIcon($assignment)
 															<a name="asnActionLink" href="#toolLinkParam("AssignmentAction" "doView_submission" "assignmentReference=$validator.escapeUrl($assignment.Reference)")">$validator.escapeHtml($validator.limit($assignment.getTitle(), 40))</a>
 														</strong>
-												#else
+													#else
 														<strong>#assignmentTitleIcon($assignment)
 															<a name="asnActionLink" href="#toolLinkParam("AssignmentAction" "doView_grade" "submissionId=$validator.escapeUrl($submission.Reference)")">$validator.escapeHtml($validator.limit($assignment.getTitle(), 40))</a>
-														</strong>
+															</strong>
 													#end
 												#else
-												<strong>#assignmentTitleIcon($assignment)
-													<a name="asnActionLink" href="#toolLinkParam("AssignmentAction" "doView_submission" "assignmentReference=$validator.escapeUrl($assignment.Reference)")">$validator.escapeHtml($validator.limit($assignment.getTitle(), 40))</a>
-												</strong>
+														#if ($assignment.getStatus() == "eportfolio")
+															<h4><a href="$assignment.getUrl()" target="_blank">
+														#else
+															<strong>#assignmentTitleIcon($assignment)
+															<a name="asnActionLink" href="#toolLinkParam("AssignmentAction" "doView_submission" "assignmentReference=$validator.escapeUrl($assignment.Reference)")">
+														#end
+														$validator.escapeHtml($validator.limit($assignment.getTitle(), 40))</a>
+														</strong>
 												#end
 												#if ($taggable && $allowAddAssignment)
 													<div class="itemAction">
@@ -387,8 +430,11 @@
 													</div>
 												#end
 											#else
-												<a name="asnActionLink" href="#toolLinkParam("AssignmentAction" "doView_assignment_as_student" "assignmentId=$assignment.Reference")">$validator.escapeHtml($validator.limit($assignment.getTitle(), 40))</a>
-											#end
+													#if ($assignment.getStatus() != "eportfolio")
+															<a href="#toolLinkParam("AssignmentAction" "doView_assignment_as_student" "assignmentId=$assignment.Reference")">
+															$validator.escapeHtml($validator.limit($assignment.getTitle(), 40))</a></h4>
+													#end
+										#end
 										#end
 										#set ($deleted = false)
 										#set ($deleted = $assignmentProperties.getProperty($assignmentProperties.getNamePropAssignmentDeleted()))
@@ -471,7 +517,7 @@
 								#if ($!showNumSubmissionColumn)
 								<td headers="num_submissions" class="specialLink">
 								## not show the link for draft assignment
-								#if (!$assignment.Draft && $!service.allowGradeSubmission($assignment.getReference()))
+								#if (!$assignment.Draft && $!service.allowGradeSubmission($assignment.getReference()) && $assignment.getStatus() != "eportfolio")
 									## 1- text only; 2-attachment only; 3-text and attachment; 4-Non-electronic
 									#set($ungradedNumber = $!service.getUngradedSubmissionsCount($assignment.Reference))
 									#set($totalNumber = $!service.getSubmittedSubmissionsCount($assignment.Reference))
@@ -490,6 +536,9 @@
 											<span class="skip"> #if ($withGrade && $gradeScale != 1)$!tlang.getString("gen.assign.gra")#else$!tlang.getString("viewsubmissions")#end : $validator.escapeHtml($validator.limit($!assignment.getTitle(), 64)). </span> <span class="skip">$!tlang.getString("gen.subm2"): </span>$!totalNumber/<span class="skip">$!tlang.getString("ungra"): </span>$!ungradedNumber
 										</a>
 									</div>
+								#end
+								#if ($assignment.getStatus() == "eportfolio")
+									N/A
 								#end
 								</td>
 								#end
@@ -521,7 +570,7 @@
 							#end
 							#if ($!allowRemoveAssignment && $!view.equals('lisofass1'))
 								<td headers="remove" class="screenOnly">
-										<input type="checkbox" name="selectedAssignments" value="$assignmentReference" id="check_$assignmentCount" onclick="ASN.checkEnableRemove();" />
+										<input type="checkbox" name="selectedAssignments" value="$assignmentReference" id="check_$assignmentCount" #if($assignment.getStatus()=="eportfolio") disabled="disabled" #end  onclick="ASN.checkEnableRemove();" />
 										<label for="check_$assignmentCount" class="skip">$tlang.getString("gen.remove"): $validator.escapeHtml($validator.limit($!assignment.getTitle(), 64))</label>
 								</td>
 							#end

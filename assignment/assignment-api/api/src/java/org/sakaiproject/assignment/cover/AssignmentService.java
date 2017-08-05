@@ -22,9 +22,16 @@
 package org.sakaiproject.assignment.cover;
 
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
+
+import edu.txstate.tracs.eportfolio.bean.EditStatus;
+import edu.txstate.tracs.eportfolio.bean.GradebookIntegrationInfo;
+import edu.txstate.tracs.eportfolio.bean.TracsAssignment;
+
 import java.util.Collection;
 import java.util.Map;
 import org.sakaiproject.site.api.Group;
@@ -876,6 +883,14 @@ public class AssignmentService {
 		return service.getScaleFactor();
 	}
 	
+	public static EditStatus editEportfolioAssignment(TracsAssignment assignment, GradebookIntegrationInfo gbIntegrationInfo) {
+		org.sakaiproject.assignment.api.AssignmentService service = getInstance();
+		if (service != null)
+			return service.editEportfolioAssignment(assignment, gbIntegrationInfo);
+
+		return null;
+	}
+
 	public static boolean hasBeenSubmitted(
 			org.sakaiproject.assignment.api.AssignmentSubmissionEdit param0) {
 		org.sakaiproject.assignment.api.AssignmentService service = getInstance();

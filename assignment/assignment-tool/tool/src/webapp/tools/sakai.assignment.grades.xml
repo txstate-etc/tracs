@@ -5,7 +5,7 @@
 	<tool
 			id="sakai.assignment.grades"
 			title="Assignments"
-			description="For posting, submitting and grading assignment(s) online.">
+			description="For posting, submitting and grading assignments.">
 		
 		<category name="course" />
 		<category name="project" />

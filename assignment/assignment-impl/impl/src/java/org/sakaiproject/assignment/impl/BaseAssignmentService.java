@@ -21,6 +21,11 @@
 
 package org.sakaiproject.assignment.impl;
 
+import edu.txstate.tracs.eportfolio.api.EportfolioService;
+import edu.txstate.tracs.eportfolio.bean.EditStatus;
+import edu.txstate.tracs.eportfolio.bean.GradebookIntegrationInfo;
+import edu.txstate.tracs.eportfolio.bean.TracsAssignment;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -1071,6 +1076,10 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 
 		assignment = m_assignmentStorage.get(assignmentId);
 
+		if (assignment == null) {
+			assignment = findEportfolioAssignment(assignmentReference);
+		}
+
 		return assignment;
 	}
 
@@ -1132,6 +1141,10 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 	protected List getUnfilteredAssignments(String context)
 	{
 		List assignments = m_assignmentStorage.getAll(context);
+
+		//Add eportfolio assignments
+		assignments.addAll(getListEportfolioAssignmentsForContext(context));
+
 		return assignments;
 	}
 
@@ -3425,7 +3438,11 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			{
 				tempAssignment = (Assignment) allAssignments.get(x);
 				
-				if ((context.equals(tempAssignment.getContext()))
+				if (tempAssignment.getStatus().equals("eportfolio"))
+				{
+					retVal.add(tempAssignment);
+				}
+				else if ((context.equals(tempAssignment.getContext()))
 						|| (context.equals(getGroupNameFromContext(tempAssignment.getContext()))))
 				{
 					String deleted = tempAssignment.getProperties().getProperty(ResourceProperties.PROP_ASSIGNMENT_DELETED);
@@ -14266,6 +14283,43 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
             String resourceString = getAccessPoint(true) + Entity.SEPARATOR + "a" + Entity.SEPARATOR + context + Entity.SEPARATOR;
             return resourceString;
     }
+
+  //TK20 integration stuff starts here
+  private EportfolioService eportfolioService = (EportfolioService) ComponentManager.get("edu.txstate.tracs.eportfolio.api.EportfolioService");
+
+	public List getListEportfolioAssignmentsForContext(String context)
+	{
+		M_log.debug(this + " getListEportfolioAssignmentsForContext : CONTEXT : " + context);
+
+		List eportfolioAssignments = new ArrayList<Assignment>();
+
+		try {
+			AuthzGroup realm = authzGroupService.getAuthzGroup(SiteService.siteReference(context));
+			String courseEid = realm.getProviderGroupId();
+			eportfolioAssignments.addAll(eportfolioService.getEportfolioAssignments(courseEid, context));
+		}
+		catch (GroupNotDefinedException e) {
+			M_log.warn("failed to get site from context: " + context);
+		}
+
+		return eportfolioAssignments;
+	}
+
+	public Assignment findEportfolioAssignment(String assignmentReference) {
+
+		String[] split = assignmentReference.split("/");
+
+		//An eportfolio assignment reference has the form <context>/<id>
+		if (split.length != 2) return null;
+
+		return eportfolioService.getEportfolioAssignment(split[1], split[0]);
+	}
+
+	public EditStatus editEportfolioAssignment(TracsAssignment assignment, GradebookIntegrationInfo gbIntegrationInfo)
+	{
+		return eportfolioService.editEportfolioAssignment(assignment, gbIntegrationInfo);
+	}
+	//TK20 integration stuff ends here
 
         /**
          * the GroupSubmission clas

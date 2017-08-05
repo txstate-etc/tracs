@@ -12,7 +12,7 @@ ASN_SCRAGNT.openScoringAgent = function(url) {
  */
 ASN_SCRAGNT.refreshScore = function(refreshUrl) {
 	jQuery.getJSON(ASN_SCRAGNT.encodeUrl(refreshUrl),function(data){
-		if (data['score']) {
+		if (data['score'] != null) {
 			var newScore = data['score'];
 			var inp = document.getElementById("grade");
 			if(newScore !== '' && newScore > 0) {

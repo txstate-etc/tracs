@@ -40,5 +40,11 @@
             <groupId>org.sakaiproject.scheduler</groupId>
             <artifactId>scheduler-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>edu.txstate.tracs</groupId>
+            <artifactId>tk20-bean</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

@@ -619,6 +619,9 @@ ASN.toggleAddOptions = function(checked){
 ASN.toggleReviewServiceOptions = function(checked){
     var section = document.getElementById("reviewServiceOptions");
     if(checked){
+        alert("When selecting to use Turnitin with an assignment, you must choose the Single Uploaded File option from the Student Submissions drop-down menu.");
+        document.getElementById('subType').value=5;
+        document.getElementById('allowResToggle').checked=false;
         section.style.display="block";
         ASN.resizeFrame('grow');
     }else{

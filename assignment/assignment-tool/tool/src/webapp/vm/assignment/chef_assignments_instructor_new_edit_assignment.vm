@@ -102,7 +102,7 @@
 </script>
 #javascript("/library/js/lang-datepicker/lang-datepicker.js")
 
-<div class="portletBody container-fluid">
+<div class="portletBody container-fluid" xmlns:aaa="http://www.w3.org/2005/07/aaa">
 	#navBarOnClick( $allowAddAssignment $withGrade $allowGradeSubmission $allowAddAssignment $allowAllGroups $assignmentscheck $allowUpdateSite $enableViewOption $view "newAssignmentForm" "new" )
 
 	<div class="page-header">
@@ -588,9 +588,11 @@
 						#if($show_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT.contains($name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_STANDARD))
 							<input type="radio" name="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_RADIO" value="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_STANDARD" #if($value_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_RADIO.equals("$name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_STANDARD"))checked#end/>$tlang.getString("review.submit.papers.repository.standard")<br/>
 						#end
-						#if($show_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT.contains($name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_INSITUTION))
-							<input type="radio" name="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_RADIO" value="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_INSITUTION" #if($value_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_RADIO.equals("$name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_INSITUTION"))checked#end/>$tlang.getString("review.submit.papers.repository.institution")<br/>
-						#end
+
+						##removing option to check institution repository because TXST doesn't have one
+						##if($show_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT.contains($name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_INSITUTION))
+						##	<input type="radio" name="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_RADIO" value="$name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_INSITUTION" ##if($value_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_RADIO.equals("$name_NEW_ASSIGNMENT_REVIEW_SERVICE_SUBMIT_INSITUTION"))checked#end/>$tlang.getString("review.submit.papers.repository.institution")<br/>
+						##end
 					</div>
 
 					<h4>
@@ -1097,6 +1099,8 @@
 				<input type="radio" name="range" id="site" value="site" onclick="if (document.getElementById('addToGradebook') !=null){$('#addToGradebook').fadeOut('slow'); ASN.showOrHideAccessMessages( false ); ASN.resizeFrame()};$('#groupTable').fadeOut('slow'); ASN.showOrHideAccessMessages( false ); ASN.resizeFrame();"
 				#if( $!range == "site" || $selectedGroupsNotFound )
 					checked="checked"
+				#elseif ($!value_CheckIsGroupSubmission.equals("1") && $!groupsList)
+          disabled="disabled"
 				#end
 				/>
 			#else
@@ -1304,10 +1308,10 @@
 				</td>
 				<td class="itemAction" style="white-space:nowrap">
 					<div id="nomodelanswer"  #if(!$!modelanswer) style="display:block"#else style="display:none" #end>
-						<a id="modelanswer_add" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("new")<span class="skip"> $tlang.getString("modelAnswer")</span></a>
+						<a id="modelanswer_add" class="extraNodeLink">$tlang.getString("new")</a>
 					</div>
 					<div id="hasmodelanswer"  #if($!modelanswer) style="display:block"#else style="display:none" #end>
-						<a id="modelanswer_edit" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("gen.revi")<span class="skip"> $tlang.getString("modelAnswer")</span></a> | <a id="modelanswer_delete" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("delet")<span class="skip"> $tlang.getString("modelAnswer")</span></a>
+						<a id="modelanswer_edit" class="extraNodeLink">$tlang.getString("gen.revi")</a> | <a id="modelanswer_delete" class="extraNodeLink">$tlang.getString("delet")</a>
 						<input id = "modelanswer_to_delete" name = "modelanswer_to_delete" type= "hidden" value = "false" />
 					</div>
 				</td>
@@ -1320,14 +1324,14 @@
 					</td>
 					<td class="itemAction" style="white-space:nowrap">
 						<div id="nonote"  #if(!$!note) style="display:block"#else style="display:none" #end>
-							<a id="note_add" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("new")<span class="skip"> $tlang.getString("note")</span></a>
+							<a id="note_add" class="extraNodeLink">$tlang.getString("new")</a>
 						</div>
 						<div id="hasnote"  #if($!note) style="display:block"#else style="display:none" #end>
 							#if ($!allowEditAssignmentNoteItem)
-								<a id="note_edit" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("gen.revi")<span class="skip"> $tlang.getString("note")</span></a> | <a id="note_delete" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("delet")<span class="skip"> $tlang.getString("note")</span></a>
+								<a id="note_edit" class="extraNodeLink">$tlang.getString("gen.revi")</a> | <a id="note_delete" class="extraNodeLink">$tlang.getString("delet")</a>
 							#else
 								#if ($!allowReadAssignmentNoteItem)
-									<a id="note_edit" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("gen.view2")</a>
+									<a id="note_edit" class="extraNodeLink">$tlang.getString("gen.view2")</a>
 								#end
 							#end
 						</div>
@@ -1341,10 +1345,10 @@
 				</td>
 				<td class="itemAction" style="white-space:nowrap">
 					<div id="noallPurpose" #if(!$!allPurpose) style="display:block"#else style="display:none" #end>
-						<a id="allPurpose_add" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("new")<span class="skip"> $tlang.getString("allPurpose")</span></a>
+						<a id="allPurpose_add" class="extraNodeLink">$tlang.getString("new")</a>
 					</div>
 					<div id="hasallPurpose" #if($!allPurpose) style="display:block"#else style="display:none" #end>
-						<a id="allPurpose_edit" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("gen.revi")<span class="skip"> $tlang.getString("allPurpose")</span></a> | <a id="allPurpose_delete" class="extraNodeLink" href="javascript:void(0)">$tlang.getString("delet")<span class="skip"> $tlang.getString("allPurpose")</span></a>
+						<a id="allPurpose_edit" class="extraNodeLink">$tlang.getString("gen.revi")</a> | <a id="allPurpose_delete" class="extraNodeLink">$tlang.getString("delet")</a>
 					</div>
 					<input type="hidden" name="value_allPurpose" #if($!allPurpose) value="true" #else value="false" #end />
 					<input id = "allPurpose_to_delete" name = "allPurpose_to_delete" type= "hidden" value = "false" />

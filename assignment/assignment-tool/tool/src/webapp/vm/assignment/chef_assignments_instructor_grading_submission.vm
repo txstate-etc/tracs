@@ -509,13 +509,12 @@
 											&nbsp<img id="infoImg" title="$tlang.getString('peerassessment.peerGradeInfo')" src="/library/image/silk/information.png" onclick="$('#peerReviewInfo').show();"/>
 										#end
 										</label>
-										<input type="text" name="$name_grade" size="5" maxlength="11" value="$!value_grade" id="grade" onkeypress="return ASN.handleEnterKeyPress(event);" /> <span class="text-info">($tlang.getString("grade.max") $assignmentContent.getMaxGradePointDisplay())</span>
-										
+										<input type="text" name="$name_grade" size="5" maxlength="11" value="$!value_grade" id="grade" onkeypress="return handleEnterKeyPress(event);" #if($scoringComponentEnabled) readonly #end /> <span class="instruction">($tlang.getString("grade.max") $assignmentContent.getMaxGradePointDisplay())</span>
+
 										<!--for grading via an external scoring service, if enabled for the associated gradebook item -->
 										#if($scoringComponentEnabled)
 											#parse ("/vm/assignment/chef_assignments_scoring_agent.vm")	
 								        #end
-										
 									</p>	
 									<div id="peerReviewInfo" class="popupMessage" style="display:none">$tlang.getString("peerassessment.peerGradeInfo")</div>
 								#elseif ($gradeType == 4)

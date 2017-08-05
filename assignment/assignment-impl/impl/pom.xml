@@ -145,6 +145,18 @@
             <artifactId>spring-context</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>edu.txstate.tracs</groupId>
+          <artifactId>tk20-bean</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>edu.txstate.tracs</groupId>
+          <artifactId>tk20-api</artifactId>
+          <version>1.0</version>
+          <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

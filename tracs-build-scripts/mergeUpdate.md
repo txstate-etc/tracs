@@ -5,9 +5,9 @@
 | alias                        | NO LOCAL CHANGES |
 | announcement                 | DONE             |
 | archive                      | NO LOCAL CHANGES |
-| assignment                   |                  |
+| assignment                   | DONE             |
 | authz                        | NO LOCAL CHANGES |
-| basiclti                     |                  |
+| basiclti                     | DONE             |
 | blogwow                      | DONE             |
 | calendar                     | DONE             |
 | chat                         | DONE             |
@@ -74,7 +74,7 @@
 | simple-rss-portlet           | NO LOCAL CHANGES |
 | site                         | NO LOCAL CHANGES |
 | site-manage                  | DONE             |
-| sitestats                    |                  |
+| sitestats                    | DONE             |
 | syllabus                     | DONE             |
 | taggable                     | NO LOCAL CHANGES |
 | textarea                     | NO LOCAL CHANGES |

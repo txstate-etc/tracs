@@ -21,10 +21,10 @@
 
 package org.sakaiproject.assignment.impl;
 
-import edu.txstate.tracs.eportfolio.api.EportfolioService;
-import edu.txstate.tracs.eportfolio.bean.EditStatus;
-import edu.txstate.tracs.eportfolio.bean.GradebookIntegrationInfo;
-import edu.txstate.tracs.eportfolio.bean.TracsAssignment;
+import edu.txstate.tracs.tk20.business.EportfolioService;
+import edu.txstate.tracs.tk20.business.model.EditStatus;
+import edu.txstate.tracs.tk20.business.model.GradebookIntegrationInfo;
+import edu.txstate.tracs.tk20.business.model.TracsAssignment;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
@@ -14312,7 +14312,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		//An eportfolio assignment reference has the form <context>/<id>
 		if (split.length != 2) return null;
 
-		return eportfolioService.getEportfolioAssignment(split[1], split[0]);
+		return (Assignment) eportfolioService.getEportfolioAssignment(split[1], split[0]);
 	}
 
 	public EditStatus editEportfolioAssignment(TracsAssignment assignment, GradebookIntegrationInfo gbIntegrationInfo)

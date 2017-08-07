@@ -59,9 +59,9 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.txstate.tracs.eportfolio.bean.EditStatus;
-import edu.txstate.tracs.eportfolio.bean.GradebookIntegrationInfo;
-import edu.txstate.tracs.eportfolio.bean.TracsAssignment;
+import edu.txstate.tracs.tk20.business.model.EditStatus;
+import edu.txstate.tracs.tk20.business.model.GradebookIntegrationInfo;
+import edu.txstate.tracs.tk20.business.model.TracsAssignment;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -18300,7 +18300,7 @@ public class AssignmentAction extends PagedResourceActionII
 
 		EditStatus status = AssignmentService.editEportfolioAssignment(tracsAssignment, gbIntegrationInfo);
 
-		if (status.getAssignmentSavedSuccessfully() && status.getGbIntegrationSuccessful())
+		if (status.isAssignmentSavedSuccessfully() && status.isGbIntegrationSuccessful())
 		{
 			state.setAttribute(STATE_MODE, MODE_LIST_ASSIGNMENTS);
 			resetAssignment(state);

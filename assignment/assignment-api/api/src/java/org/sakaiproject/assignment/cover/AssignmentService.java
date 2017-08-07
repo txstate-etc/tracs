@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 
-import edu.txstate.tracs.eportfolio.bean.EditStatus;
-import edu.txstate.tracs.eportfolio.bean.GradebookIntegrationInfo;
-import edu.txstate.tracs.eportfolio.bean.TracsAssignment;
+import edu.txstate.tracs.tk20.business.model.EditStatus;
+import edu.txstate.tracs.tk20.business.model.GradebookIntegrationInfo;
+import edu.txstate.tracs.tk20.business.model.TracsAssignment;
 
 import java.util.Collection;
 import java.util.Map;

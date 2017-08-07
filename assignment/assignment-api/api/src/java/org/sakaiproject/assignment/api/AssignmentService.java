@@ -28,9 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import edu.txstate.tracs.eportfolio.bean.EditStatus;
-import edu.txstate.tracs.eportfolio.bean.GradebookIntegrationInfo;
-import edu.txstate.tracs.eportfolio.bean.TracsAssignment;
+import edu.txstate.tracs.tk20.business.model.EditStatus;
+import edu.txstate.tracs.tk20.business.model.GradebookIntegrationInfo;
+import edu.txstate.tracs.tk20.business.model.TracsAssignment;
 import org.sakaiproject.entity.api.EntityProducer;
 import org.sakaiproject.exception.IdInvalidException;
 import org.sakaiproject.exception.IdUnusedException;

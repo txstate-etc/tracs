@@ -102,6 +102,11 @@
             <artifactId>sakai-assignment-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>edu.txstate.tracs</groupId>
+            <artifactId>tk20-business</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.sakaiproject.edu-services.gradebook</groupId>
             <artifactId>gradebook-service-api</artifactId>
         </dependency>

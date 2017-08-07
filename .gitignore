@@ -21,3 +21,4 @@ tracs-docker/webapps
 rsf/sakai-rsf-web/templates/overlays/
 rsf/sakai-rsf-web/test/overlays/
 velocity.log
+bin/

@@ -35,7 +35,7 @@
 | hierarchy                    | NO LOCAL CHANGES |
 | irubric                      | DONE             |
 | jobscheduler                 | DONE             |
-| jsf                          |                  |
+| jsf                          | DONE             |
 | kernel                       |                  |
 | lessonbuilder                | DONE             |
 | login                        | DONE             |
@@ -66,7 +66,7 @@
 | roster_legacy                | DONE             |
 | rsf                          | NO LOCAL CHANGES |
 | rwiki                        | DONE             |
-| samigo                       |                  |
+| samigo                       | DONE             |
 | search                       | DONE             |
 | sections                     | DONE             |
 | shortenedurl                 | NO LOCAL CHANGES |

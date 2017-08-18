@@ -138,6 +138,7 @@ function SaveFormContentAsync(toUrl, formId, buttonName, updateVar, updateVar2, 
 	if (saveok) {
 	    var onTimeout = TimeOutAction(toUrl, formId, buttonName, updateVar, updateVar2, repeatMilliseconds);
 	    setTimeout(onTimeout, repeatMilliseconds);
+      show_alert("Progress saved successfully.")
 	} else {
 	    //alert("Attempt to save your work automatically failed. One common cause is that you have a second window open on Tests and Quizes. We strongly suggest that you not continue working in this window. If you go to the top level of Tests and Quizes, you can restart this test or quiz.");
 	}
@@ -181,5 +182,40 @@ function initXMLHTTPRequest() {
                 throw new Error("failed to create XMLHTTPRequest");
         }
         return result;
+}
+
+function show_alert(msg) {
+  clearTimeout(show_alert.timer);
+
+  if (typeof show_alert.div == 'undefined') {
+    // Put the alert on the parent window to making positioning it easier
+    show_alert.div = $(window.parent.document.createElement('div'));
+    show_alert.div.addClass("samigoalert");
+    $(window.parent.document.body).append(show_alert.div);
+
+    $(window).unload(function() {
+        show_alert.div.remove();
+    });
+
+    $(window.parent.document).scroll(position_alert);
+  }
+
+  show_alert.div.hide();
+  show_alert.div.css('left', '0px');
+  show_alert.div.css('top', '0px');
+  show_alert.div.html(msg);
+
+  position_alert();
+
+  show_alert.div.show();
+
+  // Hide after 3 seconds
+  show_alert.timer = setTimeout(function () { show_alert.div.hide(); }, 3000);
+}
+
+function position_alert() {
+  // Position alert at the bottom of the window
+  show_alert.div.css('left', (window.parent.innerWidth+window.parent.scrollX-show_alert.div.outerWidth()-30)+'px');
+  show_alert.div.css('top', (window.parent.innerHeight+window.parent.scrollY-show_alert.div.outerHeight())+'px');
 }
 

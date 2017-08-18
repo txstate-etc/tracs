@@ -3,6 +3,34 @@ Note that this will be embedded in the page exactly as is
 --%><!-- Samigo embedded delivery.js starts here -->
 <script type="text/javascript">
 
+
+//added by Amy Boyd for ticket #578
+function checkAllPoolQs(btn){
+	var elems = btn.form.elements;
+	var len = elems.length;
+	for (var i=0; i<len; i++) {
+		if (elems[i].type && elems[i].type=='checkbox') {
+			elems[i].checked=true;
+		}
+	}
+	return false;
+}
+
+function unCheckAllPoolQs(btn){
+	var elems = btn.form.elements;
+	var len = elems.length;
+	for (var i=0; i<len; i++) {
+		if (elems[i].type && elems[i].type=='checkbox') {
+			elems[i].checked=false;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 function printForm(){
   alert("print 0");
   for(i=0; i<document.forms[0].elements.length; i++)
@@ -92,24 +120,7 @@ function clearIfDefaultString(formField, defaultString) {
     }
 }
 
-
-function submitOnEnter(event, defaultButtonId) {
-    var characterCode;
-    if (event.which) {
-        characterCode = event.which;
-    } else if (event.keyCode) {
-        characterCode = event.keyCode;
-    }
-
-    if (characterCode == 13) {
-        event.returnValue = false;
-        event.cancel = true;
-        document.getElementById(defaultButtonId).click();
-        return false;
-    } else {
-        return true;
-    }
-}
+// Removed keyboard watcher that submitted the assessment on the return key - JeffSnider,11/14/08
 
 function show(obj) {
         document.getElementById(obj).style.display = '';

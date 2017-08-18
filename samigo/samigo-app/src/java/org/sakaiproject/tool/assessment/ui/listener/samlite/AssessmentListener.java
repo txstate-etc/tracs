@@ -10,6 +10,7 @@ import org.sakaiproject.tool.assessment.facade.AgentFacade;
 import org.sakaiproject.tool.assessment.facade.AssessmentFacade;
 import org.sakaiproject.tool.assessment.qti.constants.QTIVersion;
 import org.sakaiproject.tool.assessment.services.qti.QTIService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.bean.samlite.SamLiteBean;
 import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 import org.w3c.dom.Document;
@@ -38,7 +39,7 @@ public class AssessmentListener implements ActionListener {
 		
 		samLiteBean.createAssessment(assessment);
 		samLiteBean.setData("");
-		EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.create", "siteId=" + AgentFacade.getCurrentSiteId() + ", assessmentId=" + assessment.getAssessmentId(), true));
+		EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.create", AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", " + AppConstants.SAMIGO_ASSES_ID_STRING + assessment.getAssessmentId(), true));
 	}
 	
 	public AssessmentFacade createImportedAssessment(Document document, int qti, String templateId) {

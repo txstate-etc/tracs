@@ -205,6 +205,13 @@ function textCounter(field, maxlimit) {
 <h:outputText rendered="#{questionpool.currentPool.numberOfQuestions >1}" value=" #{questionPoolMessages.qs}"/>
 <h:outputText rendered="#{questionpool.currentPool.numberOfQuestions ==1}" value=" #{questionPoolMessages.q}"/>
 <h:outputText rendered="#{questionpool.currentPool.numberOfQuestions ==0}" value=" #{questionPoolMessages.qs}"/>
+
+<f:verbatim><br/><br/></f:verbatim>
+
+<h:commandButton id="CheckAll"  rendered="#{questionpool.importToAuthoring == 'true'}" value="Check All" onclick="return checkAllPoolQs(this)" />
+<f:verbatim>&nbsp;&nbsp;</f:verbatim>
+<h:commandButton id="UnCheckAll"  rendered="#{questionpool.importToAuthoring == 'true'}" value="Uncheck All" onclick="return unCheckAllPoolQs(this)" />
+
 </h:panelGroup>
 <h:commandLink title="#{questionPoolMessages.t_addQuestion}" rendered="#{questionpool.importToAuthoring != 'true'}" id="addQlink" immediate="true" action="#{questionpool.selectQuestionType}">
   <h:outputText id="addq" value="#{questionPoolMessages.t_addQuestion}"/>

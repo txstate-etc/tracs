@@ -33,6 +33,7 @@ import org.sakaiproject.event.api.NotificationService;
 import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.tool.assessment.facade.AssessmentFacade;
 import org.sakaiproject.tool.assessment.services.assessment.AssessmentService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.bean.author.AssessmentBean;
 import org.sakaiproject.tool.assessment.ui.bean.author.AuthorBean;
 import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
@@ -63,7 +64,7 @@ public class RemoveAssessmentListener implements ActionListener
     s.removeAssessment(assessmentId);
 
     final String context = s.getAssessmentSiteId(assessmentId);
-    EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.remove", "assessmentId=" + assessmentId, context, true, NotificationService.NOTI_NONE));
+    EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.remove", AppConstants.SAMIGO_ASSES_ID_STRING + assessmentId + ", " + AppConstants.SAMIGO_SITE_ID_STRING + context, context, true, NotificationService.NOTI_NONE));
     
     // This should have been done inside AssessmentFacadeQueries.removeAssessment()
     // but it didn't work there nor inside RemoveAssessmentThread. 

@@ -26,6 +26,7 @@ package org.sakaiproject.tool.assessment.ui.bean.evaluation;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -141,8 +142,10 @@ public class TotalScoresBean
   private boolean isAnyAssessmentGradingAttachmentListModified;
   private Map userIdMap;
   
+  private boolean isPassDueDate = false; //added by -Qu bugid:3212 12/3/2010
   private boolean isAutoScored = false;
   private boolean hasFileUpload = false;
+  private String rowClasses; //added by -Qu for bugid:5489
   
   private static Logger log = LoggerFactory.getLogger(TotalScoresBean.class);
 
@@ -1195,4 +1198,29 @@ public class TotalScoresBean
 	{
 		this.isAnyAssessmentGradingAttachmentListModified = isAnyAssessmentGradingAttachmentListModified;
 	}
+
+	/**
+	 * added by -Qu to enable setToZero button after due date
+	 * bugid:3213 12/6/2010
+	 */
+	public boolean getIsPassDueDate(){
+		isPassDueDate = false;
+		Date now = new Date();
+		Date testDueDate = publishedAssessment.getAssessmentAccessControl().getDueDate();
+		//making "Assign Zeros" button available if due date is not setup bugid:4204.
+		if (testDueDate == null)
+			isPassDueDate = true;
+		else if (now.after(testDueDate))
+			isPassDueDate = true;
+		return isPassDueDate;
+	}
+
+    //added for showing status in UI list bugid:5489 9/10/2013 -Qu
+    public String getRowClasses(){
+        return this.rowClasses;
+    }
+
+    public void setRowClasses(String rowClasses){
+        this.rowClasses = rowClasses;
+    }
 }

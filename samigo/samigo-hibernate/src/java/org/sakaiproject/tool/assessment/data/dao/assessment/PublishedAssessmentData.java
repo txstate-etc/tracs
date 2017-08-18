@@ -86,6 +86,8 @@ public class PublishedAssessmentData
   private Integer scoringType;
   private Date lastNeedResubmitDate;
   private Integer timeLimit;
+  //assign Zeros for unsubmitted tests -Qu bugid:5399 7/9/2013
+  private Boolean assignZeros;
 
   
   public PublishedAssessmentData() {}
@@ -751,6 +753,14 @@ public class PublishedAssessmentData
 
   public void setTimeLimit(Integer timeLimit) {
 	  this.timeLimit = timeLimit;
+  }
+
+  public Boolean getAssignZeros() {
+	  return this.assignZeros;
+}
+
+  public void setAssignZeros(Boolean assignZeros){
+	  this.assignZeros = assignZeros;
   }
 
 }

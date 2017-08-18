@@ -183,7 +183,7 @@
         || itemauthor.currentItem.itemType==12 || (itemauthor.currentItem.itemType==2 && itemauthor.currentItem.mcmsPartialCredit=='false')}">
   <h:outputLabel value="#{authorMessages.negative_point_value}"/>
   <h:inputText id="answerdsc" value="#{itemauthor.currentItem.itemDiscount}" required="true" styleClass="ConvertPoint">
-    <f:validateDoubleRange/>
+    <f:validateDoubleRange minimum="0"/>
   </h:inputText>
   <f:verbatim> <script type="text/javascript" defer='defer'>
   		var itemType = "${itemauthor.currentItem.itemType}";

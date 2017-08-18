@@ -53,6 +53,7 @@ import org.sakaiproject.tool.assessment.data.ifc.assessment.EvaluationModelIfc;
 import org.sakaiproject.tool.assessment.facade.AgentFacade;
 import org.sakaiproject.tool.assessment.services.GradebookServiceException;
 import org.sakaiproject.tool.assessment.services.GradingService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.bean.evaluation.AgentResults;
 import org.sakaiproject.tool.assessment.ui.bean.evaluation.QuestionScoresBean;
 import org.sakaiproject.tool.assessment.ui.bean.evaluation.TotalScoresBean;
@@ -271,7 +272,9 @@ public class TotalScoreUpdateListener
           logString.append(AgentFacade.getAgentString());
     	  logString.append(", publishedAssessmentId=");
     	  logString.append(bean.getPublishedAssessment().getPublishedAssessmentId());
-    	  EventTrackingService.post(EventTrackingService.newEvent("sam.total.score.update", "siteId=" + AgentFacade.getCurrentSiteId() + ", " + logString.toString(), true));
+    	  EventTrackingService.post(EventTrackingService.newEvent("sam.total.score.update",
+    			  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", " +
+    			  logString.toString(), true));
     	  log.debug("Saved total scores.");
       } catch (GradebookServiceException ge) {
     	  FacesContext context = FacesContext.getCurrentInstance();

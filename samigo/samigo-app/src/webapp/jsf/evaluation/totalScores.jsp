@@ -3,6 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://www.sakaiproject.org/samigo" prefix="samigo" %>
 <%@ taglib uri="http://sakaiproject.org/jsf/sakai" prefix="sakai" %>
+<script src="/library/webjars/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
+<script src="/library/js/expandCollapse.js" type="text/javascript"></script>
+
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -182,7 +185,8 @@ $(document).ready(function(){
   <h:outputText value="</span></li></ul>" escape="false"/>
 
 <div class="tier1">
-  <h:messages styleClass="messageSamigo" rendered="#{! empty facesContext.maximumSeverity}" layout="table"/>
+  <%--Adding success message for assigning zeros -Qu 12/7/2010 bugid:3213 --%>
+  <h:messages infoClass="success" styleClass="messageSamigo" rendered="#{! empty facesContext.maximumSeverity}" layout="table"/>
   <!-- only shows Max Score Possible if this assessment does not contain random dawn parts -->
 
 <sakai:flowState bean="#{totalScores}" />
@@ -201,6 +205,22 @@ $(document).ready(function(){
       <h:outputText value=" #{evaluationMessages.applyGradesDesc}"/>
     </h:panelGroup>
 
+<script>
+	$(document).ready(function(){
+		$("a.sam-scoretable-deleteattempt").each(function(){
+			this.existingOnclick = this.onclick;
+			this.onclick = null;
+			$(this).click(function(){
+				if ( confirm("Are you sure you want to delete this attempt?") ) {
+					this.existingOnclick();
+				} else {
+					return false;
+				}
+			});
+		});
+		$("tr.inactivePar").css("display","none");
+	});
+</script>
 
     <h:panelGroup styleClass="all-submissions form-group row" layout="block">
       <h:outputLabel styleClass="col-md-2" value="#{evaluationMessages.view}"/>
@@ -345,6 +365,7 @@ $(document).ready(function(){
          <h:outputText value="#{description.lastName}" rendered="#{description.assessmentGradingId eq '-1' || description.forGrade == 'false' || totalScores.allSubmissions eq'4'}" />
          <h:outputText value=", " rendered="#{(description.assessmentGradingId eq '-1' || description.forGrade == 'false') && description.lastInitial ne 'Anonymous' || totalScores.allSubmissions eq'4'}"/>
          <h:outputText value="#{description.firstName}" rendered="#{description.assessmentGradingId eq '-1' || description.forGrade == 'false'  || totalScores.allSubmissions eq'4'}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive && (description.assessmentGradingId eq '-1' || description.forGrade == 'false'  || totalScores.allSubmissions eq'4')}"/>
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous' && (description.assessmentGradingId eq '-1' || description.forGrade == 'false')}" />
        <h:commandLink title="#{evaluationMessages.t_student}" action="studentScores" immediate="true" 
           rendered="#{description.forGrade == 'true' &&  description.assessmentGradingId ne '-1' && totalScores.allSubmissions!='4'}" >
@@ -352,6 +373,7 @@ $(document).ready(function(){
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
          <h:outputText value="#{description.firstName}" />
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.ResetTotalScoreListener" />
          <f:actionListener
@@ -394,6 +416,7 @@ $(document).ready(function(){
          <h:outputText value="#{description.lastName}" rendered="#{description.assessmentGradingId eq '-1' || description.forGrade == 'false' || totalScores.allSubmissions eq'4'}" />
          <h:outputText value=", " rendered="#{(description.assessmentGradingId eq '-1' || description.forGrade == 'false') && description.lastInitial ne 'Anonymous' || totalScores.allSubmissions eq'4'}"/>
          <h:outputText value="#{description.firstName}" rendered="#{description.assessmentGradingId eq '-1' || description.forGrade == 'false' ||totalScores.allSubmissions eq '4'}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive && (description.assessmentGradingId eq '-1' || description.forGrade == 'false'  || totalScores.allSubmissions eq'4')}"/>
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous' && (description.assessmentGradingId eq '-1' || description.forGrade == 'false')}" />
        <h:commandLink title="#{evaluationMessages.t_student}" action="studentScores" immediate="true" 
           rendered="#{description.forGrade == 'true' && description.assessmentGradingId ne '-1' &&  totalScores.allSubmissions!='4'}" >
@@ -401,6 +424,7 @@ $(document).ready(function(){
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
          <h:outputText value="#{description.firstName}" />
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.ResetTotalScoreListener" />
          <f:actionListener
@@ -443,6 +467,7 @@ $(document).ready(function(){
          <h:outputText value="#{description.lastName}" rendered="#{description.assessmentGradingId eq '-1' || description.forGrade == 'false'}" />
          <h:outputText value=", " rendered="#{(description.assessmentGradingId eq '-1' || description.forGrade == 'false') && description.lastInitial ne 'Anonymous' || totalScores.allSubmissions eq'4'}"/>
          <h:outputText value="#{description.firstName}" rendered="#{description.assessmentGradingId eq '-1' || description.forGrade == 'false' || totalScores.allSubmissions eq'4' || totalScores.allSubmissions eq'4'}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive && (description.assessmentGradingId eq '-1' || description.forGrade == 'false'  || totalScores.allSubmissions eq'4')}"/>
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous' && (description.assessmentGradingId eq '-1' || description.forGrade == 'false')}" />
        <h:commandLink title="#{evaluationMessages.t_student}" action="studentScores" immediate="true" 
           rendered="#{description.forGrade == 'true' && description.assessmentGradingId ne '-1' &&  totalScores.allSubmissions!='4'}" >
@@ -450,6 +475,7 @@ $(document).ready(function(){
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
          <h:outputText value="#{description.firstName}" />
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.ResetTotalScoreListener" />
          <f:actionListener
@@ -490,6 +516,7 @@ $(document).ready(function(){
      <h:panelGroup >
        <h:commandLink title="#{evaluationMessages.t_student}" action="studentScores" rendered="#{totalScores.allSubmissions != '4'}">
          <h:outputText value="#{description.assessmentGradingId}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.ResetTotalScoreListener" />
          <f:actionListener
@@ -516,6 +543,7 @@ $(document).ready(function(){
      <h:panelGroup>
        <h:commandLink title="#{evaluationMessages.t_student}" action="studentScores" immediate="true" rendered="#{totalScores.allSubmissions != '4'}">
          <h:outputText value="#{description.assessmentGradingId}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.ResetTotalScoreListener" />
          <f:actionListener
@@ -542,6 +570,7 @@ $(document).ready(function(){
      <h:panelGroup>
        <h:commandLink title="#{evaluationMessages.t_student}" action="studentScores" immediate="true" rendered="#{totalScores.allSubmissions != '4'}">
          <h:outputText value="#{description.assessmentGradingId}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.ResetTotalScoreListener" />
          <f:actionListener
@@ -993,6 +1022,18 @@ $(document).ready(function(){
       <f:actionListener
          type="org.sakaiproject.tool.assessment.ui.listener.evaluation.TotalScoreListener" />
    </h:commandButton>
+
+   <%-- Added a button to assign 0 scores for unsubmitted test by -Qu 12/6/2010 --%>
+   <h:commandButton value="#{evaluationMessages.setToZero}" alt="#{evaluationMessages.setToZero}" title="#{evaluationMessages.setToZeroTitle}" onmouseover="this.style.color='#2277DD'" onmouseout="this.style.color='black'" disabled="#{!totalScores.isPassDueDate}">
+      <f:actionListener
+         type="org.sakaiproject.tool.assessment.ui.listener.evaluation.SetUnsubmittedTotalScoreListener" />
+      <f:actionListener
+         type="org.sakaiproject.tool.assessment.ui.listener.evaluation.ResetTotalScoreListener" />
+      <f:actionListener
+         type="org.sakaiproject.tool.assessment.ui.listener.evaluation.TotalScoreListener" />
+   </h:commandButton>
+   <%--Added a new button for user to go back to author page after remove submissions bugid:4456 -Qu 6/23/2011 --%>
+   <h:commandButton value="#{evaluationMessages.return_assessments}" action="author"/>
    <h:commandButton value="#{commonMessages.cancel_action}" action="author"/>
 
 </p>

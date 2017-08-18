@@ -39,6 +39,7 @@ import org.sakaiproject.tool.assessment.facade.PublishedAssessmentFacade;
 import org.sakaiproject.tool.assessment.services.GradingService;
 import org.sakaiproject.tool.assessment.services.assessment.EventLogService;
 import org.sakaiproject.tool.assessment.services.assessment.PublishedAssessmentService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.model.delivery.TimedAssessmentGradingModel;
 import org.sakaiproject.tool.cover.SessionManager;
 
@@ -120,8 +121,7 @@ public class SubmitTimedAssessmentThread extends TimerTask
             PublishedAssessmentService publishedAssessmentService = new PublishedAssessmentService();
             String siteId = publishedAssessmentService.getPublishedAssessmentOwner(ag.getPublishedAssessmentId());
             
-            EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.thread_submit", "siteId=" + AgentFacade.getCurrentSiteId() + ", submissionId=" + ag.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED));
-
+            EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.thread_submit", AppConstants.SAMIGO_SITE_ID_STRING + siteId + ", submissionId=" + ag.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED));
             Map<String, Object> notiValues = new HashMap<>();
 
             notiValues.put("assessmentGradingID", ag.getAssessmentGradingId());

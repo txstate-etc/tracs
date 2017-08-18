@@ -14,6 +14,7 @@ import org.sakaiproject.tool.assessment.facade.AgentFacade;
 import org.sakaiproject.tool.assessment.facade.PublishedAssessmentFacade;
 import org.sakaiproject.tool.assessment.services.GradingService;
 import org.sakaiproject.tool.assessment.services.assessment.PublishedAssessmentService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.bean.author.AssessmentBean;
 import org.sakaiproject.tool.assessment.ui.bean.author.AuthorBean;
 import org.sakaiproject.tool.assessment.ui.bean.author.PublishRepublishNotificationBean;
@@ -47,7 +48,7 @@ public class ConfirmRepublishAssessmentListener implements ActionListener {
 		    control.setAssessmentBase(assessment.getData());
 		}
 	    */
-		EventTrackingService.post(EventTrackingService.newEvent("sam.pubsetting.edit", "siteId=" + AgentFacade.getCurrentSiteId() + ", publishedAssessmentId=" + assessmentId, true));
+		EventTrackingService.post(EventTrackingService.newEvent("sam.pubsetting.edit", AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", " + AppConstants.SAMIGO_PUBASSES_ID_STRING + assessmentId, true));
 		FacesContext context = FacesContext.getCurrentInstance();
 		//boolean error = savePublishedSettingsListener.setPublishedSettings(assessmentService, assessmentSettings, context, control, assessment, false);
 		/*

@@ -150,6 +150,22 @@
 
 <div class="tier1" id="jqueryui-accordion">
 
+   <%--Showing assessment type info for published assessments settings  bugid:5217 -Qu 1/25/2013--%>
+   <h:panelGroup rendered="#{publishedSettings.valueMap.templateInfo_isInstructorEditable==true and !assessmentSettings.noTemplate and template.showAssessmentTypes}" >
+       <samigo:hideDivision title="#{assessmentSettingsMessages.heading_template_information}" >
+   <f:verbatim> <div class="tier2"></f:verbatim>
+     <h:panelGrid columns="2" columnClasses="shorttext">
+            <h:outputLabel value="#{assessmentSettingsMessages.template_title}"/>
+            <h:outputText escape="false" value="#{assessmentSettings.templateTitle}" />
+            <h:outputLabel value="#{assessmentSettingsMessages.template_authors}" rendered="#{assessmentSettings.templateAuthors!=null}"/>
+            <h:outputText escape="false" rendered="#{assessmentSettings.templateAuthors!=null}" value="#{assessmentSettings.templateAuthors}" />
+            <h:outputLabel value="#{assessmentSettingsMessages.template_description}" rendered="#{assessmentSettings.templateDescription!=null}"/>
+            <h:outputText escape="false" rendered="#{assessmentSettings.templateDescription!=null}" value="#{assessmentSettings.templateDescription}" />
+        </h:panelGrid>
+    <f:verbatim></div></f:verbatim>
+      </samigo:hideDivision>
+    </h:panelGroup>
+
 <samigo:hideDivision title="#{assessmentSettingsMessages.heading_about}" >
 
   <!-- *** ASSESSMENT INTRODUCTION *** -->
@@ -689,7 +705,7 @@
 <p class="act">
 
   <!-- Save button -->
-  <h:commandButton type="submit" value="#{commonMessages.action_save}" action="#{publishedSettings.getOutcome}"  styleClass="active" onclick="setBlockDivs();updateItemNavigation(false);" >
+  <h:commandButton type="submit" value="#{commonMessages.action_save}" action="#{publishedSettings.getOutcome}"  styleClass="active" onclick="setBlockDivs();updateItemNavigation(false);return requireDates();" >
       <f:actionListener type="org.sakaiproject.tool.assessment.ui.listener.author.SavePublishedSettingsListener" />
   </h:commandButton>
   

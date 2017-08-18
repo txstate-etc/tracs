@@ -100,6 +100,7 @@ public class AgentResults
   private int submissionCount=0;
   private Double scoreSummation=new Double("0");
   private Double averageScore= new Double("0");
+  private boolean isActive;  //added for showing status in UI list bugid:5489 9/10/2013 -Qu
   
   public AgentResults() {
   }
@@ -539,4 +540,13 @@ public class AgentResults
     public void setAgentDisplayId(String agentDisplayId) {
         this.agentDisplayId = agentDisplayId;
     }
+
+	//added for showing status in UI list bugid:5489 9/10/2013 -Qu
+	public void setIsActive(boolean isActive){
+		this.isActive = isActive;
+	}
+
+	public boolean getIsActive(){
+		return this.isActive;
+	}
 }

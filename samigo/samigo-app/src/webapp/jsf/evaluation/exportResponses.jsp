@@ -132,10 +132,12 @@
 </h:panelGroup>
 <h:outputText value=" "/>
 <h:outputText value=" "/>
-<h:panelGroup>
-<h:commandButton actionListener="#{exportResponses.exportExcel}" value="#{commonMessages.export_action}" id="exportButton" />
-</h:panelGroup>
 </h:panelGrid>
+<p class="act">
+<h:commandButton styleClass="active" actionListener="#{exportResponses.exportExcel}" title="#{evaluationMessages.export_all_msg}" alt="#{evaluationMessages.export_all_msg}" value="#{commonMessages.export_action_all}" id="exportButton_all" />
+<h:commandButton actionListener="#{exportResponses.exportExcelActiveOnly}" title="#{evaluationMessages.export_active_only_msg}" alt="#{evaluationMessages.export_active_only_msg}" value="#{commonMessages.export_action_active_only}" id="exportButton_active" />
+</p>
+
 </div>
 </h:form>
 

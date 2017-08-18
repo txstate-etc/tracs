@@ -187,23 +187,7 @@
 	</h:column>
 
 	<!-- IP Address -->
-	<h:column>
-	  <f:facet name="header">
-        <h:commandLink title="#{eventLogMessages.t_sortIP}" action="eventLog">
-        <h:outputText value="#{eventLogMessages.ipAddress}"/>
-        <f:param name="sortAscending" value="#{!eventLog.sortAscending}"/>
-        <f:param name="sortBy" value="ipAddress" />
-        <h:graphicImage alt="#{eventLogMessages.alt_sortIPAscending}" rendered="#{eventLog.sortType eq 'ipAddress' && eventLog.sortAscending}" url="/images/sortascending.gif"/>
-        <h:graphicImage alt="#{eventLogMessages.alt_sortIPDescending}" rendered="#{eventLog.sortType eq 'ipAddress' && !eventLog.sortAscending}" url="/images/sortdescending.gif"/>
-        <f:actionListener
-             type="org.sakaiproject.tool.assessment.ui.listener.author.EventLogListener" />
-      </h:commandLink>
-	  </f:facet>
-
-	 <h:panelGroup>
-	    <h:outputText value="#{log.ipAddress}" />
-     </h:panelGroup>
-	</h:column>
+	<!-- removed IP Address column, see #6530 -->
 
 	</h:dataTable>
 

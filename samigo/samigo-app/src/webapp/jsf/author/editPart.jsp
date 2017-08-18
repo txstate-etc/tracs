@@ -132,7 +132,7 @@
         <%-- End Options --%>
         
         <%-- METADATA --%>
-        <fieldset>
+        <fieldset id="metadataPartsFieldSet">
             <legend><h:outputText value="#{authorMessages.metadata}"/></legend>
             <h:panelGrid columns="2" columnClasses="shorttext">
                 <h:outputLabel for="obj" value="#{authorMessages.objective}" />

@@ -49,6 +49,7 @@ remove the javascript onclick stuff.
       <head><%= request.getAttribute("html.head") %>
       <title> <h:outputText value="#{delivery.assessmentTitle}"/>
       </title>
+      <link rel="stylesheet" href="/samigo/css/tool_sam_tracs.css" type="text/css">
       <%@ include file="/jsf/delivery/deliveryjQuery.jsp" %>
       </head>
        <body onload="<%= request.getAttribute("html.body.onload") %>; ">
@@ -114,9 +115,32 @@ function saveTime()
 
   <h:panelGroup styleClass="messageSamigo2">
     <h:panelGrid border="0">
+	  <h:outputText value="#{deliveryMessages.submit_warning_1}" />
+	  <h:panelGroup>
+	    <h:outputText value="#{deliveryMessages.submit_warning_2}" />
+        <h:outputText value=" <b>#{deliveryMessages.button_submit_grading}</b> "  escape="false"/>
+	    <h:outputText value="#{deliveryMessages.submit_warning_3}" /
+	  </h:panelGroup>
+	  <h:panelGroup rendered="#{delivery.navigation ne '1'}">
+	    <h:outputText value="#{deliveryMessages.submit_warning_4}" />
+	    <h:outputText value=" <b>#{deliveryMessages.submitGradeConfirmation_cancel}</b> " escape="false"/>
+	    <h:outputText value="#{deliveryMessages.submit_warning_5}" />
+	  </h:panelGroup>
+	  <h:panelGroup rendered="#{delivery.navigation ne '1'}">
+	    <h:outputText value="#{deliveryMessages.submit_warning_7}" />
+	    <h:outputText value=" <b>#{deliveryMessages.submitGradeConfirmation_review}</b> " escape="false"/>
+	    <h:outputText value="#{deliveryMessages.submit_warning_8}" />
+	  </h:panelGroup>
+         <h:panelGroup rendered="#{delivery.navigation eq '1'}">
+            <h:outputText value="#{deliveryMessages.submit_warning_4}" />
+            <h:outputText value=" <b>#{deliveryMessages.button_cancel}</b> " escape="false"/>
+            <h:outputText value="#{deliveryMessages.submit_warning_6}" />
+          </h:panelGroup>
+<%--
 	  <h:outputText value="#{deliveryMessages.submit_warning_1}" escape="false"/>
 	  <h:outputText value="#{deliveryMessages.submit_warning_2}" escape="false"/>
 	  <h:outputText value="#{deliveryMessages.submit_warning_3_non_linear}" rendered="#{delivery.navigation ne '1'}" escape="false"/>
+--%>
 	  <h:outputText value="#{deliveryMessages.submit_warning_3_linear}" rendered="#{delivery.navigation eq '1'}" escape="false"/>
 	</h:panelGrid>
   </h:panelGroup>
@@ -133,11 +157,19 @@ function saveTime()
     <h:outputText value="#{delivery.assessmentTitle}" escape="false"/>
   </h:panelGrid>
 
+<p class="warningMessage">
+      <h:outputText styleClass="submitWarning" value="#{deliveryMessages.submitGradeConfirmation_message_5}" />
+      <h:outputText>&nbsp;</h:outputText>
+      <h:outputText styleClass="submitWarning" value="#{deliveryMessages.submitGradeConfirmation_message_1}" rendered="#{delivery.reviewNeeded || delivery.unansweredExisted}"/>
+      <h:outputText styleClass="submitWarning reason" value="#{deliveryMessages.submitGradeConfirmation_message_2}"  rendered="#{delivery.reviewNeeded && delivery.unansweredExisted}" />
+      <h:outputText styleClass="submitWarning reason" value="#{deliveryMessages.submitGradeConfirmation_message_3}"  rendered="#{delivery.reviewNeeded && !delivery.unansweredExisted}" />
+      <h:outputText styleClass="submitWarning reason" value="#{deliveryMessages.submitGradeConfirmation_message_4}"  rendered="#{!delivery.reviewNeeded && delivery.unansweredExisted}" />
+      <h:outputText value="."  rendered="#{delivery.reviewNeeded || delivery.unansweredExisted}"/>
 <p class="act">
 
   <%-- SUBMIT FOR GRADE --%>
   <h:commandButton id="submitForGrade" type="submit" value="#{deliveryMessages.button_submit_grading}"
-    action="#{delivery.submitForGrade}" styleClass="active" 
+    action="#{delivery.submitForGrade}" styleClass="submit4grading"
     rendered="#{(delivery.actionString=='takeAssessment' || delivery.actionString=='previewAssessment') 
              && delivery.navigation ne '1' 
              && !delivery.doContinue}"
@@ -160,17 +192,18 @@ function saveTime()
 
   <%-- SUBMIT FOR GRADE DURING PAU --%>
   <h:commandButton type="submit" value="#{deliveryMessages.button_submit_grading}"
-    action="#{delivery.submitForGrade}"  id="submitForm1" styleClass="active"
+		  action="#{delivery.submitForGrade}"  id="submitForm1" styleClass="submit4grading"
     rendered="#{delivery.actionString=='takeAssessmentViaUrl'}"
     onclick="pauseTiming='false'" onkeypress="pauseTiming='false'"/>
 
   <!-- Previous button for non-linear assessments -->
-  <h:commandButton id="previous" type="submit" value="#{deliveryMessages.previous}"
+  <h:commandButton id="previous" type="submit" value="#{deliveryMessages.submitGradeConfirmation_cancel}"
     action="#{delivery.confirmSubmitPrevious}"
     rendered="#{(delivery.actionString=='previewAssessment'
                  || delivery.actionString=='takeAssessment'
                  || delivery.actionString=='takeAssessmentViaUrl')
-              && delivery.navigation ne '1'}" 
+              && delivery.navigation ne '1'}" "
+    onclick="disablePrevious();return alert('Assessment has NOT been submitted for grading.')" onkeypress=""
     />
 
   <!-- Previous button for linear assessments -->
@@ -183,6 +216,8 @@ function saveTime()
     onclick="pauseTiming='false'" onkeypress="pauseTiming='false'" 
     disabled="#{delivery.actionString=='previewAssessment'}" />
 
+  <!-- View all questions button Added by -Qu 4/28/2010 bugid:3291 -->
+  <h:commandButton id="review" type="submit" value="#{deliveryMessages.submitGradeConfirmation_review}"    action="tableOfContents"  />
 <!-- DONE BUTTON FOR PREVIEW -->
 <h:panelGroup rendered="#{delivery.actionString=='previewAssessment'}">
  <f:verbatim><div class="previewMessage"></f:verbatim>

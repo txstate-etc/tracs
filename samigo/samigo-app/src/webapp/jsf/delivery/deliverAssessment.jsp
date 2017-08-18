@@ -492,7 +492,7 @@ document.links[newindex].onclick();
 <h:panelGrid columns="6" border="0" rendered="#{!(delivery.pageContents.isNoParts && delivery.navigation eq '1')}">
   <%-- PREVIOUS --%>
   <h:panelGrid columns="1" border="0">
-	<h:commandButton id="previous" type="submit" value="#{deliveryMessages.previous}"
+	<h:commandButton id="previous" styleClass="previous" type="submit" value="#{deliveryMessages.previous}"
     action="#{delivery.previous}"
     disabled="#{!delivery.previous}" 
 	rendered="#{(delivery.actionString=='previewAssessment'
@@ -561,22 +561,22 @@ document.links[newindex].onclick();
   <h:panelGrid columns="1" width="100%" border="0" columnClasses="act">
   <%-- SUBMIT FOR GRADE --%>
   <h:commandButton id="submitForGrade" type="submit" value="#{deliveryMessages.button_submit_grading}"
-    action="#{delivery.confirmSubmit}" styleClass="active"
+  action="#{delivery.confirmSubmit}" styleClass="submit4grading"
     rendered="#{(delivery.actionString=='takeAssessment' ||delivery.actionString=='takeAssessmentViaUrl' || delivery.actionString=='previewAssessment') 
              && delivery.navigation ne '1' 
              && !delivery.doContinue}"
     />
 
   <%-- SUBMIT FOR GRADE DURING PAU --%>
-  <h:commandButton type="submit" value="#{deliveryMessages.button_submit}"
-    action="#{delivery.confirmSubmit}"  id="submitForm1" styleClass="active"
-    rendered="#{delivery.actionString=='takeAssessmentViaUrl' && delivery.doContinue && delivery.anonymousLogin}"
+  <h:commandButton type="submit" value="#{deliveryMessages.button_submit_grading}"
+		  action="#{delivery.confirmSubmit}"  id="submitForm1" styleClass="submit4grading"
+		  rendered="#{delivery.actionString=='takeAssessmentViaUrl' && delivery.doContinue && delivery.anonymousLogin}"
     />
 
   <%-- SUBMIT FOR GRADE FOR LINEAR ACCESS --%>
   <h:commandButton type="submit" value="#{deliveryMessages.button_submit_grading}"
-      action="#{delivery.confirmSubmit}"  id="submitForm" styleClass="active"
-      rendered="#{(delivery.actionString=='takeAssessment'
+		action="#{delivery.confirmSubmit}"  id="submitForm" styleClass="submit4grading"
+		rendered="#{(delivery.actionString=='takeAssessment'
                    || delivery.actionString=='takeAssessmentViaUrl'
 				   || delivery.actionString=='previewAssessment')
 				   && delivery.navigation eq '1' && !delivery.doContinue}" 

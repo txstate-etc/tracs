@@ -169,7 +169,7 @@ font-size:1.2em
 }
 
 .titlePub {
-	width: 28%;
+	width: 15%;
 }
 
 .listAssessments th{
@@ -1293,4 +1293,9 @@ input[type='reset'].linearButton {
 .table-borderless tfoot tr th,
 .table-borderless tfoot tr td {
 	border: none !important;
+}
+
+/* Hide metadata since we don't use search #6571 */
+#jqueryui-accordion-metadata, #metadataPartsFieldSet {
+  display:none;
 }

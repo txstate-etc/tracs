@@ -695,7 +695,8 @@ public class AuthorBean implements Serializable
 			  pendingActionList1.add(new SelectItem("print_pending", com.getString("action_print")));
 		  }
 		  pendingActionList1.add(new SelectItem("settings_pending", com.getString("settings_action")));
-		  pendingActionList1.add(new SelectItem("publish", com.getString("publish_action")));
+		  //we don't want them to be able to publish without first visiting settings bugid#5210
+		  // pendingActionList1.add(new SelectItem("publish", com.getString("publish_action")));
 		  pendingActionList1.add(new SelectItem("duplicate", com.getString("action_duplicate")));
 		  pendingActionList1.add(new SelectItem("export", com.getString("export_action")));
 	  }

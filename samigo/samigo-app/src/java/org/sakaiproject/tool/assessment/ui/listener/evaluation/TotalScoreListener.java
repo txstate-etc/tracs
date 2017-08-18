@@ -44,6 +44,7 @@ import javax.faces.event.ValueChangeListener;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sakaiproject.section.api.coursemanagement.EnrollmentRecord;
 import org.sakaiproject.tool.assessment.business.entity.RecordingData;
 import org.sakaiproject.tool.assessment.data.dao.assessment.AssessmentAccessControl;
 import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedAccessControl;
@@ -398,13 +399,24 @@ log.debug("totallistener: firstItem = " + bean.getFirstItem());
       Map userRoles = helper.getUserRolesFromContextRealm(agentUserIds);
       //#4 - prepare agentResult list
       prepareAgentResult(p, scores.iterator(), agents, userRoles);
+      Boolean assignZeros = bean.getPublishedAssessment().getAssignZeros();
+      if(null != assignZeros)
+          prepareNotSubmittedAgentResult(assignZeros,students_not_submitted.iterator(), agents, userRoles);
+      else
       prepareNotSubmittedAgentResult(students_not_submitted.iterator(), agents, userRoles);
+
+      //added for showing status in UI list bugid:5489 9/10/2013 -Qu
+      popAgentMemberStatus(agents, useridMap);
       bean.setAgents(agents);
       bean.setAllAgents(agents);
       bean.setTotalPeople(Integer.toString(bean.getAgents().size()));
 
       //#5 - set role & sort selection
       setRoleAndSortSelection(bean, agents, sortAscending);
+
+      //assign row class according to agent status bugid:5489 9/13/2013 -Qu
+      //This method has to be after setRoleAndSortSelection; to be with the same order of agents
+      bean.setRowClasses(getRowClasses(agents));
 
       //#6 - this is for audio questions?
       //setRecordingData(bean);
@@ -687,6 +699,7 @@ log.debug("totallistener: firstItem = " + bean.getFirstItem());
       else
     	  results.setLastInitial("Anonymous");
       results.setIdString(agent.getIdString());
+      results.setAgentId(agent.getIdString());
       results.setAgentEid(agent.getEidString());
       results.setAgentDisplayId(agent.getDisplayIdString());
       log.debug("testing agent getEid agent.getFirstname= " + agent.getFirstName());
@@ -851,6 +864,7 @@ log.debug("totallistener: firstItem = " + bean.getFirstItem());
       }
       //results.setIdString(agent.getEidString());
       results.setIdString(agent.getIdString());
+      results.setAgentId(agent.getIdString());
       results.setAgentEid(agent.getEidString());
       results.setAgentDisplayId(agent.getDisplayIdString());
       results.setRole((String)userRoles.get(studentid));
@@ -866,6 +880,51 @@ log.debug("totallistener: firstItem = " + bean.getFirstItem());
       agents.add(results);
     }
   }
+
+  public void prepareNotSubmittedAgentResult(Boolean assignZeros, Iterator notsubmitted_iter,
+	          ArrayList agents, Map userRoles){
+	log.debug("TotalScoreListener: prepareNotSubmittedAgentResult starts");
+	while (notsubmitted_iter.hasNext()){
+		String studentid = (String) notsubmitted_iter.next();
+		AgentResults results = new AgentResults();
+		AgentFacade agent = new AgentFacade(studentid);
+		results.setLastName(agent.getLastName());
+		results.setFirstName(agent.getFirstName());
+		results.setEmail(agent.getEmail());
+		if (results.getLastName() != null && results.getLastName().length() > 0)
+		{
+			results.setLastInitial(results.getLastName().substring(0,1));
+		}
+		else if (results.getFirstName() != null && results.getFirstName().length() > 0)
+		{
+			results.setLastInitial(results.getFirstName().substring(0,1));
+		}
+		else
+		{
+			results.setLastInitial("Anonymous");
+		}
+		//results.setIdString(agent.getEidString());
+		results.setIdString(agent.getIdString());
+		results.setAgentId(agent.getIdString());
+		results.setAgentEid(agent.getEidString());
+		results.setRole((String)userRoles.get(studentid));
+		// use -1 to indicate this is an unsubmitted agent
+		results.setAssessmentGradingId(Long.valueOf(-1));
+		if(assignZeros)
+			results.setTotalAutoScore("0");
+		else
+			results.setTotalAutoScore("-");
+		results.setTotalOverrideScore("-");
+		results.setSubmittedDate(null);
+		if(assignZeros)
+			results.setFinalScore("0");
+		else
+			results.setFinalScore("-");
+		results.setComments("");
+		results.setStatus(AssessmentGradingData.NO_SUBMISSION);  //  no submission
+		agents.add(results);
+		}
+	}
 
   // build a Hashmap (Long itemId, ArrayList assessmentGradingIds)
   // containing the last/highest item submission 
@@ -891,5 +950,30 @@ log.debug("totallistener: firstItem = " + bean.getFirstItem());
             pub.getPublishedAssessmentId());
     }
     return publishedItemIdHash;
+  }
+
+  //added for showing status in UI list bugid:5489 9/10/2013 -Qu
+  private void popAgentMemberStatus(ArrayList<AgentResults> agents, Map<String, EnrollmentRecord> useridMap){
+	  Iterator<AgentResults> iter =  agents.iterator();
+	  while(iter.hasNext()){
+		  AgentResults results = (AgentResults)iter.next();
+		  try{
+			  EnrollmentRecord enr = (EnrollmentRecord)useridMap.get(results.getAgentId());
+			  results.setIsActive(enr.getStatus().equalsIgnoreCase("true"));
+		  }catch(Exception e){
+			  log.info("Error occured in TotalScoreListener.popAgentMemberStatus: " + e);
+}
+
+	  }
+  }
+
+  //added for showing status in UI list bugid:5489 9/10/2013 -Qu
+  private String getRowClasses(ArrayList<AgentResults> agents){
+	  StringBuilder rowClasses = new StringBuilder();
+	  for(AgentResults ar : agents){
+			  if(rowClasses.length() > 0) rowClasses.append(",");
+			  rowClasses.append(ar.getIsActive()?"activePar":"inactivePar");
+	  }
+	  return rowClasses.toString();
   }
 }

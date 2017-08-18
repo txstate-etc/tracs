@@ -73,6 +73,7 @@ import org.sakaiproject.tool.assessment.services.GradingService;
 import org.sakaiproject.tool.assessment.services.SaLengthException;
 import org.sakaiproject.tool.assessment.services.assessment.EventLogService;
 import org.sakaiproject.tool.assessment.services.assessment.PublishedAssessmentService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.shared.api.assessment.SecureDeliveryServiceAPI;
 import org.sakaiproject.tool.assessment.shared.api.assessment.SecureDeliveryServiceAPI.Phase;
 import org.sakaiproject.tool.assessment.shared.api.assessment.SecureDeliveryServiceAPI.PhaseStatus;
@@ -125,6 +126,9 @@ public class DeliveryBean
   private boolean reviewMarked;
   private boolean reviewAll;
   private boolean reviewBlank;
+  //Adding a flag for grade submit warning -Qu bugid:798 1/22/10
+  private boolean reviewNeeded;
+  private boolean unansweredExisted;
   private boolean displayMardForReview;
   private int itemIndex;
   private int size;
@@ -1572,15 +1576,20 @@ public class DeliveryBean
 		  return "editAssessment";
 	  }	  
 	  
-	  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.submit.click_sub", "siteId=" + AgentFacade.getCurrentSiteId() + ", submissionId=" + adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED)); 
+	  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.submit.click_sub",
+			  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+			  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", submissionId=" +
+			  adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED));
 
 	  if (!submitFromTimeoutPopup) {
 
 		  String nextAction = checkBeforeProceed(true, isFromTimer);
 		  log.debug("***** next Action="+nextAction);
 
-		  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.submit.checked", "siteId=" + AgentFacade.getCurrentSiteId() + ", submissionId=" + adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED)); 
-
+	  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.submit.checked",
+			  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+			  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", submissionId=" +
+			  adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED));
 
 		  if (!("safeToProceed").equals(nextAction)){
 			  return nextAction;
@@ -1626,20 +1635,30 @@ public class DeliveryBean
 		  if (this.actionMode == TAKE_ASSESSMENT_VIA_URL) // this is for accessing via published url
 		  {
 			  returnValue="anonymousThankYou";
-			  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.submit.via_url", resource, siteId, true, NotificationService.NOTI_REQUIRED)); 
+			  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.submit.via_url",
+					  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+					  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", submissionId=" +
+					  adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED));
 		  }
 		  else {
-			  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.submit", resource, true));
+			  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.submit",
+					  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+					  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", submissionId=" + adata.getAssessmentGradingId(), true));
 		  }
 	  }
 	  else {
 		  if (this.actionMode == TAKE_ASSESSMENT_VIA_URL) // this is for accessing via published url
 		  {
 			  returnValue="anonymousThankYou";
-			  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.timer_submit.url", resource , siteId, true, NotificationService.NOTI_REQUIRED));
+			  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.timer_submit.via_url",
+					  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+					  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", submissionId=" +
+					  adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED));
 		  }
 		  else {
-			  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.timer_submit", resource, true));
+			  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.timer_submit",
+					  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+					  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", submissionId=" + adata.getAssessmentGradingId(), true));
 		  }
 	  }
 	  forGrade = false;
@@ -1721,10 +1740,16 @@ public class DeliveryBean
 			  || this.actionMode == TAKE_ASSESSMENT_VIA_URL)
 	  {
 		  if (adata != null) {
-			  EventTrackingService.post(EventTrackingService.newEvent("sam.submit.from_last_page", "siteId=" + AgentFacade.getCurrentSiteId() + ", submissionId=" + adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED)); 
+			  EventTrackingService.post(EventTrackingService.newEvent("sam.submit.from_last_page",
+					  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+					  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", submissionId=" +
+					  adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED));
 		  }
 		  else {
-			  EventTrackingService.post(EventTrackingService.newEvent("sam.submit.from_last_page", "siteId=" + AgentFacade.getCurrentSiteId() + ", adata is null", siteId, true, NotificationService.NOTI_REQUIRED)); 
+			  EventTrackingService.post(EventTrackingService.newEvent("sam.submit.from_last_page",
+					  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+					  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() +
+					  ", adata is null", siteId, true, NotificationService.NOTI_REQUIRED));
 		  }
 	  }
 	  
@@ -1764,10 +1789,16 @@ public class DeliveryBean
 			  || this.actionMode == TAKE_ASSESSMENT_VIA_URL)
 	  {
 		  if (adata != null) {
-			  EventTrackingService.post(EventTrackingService.newEvent("sam.submit.from_toc", "siteId=" + AgentFacade.getCurrentSiteId() + ", submissionId=" + adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED)); 
+			  EventTrackingService.post(EventTrackingService.newEvent("sam.submit.from_toc",
+					  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+					  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", submissionId=" +
+					  adata.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED));
 		  }
 		  else {
-			  EventTrackingService.post(EventTrackingService.newEvent("sam.submit.from_toc", "siteId=" + AgentFacade.getCurrentSiteId() + ", adata is null", siteId, true, NotificationService.NOTI_REQUIRED)); 
+			  EventTrackingService.post(EventTrackingService.newEvent("sam.submit.from_toc",
+					  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", " +
+					  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() +
+					  ", adata is null", siteId, true, NotificationService.NOTI_REQUIRED));
 		  }
 	  }
 	  
@@ -1852,9 +1883,14 @@ public class DeliveryBean
     else {
     	if (this.actionMode == TAKE_ASSESSMENT_VIA_URL) {
     		returnValue = "notSubmitted";
+    		EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save.exit.via_url",
+    				AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() +
+    				", agentId=" + getAgentString(), siteId, true, NotificationService.NOTI_REQUIRED));
     	}
     	else {
     		returnValue = "select";
+    		EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save.exit",
+    				AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", agentId=" + getAgentString(), true));
     	}
     }
     
@@ -1929,6 +1965,17 @@ public class DeliveryBean
       }
     }
 
+    //-Qu adding sam event for tracs
+    if (this.actionMode == TAKE_ASSESSMENT_VIA_URL)
+    {
+    	EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save.continue.via_url",
+    		  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", agentId=" + getAgentString(),
+    		  siteId, true, NotificationService.NOTI_REQUIRED));
+         }
+    else
+    	EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save.continue",
+    		  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", agentId=" + getAgentString(), true));
+
     DeliveryActionListener l2 = new DeliveryActionListener();
     l2.processAction(null);
 
@@ -1981,6 +2028,9 @@ public class DeliveryBean
   public String auto_save()
   {
 	  skipFlag = true;
+	  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.from_autoSave",
+			  AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() +
+			  ", agentId=" + getAgentString(), getSiteId(), true, NotificationService.NOTI_REQUIRED));
 	  return save_work();
   }
   
@@ -2010,6 +2060,13 @@ public class DeliveryBean
 		  }
 	  }
 	  
+    // Create event for auto save or manual save without switching pages
+    String resource = AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", agentId=" + getAgentString();
+    if (this.actionMode == TAKE_ASSESSMENT_VIA_URL)
+      EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save.via_url", resource, getSiteId(), true, NotificationService.NOTI_REQUIRED));
+    else
+      EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save", resource, true));
+
 	  DeliveryActionListener l2 = new DeliveryActionListener();
 	  l2.processAction(null);
 
@@ -3712,6 +3769,44 @@ public class DeliveryBean
 		  return !this.getPublishedAssessment().getAssessmentAccessControl().getTimeLimit().equals(0);
 	  }
 	  
+	  /* This flag is on when at lease one question is marked as review
+	   * Added by -Qu 1/22/10 for bugid:798
+	   * return   boolean
+	   */
+	  public boolean isReviewNeeded() {
+		    boolean reviewNeeded = false;
+		    //get all partContents
+		    ArrayList parts = getTableOfContents().getPartsContents();
+		    for (int i=0; i<parts.size(); i++){
+		      SectionContentsBean part = (SectionContentsBean)parts.get(i);
+		      if(part.getReviewMarkedQuestions() != 0)
+		      reviewNeeded = true;
+		    }
+		  return reviewNeeded;
+	  }
+
+	  /* This flag is on when at lease one question is unanswered
+	   * Added by -Qu 1/22/10 for bugid:798
+	   * return   boolean
+	   */
+	  public boolean isUnansweredExisted() {
+		    boolean unansweredExisted = false;
+		    //get all partContents
+		    ArrayList parts = getTableOfContents().getPartsContents();
+		    for (int i=0; i<parts.size(); i++){
+		      SectionContentsBean part = (SectionContentsBean)parts.get(i);
+		      if(part.getUnansweredQuestions() != 0)
+		      unansweredExisted = true;
+		    }
+		  return unansweredExisted;
+	  }
+
+	  public String getAgentString(){
+		    PersonBean person = (PersonBean) ContextUtil.lookupBean("person");
+		    String agentString = person.getId();
+		    return agentString;
+	  }
+
 	  public String cleanRadioButton() {
 
 		  // We get the id of the question

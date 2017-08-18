@@ -77,6 +77,7 @@ public class SubmissionStatusBean
   private String firstItem;
   private HashMap answeredItems;
   private static Logger log = LoggerFactory.getLogger(SubmissionStatusBean.class);
+  private String rowClasses; //added by -Qu for bugid:5489
   
   //private String selectedSectionFilterValue = TotalScoresBean.ALL_SECTIONS_SELECT_VALUE;
   private String selectedSectionFilterValue = null;
@@ -717,4 +718,12 @@ public class SubmissionStatusBean
 		return releasedToGroups;
 	}
 	
+	//added for showing status in UI list bugid:5489 9/10/2013 -Qu
+	public String getRowClasses(){
+		return this.rowClasses;
+	}
+
+	public void setRowClasses(String rowClasses){
+		this.rowClasses = rowClasses;
+	}
 }

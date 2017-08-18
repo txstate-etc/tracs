@@ -72,6 +72,7 @@ import org.sakaiproject.tool.assessment.services.PublishedItemService;
 import org.sakaiproject.tool.assessment.services.QuestionPoolService;
 import org.sakaiproject.tool.assessment.services.assessment.AssessmentService;
 import org.sakaiproject.tool.assessment.services.assessment.PublishedAssessmentService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.bean.author.AnswerBean;
 import org.sakaiproject.tool.assessment.ui.bean.author.AssessmentBean;
 import org.sakaiproject.tool.assessment.ui.bean.author.AuthorBean;
@@ -219,7 +220,7 @@ public class ItemAddListener
     	try {
 	   		String timeAllowed = item.getTimeAllowed().trim();
 	   		int intTimeAllowed = Integer.parseInt(timeAllowed);
-	   		if (intTimeAllowed < 1) {
+	   		if (intTimeAllowed < 1 || intTimeAllowed > 600) {
 	   			throw new RuntimeException();
 	   		}
     	}
@@ -704,11 +705,15 @@ public class ItemAddListener
       isPendingOrPool = isEditPendingAssessmentFlow || (isFromQuestionPool && ! author.getIsEditPoolFlow());
       ItemService delegate;
       if (isPendingOrPool) {
-    	  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.revise", "siteId=" + AgentFacade.getCurrentSiteId() + ", itemId=" + itemauthor.getItemId(), true));
+    	  EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.revise",
+    			  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() +
+    			  ", itemId=" + itemauthor.getItemId(), true));
       	  delegate = new ItemService();
       }
       else {
-    	  EventTrackingService.post(EventTrackingService.newEvent("sam.pubassessment.revise", "siteId=" + AgentFacade.getCurrentSiteId() + ", itemId=" + itemauthor.getItemId(), true));
+      	  EventTrackingService.post(EventTrackingService.newEvent("sam.pubassessment.revise",
+      			  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() +
+      			  ", itemId=" + itemauthor.getItemId(), true));
       	  delegate = new PublishedItemService();
       }
       // update not working yet, delete, then add

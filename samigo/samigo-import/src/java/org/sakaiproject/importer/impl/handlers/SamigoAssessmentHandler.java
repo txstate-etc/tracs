@@ -234,12 +234,17 @@ public class SamigoAssessmentHandler implements HandlesImportable {
 						Pattern pattern = Pattern.compile("_+|<<.*>>");
 						Matcher matcher = pattern.matcher(questionTextString);
 						if (matcher.find()) questionTextString = questionTextString.replaceFirst(matcher.group(),"{}");
+
+						// to incorporate the answer into Samigo's question text,
+						// we append it here in curly braces. -- zt 03/03/2008
+						questionTextString = questionTextString + "\n\n{" + answer.getText() + "}";
+
 						text.setText(questionTextString);
 						answer.setSequence(new Long(1));
 					} else {
 						answer.setText(contextualizeUrls(importableAnswer.getAnswerText(), siteId));
 					}
-					
+
 					answer.setIsCorrect(new Boolean(correctAnswerIDs.contains(answerId)));
 					answerSet.add(answer);
 				}

@@ -170,6 +170,8 @@ $(window).load( function() {
 	    <f:actionListener type="org.sakaiproject.tool.assessment.ui.listener.author.SetFromPageAsEditAssessmentListener" />
     </h:commandLink>
     
+<!-- removing publish option to force settings to be addressed before publishing, bugid:5210 -->
+<%--
     <h:outputText value=" #{authorMessages.separator} " rendered="#{author.isEditPendingAssessmentFlow && assessmentBean.questionSize > 0}"/>
 
   	<h:commandLink title="#{commonMessages.publish_action}" id="editAssessmentSettings_editAssessment2" action="#{assessmentSettings.getOutcomePublish}" immediate="true" rendered="#{author.isEditPendingAssessmentFlow && assessmentBean.questionSize > 0}">
@@ -180,6 +182,8 @@ $(window).load( function() {
       <f:actionListener type="org.sakaiproject.tool.assessment.ui.listener.author.SetFromPageAsEditAssessmentListener" />
     </h:commandLink>
     </p>
+--%>
+
 
 <h:panelGrid  columns="1" styleClass="validation" rendered="#{author.isEditPoolFlow}">
 	<h:outputFormat value="#{authorMessages.edit_published_assessment_warn_edit_pool_questions}">

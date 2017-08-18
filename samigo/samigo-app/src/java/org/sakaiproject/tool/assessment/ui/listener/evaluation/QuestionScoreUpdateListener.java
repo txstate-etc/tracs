@@ -47,6 +47,7 @@ import org.sakaiproject.tool.assessment.data.ifc.assessment.AttachmentIfc;
 import org.sakaiproject.tool.assessment.facade.AgentFacade;
 import org.sakaiproject.tool.assessment.services.GradebookServiceException;
 import org.sakaiproject.tool.assessment.services.GradingService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.bean.evaluation.AgentResults;
 import org.sakaiproject.tool.assessment.ui.bean.evaluation.QuestionScoresBean;
 import org.sakaiproject.tool.assessment.ui.bean.evaluation.TotalScoresBean;
@@ -210,7 +211,7 @@ public class QuestionScoreUpdateListener
           if (!(Precision.equalsIncludingNaN(newAutoScore, oldAutoScore, 0.0001)) || !newComments.equals(oldComments)){
             data.setGradedBy(AgentFacade.getAgentString());
             data.setGradedDate(new Date());
-            String targetString = "siteId=" + AgentFacade.getCurrentSiteId() + ", " + logString.toString();
+            String targetString = AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", " + logString.toString();
             String safeString = targetString.length() > 255 ? targetString.substring(0, 255) : targetString;
             EventTrackingService.post(EventTrackingService.newEvent("sam.question.score.update", safeString, true));
             delegate.updateItemScore(data, newAutoScore-oldAutoScore, tbean.getPublishedAssessment());
@@ -261,7 +262,8 @@ public class QuestionScoreUpdateListener
 	  if (attachmentList.size() > 0) {
 			gradingService.saveOrUpdateAttachments(attachmentList);
 			EventTrackingService.post(EventTrackingService.newEvent("sam.student.score.update", 
-					"siteId=" + AgentFacade.getCurrentSiteId() + ", Adding " + attachmentList.size() + " attachments for itemGradingData id = " + itemGradingData.getItemGradingId(), 
+					AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", Adding " +
+					attachmentList.size() + " attachments for itemGradingData id = " + itemGradingData.getItemGradingId(),
 					true));
 		}
 
@@ -272,7 +274,7 @@ public class QuestionScoreUpdateListener
 		  Long attachmentId = (Long)iter.next();
 		  gradingService.removeItemGradingAttachment(attachmentId.toString());
 		  EventTrackingService.post(EventTrackingService.newEvent("sam.student.score.update", 
-				  "siteId=" + AgentFacade.getCurrentSiteId() + ", Removing attachmentId = " + attachmentId, true));
+				  AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", Removing attachmentId = " + attachmentId, true));
 	  }
 	  bean.setIsAnyItemGradingAttachmentListModified(true);
   }

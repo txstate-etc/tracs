@@ -1,0 +1,26 @@
+/* css added for assessment content page UI change bugid:796  -Qu 1/19/10  */
+
+table.allQuestions tr{
+	height:1.5em;
+}
+
+table.allQuestions td {
+    padding-left: 1em;
+}
+
+table.allQuestions {
+	border-spacing:1px;
+}
+
+tr.reviewOrUnanswered td.questions{
+	background:#F5D464;
+	padding-right: 1em;
+}
+
+.submitWarning {
+	font-weight: bold;
+}
+
+.submitWarning.reason {
+	color:#BB1111;
+}

@@ -28,6 +28,9 @@
     <property name="lastModifiedBy" type="string" length="255" column="LASTMODIFIEDBY" not-null="true" />
     <property name="lastModifiedDate" type="timestamp" column="LASTMODIFIEDDATE" not-null="true" />
     <property name="lastNeedResubmitDate" type="timestamp" column="LASTNEEDRESUBMITDATE" not-null="false" />
+    <property name="assignZeros" type="boolean" not-null="false">
+         <column name="ASSIGNZEROS" default='0'/>
+    </property>
     <set name="sectionSet" table="SAM_PUBLISHEDSECTION_T" cascade="all" order-by="sequence asc"
       inverse="true" lazy="true">
       <key column="ASSESSMENTID"/>

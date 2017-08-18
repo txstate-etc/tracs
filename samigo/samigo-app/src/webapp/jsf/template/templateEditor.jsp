@@ -151,17 +151,17 @@
 
   <!-- *** RELEASED TO  *** -->
   <samigo:hideDivision title="#{templateMessages.released_to}" id="div4">
+   <div class="tier2">
+  <div class="longtext">
+    <h:outputLabel value="#{templateMessages.template_canedit}"/></div>
    <div class="tier3">
-     <h:selectOneRadio layout="pageDirection" value="#{template.valueMap.releaseTo}" required="true">
-       <f:selectItem itemValue="ANONYMOUS_USERS"
-          itemLabel="#{templateMessages.anon}"/>
-       <f:selectItem itemValue="SITE_MEMBERS"
-          itemLabel="#{templateMessages.auth_users}"/>
-       <f:selectItem itemValue="SELECTED_GROUPS"
-          itemLabel="#{templateMessages.selected_groups}"/>
-     </h:selectOneRadio>
-     
-  </div>
+    <h:panelGrid columns="1"
+      summary="#{msg.released_to_info_sec}">
+      <h:outputLabel for="anononymous" value="#{templateMessages.anon}"/>
+      <h:outputLabel for="auth_users" value="#{templateMessages.auth_users}"/>
+      <h:outputLabel for="selected_groups" value="#{templateMessages.selected_groups}"/>
+    </h:panelGrid>
+  </div></div>
   </samigo:hideDivision>
 
   <!-- *** HIGH SECURITY *** -->
@@ -223,8 +223,7 @@
          <h:panelGroup>
         <!-- h:panelGroup style="tier4" -->
          <h:selectOneRadio layout="pageDirection" value="#{template.itemAccessType}" required="true">
-         <f:selectItem itemValue="1"
-          itemLabel="#{templateMessages.linear_access_no_return}"/>
+        <!-- linear option removed by Amy Boyd ticket #443  -->
          <f:selectItem itemValue="2"
           itemLabel="#{templateMessages.random_access_questions_toc}"/>
          </h:selectOneRadio>
@@ -464,7 +463,7 @@
 
        <h:outputText value=" "/>
       <h:panelGroup>
-    <h:selectOneRadio layout="pageDirection" value="#{template.feedbackType}"
+    <h:selectOneRadio id="feedbackDelivery" layout="pageDirection" value="#{template.feedbackType}"
       required="true" onclick="disableAllFeedbackCheckTemplate(this.value);">
       <f:selectItem itemValue="1"
         itemLabel="#{templateMessages.immediate_feedback}"/>
@@ -489,7 +488,7 @@
         <h:outputLabel for="select_feedback_comp" value="#{templateMessages.template_canbedefault}"/>
 
       <h:outputText value=" "/>
-      <h:panelGrid columns="2">
+      <h:panelGrid columns="2" styleClass="respChoice">
 
       <h:panelGroup>
         <h:selectBooleanCheckbox id="feedbackComponentstudent_response"

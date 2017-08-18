@@ -328,7 +328,7 @@
         </h:selectOneMenu>
         <h:outputText value="&#160;" escape="false" />
         <h:outputText value="#{assessmentSettingsMessages.timed_hours} " />
-        <h:selectOneMenu id="timedMinutes" value="#{assessmentSettings.timedMinutes}" >
+        <h:selectOneMenu id="timedMinutes" value="#{assessmentSettings.timedMinutes}" onchange="return timerValidation()" >
           <f:selectItems value="#{assessmentSettings.mins}" />
         </h:selectOneMenu>
         <h:outputText value="&#160;" escape="false" />
@@ -538,7 +538,7 @@
     <h:panelGroup styleClass="form-group row" layout="block" rendered="#{assessmentSettings.valueMap.feedbackType_isInstructorEditable==true}">
       <h:outputLabel styleClass="col-md-2" for="feedbackDelivery" value="#{assessmentSettingsMessages.feedback_type}"/>
       <div class="col-md-10">
-        <t:selectOneRadio id="feedbackDelivery" value="#{assessmentSettings.feedbackDelivery}" onclick="setBlockDivs();disableAllFeedbackCheck(this.value);" layout="spread">
+        <t:selectOneRadio id="feedbackDelivery" value="#{assessmentSettings.feedbackDelivery}" onclick="setBlockDivs();feedbackAlertAuthor();disableAllFeedbackCheck(this.value);" layout="spread">
           <f:selectItem itemValue="3" itemLabel="#{assessmentSettingsMessages.no_feedback}"/>
           <f:selectItem itemValue="1" itemLabel="#{assessmentSettingsMessages.immediate_feedback}"/>
           <f:selectItem itemValue="4" itemLabel="#{commonMessages.feedback_on_submission}"/>
@@ -618,9 +618,10 @@
       <h:outputLabel styleClass="col-md-2" for="itemNavigation" value="#{assessmentSettingsMessages.navigation}" />
       <div class="col-md-10">
         <t:selectOneRadio id="itemNavigation" value="#{assessmentSettings.itemNavigation}" layout="spread" onclick="setBlockDivs();updateItemNavigation(true);lockdownQuestionLayout(this.value);lockdownMarkForReview(this.value);">
-          <f:selectItem itemValue="1" itemLabel="#{assessmentSettingsMessages.linear_access}"/>
+        <!-- Removed linear access option, because of skipped question 1 problem.  Ticket 237. - JeffSnider,11/14/08 -->
           <f:selectItem itemValue="2" itemLabel="#{assessmentSettingsMessages.random_access}"/>
         </t:selectOneRadio>
+   <%-- bugid:5185 -Qu 11/19/2012>
         <ul class="layout-navigation">
           <li><t:radio for="itemNavigation" index="0" /></li>
           <li><t:radio for="itemNavigation" index="1" /></li>
@@ -628,6 +629,7 @@
         <div class="info-text help-block small">
           <h:outputText value="#{assessmentSettingsMessages.linear_access_warning} "/>
         </div>
+    --%>
       </div>
     </h:panelGroup>
 
@@ -697,7 +699,7 @@
 
  <!-- save & publish -->
   <h:commandButton  value="#{assessmentSettingsMessages.button_unique_save_and_publish}" type="submit" styleClass="active" rendered="#{assessmentSettings.hasQuestions}"
-      action="#{assessmentSettings.getOutcomePublish}" onclick="setBlockDivs();updateItemNavigation(false);" >
+      action="#{assessmentSettings.getOutcomePublish}" onclick="setBlockDivs();updateItemNavigation(false);return requireDates();">
       <f:actionListener type="org.sakaiproject.tool.assessment.ui.listener.author.ConfirmPublishAssessmentListener" />
       <f:actionListener type="org.sakaiproject.tool.assessment.ui.listener.author.PublishAssessmentListener" />
   </h:commandButton>
@@ -706,7 +708,7 @@
       action="#{assessmentSettings.getOutcomePublish}" disabled="true" />
       
   <!-- Save button -->
-  <h:commandButton type="submit" value="#{commonMessages.action_save}" action="#{assessmentSettings.getOutcomeSave}"  onclick="setBlockDivs();updateItemNavigation(false);">
+  <h:commandButton type="submit" value="#{commonMessages.action_save}" action="#{assessmentSettings.getOutcomeSave}"  onclick="setBlockDivs();updateItemNavigation(false);return requireDates();" styleClass="#{assessmentSettings.hasQuestions ? 'active':''}">
       <f:param name="assessmentId" value="#{assessmentSettings.assessmentId}"/>
       <f:actionListener type="org.sakaiproject.tool.assessment.ui.listener.author.SaveAssessmentSettingsListener"/>
   </h:commandButton>

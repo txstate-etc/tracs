@@ -79,6 +79,7 @@
 | taggable                     | NO LOCAL CHANGES |
 | textarea                     | NO LOCAL CHANGES |
 | tool                         | DONE             |
+| turnitin                     | DONE             |
 | turningpoint                 | DONE             |
 | user                         | Anne             |
 | userauditservice             | NO LOCAL CHANGES |

@@ -1108,6 +1108,7 @@ public class TurnitinReviewServiceImpl extends BaseReviewServiceImpl {
 
 				Entity ent = ep.getEntity(ref);
 				log.debug("got entity " + ent);
+				if ( null == ent ) return null;
 				String title = scrubSpecialCharacters(ent.getClass().getMethod("getTitle").invoke(ent).toString());
 				log.debug("Got reflected assignemment title from entity " + title);
 				togo = URLDecoder.decode(title,"UTF-8");
@@ -2652,6 +2653,7 @@ public class TurnitinReviewServiceImpl extends BaseReviewServiceImpl {
 
 					String assign = currentItem.getTaskId();
 					String ctl = currentItem.getSiteId();
+					String assignTitle = getAssignmentTitle(currentItem.getTaskId());
 
 					// TODO FIXME Current sgithens
 					// Move the update setRetryAttempts to here, and first call and
@@ -2664,8 +2666,11 @@ public class TurnitinReviewServiceImpl extends BaseReviewServiceImpl {
 						// the thread, but we're in a quartz job.
 						//Map curasnn = getAssignment(currentItem.getSiteId(), currentItem.getTaskId());
 						// TODO FIXME Parameterize getAssignment method to take user information
+						if (null == assignTitle) {
+							throw new IdUnusedException("Couldn't find title for assignment " + assignid );
+						}
 						Map getAsnnParams = TurnitinAPIUtil.packMap(turnitinConn.getBaseTIIOptions(),
-								"assign", getAssignmentTitle(currentItem.getTaskId()), "assignid", currentItem.getTaskId(), "cid", currentItem.getSiteId(), "ctl", currentItem.getSiteId(),
+								"assign", assignTitle, "assignid", currentItem.getTaskId(), "cid", currentItem.getSiteId(), "ctl", currentItem.getSiteId(),
 								"fcmd", "7", "fid", "4", "utp", "2" );
 
 						getAsnnParams.putAll(getInstructorInfo(currentItem.getSiteId()));
@@ -2709,6 +2714,8 @@ public class TurnitinReviewServiceImpl extends BaseReviewServiceImpl {
 						}
 					} catch (SubmissionException | TransientSubmissionException e) {
 						log.error("Unable to check the report gen speed of the asnn for item: " + currentItem.getId(), e);
+					} catch (IdUnusedException e) {
+						log.warn("Unable to get title for asnn " + assignid + " . Might not exist anymore (deleted already)");
 					}
 
 					Map params = TurnitinAPIUtil.packMap(turnitinConn.getBaseTIIOptions(),

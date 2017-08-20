@@ -17,7 +17,7 @@
 | common                       | DONE             |
 | config                       | DONE             |
 | content                      | Anne             |
-| content-review               |                  |
+| content-review               | DONE             |
 | courier                      | NO LOCAL CHANGES |
 | dashboard                    | DONE             |
 | dav                          | DONE             |

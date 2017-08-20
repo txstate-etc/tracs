@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import edu.txstate.tracs.tk20.business.model.TracsAssignment;
 
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;

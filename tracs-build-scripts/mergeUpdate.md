@@ -60,7 +60,7 @@
 | profile2                     | DONE             |
 | providers                    | DONE             |
 | reference                    | DONE             |
-| reset-pass                   |                  |
+| reset-pass                   | DONE             |
 | rest                         | DONE             |
 | rights                       | NO LOCAL CHANGES |
 | roster2                      | DONE             |

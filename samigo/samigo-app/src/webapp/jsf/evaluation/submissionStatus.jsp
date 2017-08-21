@@ -3,6 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://www.sakaiproject.org/samigo" prefix="samigo" %>
 <%@ taglib uri="http://sakaiproject.org/jsf/sakai" prefix="sakai" %>
+<script src="/library/js/jquery.js" type="text/javascript"></script>
+<script src="/library/js/expandCollapse.js" type="text/javascript"></script>
   
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -43,6 +45,7 @@ $Id$
 
 <!-- JAVASCRIPT -->
 <%@ include file="/js/delivery.js" %>
+<%@ include file="/library/js/expandCollapse.js" %>
 
 <div class="portletBody container-fluid">
 <h:form id="editTotalResults">
@@ -161,11 +164,13 @@ $Id$
 	</div>
   </h:panelGroup>
 
+  <div class="hideUnhide" style="padding-left: 5px;"><a id="collapseAll" href="#">Hide</a> | <a id="expandAll" href="#">Show</a>  Inactive Participants </div>
+
   <!-- STUDENT RESPONSES AND GRADING -->
   <!-- note that we will have to hook up with the back end to get N at a time -->
 <div class="table-responsive">
-  <h:dataTable styleClass="table table-striped table-bordered" id="totalScoreTable" value="#{submissionStatus.agents}"
-    var="description">
+  <h:dataTable rowClasses="#{submissionStatus.rowClasses}" styleClass="table table-striped table-bordered" id="totalScoreTable" value="#{submissionStatus.agents}"
+  var="description">
     <!-- NAME/SUBMISSION ID -->
 
     <h:column rendered="#{submissionStatus.sortType ne 'lastName'}">
@@ -230,6 +235,7 @@ $Id$
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
        <h:outputText value="#{description.firstName}" />
        <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
+       <h:graphicImage value="/../library/image/inactive.gif" alt="Includes inactive participants" title="Includes inactive participants" rendered="#{!description.isActive}"/>
        <f:verbatim><br/></f:verbatim>
 	   <span class="itemAction">
 	   <h:panelGroup rendered="#{totalScores.anonymous eq 'false' && description.email != null && description.email != '' && email.fromEmailAddress != null && email.fromEmailAddress != ''}">
@@ -277,6 +283,8 @@ $Id$
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
        <h:outputText value="#{description.firstName}" />
        <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
+       <h:graphicImage value="/../library/image/inactive.gif" alt="Includes inactive participants" title="Includes inactive participants" rendered="#{!description.isActive}"/>
+       <h:graphicImage value="/../library/image/inactive.gif" alt="Includes inactive participants" title="Includes inactive participants" rendered="#{!description.isActive}"/>
        <f:verbatim><br/></f:verbatim>
 	   <span class="itemAction">
 	   <h:panelGroup rendered="#{totalScores.anonymous eq 'false' && description.email != null && description.email != '' && email.fromEmailAddress != null && email.fromEmailAddress != ''}">

@@ -432,6 +432,17 @@ function disableAllFeedbackCheckTemplate(feedbackType)
 
 $(window).load( function() {
 	checkNoFeedbackOnLoad();
+
+  $(lateHandlingName).click(function() {
+    if ($(lateHandlingName + ":checked").val() == "2") return;
+
+    var dueDate = Date.parse($(dueName).val());
+    var retractDate = Date.parse($(retractName).val());
+
+    if (retractDate == "" || isNaN(retractDate) || retractDate < dueDate) {
+      $(retractName).val($(dueName).val());
+    }
+  });
 });
 
 function checkNoFeedbackOnLoad(){
@@ -671,6 +682,68 @@ function checkLastHandling(){
 		$(retractDate).prop( "disabled", false );
 		$(retractDate).next().show();
 	}
+}
+
+/*Added by -Qu for bugid:5258 3/14/2013  */
+function timerValidation()
+{
+    var hours = document.getElementById('assessmentSettingsAction:timedHours').value;
+    var minutes = document.getElementById('assessmentSettingsAction:timedMinutes').value;
+    if(hours == 0 && minutes < 10) {
+      alert("The assessment timer settings you chose have been set to "+ minutes + " minute(s).  Assessments less than 10 minutes are not recommended.  The ability to complete the assessment in the allotted time cannot be guaranteed due to variables (wifi connection, computer performance issues, network load, etc.) that are beyond our control.");
+    }
+}
+
+/*Added by -Qu for bugid:5551 10/16/2013  */
+function feedbackAlertAuthor()
+{
+  if(document.getElementById("assessmentSettingsAction:feedbackDelivery").getElementsByTagName("input")[0].checked==true){
+    alert("Warning!\n\nA Show Feedback button will appear at the top of each question screen.  Depending upon the feedback options you have chosen, students may be able to see points earned or correct and incorrect answers.  If you do not wish for students to see feedback during the assessment, please choose another delivery option.");
+  }
+}
+
+function feedbackAlertPublished()
+{
+  if(document.getElementById("assessmentSettingsAction:feedbackDelivery2").getElementsByTagName("input")[0].checked==true){
+    alert("Warning!\n\nA Show Feedback button will appear at the top of each question screen.  Depending upon the feedback options you have chosen, students may be able to see points earned or correct and incorrect answers.  If you do not wish for students to see feedback during the assessment, please choose another delivery option.");
+  }
+}
+
+var retractName = "input[name='assessmentSettingsAction:retractDate']";
+var dueName = "input[name='assessmentSettingsAction:endDate']";
+var lateHandlingName = "input[name='assessmentSettingsAction:lateHandling']";
+
+//added by Amy Boyd to address ticket number 305
+function requireDates() {
+  var dueDate = $(dueName).val();
+  var retractDate = $(retractName).val();
+  var acceptUntilChecked = $(lateHandlingName + ":checked").val() == "1";
+
+  if (acceptUntilChecked && retractDate == "") {
+    var alertText = "Please specify an Accept Until Date ";
+    if (dueDate == "") alertText += "and a Due Date ";
+    alertText += "under the Delivery Dates heading.";
+    alert(alertText);
+    return false;
+  }
+
+  if (dueDate == "") {
+    alert ("Please specify a Due Date under the Delivery Dates heading");
+    return false;
+  }
+
+  if (acceptUntilChecked && Date.parse(retractDate) < Date.parse(dueDate)) {
+    alert ("Please specifiy an Accept Until Date that is after the Due Date.");
+    return false;
+  }
+
+  // If no late submissions are allowed, retract date should equal due date
+  if (!acceptUntilChecked) {
+    $(retractName).val(dueDate);
+    $(retractName).prop('disabled', false);
+  }
+
+  return true;
 }
 
 //if the containing frame is small, then offsetHeight is pretty good for all but ie/xp.

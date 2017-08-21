@@ -921,6 +921,11 @@
       <from-outcome>confirmRemoveAssessment</from-outcome>
       <to-view-id>/jsf/author/removeAssessment.jsp</to-view-id>
     </navigation-case>
+    <!--Added another page for remove submissions before delete assessment bugid:4456 -Qu 6/23/2011  -->
+    <navigation-case>
+      <from-outcome>requireRemoveSubmissions</from-outcome>
+      <to-view-id>/jsf/author/requireRemoveSubmissions.jsp</to-view-id>
+    </navigation-case>
     <navigation-case>
       <from-outcome>confirmCopyAssessment</from-outcome>
       <to-view-id>/jsf/author/confirmCopyAssessment.jsp</to-view-id>

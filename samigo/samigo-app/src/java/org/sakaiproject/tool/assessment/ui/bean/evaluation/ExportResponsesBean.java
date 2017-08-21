@@ -50,6 +50,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.jsf.model.PhaseAware;
+import org.sakaiproject.section.api.coursemanagement.EnrollmentRecord;
 import org.sakaiproject.tool.assessment.jsf.convert.AnswerSurveyConverter;
 import org.sakaiproject.tool.assessment.services.GradingService;
 import org.sakaiproject.tool.assessment.services.assessment.PublishedAssessmentService;
@@ -169,13 +170,34 @@ public class ExportResponsesBean implements Serializable, PhaseAware {
         response.reset();	// Eliminate the added-on stuff
         response.setHeader("Pragma", "public");	// Override old-style cache control
         response.setHeader("Cache-Control", "public, must-revalidate, post-check=0, pre-check=0, max-age=0");	// New-style
-       	writeDataToResponse(getSpreadsheetData(), getDownloadFileName(), response);
-       	faces.responseComplete();
+        writeDataToResponse(getSpreadsheetData(), getDownloadFileName(), response);
+        faces.responseComplete();
     }
-	
+
+	public void exportExcelActiveOnly(ActionEvent event){
+        log.debug("exporting as Excel for active students: assessment id =  " + getAssessmentId());
+        boolean activeOnly = true;
+        FacesContext faces = FacesContext.getCurrentInstance();
+        HttpServletResponse response = (HttpServletResponse)faces.getExternalContext().getResponse();
+        response.reset();	// Eliminate the added-on stuff
+        response.setHeader("Pragma", "public");	// Override old-style cache control
+        response.setHeader("Cache-Control", "public, must-revalidate, post-check=0, pre-check=0, max-age=0"); // New-style
+        writeDataToResponse(getSpreadsheetData(activeOnly), getDownloadFileName(), response);
+        faces.responseComplete();
+    }
+
+	//added for exluding inactive participants from the export bugid:5489 9/11/2013 -Qu
+	//modified also to support sakai original method which include inactive participants in the export
     private List<List<Object>> getSpreadsheetData() {
+    	boolean activeOnly = false;
+    	return getSpreadsheetData(activeOnly);
+	 }
+
+    private List<List<Object>> getSpreadsheetData(boolean activeOnly) {
     	TotalScoresBean totalScores = (TotalScoresBean) ContextUtil.lookupBean("totalScores");
     	Map useridMap = totalScores.getUserIdMap(TotalScoresBean.CALLED_FROM_EXPORT_LISTENER);
+    	
+    	if(activeOnly)  filterOutInactiveStudents(useridMap);
     	
         HistogramListener histogramListener = new HistogramListener();
   	  	Iterator detailedStats = histogramListener.getDetailedStatisticsSpreadsheetData(assessmentId).iterator(); 
@@ -458,6 +480,18 @@ public class ExportResponsesBean implements Serializable, PhaseAware {
 		return cell;
 	}
 	
+	//added for exluding inactive participants from the export bugid:5489 9/11/2013 -Qu
+	private void filterOutInactiveStudents(Map<String, EnrollmentRecord> useridMap) {
+		Iterator iter = useridMap.entrySet().iterator();
+		while(iter.hasNext()){
+			Map.Entry<String, EnrollmentRecord> pair = (Map.Entry<String, EnrollmentRecord>) iter.next();
+			//String userid = pair.getKey();
+			EnrollmentRecord enr = pair.getValue();
+			if(enr.getStatus().equalsIgnoreCase("false"))
+				//remove the inactive participants from the map
+				iter.remove();
+		}
+	}
     
     
 }

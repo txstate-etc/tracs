@@ -80,6 +80,7 @@ import org.sakaiproject.tool.assessment.facade.EventLogFacade;
 import org.sakaiproject.tool.assessment.facade.PublishedAssessmentFacade;
 import org.sakaiproject.tool.assessment.services.GradingService;
 import org.sakaiproject.tool.assessment.services.assessment.PublishedAssessmentService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.shared.api.assessment.SecureDeliveryServiceAPI;
 import org.sakaiproject.tool.assessment.shared.api.assessment.SecureDeliveryServiceAPI.Phase;
 import org.sakaiproject.tool.assessment.shared.api.assessment.SecureDeliveryServiceAPI.PhaseStatus;
@@ -286,7 +287,7 @@ public class DeliveryActionListener
               }
 
               // post event
-              eventRef = new StringBuffer("publishedAssessmentId=");
+              eventRef = new StringBuffer(AppConstants.SAMIGO_PUBASSES_ID_STRING);
               eventRef.append(delivery.getAssessmentId());
               eventRef.append(", submissionId=");
               eventRef.append(agData.getAssessmentGradingId());
@@ -444,7 +445,7 @@ public class DeliveryActionListener
                   eventService.saveOrUpdateEventLog(eventLogFacade);           	  
                   
             	  if (action == DeliveryBean.TAKE_ASSESSMENT) {
-            		  eventRef = new StringBuffer("publishedAssessmentId=");
+            		  eventRef = new StringBuffer(AppConstants.SAMIGO_PUBASSES_ID_STRING);
             		  eventRef.append(delivery.getAssessmentId());
             		  eventRef.append(", agentId=");
             		  eventRef.append(getAgentString());
@@ -456,24 +457,24 @@ public class DeliveryActionListener
             			  eventRef.append(timeRemaining);
             		  }
                       event = EventTrackingService.newEvent("sam.assessment.take",
-                              "siteId=" + site_id + ", " + eventRef.toString(), true);
+                              AppConstants.SAMIGO_SITE_ID_STRING + site_id + ", " + eventRef.toString(), true);
                       EventTrackingService.post(event);
                       registerIrss(delivery, event, false);
             	  }
             	  else if (action == DeliveryBean.TAKE_ASSESSMENT_VIA_URL) {
-            		  eventRef = new StringBuffer("publishedAssessmentId=");
-            		  eventRef.append(delivery.getAssessmentId());
-            		  eventRef.append(", agentId=");
-            		  eventRef.append(getAgentString());
-            		  if (delivery.isTimeRunning()) {
-            			  eventRef.append(", elapsed=");
-            			  eventRef.append(delivery.getTimeElapse());
-            			  eventRef.append(", remaining=");
-            			  int timeRemaining = Integer.parseInt(delivery.getTimeLimit()) - Integer.parseInt(delivery.getTimeElapse());
-            			  eventRef.append(timeRemaining);
-            		  }
+                         eventRef = new StringBuffer("publishedAssessmentId=");
+                         eventRef.append(delivery.getAssessmentId());
+                         eventRef.append(", agentId=");
+                         eventRef.append(getAgentString());
+                         if (delivery.isTimeRunning()) {
+                                 eventRef.append(", elapsed=");
+                                 eventRef.append(delivery.getTimeElapse());
+                                 eventRef.append(", remaining=");
+                                 int timeRemaining = Integer.parseInt(delivery.getTimeLimit()) - Integer.parseInt(delivery.getTimeElapse());
+                                 eventRef.append(timeRemaining);
+                         }
                       event = EventTrackingService.newEvent("sam.assessment.take.via_url",
-                                "siteId=" + site_id + ", " + eventRef.toString(), site_id, true, NotificationService.NOTI_REQUIRED);
+                                AppConstants.SAMIGO_SITE_ID_STRING + site_id + ", " + eventRef.toString(), site_id, true, NotificationService.NOTI_REQUIRED);
                       EventTrackingService.post(event);
                       registerIrss(delivery, event, true);
             	  }
@@ -489,7 +490,7 @@ public class DeliveryActionListener
                       PublishedAssessmentService publishedAssessmentService = new PublishedAssessmentService();
                       site_id = publishedAssessmentService.getPublishedAssessmentOwner(Long.valueOf(delivery.getAssessmentId()));
                   }
-            	  eventRef = new StringBuffer("publishedAssessmentId=");
+            	  eventRef = new StringBuffer(AppConstants.SAMIGO_PUBASSES_ID_STRING);
             	  eventRef.append(delivery.getAssessmentId());
             	  eventRef.append(", agentId=");
             	  eventRef.append(getAgentString());
@@ -501,7 +502,7 @@ public class DeliveryActionListener
             		  eventRef.append(timeRemaining);
             	  }
                   event = EventTrackingService.newEvent("sam.assessment.resume",
-                                "siteId=" + site_id + ", " + eventRef.toString(), site_id, true, NotificationService.NOTI_REQUIRED);
+                                AppConstants.SAMIGO_SITE_ID_STRING + site_id + ", " + eventRef.toString(), site_id, true, NotificationService.NOTI_REQUIRED);
                   EventTrackingService.post(event);
               }
               

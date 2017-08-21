@@ -4,6 +4,9 @@
 <%@ taglib uri="http://www.sakaiproject.org/samigo" prefix="samigo" %>
 <%@ taglib uri="http://sakaiproject.org/jsf/sakai" prefix="sakai" %>
 <%@ taglib uri="http://myfaces.apache.org/tomahawk" prefix="t"%>
+<script src="/library/js/jquery.js" type="text/javascript"></script>
+<script src="/library/js/expandCollapse.js" type="text/javascript"></script>
+
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -79,6 +82,9 @@ function hiddenLinkOnClick(){
 	//document.getElementById['editTotalResults:hiddenlink'].click();
 }
 
+$(document).ready(function(){
+    $("tr.inactivePar").css("display","none");
+});
 </script>
 
 <!-- content... -->
@@ -520,7 +526,7 @@ function hiddenLinkOnClick(){
   <!-- STUDENT RESPONSES AND GRADING -->
   <!-- note that we will have to hook up with the back end to get N at a time -->
 <div class="table-responsive">
-  <h:dataTable id="questionScoreTable" value="#{questionScores.agents}" var="description" styleClass="table table-bordered table-striped" columnClasses="textTable">
+  <h:dataTable id="questionScoreTable" value="#{questionScores.agents}" var="description" styleClass="table table-bordered table-striped" columnClasses="textTable" rowClasses="#{questionScores.rowClasses}">
 
     <!-- NAME/SUBMISSION ID -->
     <h:column rendered="#{questionScores.anonymous eq 'false' && questionScores.sortType ne 'lastName'}">
@@ -543,6 +549,7 @@ function hiddenLinkOnClick(){
          <h:outputText value="#{description.lastName}" />
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
          <h:outputText value="#{description.firstName}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.StudentScoreListener" />
@@ -582,6 +589,7 @@ function hiddenLinkOnClick(){
          <h:outputText value="#{description.lastName}" />
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
          <h:outputText value="#{description.firstName}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.StudentScoreListener" />
@@ -623,6 +631,7 @@ function hiddenLinkOnClick(){
          <h:outputText value="#{description.lastName}" />
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
          <h:outputText value="#{description.firstName}" />
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.QuestionScoreUpdateListener" />
@@ -727,6 +736,7 @@ function hiddenLinkOnClick(){
      </h:panelGroup>
     </h:column>  
 
+<div class="hideUnhide" style="padding-left: 5px;"><a id="collapseAll" href="#">Hide</a> | <a id="expandAll" href="#">Show</a>  Inactive Participants </div>
 
    <!-- STUDENT ID -->
     <h:column rendered="#{questionScores.anonymous eq 'false' && questionScores.sortType!='agentDisplayId'}" >

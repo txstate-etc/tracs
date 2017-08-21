@@ -40,6 +40,7 @@ import org.sakaiproject.tool.assessment.facade.AssessmentFacade;
 import org.sakaiproject.tool.assessment.facade.AssessmentFacadeQueries;
 import org.sakaiproject.tool.assessment.facade.AssessmentTemplateFacade;
 import org.sakaiproject.tool.assessment.services.assessment.AssessmentService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.bean.author.AssessmentBean;
 import org.sakaiproject.tool.assessment.ui.bean.author.AssessmentSettingsBean;
 import org.sakaiproject.tool.assessment.ui.bean.author.AuthorBean;
@@ -134,7 +135,7 @@ public class AuthorAssessmentListener
     try{
       assessment = createAssessment(
          assessmentTitle.trim(), description, typeId, templateId);
-      EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.create", "siteId=" + AgentFacade.getCurrentSiteId() + ", assessmentId=" + assessment.getAssessmentId(), true));
+      EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.create", AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", " + AppConstants.SAMIGO_ASSES_ID_STRING + assessment.getAssessmentId(), true));
     }
     catch(Exception e){
       // can't create assesment because gradebookService is not ready

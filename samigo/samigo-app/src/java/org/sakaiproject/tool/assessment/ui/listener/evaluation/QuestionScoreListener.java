@@ -39,6 +39,7 @@ import javax.faces.event.ValueChangeListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sakaiproject.section.api.coursemanagement.EnrollmentRecord;
 import org.sakaiproject.tool.assessment.data.dao.assessment.AssessmentAccessControl;
 import org.sakaiproject.tool.assessment.data.dao.assessment.EvaluationModel;
 import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedAnswer;
@@ -830,6 +831,7 @@ public class QuestionScoreListener implements ActionListener,
 						else
 							results.setLastInitial("Anonymous");
 						results.setIdString(agent.getIdString());
+						results.setAgentId(agent.getIdString());
 						results.setAgentEid(agent.getEidString());
                         results.setAgentDisplayId(agent.getDisplayIdString());
 						log.debug("testing agent getEid agent.getFirstname= "
@@ -867,6 +869,10 @@ public class QuestionScoreListener implements ActionListener,
 				agents = (ArrayList) bs.sortDesc();
 			}
 
+			//added for showing status in UI list bugid:5489 9/10/2013 -Qu
+			popAgentMemberStatus(agents, useridMap);
+			//assign row class according to agent status
+			bean.setRowClasses(getRowClasses(agents));
 			// log.info("Listing agents.");
 			bean.setAgents(agents);
 			bean.setAllAgents(agents);
@@ -1002,4 +1008,29 @@ public class QuestionScoreListener implements ActionListener,
 		log.debug("questionScores(): sections size = " + sections.size());
 		bean.setSections(sections);
 	}
+	
+	//added for showing status in UI list bugid:5489 9/10/2013 -Qu
+	  private void popAgentMemberStatus(ArrayList<AgentResults> agents, Map<String, EnrollmentRecord> useridMap){
+		  Iterator<AgentResults> iter =  agents.iterator();
+		  while(iter.hasNext()){
+			  AgentResults results = (AgentResults)iter.next();
+			  try{
+				  EnrollmentRecord enr = (EnrollmentRecord)useridMap.get(results.getAgentId());
+				  results.setIsActive(enr.getStatus().equalsIgnoreCase("true"));
+			  }catch(Exception e){
+				  log.info("Error occured in TotalScoreListener.popAgentMemberStatus: " + e);
+}
+
+		  }
+	  }
+	  
+	  //added for showing status in UI list bugid:5489 9/10/2013 -Qu
+	  private String getRowClasses(ArrayList<AgentResults> agents){
+		  StringBuilder rowClasses = new StringBuilder();
+		  for(AgentResults ar : agents){
+				  if(rowClasses.length() > 0) rowClasses.append(",");
+				  rowClasses.append(ar.getIsActive()?"activePar":"inactivePar");
+		  }
+		  return rowClasses.toString();
+	  }
 }

@@ -92,6 +92,7 @@ public class QuestionScoresBean
   private String typeId;
   private HashMap scoresByItem;
   private static Logger log = LoggerFactory.getLogger(QuestionScoresBean.class);
+  private String rowClasses; //added by -Qu for bugid:5489
 
   //private String selectedSectionFilterValue = TotalScoresBean.ALL_SECTIONS_SELECT_VALUE;
   private String selectedSectionFilterValue = null;
@@ -976,5 +977,14 @@ public void clear(ActionEvent event) {
 	public void setIsAnyItemGradingAttachmentListModified(boolean isAnyItemGradingAttachmentListModified)
 	{
 		this.isAnyItemGradingAttachmentListModified = isAnyItemGradingAttachmentListModified;
+	}
+
+	//added for showing status in UI list bugid:5489 9/10/2013 -Qu
+	public String getRowClasses(){
+		return this.rowClasses;
+	}
+
+	public void setRowClasses(String rowClasses){
+		this.rowClasses = rowClasses;
 	}
 }

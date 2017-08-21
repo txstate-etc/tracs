@@ -29,3 +29,11 @@
 	path = tracs-tk20
 	url = git@git.txstate.edu:its/tracs-tk20.git
 	branch = tracs
+[submodule "turnitin"]
+	path = turnitin
+	url = https://github.com/txstate-etc/turnitin.git
+    branch = tracs
+[submodule "bbb"]
+	path = bbb
+	url = https://github.com/txstate-etc/bbb-tool.git
+    branch = tracs

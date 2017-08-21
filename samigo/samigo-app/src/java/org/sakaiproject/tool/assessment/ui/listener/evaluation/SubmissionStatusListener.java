@@ -58,6 +58,7 @@ import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 import org.sakaiproject.tool.assessment.util.BeanSort;
 import org.sakaiproject.tool.assessment.integration.helper.ifc.AgentHelper;
 import org.sakaiproject.tool.assessment.integration.context.IntegrationContextFactory;
+import org.sakaiproject.section.api.coursemanagement.EnrollmentRecord;
 
 
 /**
@@ -239,6 +240,7 @@ public class SubmissionStatusListener
         else
           results.setLastInitial("A");
         results.setIdString(agent.getIdString());
+        results.setAgentId(agent.getIdString());
         results.setAgentEid(agent.getEidString());
         results.setAgentDisplayId(agent.getDisplayIdString());
         results.setRole((String)userRoles.get(agentid));
@@ -276,7 +278,10 @@ public class SubmissionStatusListener
       	log.debug("TotalScoreListener: setRoleAndSortSection() :: !sortAscending");
       	agents = (ArrayList)bs.sortDesc();
       }
-      
+      //added for showing status in UI list bugid:5489 9/10/2013 -Qu
+      popAgentMemberStatus(agents,useridMap);
+      //assign row class according to agent status
+      bean.setRowClasses(getRowClasses(agents));
       bean.setAgents(agents);
       bean.setAllAgents(agents);
       bean.setTotalPeople(Integer.toString(bean.getAgents().size()));
@@ -324,6 +329,7 @@ public class SubmissionStatusListener
         results.setLastInitial("Anonymous");
       }
       results.setIdString(agent.getIdString());
+      results.setAgentId(agent.getIdString());
       results.setAgentEid(agent.getEidString());
       results.setAgentDisplayId(agent.getDisplayIdString());
       results.setRole((String)userRoles.get(studentid));
@@ -388,4 +394,30 @@ public class SubmissionStatusListener
 		}
 		return false;
 	} 
+
+  //added for showing status in UI list bugid:5489 9/10/2013 -Qu
+  private void popAgentMemberStatus(ArrayList<AgentResults> agents, Map<String, EnrollmentRecord> useridMap){
+	  Iterator<AgentResults> iter =  agents.iterator();
+	  while(iter.hasNext()){
+		  AgentResults results = (AgentResults)iter.next();
+		  try{
+			  EnrollmentRecord enr = (EnrollmentRecord)useridMap.get(results.getAgentId());
+			  results.setIsActive(enr.getStatus().equalsIgnoreCase("true"));
+		  }catch(Exception e){
+			  log.info("Error occured in SubmissionStatusListener.popAgentMemberStatus: " + e);
+}
+
+	  }
+  }
+  
+  //added for showing status in UI list bugid:5489 9/10/2013 -Qu
+  private String getRowClasses(ArrayList<AgentResults> agents){
+	  StringBuilder rowClasses = new StringBuilder();
+	  for(AgentResults ar : agents){
+			  if(rowClasses.length() > 0) rowClasses.append(",");
+			  rowClasses.append(ar.getIsActive()?"activePar":"inactivePar");
+	  }
+	  return rowClasses.toString();
+  }
+
 }

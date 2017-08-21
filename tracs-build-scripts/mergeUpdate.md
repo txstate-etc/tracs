@@ -8,6 +8,7 @@
 | assignment                   | DONE             |
 | authz                        | NO LOCAL CHANGES |
 | basiclti                     | DONE             |
+| bbb                          | DONE             |
 | blogwow                      | DONE             |
 | calendar                     | DONE             |
 | chat                         | DONE             |
@@ -17,7 +18,7 @@
 | common                       | DONE             |
 | config                       | DONE             |
 | content                      | Anne             |
-| content-review               |                  |
+| content-review               | DONE             |
 | courier                      | NO LOCAL CHANGES |
 | dashboard                    | DONE             |
 | dav                          | DONE             |
@@ -35,7 +36,7 @@
 | hierarchy                    | NO LOCAL CHANGES |
 | irubric                      | DONE             |
 | jobscheduler                 | DONE             |
-| jsf                          |                  |
+| jsf                          | DONE             |
 | kernel                       |                  |
 | lessonbuilder                | DONE             |
 | login                        | DONE             |
@@ -66,7 +67,7 @@
 | roster_legacy                | DONE             |
 | rsf                          | NO LOCAL CHANGES |
 | rwiki                        | DONE             |
-| samigo                       |                  |
+| samigo                       | DONE             |
 | search                       | DONE             |
 | sections                     | DONE             |
 | shortenedurl                 | NO LOCAL CHANGES |
@@ -79,6 +80,7 @@
 | taggable                     | NO LOCAL CHANGES |
 | textarea                     | NO LOCAL CHANGES |
 | tool                         | DONE             |
+| turnitin                     | DONE             |
 | turningpoint                 | DONE             |
 | user                         | Anne             |
 | userauditservice             | NO LOCAL CHANGES |

@@ -11,6 +11,7 @@ import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedAssessmentD
 import org.sakaiproject.tool.assessment.facade.AgentFacade;
 import org.sakaiproject.tool.assessment.facade.PublishedAssessmentFacade;
 import org.sakaiproject.tool.assessment.services.assessment.PublishedAssessmentService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.bean.author.AssessmentBean;
 import org.sakaiproject.tool.assessment.ui.bean.author.AuthorBean;
 import org.sakaiproject.tool.assessment.ui.bean.authz.AuthorizationBean;
@@ -37,6 +38,6 @@ public class ConfirmEditPublishedAssessmentListener  implements ActionListener {
 		}
 
 		assessmentBean.setAssessmentId(publishedAssessmentId);
-		EventTrackingService.post(EventTrackingService.newEvent("sam.pubassessment.confirm_edit", "siteId=" + AgentFacade.getCurrentSiteId() + ", publishedAssessmentId=" + publishedAssessmentId, true));
+		EventTrackingService.post(EventTrackingService.newEvent("sam.pubassessment.confirm_edit", AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", " + AppConstants.SAMIGO_PUBASSES_ID_STRING + publishedAssessmentId, true));
 	}
 }

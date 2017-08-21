@@ -49,6 +49,7 @@ import org.sakaiproject.tool.assessment.facade.TypeFacade;
 import org.sakaiproject.tool.assessment.services.GradingService;
 import org.sakaiproject.tool.assessment.services.ItemService;
 import org.sakaiproject.tool.assessment.services.PublishedItemService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.ui.bean.author.AuthorBean;
 import org.sakaiproject.tool.assessment.ui.bean.util.Validator;
 import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
@@ -435,10 +436,10 @@ public class ItemContentsBean implements Serializable {
 						&& !data.getAnswerText().equals("")) {
 					return false;
 				}
-			} 
-			else {
+			} else {
+				//fixing answer field with empty string should treat as unanswered  -Qu bugid:798 1/22/10
 				if (data.getPublishedAnswerId() != null
-						|| data.getAnswerText() != null) {
+						|| (data.getAnswerText() != null && !data.getAnswerText().equals(""))){
 					return false;
 				}
 			}
@@ -1357,7 +1358,7 @@ public class ItemContentsBean implements Serializable {
                                      "new value " + score);
                   answer.setScore(score);
               }
-              EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.revise", "siteId=" + AgentFacade.getCurrentSiteId() + ", itemId=" + itemData.getItemId(), true));
+              EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.revise", AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", itemId=" + itemData.getItemId(), true));
           }
           itemService.saveItem(item);
           itemData.setScore(score);

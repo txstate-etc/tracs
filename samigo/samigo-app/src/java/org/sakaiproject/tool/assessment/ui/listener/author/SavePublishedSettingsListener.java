@@ -68,6 +68,7 @@ import org.sakaiproject.tool.assessment.integration.helper.ifc.GradebookServiceH
 import org.sakaiproject.tool.assessment.services.GradingService;
 import org.sakaiproject.tool.assessment.services.PersistenceService;
 import org.sakaiproject.tool.assessment.services.assessment.PublishedAssessmentService;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 import org.sakaiproject.tool.assessment.shared.api.assessment.SecureDeliveryServiceAPI;
 import org.sakaiproject.tool.assessment.ui.bean.author.AssessmentBean;
 import org.sakaiproject.tool.assessment.ui.bean.author.AuthorBean;
@@ -123,7 +124,7 @@ implements ActionListener
 			retractNow = true;
 		}
 
-		EventTrackingService.post(EventTrackingService.newEvent("sam.pubsetting.edit", "siteId=" + AgentFacade.getCurrentSiteId() + ", publishedAssessmentId=" + assessmentId, true));
+		EventTrackingService.post(EventTrackingService.newEvent("sam.pubsetting.edit", AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", " + AppConstants.SAMIGO_PUBASSES_ID_STRING + assessmentId, true));
 		boolean error = checkPublishedSettings(assessmentService, assessmentSettings, context);
 		
 		if (error){
@@ -206,7 +207,7 @@ implements ActionListener
 	    assessmentService.saveAssessment(assessment);
 	    
 		saveAssessmentSettings.updateAttachment(assessment.getAssessmentAttachmentList(), assessmentSettings.getAttachmentList(),(AssessmentIfc)assessment.getData(), false);
-		EventTrackingService.post(EventTrackingService.newEvent("sam.pubSetting.edit", "siteId=" + AgentFacade.getCurrentSiteId() + ", pubAssessmentId=" + assessmentSettings.getAssessmentId(), true));
+		EventTrackingService.post(EventTrackingService.newEvent("sam.pubSetting.edit", AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", " + AppConstants.SAMIGO_PUBASSES_ID_STRING + assessmentSettings.getAssessmentId(), true));
 	    
 		AuthorBean author = (AuthorBean) ContextUtil.lookupBean("author");
 		if ("editAssessment".equals(author.getFromPage())) {
@@ -466,7 +467,9 @@ implements ActionListener
 		control.setStartDate(assessmentSettings.getStartDate());
 		control.setDueDate(assessmentSettings.getDueDate());
 
-		if (assessmentSettings.getLateHandling() != null) {
+		if (retractNow) {
+			control.setLateHandling(AssessmentAccessControlIfc.ACCEPT_LATE_SUBMISSION);
+		} else if (assessmentSettings.getLateHandling()!=null){
 			control.setLateHandling(new Integer(assessmentSettings.getLateHandling()));
 		}
 

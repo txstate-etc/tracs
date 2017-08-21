@@ -77,6 +77,7 @@ public class SectionContentsBean
   private String description;
   private int unansweredQuestions; // ItemContentsBeans
   private ArrayList questionNumbers = new ArrayList();
+  private int reviewMarkedQuestions;
 
   // added section Type , question ordering
   private Integer sectionAuthorType;
@@ -702,10 +703,39 @@ public class SectionContentsBean
   {
 	  this.noQuestions = noQuestions;
   }
+
+  /**
+   * Number reviewMarked.
+   * @return total reviewMarked questions.
+   * Added by -Qu 1/22/10 bugid:798
+   */
+  public int getReviewMarkedQuestions()
+  {
+    Iterator i = itemContents.iterator();
+    int num = 0;
+    while (i.hasNext())
+    {
+      ItemContentsBean next = (ItemContentsBean) i.next();
+      if (next.getReview())
+      {
+        num++;
+      }
+    }
+    return num;
+  }
   public String getRandomQuestionsDrawDate() {
 	  return randomQuestionsDrawDate;
   }
 
+  /**
+   * Number reviewMarked.
+   * @param reviewMarkedQuestions
+   * Added by -Qu 1/22/10  bugid:798
+   */
+  public void setReviewMarkedQuestions(int reviewMarkedQuestions)
+  {
+    this.reviewMarkedQuestions = reviewMarkedQuestions;
+  }
   public void setRandomQuestionsDrawDate(String randomQuestionsDrawDate) {
 	  this.randomQuestionsDrawDate = randomQuestionsDrawDate;
   }

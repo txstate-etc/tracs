@@ -92,6 +92,7 @@ public class GradebookPage extends BasePage {
 	GbModalWindow deleteItemWindow;
 	GbModalWindow gradeStatisticsWindow;
 	GbModalWindow updateCourseGradeDisplayWindow;
+	GbModalWindow addScalePointsWindow;
 
 	Label liveGradingFeedback;
 	boolean hasAssignmentsAndGrades;
@@ -142,6 +143,10 @@ public class GradebookPage extends BasePage {
 		this.addOrEditGradeItemWindow = new GbModalWindow("addOrEditGradeItemWindow");
 		this.addOrEditGradeItemWindow.showUnloadConfirmation(false);
 		this.form.add(this.addOrEditGradeItemWindow);
+
+		this.addScalePointsWindow = new GbModalWindow("addScalePointsWindow");
+		this.addScalePointsWindow.showUnloadConfirmation(false);
+		this.form.add(this.addScalePointsWindow);
 
 		this.studentGradeSummaryWindow = new GbModalWindow("studentGradeSummaryWindow");
 		this.studentGradeSummaryWindow.setWidthUnit("%");
@@ -692,6 +697,10 @@ public class GradebookPage extends BasePage {
 
 	public GbModalWindow getUpdateUngradedItemsWindow() {
 		return this.updateUngradedItemsWindow;
+	}
+
+	public GbModalWindow getAddScalePointsWindow() {
+		retirm this.addScalePointsWindow;
 	}
 
 	public GbModalWindow getGradeLogWindow() {

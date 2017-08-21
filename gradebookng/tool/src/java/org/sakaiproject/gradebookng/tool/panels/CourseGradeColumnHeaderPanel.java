@@ -124,6 +124,19 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 				window.show(target);
 			}
 		});
+		menu.add(new GbAjaxLink("addScalePoints") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onClick(final AjaxRequestTarget target) {
+				final GbModalWindow window = gradebookPage.getAddScalePointsWindow();
+				window.setTitle(getString("heading.addscalepoints"));
+				window.setComponentToReturnFocusTo(getParentCellFor(this));
+				window.setContent(new AddScalePointsPanel(window.getContentId(), window));
+				window.showUnloadConfirmation(false);
+				window.show(target);
+			}
+		})
 
 		final GbAjaxLink<Boolean> showHidePoints = new GbAjaxLink("showHidePoints", this.model) {
 			private static final long serialVersionUID = 1L;

@@ -132,7 +132,7 @@
                 <!-- Contrib Tools -->
                 <module>melete</module>
                 <module>blogwow</module>
-          <!--      <module>bbb</module> -->
+                <module>bbb</module>
           <!--      <module>turningpoint</module> -->
                 <module>irubric/irubric-core</module>
                 <module>irubric/irubric-tool</module>

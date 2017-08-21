@@ -32,3 +32,8 @@
 [submodule "turnitin"]
 	path = turnitin
 	url = https://github.com/txstate-etc/turnitin.git
+    branch = tracs
+[submodule "bbb"]
+	path = bbb
+	url = https://github.com/txstate-etc/bbb-tool.git
+    branch = tracs

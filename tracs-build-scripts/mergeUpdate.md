@@ -8,6 +8,7 @@
 | assignment                   | DONE             |
 | authz                        | NO LOCAL CHANGES |
 | basiclti                     | DONE             |
+| bbb                          | DONE             |
 | blogwow                      | DONE             |
 | calendar                     | DONE             |
 | chat                         | DONE             |

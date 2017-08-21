@@ -20,7 +20,7 @@ p, h1, form, button {
 
 /* ----------- wrapper ------------*/
 .wrapper {
-border:2px solid #336699;
+border:2px solid #392E2C;
 padding:10px 20px 20px 20px;
 background:#fff;
 margin: 2em auto;
@@ -28,7 +28,7 @@ width:43em;
 }
 
 .header {
-background:url("/library/skin/default/images/logo_inst.gif") no-repeat scroll left top;
+#e1dacf url("/library/image/tracslogo_small.png") no-repeat scroll 15px center;
 padding: 5px 0 20px 120px;
 border-bottom: 1px solid #E4E4E4;
 margin-bottom: 10px;
@@ -119,19 +119,19 @@ margin-bottom: 10px;
 }
 
 .spacerVertical {
-border-left:4px solid #B7DDF2;
+border-left:4px solid #392E2C;
 height:110px;
 width:1px;
 }
 
 .or {
-	color:#FF9900;
+	color:rgb(162, 133, 72);
 	font-size:140%;
 	font-weight:bold;
 }
 
 .username {
-	color:#336699;
+	color:rgb(162, 133, 72);
 	font-weight:bold;
 	padding-left:20px;
 }

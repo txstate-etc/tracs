@@ -700,7 +700,7 @@ public class GradebookPage extends BasePage {
 	}
 
 	public GbModalWindow getAddScalePointsWindow() {
-		retirm this.addScalePointsWindow;
+		return this.addScalePointsWindow;
 	}
 
 	public GbModalWindow getGradeLogWindow() {

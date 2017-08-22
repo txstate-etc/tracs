@@ -1414,23 +1414,25 @@ public class GradebookNgBusinessService {
 		{
 			for (final GradeDefinition def : defs)
 			{
-				string grade = def.getGrade();
-				if(grade == null || grade.isEmpty)
+				String grade = def.getGrade();
+				if(grade == null || grade.isEmpty())
 					continue;
-				if(def.getGradeType() != GradeBookService.GRADE_TYPE_POINTS)
+				if(def.getGradeEntryType() != GradebookService.GRADE_TYPE_POINTS)
 					continue;
 
 				double dGrade = Double.parseDouble(grade);
 				dGrade += pointValue;
-				def.setGrade(String.valueOf(dGrade));
+				//def.setGrade(String.valueOf(dGrade));
 
 				this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
 						assignmentId,
 						def.getStudentUid(),
-						dGrade.getGrade(), null);
+						def.getGrade(), null);
 			}
+
+			return true;
 		}
-		return true;
+
 		catch (final Exception e)
 		{
 			log.error("An error occurred adding points to the assignment", e);

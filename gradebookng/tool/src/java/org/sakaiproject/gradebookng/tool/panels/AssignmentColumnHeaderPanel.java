@@ -290,6 +290,25 @@ public class AssignmentColumnHeaderPanel extends Panel {
 			}
 		});
 
+		menu.add(new GbAjaxLink<Long>("addScalePoints", Model.of(assignment.getId())) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onClick(final AjaxRequestTarget target) {
+				final GbModalWindow window = gradebookPage.getAddScalePointsWindow();
+				window.setTitle(getString("heading.addscalepoints"));
+				window.setComponentToReturnFocusTo(getParentCellFor(this));
+				window.setContent(new AddScalePointsPanel(window.getContentId(), getModel(), window));
+				window.showUnloadConfirmation(false);
+				window.show(target);
+			}
+
+			@Override
+			public boolean isVisible() {
+				return role == GbRole.INSTRUCTOR;
+			}
+		});
+
 		menu.add(new GbAjaxLink<Long>("hideAssignment", Model.of(assignment.getId())) {
 			private static final long serialVersionUID = 1L;
 

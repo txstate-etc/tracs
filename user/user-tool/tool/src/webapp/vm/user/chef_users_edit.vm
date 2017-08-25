@@ -107,7 +107,7 @@ function removeOptionalAttributeBlock(elem) {
 			#end
 			</div>	
 #if ($incPw)
-  #if(!$!superUser)
+  #if(!$!superUser && !$!rugUser)
     #if ($service.allowUpdateUserName($user.Id) || $service.allowUpdateUserEmail($user.Id) || $service.allowUpdateUserPassword($user.Id) || !$user)
         <div class="shorttext">
             <label for="user_pwcur">
@@ -151,7 +151,8 @@ function removeOptionalAttributeBlock(elem) {
 				<label for="type">
 					$tlang.getString("usecre.typ")
 				</label>
-			#if ($service.allowUpdateUserType($user.Id) || !$user)
+			## Not allow TRACS rug user to change sakai user type bugid:5354
+			#if (!$!rugUser && ($service.allowUpdateUserType($user.Id) || !$user))
 				#if($userTypes)
 					<select name="type" id="type">
 					#foreach ( $userType in $userTypes )
@@ -162,7 +163,10 @@ function removeOptionalAttributeBlock(elem) {
 					<input type="text" name="type" id="type" #if($user)value="$validator.escapeHtml($user.Type)"#elseif($valueType)value="$validator.escapeHtml($valueType)"#end />
 				#end
 			#else
+				#if ($!rugUser)
+					<input type="hidden" name="type" id="type" #if($user)value="$validator.escapeHtml($user.Type)"#elseif($valueType)value="$validator.escapeHtml($valueType)"#end />
 				#if($user)$validator.escapeHtml($user.Type)#elseif($valueType)$validator.escapeHtml($valueType)#end
+			#end
 			#end
 			</div>	
 #end

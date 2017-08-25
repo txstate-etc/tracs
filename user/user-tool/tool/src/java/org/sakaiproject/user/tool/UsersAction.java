@@ -269,8 +269,9 @@ public class UsersAction extends PagedResourceActionII
 
 
 
+		// give TRACS rug user permission to use sakai Users tool bugid:5354 -Qu 4/17/2013
 		// if not logged in as the super user, we won't do anything
-		if ((!singleUser) && (!createUser) && (!SecurityService.isSuperUser()))
+		if ((!singleUser) && (!createUser) && (!SecurityService.isSuperUser()) && (!isTracsRugUser()))
 		{
 			context.put("tlang",rb);
 			return (String) getContext(rundata).get("template") + "_noaccess";
@@ -453,6 +454,7 @@ public class UsersAction extends PagedResourceActionII
 		context.put("incType", Boolean.valueOf(true));
 
     context.put("superUser", Boolean.valueOf(SecurityService.isSuperUser()));
+		context.put("rugUser", Boolean.valueOf(isTracsRugUser()));
 
 		String value = (String) state.getAttribute("valueEid");
 		if (value != null) context.put("valueEid", value);
@@ -468,6 +470,9 @@ public class UsersAction extends PagedResourceActionII
 
 		value = (String) state.getAttribute("valueType");
 		if (value != null) context.put("valueType", value);
+		//only allow rug user to create guest type user bugid:5354 -Qu
+		else if (isTracsRugUser())
+			context.put("valueType", "guest");
 		
 		//optional attributes list
 		context.put("optionalAttributes", getOptionalAttributes());
@@ -550,6 +555,7 @@ public class UsersAction extends PagedResourceActionII
 		
 		// is super user/admin user?
 		context.put("superUser", Boolean.valueOf(SecurityService.isSuperUser()));
+		context.put("rugUser", Boolean.valueOf(isTracsRugUser()));
 
 		// include the password fields?
 		context.put("incPw", state.getAttribute("include-password"));
@@ -1583,8 +1589,9 @@ public class UsersAction extends PagedResourceActionII
 			//validate the password only for local users
 			if (!isProvidedType(user.getType())) {
 			
-				// make sure the old password matches, but don't check for super users
-				if (!SecurityService.isSuperUser()) {
+				// make sure the old password matches, but don't check for super users and TRACS's rug users
+				// modified by -Qu 4/18/2013 bugid:5354
+				if (!SecurityService.isSuperUser() && !isTracsRugUser()) {
 					if (!user.checkPassword(pwcur)) {
 						addAlert(state, rb.getString("usecre.curpass"));
 						return false;
@@ -1612,6 +1619,16 @@ public class UsersAction extends PagedResourceActionII
 		return true;
 	}
 	
+	//Added by -Qu 4/18/2013 for bugid:5354
+	//May need to put in security service check in future if similar feature request come along
+	//check current user type
+	//generalize TracsRugUserType
+	public boolean isTracsRugUser() {
+		List<String> tracsRugUserTypes = Arrays.asList(rb.getString("TracsRugUserType").toLowerCase().split(","));
+		String curUserType = UserDirectoryService.getCurrentUser().getType().toLowerCase();
+		return tracsRugUserTypes.contains(curUserType);
+	}
+
 	/**
 	 * Get the Map of optional attributes from sakai.properties
 	 * 

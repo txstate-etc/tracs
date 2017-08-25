@@ -1402,6 +1402,46 @@ public class GradebookNgBusinessService {
 
 		return false;
 	}
+	public boolean addScalePoints(final long assignmentId, final double pointValue)
+	{
+		final String siteId = getCurrentSiteId();
+		final Gradebook gradebook = getGradebook(siteId);
+		final List<String> studentUuids = this.getGradeableUsers();
+		final List<GradeDefinition> defs = this.gradebookService.getGradesForStudentsForItem(gradebook.getUid(),
+				assignmentId, studentUuids);
+
+		try
+		{
+			for (final GradeDefinition def : defs)
+			{
+				String grade = def.getGrade();
+				if(grade == null || grade.isEmpty())
+					continue;
+				if(def.getGradeEntryType() != GradebookService.GRADE_TYPE_POINTS)
+					continue;
+
+				double dGrade = Double.parseDouble(grade);
+				dGrade += pointValue;
+				//def.setGrade(String.valueOf(dGrade));
+
+				this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
+						assignmentId,
+						def.getStudentUid(),
+						def.getGrade(), null);
+			}
+
+			return true;
+		}
+
+		catch (final Exception e)
+		{
+			log.error("An error occurred adding points to the assignment", e);
+		}
+
+		return false;
+
+	}
+
 
 	/**
 	 * Updates ungraded items in the given assignment with the given grade
@@ -1413,6 +1453,7 @@ public class GradebookNgBusinessService {
 	public boolean updateUngradedItems(final long assignmentId, final double grade) {
 		return updateUngradedItems(assignmentId, grade, null);
 	}
+
 
 	/**
 	 * Updates ungraded items in the given assignment for students within a particular group and with the given grade

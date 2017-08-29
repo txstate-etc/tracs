@@ -1404,6 +1404,10 @@ public class GradebookNgBusinessService {
 	}
 	public boolean addScalePoints(final Long assignmentId, final double maxGrade, final double pointValue)
 	{
+		log.warn("Entered addScalePoints");
+		log.warn("Max Grade = " + Double.toString(maxGrade));
+		log.warn("Point Value = " + Double.toString(pointValue));
+
 		final String siteId = getCurrentSiteId();
 		final Gradebook gradebook = getGradebook(siteId);
 		final List<String> studentUuids = this.getGradeableUsers();
@@ -1413,24 +1417,31 @@ public class GradebookNgBusinessService {
 		{
 			for (final GradeDefinition def : defs)
 			{
-				if(def.getGradeEntryType() != GradebookService.GRADE_TYPE_POINTS) {
-					log.warn("Ignored one due to unsupported Grade Entry Type");
-					continue;
-				}
-
 				String grade = def.getGrade();
 				if(grade == null || grade.isEmpty()) {
 					log.warn("Ignored one due to empty Grade");
 					continue;
 				}
-				
-				double newGrade = Double.parseDouble(grade) + pointValue;
-				def.setGrade(String.valueOf(Math.min(newGrade, maxGrade)));
+
+				if(def.getGradeEntryType() == GradebookService.GRADE_TYPE_POINTS) {		
+					log.warn("Processing type POINTS");		
+					double newGrade = Double.parseDouble(grade) + pointValue;
+					def.setGrade(String.valueOf(Math.min(newGrade, maxGrade)));
+				}
+				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_PERCENTAGE) {
+					log.warn("Processing type PERCENTAGE");	
+					double newGrade = Double.parseDouble(grade) + ((pointValue / 100) * maxGrade);
+					def.setGrade(String.valueOf(Math.min(newGrade, maxGrade)));
+				}
+				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_LETTER) {
+					log.warn("addScalePoints: Skipping unsupported Gradebook type of LETTER");
+					continue;
+				}
 
 				this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
-						assignmentId,
-						def.getStudentUid(),
-						def.getGrade(), null);
+							assignmentId,
+							def.getStudentUid(),
+							def.getGrade(), null);				
 			}
 
 			return true;

@@ -100,11 +100,6 @@ $lessons-checklist-background: $soft-color;
   }
 }
 
-//strange blank image at top of tool menu
-.img_site_toolmenu {
-  display: none;
-}
-
 //instruction boxes: Sakai creates variables for these colors but doesn't use them.
 .instruction{
    background: $info-background-color !important;
@@ -200,24 +195,6 @@ body.Mrphs-portalBody{
   display: none;
   @media (max-width: $break-small-end){
      display: block;
-  }
-}
-
-.quick-links {
-  display: flex;
-  @media (max-width: $break-small-end){
-     display: none;
-  }
-  .qlink {
-    padding: 0px 5px;
-    text-decoration: none;
-    & + .qlink {
-      border-left: 1px solid $top-header-text-color; 
-    }
-    &:hover {
-      text-decoration: underline;
-      color: $top-header-text-color;
-    }
   }
 }
 

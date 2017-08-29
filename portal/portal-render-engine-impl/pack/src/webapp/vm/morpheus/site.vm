@@ -33,11 +33,7 @@
 
                     #end ## END of IF (${tabsSites})
                     *#
-                    <div class="quick-links">
-                        #foreach ( $link in $tracsHeaderLinks )
-                           ${link}
-                        #end ## END of FOREACH ( $link in $tracsHeaderLinks )
-                    </div>
+
                     #parse("/vm/morpheus/includeLoginNav.vm")
                 </div>
                 

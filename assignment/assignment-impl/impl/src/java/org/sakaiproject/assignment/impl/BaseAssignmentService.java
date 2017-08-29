@@ -21,6 +21,7 @@
 
 package org.sakaiproject.assignment.impl;
 
+import edu.txstate.tracs.tk20.business.model.EportfolioAssignment;
 import edu.txstate.tracs.tk20.business.EportfolioService;
 import edu.txstate.tracs.tk20.business.model.EditStatus;
 import edu.txstate.tracs.tk20.business.model.GradebookIntegrationInfo;
@@ -14767,7 +14768,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
     }
 
   //TK20 integration stuff starts here
-  private EportfolioService eportfolioService = (EportfolioService) ComponentManager.get("edu.txstate.tracs.eportfolio.api.EportfolioService");
+  private EportfolioService eportfolioService = (EportfolioService) ComponentManager.get("edu.txstate.tracs.tk20.business.EportfolioService");
 
 	public List getListEportfolioAssignmentsForContext(String context)
 	{
@@ -14778,7 +14779,10 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		try {
 			AuthzGroup realm = authzGroupService.getAuthzGroup(SiteService.siteReference(context));
 			String courseEid = realm.getProviderGroupId();
-			eportfolioAssignments.addAll(eportfolioService.getEportfolioAssignments(courseEid, context));
+			List<EportfolioAssignment> assignments = null;
+		//	List<EportfolioAssignment> assignments = eportfolioService.getEportfolioAssignments(courseEid, context);
+			if ( assignments != null)
+				eportfolioAssignments.addAll(assignments);
 		}
 		catch (GroupNotDefinedException e) {
 			M_log.warn("failed to get site from context: " + context);

@@ -47,9 +47,8 @@ public class AddScalePointsPanel extends Panel {
 
     @SpringBean(name = "org.sakaiproject.gradebookng.business.GradebookNgBusinessService")
     protected GradebookNgBusinessService businessService;
-
+    private final IModel<Long> model;
     private final ModalWindow window;
-    private IModel<Long> model;
     private static final double DEFAULT_VALUE = 0;
 
     public AddScalePointsPanel(final String id, final IModel<Long> model, final ModalWindow window) {
@@ -63,10 +62,13 @@ public class AddScalePointsPanel extends Panel {
         super.onInitialize();
 
         final Long assignmentId = this.model.getObject();
+        final Assignment assignment = this.businessService.getAssignment(assignmentId.longValue());
+
         final GbGradingType gradeType = GbGradingType.valueOf(this.businessService.getGradebook().getGrade_type());
 
         final GradeScale gradeScale = new GradeScale();
         gradeScale.setPoints(String.valueOf(DEFAULT_VALUE));
+        gradeScale.setAssignmentId(assignmentId);
         final CompoundPropertyModel<GradeScale> formModel = new CompoundPropertyModel<GradeScale>(gradeScale);
 
         final Form<GradeScale> form = new Form<GradeScale>("form", formModel);
@@ -78,7 +80,7 @@ public class AddScalePointsPanel extends Panel {
             public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
 
                 final GradeScale gs = (GradeScale) form.getModelObject();
-                final boolean success = AddScalePointsPanel.this.businessService.addScalePoints(assignmentId, Double.parseDouble(gs.getPoints()));
+                final boolean success = AddScalePointsPanel.this.businessService.addScalePoints(assignment.getId(), assignment.getPoints(), Double.parseDouble(gs.getPoints()));
 
                 if (success) {
                     AddScalePointsPanel.this.window.close(target);

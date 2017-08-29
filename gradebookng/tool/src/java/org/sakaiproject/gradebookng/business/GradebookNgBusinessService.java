@@ -1402,27 +1402,30 @@ public class GradebookNgBusinessService {
 
 		return false;
 	}
-	public boolean addScalePoints(final long assignmentId, final double pointValue)
+	public boolean addScalePoints(final Long assignmentId, final double maxGrade, final double pointValue)
 	{
 		final String siteId = getCurrentSiteId();
 		final Gradebook gradebook = getGradebook(siteId);
 		final List<String> studentUuids = this.getGradeableUsers();
-		final List<GradeDefinition> defs = this.gradebookService.getGradesForStudentsForItem(gradebook.getUid(),
-				assignmentId, studentUuids);
+		final List<GradeDefinition> defs = this.gradebookService.getGradesForStudentsForItem(gradebook.getUid(), assignmentId, studentUuids);
 
 		try
 		{
 			for (final GradeDefinition def : defs)
 			{
-				String grade = def.getGrade();
-				if(grade == null || grade.isEmpty())
+				if(def.getGradeEntryType() != GradebookService.GRADE_TYPE_POINTS) {
+					log.warn("Ignored one due to unsupported Grade Entry Type");
 					continue;
-				if(def.getGradeEntryType() != GradebookService.GRADE_TYPE_POINTS)
-					continue;
+				}
 
-				double dGrade = Double.parseDouble(grade);
-				dGrade += pointValue;
-				//def.setGrade(String.valueOf(dGrade));
+				String grade = def.getGrade();
+				if(grade == null || grade.isEmpty()) {
+					log.warn("Ignored one due to empty Grade");
+					continue;
+				}
+				
+				double newGrade = Double.parseDouble(grade) + pointValue;
+				def.setGrade(String.valueOf(Math.min(newGrade, maxGrade)));
 
 				this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
 						assignmentId,

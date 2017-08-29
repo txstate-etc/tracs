@@ -85,8 +85,6 @@ public class AddScalePointsPanel extends Panel {
                 if (success) {
                     AddScalePointsPanel.this.window.close(target);
                     setResponsePage(GradebookPage.class);
-                } else {
-                    //ALAN - Do something here?
                 }
 
             }

@@ -27,7 +27,16 @@
 </script>
 
 #javascript("/sakai-content-tool/js/jstree/dist/jstree.min.js")
+#javascript("/library/js/expandCollapse.js")
 #css("/sakai-content-tool/js/jstree/dist/themes/default/style.min.css")
+#macro (showOwnerStatus $itemid)
+	#if($!itemOwnerStatus.get($itemid).equals("false"))
+		<i class="fa fa-ban" style="color:#990000 !important" arial-label="Inactive Participant" title="Inactive Participant"></i>
+	#elseif($!itemOwnerStatus.get($itemid).equals("deleted"))
+		<i class="fa fa-minus-circle" style="color:#990000 !important" arial-label="Deleted Participant" title="Deleted Participant"></i>
+	#end
+#end
+
 <div id="dialog-copyright"></div>
 #set($num = 0)
 <div class="portletBody specialLink">
@@ -132,10 +141,14 @@
         </li>
       #end
       #foreach ($item in $collectionPath)
+        #set ($itemid = $item.id)
         #set($qid=$item.id.replaceAll("'","\\'").replaceAll("\"", "&quot;"))
         #if($item.isLast())
           <li class="active">
             $validator.escapeHtml("$item.name")
+            #if ($!itemLevel.get($itemid) == 1)
+              #showOwnerStatus($itemid)
+            #end
           </li>
         #elseif($item.canRead())
           <li>
@@ -144,16 +157,27 @@
               title= "$tlang.getString('sh.go')">
                $validator.escapeHtml("$item.name")
             </a>
+            #if ($!itemLevel.get($itemid) == 1)
+              #showOwnerStatus($itemid)
+            #end
           </li>
           #set($upOneLevel = $item)
         #else
           <li class="active">
             $validator.escapeHtml("$item.name")
+            #if ($!itemLevel.get($itemid) == 1)
+              #showOwnerStatus($itemid)
+            #end
           </li>
         #end
       #end
     </ol>
 
+  #if($dropboxMode && $allowUpdateSite)
+    <div class="hideUnhide">
+      <a id="collapseAll" style="text-decoration:underline;" href="#"> Hide</a> | <a id="expandAll" style="text-decoration:underline;" href="#">Show</a>  Inactive Participants
+    </div>
+  #end
   #if ($dropboxMode)
     <div class="container-fluid">
       <div class="row">
@@ -345,6 +369,7 @@
 			#set($itemcount = 0)
 			#set ($unit ="em")
 			#foreach($item in $site)
+				#set ($itemid = $item.id)
 				#set($qid=$item.id.replaceAll("'","\\'").replaceAll("\"", "&quot;"))
 				#set($dqid=$item.id.replaceAll("\"", "&quot;"))
 				#if ((!$dropboxGroupPermission_enabled) || ($item.isDropbox() && $item.DropboxOwner && $dropboxGroupPermission_allGroupsUsers.contains($item.DropboxOwner)))
@@ -362,7 +387,9 @@
 				#end
 				############################### Show top level folder #################
 				<tr 
-					class="#if($item.isSelectedForCopy()) selectedCopy#end#if($item.isSelectedForMove()) selectedMove#end#if(!$item.isAvailable()) inactive#end">
+					class="#if($item.isSelectedForCopy()) selectedCopy#end#if($item.isSelectedForMove()) selectedMove#end#if(!$item.isAvailable()) inactive#end
+					#if($!itemOwnerStatus.get($qid).equals("false")||$!itemOwnerStatus.get($qid).equals("deleted")) inactivePar inactive inactiveBack#end
+					">
 					#set ($num=$num + 1)
 					<td headers="expansion" class="attach hidden-sm hidden-xs">
 					</td>
@@ -433,12 +460,19 @@
                       <span class="visible-sm-inline visible-xs-inline">$trimmedTitle</span>
                       <span class="hidden-sm hidden-xs">$validator.escapeHtml($item.name)</span>
 									#else
+										#* Disable first level of folderplus clickable for inacitve/deleted participants' folders)    -Qu  *#
+										##if ($!itemOwnerStatus.get($itemid) != "true" && $!itemLevel.get($itemid)==1)
+											##	<img src="#imageLink($item.expandIconLocation)" border= "0" alt="$item.expandLabel"  /></span>
+										##else
 										<a href="#"
     										onclick="document.getElementById('sakai_action').value='doNavigate';document.getElementById('collectionId').value='$qid';document.getElementById('navRoot').value='$validator.escapeUrl($item.root)';document.getElementById('showForm').submit();"
     										title= "$item.hoverText">
                         <span class="visible-sm-inline visible-xs-inline">$trimmedTitle</span>
                         <span class="hidden-sm hidden-xs">$validator.escapeHtml($item.name)</span>
     									</a>
+										#if(($item.depth==1 && $!itemLevel.get($itemid)==1)||($item.depth==0 && $!itemLevel.get($itemid)==1)) 
+												#showOwnerStatus($itemid)
+										#end
 									#end	
 								#else
 									#if($item.isTooBigNav())
@@ -773,6 +807,31 @@
 			############################################# end of "Other sites" section 
 		
 		</table>
+		############ Added legend for ticket #299 by -Qu ###############
+		#if ($dropboxMode && $allowUpdateSite)
+			<table class="instruction" cellpadding="0" cellspacing="0">
+				<tbody>
+					<tr>
+						<td>
+							$tlang.getString("gen.legend_title")
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<i class="fa fa-ban" style="color:#990000" arial-label="Inactive Participant" title="Inactive Participant"></i>
+							$tlang.getString("gen.footnote_legend1")
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<i class="fa fa-minus-circle" style="color:#990000" arial-label="Deleted Participant" title="Deleted Participant"></i>
+							$tlang.getString("gen.footnote_legend2")
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		#end
+
 		<div id="bottompadding" style="height:35em"> </div> 
 		
 		#foreach($key in $listActions.keySet())

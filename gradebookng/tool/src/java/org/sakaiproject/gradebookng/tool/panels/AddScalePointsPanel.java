@@ -30,6 +30,8 @@ import org.sakaiproject.gradebookng.tool.component.GbFeedbackPanel;
 import org.sakaiproject.gradebookng.tool.model.GradebookUiSettings;
 import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.apache.wicket.markup.html.form.NumberTextField;
+import org.apache.wicket.model.Model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -102,8 +104,24 @@ public class AddScalePointsPanel extends Panel {
         cancel.setDefaultFormProcessing(false);
         form.add(cancel);
 
-        form.add(new TextField<Double>("points").setRequired(true));
-        //form.add(new Label("points"), "Add Points");
+        Model<Double> pointsTextFieldModel = Model.of(0.0);
+        final NumberTextField<Double> pointsTextField = new NumberTextField<Double>("points", pointsTextFieldModel, Double.class);        
+        pointsTextField.setStep(0.1);
+        if (gradeType == GbGradingType.PERCENTAGE) 
+        {
+            pointsTextField.setMinimum(-50.0);
+            pointsTextField.setMaximum(50.0);
+            form.add(pointsTextField.setRequired(true));
+            form.add(new Label("pointsSuffix", "%"));
+        } 
+        else 
+        {
+            Double halfPoints = assignment.getPoints() / 2;
+            pointsTextField.setMinimum(halfPoints * -1.0);
+            pointsTextField.setMaximum(halfPoints);
+            form.add(pointsTextField.setRequired(true));
+            form.add(new Label("pointsSuffix", "points"));
+        }
 
         add(form);
 

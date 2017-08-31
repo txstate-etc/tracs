@@ -1,19 +1,19 @@
 package org.sakaiproject.gradebookng.tool.panels;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
+//import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.ChoiceRenderer;
-import org.apache.wicket.markup.html.form.DropDownChoice;
+//import org.apache.wicket.markup.html.form.ChoiceRenderer;
+//import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextField;
+//import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
@@ -24,7 +24,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GbRole;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
-import org.sakaiproject.gradebookng.business.model.GbGroup;
+//import org.sakaiproject.gradebookng.business.model.GbGroup;
 import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
 import org.sakaiproject.gradebookng.tool.component.GbFeedbackPanel;
 import org.sakaiproject.gradebookng.tool.model.GradebookUiSettings;
@@ -32,7 +32,7 @@ import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.apache.wicket.markup.html.form.NumberTextField;
 import org.apache.wicket.model.Model;
-
+import org.apache.wicket.validation.validator.RangeValidator;
 import lombok.Getter;
 import lombok.Setter;
 import org.sakaiproject.service.gradebook.shared.GraderPermission;
@@ -70,10 +70,13 @@ public class AddScalePointsPanel extends Panel {
 
         final GradeScale gradeScale = new GradeScale();
         gradeScale.setPoints(String.valueOf(DEFAULT_VALUE));
-        gradeScale.setAssignmentId(assignmentId);
         final CompoundPropertyModel<GradeScale> formModel = new CompoundPropertyModel<GradeScale>(gradeScale);
 
         final Form<GradeScale> form = new Form<GradeScale>("form", formModel);
+
+        Model<Double> pointsTextFieldModel = Model.of(0.0);
+        final NumberTextField<Double> pointsTextField = new NumberTextField<Double>("points", pointsTextFieldModel, Double.class);        
+        pointsTextField.setStep(1.0);
 
         final GbAjaxButton submit = new GbAjaxButton("submit") {
             private static final long serialVersionUID = 1L;
@@ -81,14 +84,19 @@ public class AddScalePointsPanel extends Panel {
             @Override
             public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
 
-                final GradeScale gs = (GradeScale) form.getModelObject();
-                final boolean success = AddScalePointsPanel.this.businessService.addScalePoints(assignment.getId(), assignment.getPoints(), Double.parseDouble(gs.getPoints()));
+                final boolean success = AddScalePointsPanel.this.businessService.addScalePoints(assignment.getId(), assignment.getPoints(), Double.parseDouble(pointsTextField.getValue()));
 
                 if (success) {
                     AddScalePointsPanel.this.window.close(target);
                     setResponsePage(GradebookPage.class);
+                } else {
+                    target.addChildren(form, GbFeedbackPanel.class);
                 }
+            }
 
+            @Override
+            protected void onError(final AjaxRequestTarget target, final Form<?> form) {
+                target.addChildren(form, GbFeedbackPanel.class);
             }
         };
         form.add(submit);
@@ -104,27 +112,26 @@ public class AddScalePointsPanel extends Panel {
         cancel.setDefaultFormProcessing(false);
         form.add(cancel);
 
-        Model<Double> pointsTextFieldModel = Model.of(0.0);
-        final NumberTextField<Double> pointsTextField = new NumberTextField<Double>("points", pointsTextFieldModel, Double.class);        
-        pointsTextField.setStep(0.1);
         if (gradeType == GbGradingType.PERCENTAGE) 
         {
-            pointsTextField.setMinimum(-50.0);
-            pointsTextField.setMaximum(50.0);
+            //pointsTextField.setMinimum(-50.0);
+            //pointsTextField.setMaximum(50.0);
+            pointsTextField.add(RangeValidator.range(-50.0, 50.0));
             form.add(pointsTextField.setRequired(true));
             form.add(new Label("pointsSuffix", "%"));
         } 
         else 
         {
             Double halfPoints = assignment.getPoints() / 2;
-            pointsTextField.setMinimum(halfPoints * -1.0);
-            pointsTextField.setMaximum(halfPoints);
+            //pointsTextField.setMinimum(halfPoints * -1.0);
+            //pointsTextField.setMaximum(halfPoints);
+            pointsTextField.add(RangeValidator.range(halfPoints * -1, halfPoints));
             form.add(pointsTextField.setRequired(true));
             form.add(new Label("pointsSuffix", "points"));
         }
 
         add(form);
-
+        
         form.add(new GbFeedbackPanel("addScalePointsFeedback"));
     }
 
@@ -138,9 +145,5 @@ public class AddScalePointsPanel extends Panel {
         @Getter
         @Setter
         private String points;
-
-        @Getter
-        @Setter
-        private Long assignmentId;
     }
 }

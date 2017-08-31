@@ -1402,7 +1402,7 @@ public class GradebookNgBusinessService {
 
 		return false;
 	}
-	public boolean addScalePoints(final Long assignmentId, final double maxGrade, final double pointValue)
+	public boolean addScalePoints(final Long assignmentId, final double maxGradePoints, final double pointValue)
 	{
 		final String siteId = getCurrentSiteId();
 		final Gradebook gradebook = getGradebook(siteId);
@@ -1415,20 +1415,20 @@ public class GradebookNgBusinessService {
 			{
 				String grade = def.getGrade();
 				if(grade == null || grade.isEmpty()) {
-					log.warn("addScalePoints: Ignored one Grade Definition due to empty Grade");
+					log.warn("Ignored one Grade Definition due to empty Grade");
 					continue;
 				}
 
 				if(def.getGradeEntryType() == GradebookService.GRADE_TYPE_POINTS) {			
 					double newGrade = Double.parseDouble(grade) + pointValue;
-					def.setGrade(String.valueOf(Math.min(newGrade, maxGrade)));
+					def.setGrade(String.valueOf(Math.min(newGrade, maxGradePoints)));
 				}
 				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_PERCENTAGE) {
-					double newGrade = Double.parseDouble(grade) + ((pointValue / 100) * maxGrade);
-					def.setGrade(String.valueOf(Math.min(newGrade, maxGrade)));
+					double newGrade = Double.parseDouble(grade) + ((pointValue / 100.0) * maxGradePoints);
+					def.setGrade(String.valueOf(Math.min(newGrade, 100.0)));
 				}
 				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_LETTER) {
-					log.warn("addScalePoints: Skipping unsupported Gradebook type of LETTER");
+					log.warn("Skipping unsupported Gradebook type of LETTER");
 					continue;
 				}
 

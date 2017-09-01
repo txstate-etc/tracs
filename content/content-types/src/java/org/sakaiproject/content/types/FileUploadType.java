@@ -209,6 +209,9 @@ public class FileUploadType extends BaseResourceType
 		
 		@Override
 		public boolean available(ContentEntity entity) {
+			//Fixing null entity handling  bugid:5673  -Qu 12/16/2013
+			if(null == entity) return false;
+
 			boolean enabled = false;
 			if (entity instanceof ContentResource) {
 				enabled = ServerConfigurationService.getBoolean(ContentHostingService.RESOURCES_ZIP_ENABLE, true) ||

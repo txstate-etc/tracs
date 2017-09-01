@@ -59,7 +59,10 @@ import org.sakaiproject.alias.api.AliasEdit;
 import org.sakaiproject.alias.api.AliasService;
 import org.sakaiproject.antivirus.api.VirusFoundException;
 import org.sakaiproject.authz.api.PermissionsHelper;
+import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
+import org.sakaiproject.authz.api.GroupNotDefinedException;
+import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.cover.SecurityService;
 import org.sakaiproject.cheftool.Context;
 import org.sakaiproject.cheftool.JetspeedRunData;
@@ -432,6 +435,12 @@ public class ResourcesAction
 	public static final String SYS = "sys.";
 	public static final String REQUEST = "request.";
 	
+	//For ticket #299 by -Qu
+	/** Mapping of resource item id and its owner's status in the site */
+	public static Map<String, String> itemOwnerStatus = new HashMap<String, String>();
+	/** Mapping of resource item id and its level in the folder tree */
+	public static Map<String, Integer> itemLevel = new HashMap<String,Integer>();
+
 	public static final List<ActionType> ACTIONS_ON_FOLDERS = new ArrayList<ActionType>();
 	public static final List<ActionType> ACTIONS_ON_MULTIPLE_ITEMS = new ArrayList<ActionType>();
 	public static final List<ActionType> ACTIONS_ON_RESOURCES = new ArrayList<ActionType>();
@@ -4296,7 +4305,11 @@ protected static final String PARAM_PAGESIZE = "collections_per_page";
 			catch (PermissionException e) {}
 		}
 		boolean allowUpdateSite = SiteService.allowUpdateSite(ToolManager.getCurrentPlacement().getContext());
-		if(atHome && SiteService.allowUpdateSite(ToolManager.getCurrentPlacement().getContext()))
+		if (allowUpdateSite) {
+			context.put("allowUpdateSite", Boolean.TRUE.toString());
+		}
+
+		if(atHome && allowUpdateSite)
 		{
 			if(dropboxMode)
 			{
@@ -4443,6 +4456,13 @@ protected static final String PARAM_PAGESIZE = "collections_per_page";
 			
 			List<ListItem> items = item.convert2list();
 			
+			//build itemOwnerStatus - a map  for itemid-> its owner's status in the site, ticket #299  -Qu
+			//build itemLevel - a map  for itemid-> folder level in the tree
+			Site site = SiteService.getSite(ToolManager.getCurrentPlacement().getContext());
+			String realmId = SiteService.siteReference(site.getId());
+			AuthzGroup realm ;
+			try {
+				realm = authzGroupService.getAuthzGroup(realmId);
 			for(ListItem lItem : items)
 			{
 				if(lItem.hasMultipleItemActions())
@@ -4456,7 +4476,28 @@ protected static final String PARAM_PAGESIZE = "collections_per_page";
 						}
 					}
 				}
+					//make sure that we won't need to gather status info if
+					//it is not dropbox tool(like resources tool)
+					if(dropboxMode){
+						String userId = getUserId(lItem.id);
+						String status = null;
+						if ( userId != null){
+							Member member = realm.getMember(userId);
+							if (member != null)
+								status = new Boolean(member.isActive()).toString();
+							else
+								status = "deleted";
+						}
+						itemLevel.put(lItem.id, getItemLevel(lItem.id));
+						itemOwnerStatus.put(lItem.id, status);
+					}
+				}
+			} catch (GroupNotDefinedException e) {
+				logger.warn(this + e.toString());
 			}
+
+			context.put("itemOwnerStatus", itemOwnerStatus);
+			context.put("itemLevel", itemLevel);
 			
                           // listActions needs to add Show and Hide
                         boolean canShowHide = canReviseOwn() || canReviseAny();
@@ -4469,7 +4510,7 @@ protected static final String PARAM_PAGESIZE = "collections_per_page";
 			if(contentService.COLLECTION_DROPBOX.equals(containingCollectionId))
 			{
 				Reference ref = EntityManager.newReference(contentService.getReference(item.getId()));
-				Site site = SiteService.getSite(ref.getContext());
+//				Site site = SiteService.getSite(ref.getContext());
 				String[] args = {site.getTitle()};
 				item.setName(trb.getFormattedMessage("title.dropbox", args));
 				
@@ -4478,7 +4519,7 @@ protected static final String PARAM_PAGESIZE = "collections_per_page";
 			else if(contentService.COLLECTION_SITE.equals(containingCollectionId))
 			{
 				Reference ref = EntityManager.newReference(contentService.getReference(item.getId()));
-				Site site = SiteService.getSite(ref.getContext());
+//				Site site = SiteService.getSite(ref.getContext());
 				String[] args = {site.getTitle()};
 				item.setName(trb.getFormattedMessage("title.resources", args));
 			}
@@ -9378,6 +9419,40 @@ protected static final String PARAM_PAGESIZE = "collections_per_page";
 		errorMessages.add(message);
 	}
 	
+	/**This gives the user id from an item id in the content.
+	 * It depends on the pattern of the item id the system use
+	 * itemId is like "/group-user/39bc155a-9191-464c-0096-dad098706e5a/4650c1bf-b622-4b95-005c-ca28660428b1/"
+	 * @param itemId
+	 * @return user id
+	 * Added by -Qu for ticket #299
+	 */
+	public String getUserId(String itemId){
+		String userId = null;
+		if (itemId != null &&  itemId.contains("/")){
+			String[] ids = itemId.split("/");
+			if (ids.length < 4)
+				userId = null;
+			else
+				userId = ids[3];
+		}
+		return userId;
+	}
+
+	/** This gives the folder level of the item in the folder tree
+	 *  site level: 0
+	 *  site participant's root folder: 1
+	 *  site participant's subfolders: 2,3.....
+	 * @param itemId
+	 * @return folder level of an item
+	 * Added by -Qu for ticket #299
+	 */
+	public Integer getItemLevel(String itemId){
+		int itemLevel = 0;
+		String[] ids = itemId.split("/");
+		itemLevel = ids.length - 3;
+		return itemLevel;
+	}
+
 	public static void checkMessageList(SessionState state)
 	{
 		logger.debug("ResourcesAction.checkMessageList()");

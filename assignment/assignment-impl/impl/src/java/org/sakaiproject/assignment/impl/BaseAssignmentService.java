@@ -14774,13 +14774,13 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 	{
 		M_log.debug(this + " getListEportfolioAssignmentsForContext : CONTEXT : " + context);
 
-		List eportfolioAssignments = new ArrayList<Assignment>();
+		List eportfolioAssignments = new ArrayList<EportfolioAssignment>();
 
 		try {
 			AuthzGroup realm = authzGroupService.getAuthzGroup(SiteService.siteReference(context));
 			String courseEid = realm.getProviderGroupId();
 			List<EportfolioAssignment> assignments = null;
-		//	List<EportfolioAssignment> assignments = eportfolioService.getEportfolioAssignments(courseEid, context);
+			assignments = eportfolioService.getEportfolioAssignments(courseEid, context);
 			if ( assignments != null)
 				eportfolioAssignments.addAll(assignments);
 		}
@@ -14788,7 +14788,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			M_log.warn("failed to get site from context: " + context);
 		}
 
-		return eportfolioAssignments;
+		return (List<Assignment>)eportfolioAssignments;
 	}
 
 	public Assignment findEportfolioAssignment(String assignmentReference) {

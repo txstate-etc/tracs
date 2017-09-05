@@ -17,7 +17,7 @@
 | cmprovider                   | DONE             |
 | common                       | DONE             |
 | config                       | DONE             |
-| content                      | Anne             |
+| content                      | DONE             |
 | content-review               | DONE             |
 | courier                      | NO LOCAL CHANGES |
 | dashboard                    | DONE             |
@@ -54,7 +54,7 @@
 | podcasts                     | DONE             |
 | polls                        | DONE             |
 | portal                       | DONE             |
-| portal-skin                  |                  |
+| portal-skin                  | DONE             |
 | postem                       | DONE             |
 | presence                     | NO LOCAL CHANGES |
 | profile2                     | DONE             |
@@ -82,7 +82,7 @@
 | tool                         | DONE             |
 | turnitin                     | DONE             |
 | turningpoint                 | DONE             |
-| user                         | Anne             |
+| user                         | DONE             |
 | userauditservice             | NO LOCAL CHANGES |
 | usermembership               | NO LOCAL CHANGES |
 | velocity                     | NO LOCAL CHANGES |

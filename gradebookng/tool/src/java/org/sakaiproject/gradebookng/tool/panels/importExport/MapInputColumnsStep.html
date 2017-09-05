@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+
+<body>
+<wicket:panel>
+
+    <form class="form-horizontal" wicket:id="form">
+        <div class="form-group">
+
+            <div class="help-block">
+                <p><wicket:message key="Automatic mapping failed. Please specify columns below:" /></p>
+            </div>
+
+            <div class="form-group form-group-sm">
+                <div class="col-xs-4">
+                    <div class="input-group">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-offset-4 col-xs-5">
+                <button class="button_color" wicket:id="submit"><wicket:message key="button.done" /></button>
+                <button wicket:id="cancel"><wicket:message key="button.cancel"/></button>
+            </div>
+
+        </div>
+    </form>
+</wicket:panel>
+</body>
+</html>

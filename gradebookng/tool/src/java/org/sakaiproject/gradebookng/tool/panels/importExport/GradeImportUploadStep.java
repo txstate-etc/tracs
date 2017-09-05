@@ -125,6 +125,13 @@ public class GradeImportUploadStep extends Panel {
 					return;
 				}
 
+				if(ImportGradesHelper.ErrorsList.length() > 0)
+				{
+					// 1) Show Dialog here to Map Input Columns manually
+					// 2) Apply apply user decisions in the form of column Title and Type changes to the spreadsheetWrapper
+					// 3) Continue forward and process as usual
+				}
+
 				//get existing data
 				final List<Assignment> assignments = GradeImportUploadStep.this.businessService.getGradebookAssignments();
 				final List<GbStudentGradeInfo> grades = GradeImportUploadStep.this.businessService.buildGradeMatrix(assignments);

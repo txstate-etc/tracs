@@ -1402,32 +1402,40 @@ public class GradebookNgBusinessService {
 
 		return false;
 	}
-	public boolean addScalePoints(final long assignmentId, final double pointValue)
+	public boolean addScalePoints(final Long assignmentId, final double maxGradePoints, final double pointValue)
 	{
 		final String siteId = getCurrentSiteId();
 		final Gradebook gradebook = getGradebook(siteId);
 		final List<String> studentUuids = this.getGradeableUsers();
-		final List<GradeDefinition> defs = this.gradebookService.getGradesForStudentsForItem(gradebook.getUid(),
-				assignmentId, studentUuids);
+		final List<GradeDefinition> defs = this.gradebookService.getGradesForStudentsForItem(gradebook.getUid(), assignmentId, studentUuids);
 
 		try
 		{
 			for (final GradeDefinition def : defs)
 			{
 				String grade = def.getGrade();
-				if(grade == null || grade.isEmpty())
+				if(grade == null || grade.isEmpty()) {
+					log.warn("Ignored one Grade Definition due to empty Grade");
 					continue;
-				if(def.getGradeEntryType() != GradebookService.GRADE_TYPE_POINTS)
-					continue;
+				}
 
-				double dGrade = Double.parseDouble(grade);
-				dGrade += pointValue;
-				//def.setGrade(String.valueOf(dGrade));
+				if(def.getGradeEntryType() == GradebookService.GRADE_TYPE_POINTS) {			
+					double newGrade = Double.parseDouble(grade) + pointValue;
+					def.setGrade(String.valueOf(Math.min(newGrade, maxGradePoints)));
+				}
+				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_PERCENTAGE) {
+					double newGrade = Double.parseDouble(grade) + ((pointValue / 100.0) * maxGradePoints);
+					def.setGrade(String.valueOf(Math.min(newGrade, 100.0)));
+				}
+				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_LETTER) {
+					log.warn("Skipping unsupported Gradebook type of LETTER");
+					continue;
+				}
 
 				this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
-						assignmentId,
-						def.getStudentUid(),
-						def.getGrade(), null);
+							assignmentId,
+							def.getStudentUid(),
+							def.getGrade(), null);				
 			}
 
 			return true;

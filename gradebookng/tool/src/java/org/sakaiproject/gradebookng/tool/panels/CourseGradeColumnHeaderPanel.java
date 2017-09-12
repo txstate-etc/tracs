@@ -172,6 +172,19 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 		showHidePoints.add(new Label("showHidePointsLabel", showHidePointsModel));
 		menu.add(showHidePoints);
 
+		menu.add(new GbAjaxLink("viewCourseGradeStatistics") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onClick(final AjaxRequestTarget target) {
+				final GradebookPage gradebookPage = (GradebookPage) getPage();
+				final GbModalWindow window = gradebookPage.getCourseGradeStatisticsWindow();
+				window.setComponentToReturnFocusTo(getParentCellFor(this));
+				window.setContent(new CourseGradeStatisticsPanel(window.getContentId(), window));
+				window.show(target);
+			}
+		});
+
 		add(menu);
 	}
 

@@ -13,10 +13,9 @@ var timeoutLoggedoutUrl;
 var timeoutPortalPath;
 
 $PBJQ(document).ready(function(){
-
   // note a session exists whether the user is logged in or no
-  if (portal.loggedIn && portal.timeoutDialog) {
-    setTimeout('setup_timeout_config();', 60000);
+  if (portal.loggedIn) {
+    setTimeout(refresh_session, 60000);
   }
 
 });
@@ -35,6 +34,21 @@ var setup_timeout_config = function(){
 
   }
 
+}
+
+var refresh_session = function(){
+    jQuery.ajax({
+        url: "/direct/session/" + sessionId + ".json",
+        cache: false,
+        dataType: "json",
+        success: function(data){
+            clearTimeout(sessionTimeOut);
+            sessionTimeOut = setTimeout(refresh_session, (60000));
+        },
+        error: function(XMLHttpRequest, status, error){
+            // Should we do anything here? Keep trying?
+        }
+    });
 }
 
 var poll_session_data = function(){

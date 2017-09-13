@@ -77,6 +77,11 @@ public class FakeUserDirectoryService implements UserDirectoryService {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public void updateUsersProperty(Map<String,Boolean> usersPropertyMap, String property) {
+		// TODO Auto-generated method stub
+	}
+
 	public boolean updateUserId(String eId, String newEmail) {
 		return false;
 	}

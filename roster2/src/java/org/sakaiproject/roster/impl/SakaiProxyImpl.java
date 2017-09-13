@@ -19,6 +19,8 @@
 
 package org.sakaiproject.roster.impl;
 
+import edu.txstate.tracs.warehouse.WarehouseService;
+
 import java.util.*;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -37,6 +39,8 @@ import org.sakaiproject.coursemanagement.api.Enrollment;
 import org.sakaiproject.coursemanagement.api.EnrollmentSet;
 import org.sakaiproject.coursemanagement.api.Section;
 import org.sakaiproject.coursemanagement.api.exception.IdNotFoundException;
+import org.sakaiproject.entity.api.EntityPropertyNotDefinedException;
+import org.sakaiproject.entity.api.EntityPropertyTypeException;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.event.api.Event;
 import org.sakaiproject.event.api.EventTrackingService;
@@ -92,7 +96,10 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 	private ToolManager toolManager;
 	private UserDirectoryService userDirectoryService;
     private RosterMemberComparator memberComparator;
-	
+    private WarehouseService warehouseService;
+
+    private final static String PPT_CONF="confidential";
+
 	public void init() {
 		
 		List<String> registered = functionManager.getRegisteredFunctions();
@@ -372,26 +379,28 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 			log.error("Site '" + siteId + "' not found. Returning null ...");
             return null;
 		}
-
+		List<RosterMember> rosterMembers = new ArrayList<RosterMember>();
         if (site.isType("course") && enrollmentSetId != null) {
-            return getEnrollmentMembership(site, enrollmentSetId, enrollmentStatus, currentUserId);
+            rosterMembers = getEnrollmentMembership(site, enrollmentSetId, enrollmentStatus, currentUserId);
         } else {
-            List<RosterMember> rosterMembers = getAndCacheSortedMembership(site, groupId, roleId);
+            rosterMembers = getAndCacheSortedMembership(site, groupId, roleId);
             rosterMembers = filterMembers(site, currentUserId, rosterMembers, groupId);
-            return rosterMembers;
         }
+        return rosterMembers;
 	}
-		
+
     private Map<String, User> getUserMap(Set<Member> members) {
 
         Map<String, User> userMap = new HashMap<String, User>();
 
         Set<String> userIds = new HashSet<String>();
+        Set<String> userEids = new HashSet<String>();
 
         // Build a map of userId to role
         for (Member member : members) {
-        	//Add all members, not only active -Qu
-				userIds.add(member.getUserId());
+             //Add all members, not only active -Qu
+             userIds.add(member.getUserId());
+             userEids.add(member.getUserEid());
         }
 
         // Get the user objects
@@ -399,9 +408,14 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
             userMap.put(user.getId(), user);
         }
 
+        //update user objects for user properties on the fly; here for user confidentials
+        Map<String, Boolean> usersConfidentialMap = new HashMap<String, Boolean>();
+        usersConfidentialMap = warehouseService.getUsersConfidentialMap(userEids);
+        userDirectoryService.updateUsersProperty(usersConfidentialMap, PPT_CONF);
+
         return userMap;
     }
-		
+
     /**
      * @return A mapping of RosterMember onto eid
      */
@@ -591,7 +605,7 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 		rosterMember.setDisplayName(user.getDisplayName());
 		rosterMember.setPlid(user.getPlid());
 		rosterMember.setActive(member.isActive());
-		rosterMember.setConfidential(true);
+		rosterMember.setConfidential(isConfidential(user));
 
 		rosterMember.setSortName(user.getSortName());
 
@@ -1072,7 +1086,18 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
 	private boolean isAllowed(String userId, String permission, String reference) {
 		return securityService.unlock(userId, permission, reference);
 	}
-	
+
+	private boolean isConfidential(User user) {
+		boolean isConfidential = false;
+		try {
+			isConfidential = user.getProperties().getBooleanProperty("confidential");
+		} catch (EntityPropertyNotDefinedException e) {
+			log.info("User" + user.getDisplayId() + " is not in our system directory.");
+		} catch (EntityPropertyTypeException e) {
+			log.info("Wrong user property type");
+		}
+		return isConfidential;
+	}
 	
 	/**
 	 * {@inheritDoc}

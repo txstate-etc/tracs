@@ -1,20 +1,23 @@
 package edu.txstate.tracs.jdbc;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-public class BaseJdbcDao extends JdbcDaoSupport
+
+public class BaseJdbcDao extends NamedParameterJdbcDaoSupport
 {
-  private static final Log LOG = LogFactory.getLog(BaseJdbcDao.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BaseJdbcDao.class);
 
   private Queries queries;
 
@@ -81,7 +84,50 @@ public class BaseJdbcDao extends JdbcDaoSupport
     }
     catch (DataAccessException ex)
     {
-      LOG.error("There was an error executing query " + queryName + "with args " + args.toString());
+      LOG.error("There was an error executing query " + queryName + " with args " + args.toString());
+      ex.printStackTrace();
+      return null;
+    }
+  }
+
+  protected List<Map<String, Object>> queryForList(String queryName, MapSqlParameterSource parameters)
+  {
+    try
+    {
+      String query = queries.get(queryName);
+      LOG.info("Getting query : " + queryName + " with parameters " + parameters.toString());
+      return getNamedParameterJdbcTemplate().queryForList(query, parameters);
+    }
+    catch (QueryNotFoundException ex)
+    {
+      LOG.error("Can't find query " + queryName);
+      ex.printStackTrace();
+      return null;
+    }
+    catch (DataAccessException ex)
+    {
+      LOG.error("There was an error executing query " + queryName + " with parameters " + parameters.toString());
+      ex.printStackTrace();
+      return null;
+    }
+  }
+
+  protected Object queryForObject(String queryName, MapSqlParameterSource parameters, Class requiredType)
+  {
+    try
+    {
+      String query = queries.get(queryName);
+      return getNamedParameterJdbcTemplate().queryForObject(query, parameters, requiredType);
+    }
+    catch (QueryNotFoundException ex)
+    {
+      LOG.error("Can't find query " + queryName);
+      ex.printStackTrace();
+      return null;
+    }
+    catch (DataAccessException ex)
+    {
+      LOG.error("There was an error executing query " + queryName + " with parameters " + parameters.toString());
       ex.printStackTrace();
       return null;
     }
@@ -107,7 +153,7 @@ public class BaseJdbcDao extends JdbcDaoSupport
     }
     catch (DataAccessException ex)
     {
-      LOG.error("There was an error executing query " + queryName + "with args " + args.toString());
+      LOG.error("There was an error executing query " + queryName + " with args " + args.toString());
       ex.printStackTrace();
       return null;
     }
@@ -206,7 +252,7 @@ public class BaseJdbcDao extends JdbcDaoSupport
     }
     catch (DataAccessException ex)
     {
-      LOG.error("There was an error executing query " + queryName + "with args " + args.toString());
+      LOG.error("There was an error executing query " + queryName + " with args " + args.toString());
       ex.printStackTrace();
       return 0;
     }

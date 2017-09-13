@@ -2,6 +2,7 @@ package edu.txstate.tracs.warehouse;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class WarehouseDatabaseService implements WarehouseService {
 
@@ -12,7 +13,7 @@ public class WarehouseDatabaseService implements WarehouseService {
         return warehouseDao.isUserConfidential(netid);
     }
 
-    public Map<String, Boolean> getUserConfidentailMap(List<String> netids) {
-        return warehouseDao.getUserConfidentialMap(netids);
+    public Map<String, Boolean> getUsersConfidentialMap(Set<String> netids) {
+        return warehouseDao.getUsersConfidentialMap(netids);
     }
 }

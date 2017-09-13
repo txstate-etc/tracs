@@ -12,6 +12,7 @@
   <groupId>edu.txstate.tracs</groupId>
   <artifactId>warehouse</artifactId>
   <packaging>pom</packaging>
+  <version>2</version>
   <inceptionYear>2016</inceptionYear>
 
   <dependencyManagement>
@@ -21,6 +22,7 @@
         <artifactId>tracs-jdbc</artifactId>
         <version>1.0</version>
       </dependency>
+
     </dependencies>
   </dependencyManagement>
 

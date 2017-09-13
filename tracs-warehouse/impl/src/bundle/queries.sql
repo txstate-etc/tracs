@@ -3,5 +3,5 @@ get_confidential_from_person {
 }
 
 get_confidential_map_from_person {
-  select netid, confidential from person where netid in ?
+  select netid, confidential from person where netid in (:netids)
 }

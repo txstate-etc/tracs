@@ -4,7 +4,7 @@
   <parent>
     <groupId>edu.txstate.tracs</groupId>
     <artifactId>warehouse</artifactId>
-    <version>11.3</version>
+    <version>2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -30,6 +30,7 @@
       <groupId>edu.txstate.tracs</groupId>
       <artifactId>warehouse-api</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

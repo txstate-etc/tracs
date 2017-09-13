@@ -54,7 +54,6 @@ public class GradeImportUploadStep extends Panel {
 	@Override
 	public void onInitialize() {
 		super.onInitialize();
-
 		add(new ExportPanel("export"));
 		add(new UploadForm("form"));
 	}
@@ -125,15 +124,21 @@ public class GradeImportUploadStep extends Panel {
 					return;
 				}
 
+				final List<Assignment> assignments = GradeImportUploadStep.this.businessService.getGradebookAssignments();
+
 				if(ImportGradesHelper.ErrorsList.length() > 0)
 				{
-					// 1) Show Dialog here to Map Input Columns manually
-					// 2) Apply apply user decisions in the form of column Title and Type changes to the spreadsheetWrapper
-					// 3) Continue forward and process as usual
+					log.info("Completed with errors. Prompting user to manually select columns");
+					ColumnMap columnMap = new ColumnMap(spreadsheetWrapper.getColumns(), ImportGradesHelper.ErrorsList);
+					final MapInputColumnsStep mapInputColumns = new MapInputColumnsStep(GradeImportUploadStep.this.panelId, Model.of(columnMap));
+					mapInputColumns.setOutputMarkupId(true);
+					GradeImportUploadStep.this.replaceWith(mapInputColumns);
+					//spreadsheetWrapper.setColumns(mapInputColumns.getImportedColumns());
+					return;
 				}
 
 				//get existing data
-				final List<Assignment> assignments = GradeImportUploadStep.this.businessService.getGradebookAssignments();
+				
 				final List<GbStudentGradeInfo> grades = GradeImportUploadStep.this.businessService.buildGradeMatrix(assignments);
 
 				// process file

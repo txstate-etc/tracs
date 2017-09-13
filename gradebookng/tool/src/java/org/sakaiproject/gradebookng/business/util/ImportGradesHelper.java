@@ -489,7 +489,7 @@ public class ImportGradesHelper {
 		for (int i = 0; i < line.length; i++) {
 
 			ImportedColumn column = new ImportedColumn();
-
+			column.setUnparsedTitle(line[i]);
 			log.warn("i: " + i);
 			log.warn("line[i]: " + line[i]);
 
@@ -521,7 +521,7 @@ public class ImportGradesHelper {
 	 */
 	private static ImportedColumn parseHeaderToColumn(final String headerValue) throws GbImportExportInvalidColumnException {
 
-		//NOTE: Special characters in the GB Item name will currently throw this parser off its game
+		//NOTE: Special characters in the GB Item name will currently throw this parser off
 		if(StringUtils.isBlank(headerValue)) {
 			throw new GbImportExportInvalidColumnException("Invalid column header: " + headerValue);
 		}
@@ -529,6 +529,7 @@ public class ImportGradesHelper {
 		log.warn("headerValue: " + headerValue);
 
 		final ImportedColumn column = new ImportedColumn();
+		column.setUnparsedTitle(headerValue);
 
 		// assignment with points header
 		final Matcher m1 = ASSIGNMENT_WITH_POINTS_PATTERN.matcher(headerValue);

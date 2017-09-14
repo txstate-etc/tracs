@@ -126,7 +126,7 @@
           <!--      <module>appserverpicker</module> -->
           <!--      <module>admintools</module> -->
                 <module>rest</module>
-          <!--      <module>warehouse</module> -->
+                <module>tracs-warehouse</module>
           <!--      <module>notifications</module> -->
 
                 <!-- Contrib Tools -->

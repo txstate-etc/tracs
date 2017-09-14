@@ -69,7 +69,8 @@ public class CourseGradeStatisticsPanel extends Panel {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             CourseGrade cg = (CourseGrade) pair.getValue();
-            grades.add(Double.parseDouble(cg.getCalculatedGrade()));
+            if(null != cg.getCalculatedGrade())
+                grades.add(Double.parseDouble(cg.getCalculatedGrade()));
         }
 
         Collections.sort(grades);
@@ -146,13 +147,22 @@ public class CourseGradeStatisticsPanel extends Panel {
 
         add(new JFreeChartImageWithToolTip("chart", Model.of(chart), "tooltip", 540, 300));
 
-        add(new Label("average", constructAverageLabel(grades)));
-        add(new Label("median", constructMedianLabel(grades)));
-        add(new Label("graded", String.valueOf(courseGrades.size())));
-        add(new Label("deviation", constructStandardDeviationLabel(grades)));
-        add(new Label("lowest", constructLowestLabel(grades)));
-        add(new Label("highest", constructHighestLabel(grades)));
-
+        if(grades.size() > 0) {
+            add(new Label("average", constructAverageLabel(grades)));
+            add(new Label("median", constructMedianLabel(grades)));
+            add(new Label("graded", String.valueOf(courseGrades.size())));
+            add(new Label("deviation", constructStandardDeviationLabel(grades)));
+            add(new Label("lowest", constructLowestLabel(grades)));
+            add(new Label("highest", constructHighestLabel(grades)));
+        }
+        else {
+            add(new Label("average", "-"));
+            add(new Label("median", "-"));
+            add(new Label("graded", "-"));
+            add(new Label("deviation", "-"));
+            add(new Label("lowest", "-"));
+            add(new Label("highest", "-"));
+        }
         final GbAjaxButton done = new GbAjaxButton("done") {
             private static final long serialVersionUID = 1L;
 

@@ -2000,6 +2000,17 @@ public abstract class BaseUserDirectoryService implements UserDirectoryService, 
 		return u;
 	}
 
+	public void updateUsersProperty(Map<String,Boolean> userConfidentialMap, String property) {
+		for(Map.Entry<String, Boolean> entry : userConfidentialMap.entrySet() ) {
+			try {
+				User user = getUserByEid(entry.getKey());
+				user.getProperties().addProperty(property, entry.getValue().toString());
+			} catch (UserNotDefinedException e) {
+				M_log.info("User " + entry.getKey() + "doesn't exists");
+			}
+		}
+	}
+
 	public boolean updateUserId(String id,String newEmail)
 	{
 		try {

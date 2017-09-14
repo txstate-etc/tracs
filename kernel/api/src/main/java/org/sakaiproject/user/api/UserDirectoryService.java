@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -178,6 +179,9 @@ public interface UserDirectoryService extends EntityProducer
 	 * @return true if the user is allowed to update their own first and last names, false if not.
 	 */
 	public boolean allowUpdateUserName(String id);
+
+	public void updateUsersProperty(Map<String,Boolean> usersPropertyMap, String property);
+
 	/**
 	 * Gets the UserEdit object from storage inorder to update the user Eid()
 	 *

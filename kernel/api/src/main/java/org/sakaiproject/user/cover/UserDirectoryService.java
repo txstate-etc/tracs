@@ -21,6 +21,8 @@
 
 package org.sakaiproject.user.cover;
 
+import java.util.Map;
+
 import org.sakaiproject.component.cover.ComponentManager;
 
 /**
@@ -152,6 +154,14 @@ public class UserDirectoryService
 		if (service == null) return false;
 
 		return service.allowUpdateUser(param0);
+	}
+
+	public static void updateUsersProperty(java.util.Map<java.lang.String,java.lang.Boolean> param0, String param1)
+	{
+		org.sakaiproject.user.api.UserDirectoryService service = getInstance();
+		if (service == null) return;
+
+		service.updateUsersProperty(param0,param1);
 	}
 
 	public static boolean updateUserId(java.lang.String param0,java.lang.String param1)

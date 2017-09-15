@@ -156,6 +156,13 @@ $lessons-checklist-background: $soft-color;
     padding: .2em;
     position: relative;
     font-weight: 500;
+    .view-all-sites-btn {
+      display: inline;
+      z-index: auto !important;
+      i {
+        margin-right: 0.35em;
+      }
+    }
   }
   .Mrphs-sitesNav__submenuitem {
     a {

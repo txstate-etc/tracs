@@ -26,8 +26,13 @@
                     </li>
 
                 #end ## END of IF (${site.isMyWorkspace})
-
             #end ## END of FOREACH ( $site in $tabsSites.tabsSites )
+            <li class="Mrphs-sitesNav__menuitem">
+                <a class="link-container view-all-sites-btn" href="#" title="${rloader.sit_worksites}" role="menuitem" aria-haspopup="true">
+                    <i class="fa fa-th"></i>
+                    <span>${rloader.sit_worksites}</span>
+                </a>
+            </li>
         </ul>
     </div>
 

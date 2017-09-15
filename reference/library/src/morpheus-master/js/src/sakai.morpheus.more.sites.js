@@ -35,8 +35,10 @@ var dhtml_view_sites = function(){
 
         var topPosition = allSitesButton.offset().top + allSitesButton.outerHeight() + topPadding;
         var rightPosition = $PBJQ('body').outerWidth() - (allSitesButton.offset().left + allSitesButton.outerWidth());
+        var leftPosition = allSitesButton.offset().left + "px";
         if( $PBJQ('html').attr('dir') !== "rtl" ){
-          modal.css('top', topPosition).css('right', rightPosition);
+          // modal.css('top', topPosition).css('right', rightPosition);
+          modal.css('top', topPosition).css('left', leftPosition);
         }else{
           modal.css('top', topPosition).css('left', $PBJQ('body').outerWidth() - rightPosition );
         }

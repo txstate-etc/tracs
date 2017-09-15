@@ -48,7 +48,11 @@ $lessons-checklist-background: $soft-color;
 
 // This is the separator between the Sites and Sakai menus in the top right corner
 .is-maximized #loginLinks {
-  border-color: $top-header-text-color;
+  border-color: transparent;
+}
+
+#selectSiteModal::after {
+  display: none;
 }
 
 //Change default color of Tools and Sites bar on mobile

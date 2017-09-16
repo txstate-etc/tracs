@@ -37,3 +37,7 @@
 	path = bbb
 	url = https://github.com/txstate-etc/bbb-tool.git
 	branch = tracs
+[submodule "tracs-pearson"]
+	path = tracs-pearson
+	url = https://git.txstate.edu/its/tracs-pearson.git
+	branch = tracs

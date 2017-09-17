@@ -120,13 +120,14 @@
                 
                 <!-- TxState Specific -->
                 <module>tracs-jdbc</module>
-          <!--      <module>tracs-pearson</module> -->
+                <module>tracs-pearson</module>
+                <module>tracs-examity</module>
                 <module>tracs-tk20</module>
+                <module>tracs-warehouse</module>
           <!--      <module>tracs-admin</module>-->
-          <!--      <module>appserverpicker</module> -->
+                <module>appserverpicker</module>
           <!--      <module>admintools</module> -->
                 <module>rest</module>
-                <module>tracs-warehouse</module>
           <!--      <module>notifications</module> -->
 
                 <!-- Contrib Tools -->
@@ -136,7 +137,6 @@
           <!--      <module>turningpoint</module> -->
                 <module>irubric/irubric-core</module>
                 <module>irubric/irubric-tool</module>
-        <!--        <module>examity</module> -->
 
                 <!-- Contrib Dependencies -->
                 <module>roster-legacy</module>

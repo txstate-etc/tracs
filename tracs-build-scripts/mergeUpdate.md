@@ -4,6 +4,7 @@
 | access                       | NO LOCAL CHANGES |
 | alias                        | NO LOCAL CHANGES |
 | announcement                 | DONE             |
+| appserverpicker              | DONE             |
 | archive                      | NO LOCAL CHANGES |
 | assignment                   | DONE             |
 | authz                        | NO LOCAL CHANGES |
@@ -37,7 +38,7 @@
 | irubric                      | DONE             |
 | jobscheduler                 | DONE             |
 | jsf                          | DONE             |
-| kernel                       |                  |
+| kernel                       | DONE             |
 | lessonbuilder                | DONE             |
 | login                        | DONE             |
 | lticontact                   | DONE             |
@@ -89,3 +90,7 @@
 | web                          | DONE             |
 | webservices                  |                  |
 | tracs-tk20                   | DONE             |
+| tracs-examity                | DONE             |
+| tracs-pearson                | DONE             |
+| tracs-warehouse              | DONE             |
+| tracs-jdbc                   | DONE             |

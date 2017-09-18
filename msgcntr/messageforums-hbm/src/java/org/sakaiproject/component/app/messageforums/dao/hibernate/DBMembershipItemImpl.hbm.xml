@@ -65,6 +65,14 @@
 		    area.id = :areaId
 		]]>
   </query>
+
+  <query name="findAllTopicsByForumIds">
+    <![CDATA[from org.sakaiproject.component.app.messageforums.dao.hibernate.TopicImpl as topic
+       join topic.openForum as forum
+       where
+       forum.id IN (:forumList)
+   ]]>
+  </query>
  
   <query name="findAllTopicsForSite">
     <![CDATA[from org.sakaiproject.component.app.messageforums.dao.hibernate.TopicImpl as topic

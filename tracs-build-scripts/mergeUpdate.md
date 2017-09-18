@@ -48,7 +48,7 @@
 | melete                       | DONE             |
 | memory                       | NO LOCAL CHANGES |
 | message                      | NO LOCAL CHANGES |
-| msgcntr                      |                  |
+| msgcntr                      | DONE             |
 |notifications                 | DONE             |
 | oauth                        | NO LOCAL CHANGES |
 | pack                         | NO LOCAL CHANGES |

@@ -39,9 +39,9 @@
 	branch = tracs
 [submodule "tracs-pearson"]
 	path = tracs-pearson
-	url = https://git.txstate.edu/its/tracs-pearson.git
+	url =git@git.txstate.edu:its/tracs-pearson.git
 	branch = tracs
 [submodule "tracs-examity"]
 	path = tracs-examity
-	url = ./tracs-examity/
+	url = git@git.txstate.edu:its/tracs-examity.git
 	branch = tracs

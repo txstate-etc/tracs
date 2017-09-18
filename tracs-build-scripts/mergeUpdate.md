@@ -49,6 +49,7 @@
 | memory                       | NO LOCAL CHANGES |
 | message                      | NO LOCAL CHANGES |
 | msgcntr                      |                  |
+|notifications                 | DONE             |
 | oauth                        | NO LOCAL CHANGES |
 | pack                         | NO LOCAL CHANGES |
 | pasystem                     | NO LOCAL CHANGES |

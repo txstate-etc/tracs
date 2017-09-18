@@ -51,9 +51,18 @@ $lessons-checklist-background: $soft-color;
   border-color: transparent;
 }
 
-#selectSiteModal::after {
-  display: none;
+#selectSiteModal {
+  left: 50%;
+  top: 20%;
+  transform: translate(-50%, -20%);
+  @media (max-width: $break-small-end){
+      transform: none;
+    }
+  &::after {
+    display: none;
+  }
 }
+
 
 //Change default color of Tools and Sites bar on mobile
 .Mrphs-skipNav__menu .Mrphs-skipNav__menuitem .Mrphs-skipNav__link{

@@ -13,7 +13,7 @@ import lombok.Setter;
  * Describes the type of column imported
  */
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 public class ImportedColumn implements Serializable {
 	
 	public ImportedColumn(String title, String points, Type type) {

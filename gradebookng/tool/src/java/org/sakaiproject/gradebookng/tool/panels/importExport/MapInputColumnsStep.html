@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html xmlns:wicket="http://wicket.apache.org">
-
-<body>
-<wicket:panel>
-
-    <form class="form-horizontal">
+<wicket:panel xmlns:wicket="http://wicket.apache.org">
+    <form wicket:id="form">
         <div class="form-group">
-
             <div class="help-block">
                 <p>Automatic mapping failed. Please specify columns below:</p>
             </div>
@@ -16,14 +10,11 @@
                 <br>
             </div>
 
-            <div class="col-xs-offset-4 col-xs-5">
-               <input class="active" type="submit" wicket:id="continuebutton" wicket:message="value:importExport.button.continue"/>
+            <div class="act">
+                <input type="submit" wicket:id="continuebutton" wicket:message="value:importExport.button.continue"/>
                 <input type="submit" wicket:id="backbutton" wicket:message="value:importExport.button.back"/>
             </div>
-
         </div>
     </form>
 </wicket:panel>
-</body>
-</html>
 

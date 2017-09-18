@@ -10,6 +10,9 @@ import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GradeDefinition;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentService;
+import org.sakaiproject.component.api.ServerConfigurationService;
+import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.site.api.Site;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -193,12 +196,21 @@ public class MHAssignment extends AbstractWebService {
     * @return boolean
     */
     private boolean hasPermission(String gradebookID, String permission) {
-       // Make sure the user has update all scores permission (typically an Instructor).
+       // The code we got from MH assumes the mhcampus user is an admin. We don't want to give them an admin account,
+       // so just check that the current user is the mhcampus user and the current site has the mhcampus
+       // tool.
        User user = userDirectoryService.getCurrentUser();
-       String siteRef = siteService.siteReference(gradebookID);
+       String mhCampusUserEid = serverConfigurationService.getString("mhcampus.serviceuser");
 
-       return securityService.unlock(user, permission, siteRef);
-   }
+       Site site;
+       try {
+            site = siteService.getSite(gradebookID);
+        } catch (IdUnusedException ex) {
+            throw new RuntimeException("Site does not exist.");
+        }
+
+        return site.getToolForCommonId("sakai.mhcampuse") != null && user.getEid().equals(mhCampusUserEid);
+    }
 
     /**
      * Returns the user id from the direcotry service.

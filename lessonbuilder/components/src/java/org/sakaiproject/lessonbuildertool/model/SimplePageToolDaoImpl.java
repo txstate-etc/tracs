@@ -1242,10 +1242,18 @@ public class SimplePageToolDaoImpl extends HibernateDaoSupport implements Simple
 	}
 
 	public void incrementQRCount(long questionId, long responseId) {
-	    Object [] fields = new Object[2];
-	    fields[0] = questionId;
-	    fields[1] = responseId;
-	    sqlService.dbWrite("update lesson_builder_qr_totals set respcount = respcount + 1 where questionId = ? and responseId = ?", fields);
+		// Anne modified 9/18/2017: "Show Poll" option not working in lessons. This fix is from a pull request
+		// that will tentatively be merged in Sakai 11.5 or Sakai 12. (Pull Request #4680)
+	    // Object [] fields = new Object[2];
+	    // fields[0] = questionId;
+	    // fields[1] = responseId;
+	    // sqlService.dbWrite("update lesson_builder_qr_totals set respcount = respcount + 1 where questionId = ? and responseId = ?", fields);
+		getHibernateTemplate().execute(session -> {
+			Query query = session.createQuery("update SimplePageQuestionResponseTotalsImpl s set s.count = s.count + 1 where s.questionId= :questionId and s.responseId = :responseId");
+			query.setLong("questionId", questionId);
+			query.setLong("responseId", responseId);
+			return query.executeUpdate();
+		});
 	}
 
 	public void syncQRTotals(SimplePageItem item) {

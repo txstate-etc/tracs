@@ -7026,8 +7026,11 @@ public class SimplePageBean {
 			}
 			
 			item.setAttribute("questionShowPoll", String.valueOf(questionShowPoll));
+			// Anne commented out 9/18/17 "Show Poll" option not working in lessons. 
+			//This fix is from a pull request that will tentatively be merged in Sakai 11.5 or Sakai 12. 
+			//(Pull Request #4680)
 
-			simplePageToolDao.syncQRTotals(item);
+			//simplePageToolDao.syncQRTotals(item);
 
 		}
 		
@@ -7088,7 +7091,13 @@ public class SimplePageBean {
 		
 		setItemGroups(item, selectedGroups);
 
-		saveOrUpdate(item);
+		saveOrUpdate(item);;
+
+		// Anne modified 9/18/2017: "Show Poll" option not working in lessons. This fix is from a pull request
+		// that will tentatively be merged in Sakai 11.5 or Sakai 12. (Pull Request #4680)
+		if(questionType.equals("multipleChoice")) {
+			simplePageToolDao.syncQRTotals(item);
+		}
 
 		regradeAllQuestionResponses(item.getId());
 		

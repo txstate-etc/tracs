@@ -228,7 +228,8 @@
      select moft.TITLE forumTitle, mtt.TITLE topicTitle, mmt.CREATED msgCreated, mmt.TITLE msgTitle, mmt.ID msgId, mtt.ID topicId, moft.ID forumId
 	    from MFR_MESSAGE_T mmt 
 		inner join MFR_TOPIC_T mtt on mmt.surrogateKey=mtt.ID 
-		inner join MFR_OPEN_FORUM_T moft on mtt.of_surrogateKey=moft.ID 
+		inner join MFR_TOPIC_OPEN_FORUM_T ttof on mtt.ID=ttof.TOPIC_ID
+    inner join MFR_OPEN_FORUM_T moft on ttof.OPEN_FORUM_ID=moft.ID
 		inner join MFR_UNREAD_STATUS_T must on must.MESSAGE_C = mmt.ID
 		inner join MFR_AREA_T mat on mat.ID = moft.surrogateKey
 		where mat.CONTEXT_ID=:contextId
@@ -249,7 +250,8 @@
      select moft.TITLE forumTitle, mtt.TITLE topicTitle, mmt.CREATED msgCreated, mmt.TITLE msgTitle, mmt.ID msgId, mtt.ID topicId, moft.ID forumId
 	    from MFR_MESSAGE_T mmt 
 		inner join MFR_TOPIC_T mtt on mmt.surrogateKey=mtt.ID 
-		inner join MFR_OPEN_FORUM_T moft on mtt.of_surrogateKey=moft.ID 
+		inner join MFR_TOPIC_OPEN_FORUM_T ttof on mtt.ID=ttof.TOPIC_ID
+    inner join MFR_OPEN_FORUM_T moft on ttof.OPEN_FORUM_ID=moft.ID
 		inner join MFR_UNREAD_STATUS_T must on must.MESSAGE_C = mmt.ID
 		where mtt.ID=:topicId
 		and must.USER_C=:userId
@@ -269,7 +271,8 @@
      select moft.TITLE forumTitle, mtt.TITLE topicTitle, mmt.CREATED msgCreated, mmt.TITLE msgTitle, mmt.ID msgId, mtt.ID topicId, moft.ID forumId
 	    from MFR_MESSAGE_T mmt 
 		inner join MFR_TOPIC_T mtt on mmt.surrogateKey=mtt.ID 
-		inner join MFR_OPEN_FORUM_T moft on mtt.of_surrogateKey=moft.ID 
+		inner join MFR_TOPIC_OPEN_FORUM_T ttof on mtt.ID=ttof.TOPIC_ID
+    inner join MFR_OPEN_FORUM_T moft on ttof.OPEN_FORUM_ID=moft.ID
 		inner join MFR_UNREAD_STATUS_T must on must.MESSAGE_C = mmt.ID
 		where moft.ID=:forumId
 		and must.USER_C=:userId
@@ -364,7 +367,8 @@
      select moft.TITLE forumTitle, mtt.TITLE topicTitle, mmt.CREATED msgCreated, mmt.TITLE msgTitle, mmt.ID msgId, mtt.ID topicId, moft.ID forumId
 		from MFR_MESSAGE_T mmt 
 		inner join MFR_TOPIC_T mtt on mmt.surrogateKey=mtt.ID 
-		inner join MFR_OPEN_FORUM_T moft on mtt.of_surrogateKey=moft.ID 
+		inner join MFR_TOPIC_OPEN_FORUM_T ttof on mtt.ID=ttof.TOPIC_ID
+    inner join MFR_OPEN_FORUM_T moft on ttof.OPEN_FORUM_ID=moft.ID
 		inner join MFR_AREA_T mat on moft.surrogateKey = mat.ID
 		where moft.surrogateKey=mat.ID 
 		and mat.CONTEXT_ID=:contextId
@@ -394,7 +398,8 @@
      select moft.TITLE forumTitle, mtt.TITLE topicTitle, mmt.CREATED msgCreated, mmt.TITLE msgTitle, mmt.ID msgId, mtt.ID topicId, moft.ID forumId
 		from MFR_MESSAGE_T mmt 
 		inner join MFR_TOPIC_T mtt on mmt.surrogateKey=mtt.ID 
-		inner join MFR_OPEN_FORUM_T moft on mtt.of_surrogateKey=moft.ID 
+		inner join MFR_TOPIC_OPEN_FORUM_T ttof on mtt.ID=ttof.TOPIC_ID
+    inner join MFR_OPEN_FORUM_T moft on ttof.OPEN_FORUM_ID=moft.ID
 		where mtt.ID=:topicId
 		and mmt.CREATED_BY= :userId
 		and mmt.DRAFT=0 
@@ -422,7 +427,8 @@
      select moft.TITLE forumTitle, mtt.TITLE topicTitle, mmt.CREATED msgCreated, mmt.TITLE msgTitle, mmt.ID msgId, mtt.ID topicId, moft.ID forumId
 		from MFR_MESSAGE_T mmt 
 		inner join MFR_TOPIC_T mtt on mmt.surrogateKey=mtt.ID 
-		inner join MFR_OPEN_FORUM_T moft on mtt.of_surrogateKey=moft.ID 
+		inner join MFR_TOPIC_OPEN_FORUM_T ttof on mtt.ID=ttof.TOPIC_ID
+    inner join MFR_OPEN_FORUM_T moft on ttof.OPEN_FORUM_ID=moft.ID
 		where moft.ID=:forumId
 		and mmt.CREATED_BY= :userId
 		and mmt.DRAFT=0 

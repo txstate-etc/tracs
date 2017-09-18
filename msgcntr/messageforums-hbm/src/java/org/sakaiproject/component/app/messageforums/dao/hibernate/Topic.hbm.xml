@@ -109,16 +109,16 @@
     <property name="openDate" column="OPEN_DATE" type="timestamp" />
     <property name="closeDate" column="CLOSE_DATE" type="timestamp" /> 
     
-    <many-to-one name="openForum" column="of_surrogateKey"
-      class="org.sakaiproject.component.app.messageforums.dao.hibernate.OpenForumImpl"
-      not-null="false" index="MFR_TOPIC_PARENT_I1" cascade="none" />
-    <!-- <property name="ofindex" column="of_index_col" type="int" update="true" insert="true"/> -->
-
-    <many-to-one name="privateForum" column="pf_surrogateKey"
-      class="org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateForumImpl"
-      not-null="false" index="MFR_TOPIC_PARENT_I2" cascade="none" />
-    <!-- <property name="pfindex" column="pf_index_col" type="int" update="true" insert="true"/> -->
-
+    <join table="MFR_TOPIC_OPEN_FORUM_T" inverse="true" optional="true">
+      <key column="TOPIC_ID" />
+      <many-to-one name="openForum" column="OPEN_FORUM_ID"
+        class="org.sakaiproject.component.app.messageforums.dao.hibernate.OpenForumImpl" cascade="none" />
+    </join>
+    <join table="MFR_TOPIC_PRIVATE_FORUM_T" inverse="true" optional="true">
+      <key column="TOPIC_ID" />
+      <many-to-one name="privateForum" column="PRIVATE_FORUM_ID"
+        class="org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateForumImpl" cascade="none" />
+    </join>
     <!-- PrivateTopic fields -->
     <subclass 
         name="org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateTopicImpl"

@@ -74,8 +74,8 @@ public class UpdateSynopticMessageCounts implements Job{
 															"group by message.USER_ID, message.CONTEXT_ID";
 	
 	private static final String TOPICS_AND_FORUMS_QUERY = "select area.CONTEXT_ID, forum.ID as FORUM_ID, topic.ID as TOPIC_ID, forum.DRAFT as isForumDraft, topic.DRAFT as isTopicDraft, topic.MODERATED as isTopicModerated, forum.LOCKED as isForumLocked, topic.LOCKED as isTopicLocked, forum.CREATED_BY as forumCreatedBy, topic.CREATED_BY as topicCreatedBy " +
-															"from MFR_AREA_T area, MFR_OPEN_FORUM_T forum, MFR_TOPIC_T topic " +
-															"Where area.ID = forum.surrogateKey and forum.ID = topic.of_surrogateKey";
+															"from MFR_AREA_T area, MFR_OPEN_FORUM_T forum, MFR_TOPIC_T topic, MFR_TOPIC_OPEN_FORUM_T ttof " +
+															"Where area.ID = forum.surrogateKey and forum.ID = ttof.OPEN_FORUM_ID and topic.ID = ttof.TOPIC_ID";
 	
 	private boolean updateNewMembersOnly = ServerConfigurationService.getBoolean("msgcntr.synoptic.updateMessageCounts.updateNewMembersOnly", false);
 	//by default, this job only updates/adds the counts when the counts for forums or messages isn't 0, this overrides that and forces updates for all items no matter what

@@ -47,10 +47,10 @@
         <key column="pf_surrogateKey"/>                        
         <one-to-many class="org.sakaiproject.component.app.messageforums.dao.hibernate.TopicImpl"/>            
     </set>-->
-    <set name="topicsSet" lazy="true" cascade="save-update"
+    <set name="topicsSet" lazy="true" cascade="save-update" table="MFR_TOPIC_PRIVATE_FORUM_T"
       sort="org.sakaiproject.component.app.messageforums.dao.hibernate.util.comparator.TopicBySortIndexAscAndCreatedDateDesc" batch-size="50">
-        <key column="pf_surrogateKey"/>                        
-        <one-to-many class="org.sakaiproject.component.app.messageforums.dao.hibernate.TopicImpl"/>            
+        <key column="PRIVATE_FORUM_ID"/>
+        <many-to-many column="TOPIC_ID" class="org.sakaiproject.component.app.messageforums.dao.hibernate.TopicImpl"/>
     </set>
     
    	<!-- 
@@ -91,8 +91,8 @@
   </class>
 
   <query name="findPrivateTopicsByForumId">
-    <![CDATA[from org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateTopicImpl
-             where pf_surrogateKey = :id
+    <![CDATA[select t from org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateTopicImpl t
+             join t.privateForum
     ]]>
   </query>
 

@@ -9,33 +9,34 @@ $dark-yellow:   #f9D862;
 $corn:          #FBE493;
 $platinum:      #DFE4E7;
 $brown:         #5A4801;
-$medium-blue:   #326B97;
 $arsenic:       #3A4448;
 $off-white:     #EAE9E8;
 $warm-silver:   #a9afa1;
 $snow:          #fafafa;
 $gold:          #8D734A;
 $sunlight:      #fef8e5;
+$white-sand:    #E2E0D7;
+$sand:          #D4D1C3;
 
 /* Top Header */
-$top-header-background: $yellow;
+$top-header-background: none;
 $top-header-text-color: $charcoal;
 
 /* This is the gradient in the header of the page, but we don't want a gradient. */
-$header-gradient-a: $white;
-$header-gradient-b: $white; // Maria what color should this be?
-$header-gradient-c: $white;
-$header-gradient-d: $white;
+$header-gradient-a: $yellow;
+$header-gradient-b: $yellow;
+$header-gradient-c: $yellow;
+$header-gradient-d: $yellow;
 
 /* Tool Menu */
-$tool-menu-background-color: $yellow;
+$tool-menu-background-color: $white-sand;
 $tool-menu-color: $charcoal;
 $tool-menu-current-background-color: $white;
 $tool-menu-current-color: $brown;
 $tool-menu-current-border-color: $brown;
 $tool-menu-hover-color: $charcoal;
-$tool-menu-hover-background-color: $dark-yellow;
-$tool-tab-background-color: $yellow;
+$tool-menu-hover-background-color: $sand;
+$tool-tab-background-color: $white-sand;
 
 /* Information section */
 $info-color:                $dark-teal;
@@ -63,20 +64,20 @@ $tool-title-nav-link-color-hover: $charcoal;
 
 $site-hierarchy-separator-color: $arsenic;
 
-$sites-nav-menu-item-background:            $platinum;
+$sites-nav-menu-item-background:            $white;
 $sites-nav-menu-item-color:                 $charcoal;
 $sites-nav-menu-item-color-hover:           $charcoal;
 $sites-nav-menu-item-border-top:            1px solid darken($platinum, 20%); 
 $sites-nav-menu-item-border-right:          1px solid darken($platinum, 20%);
 $sites-nav-menu-item-border-bottom:         1px solid darken($platinum, 20%);
 $sites-nav-menu-item-border-left:           1px solid darken($platinum, 20%);
-$sites-nav-menu-item-selected-background:   $dark-teal;
-$sites-nav-menu-item-selected-color:        $white;
-$sites-nav-menu-item-selected-color-hover:  $white;
-$sites-nav-menu-item-selected-border-top:   1px solid darken($dark-teal, 20%); 
-$sites-nav-menu-item-selected-border-right: 1px solid darken($dark-teal, 20%);
-$sites-nav-menu-item-selected-border-bottom:1px solid darken($dark-teal, 20%);
-$sites-nav-menu-item-selected-border-left:  1px solid darken($dark-teal, 20%);
+$sites-nav-menu-item-selected-background:   $white-sand;
+$sites-nav-menu-item-selected-color:        $charcoal;
+$sites-nav-menu-item-selected-color-hover:  $charcoal;
+$sites-nav-menu-item-selected-border-top:   1px solid darken($white-sand, 20%); 
+$sites-nav-menu-item-selected-border-right: 1px solid darken($white-sand, 20%);
+$sites-nav-menu-item-selected-border-bottom:1px solid darken($white-sand, 20%);
+$sites-nav-menu-item-selected-border-left:  1px solid darken($white-sand, 20%);
 
 $sites-nav-submenu-item-color:              $arsenic;
 $sites-nav-submenu-selected-background:     $platinum;

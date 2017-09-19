@@ -89,7 +89,7 @@
 | usermembership               | NO LOCAL CHANGES |
 | velocity                     | NO LOCAL CHANGES |
 | web                          | DONE             |
-| webservices                  |                  |
+| webservices                  | DONE             |
 | tracs-tk20                   | DONE             |
 | tracs-examity                | DONE             |
 | tracs-pearson                | DONE             |

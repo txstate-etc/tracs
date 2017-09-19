@@ -110,7 +110,6 @@
                 <module>taggable</module>
                 <module>textarea</module>
                 <module>tool</module>
-                <module>notifications</module>
                 <module>user</module>
                 <module>userauditservice</module>
                 <module>usermembership</module>
@@ -128,7 +127,7 @@
                 <module>appserverpicker</module>
           <!--      <module>admintools</module> -->
                 <module>rest</module>
-          <!--      <module>notifications</module> -->
+                <module>notifications</module>
 
                 <!-- Contrib Tools -->
                 <module>melete</module>

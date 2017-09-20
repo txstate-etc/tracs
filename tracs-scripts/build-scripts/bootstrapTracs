@@ -1,0 +1,229 @@
+#!/usr/bin/perl
+use strict;
+
+use Getopt::Long qw/GetOptions/;
+use Cwd qw/abs_path/;
+use File::Temp qw/tempdir/;
+
+
+our $sakaiVersion = '10.7';
+our $tomcatVersion = '7.0.59';
+
+my $tempDir = tempdir( CLEANUP => 1 );
+my $currentDirectory = abs_path();
+
+sub help { my($exitValue) = @_; # Print out explaination of command line options and exit with specified code
+	print <<EOF;
+
+./bootstrapTracs [--release <version>] [--quick] <path to source tree>
+
+	<path to source tree>
+		This should be the top directory of the sakai source.
+
+	--release <version>
+		Write the tarball with the specified version number and add a tag to the local repository
+
+	--quick
+		Skip tests and cleaning the source tree before build
+
+EOF
+	exit($exitValue);
+}#
+
+my($sourceTreePath,$tomcatOverlayPath,$releaseName,$skipSlowStuff);
+{# Parse and check command line
+	GetOptions(
+		"help|h"=>\&help,
+		"release=s"=>\$releaseName,
+		"quick"=>\$skipSlowStuff,
+	);
+	($sourceTreePath) = @ARGV;
+	
+	if ( $releaseName and $skipSlowStuff ) {
+		die("\n\tA release build should\n".
+		    "\tbe built clean and with tests.  If you really\n".
+		    "\treally want to build using quick, comment\n".
+		    "\tthis out in bootstrapTracs.\n\n");
+	}
+	
+	if ( !defined($sourceTreePath) ) {
+		warn "The path of the source tree must be specified on the command line.\n\n";
+		help(1);
+	}
+	
+	$sourceTreePath = abs_path($sourceTreePath);
+	$tomcatOverlayPath = abs_path("$sourceTreePath/../tomcat_overlay");
+	if ( ! -d $sourceTreePath ) {
+		warn "$sourceTreePath is not a directory.\n\n";
+		help(1);
+	}
+	if ( ! -d $tomcatOverlayPath ) {
+		warn "The tomcat_overlay directory must exist in the same directory as the source tree.\n\n";
+		help(1);
+	}
+}#
+
+my($tar);
+{# Check on required programs
+	my $versions = `mvn -version`;
+
+	my($mvnVersion) = $versions =~ m/^Apache Maven ([\d.]+)/m;
+	$mvnVersion = join("",map({sprintf('%03d',$_)} split(m/[._]/,$mvnVersion)));
+
+	my($javaVersion) = $versions =~ m/^Java version: ([\d._]+)/m;
+	$javaVersion = join("",map({sprintf('%03d',$_)} split(m/[._]/,$javaVersion)));
+
+	if ( !$mvnVersion || !$javaVersion ) {
+		die "Unable to parse version numbers. Please check that Maven and Java are installed and working.\n";
+	}
+
+	if ( $javaVersion < 1007000060 || $javaVersion >= 1008000000 ) {
+		die "Please use Java 1.7.0, update 60 or newer.";
+	}
+
+	if ( $mvnVersion < 3002002 ) {
+		die "Please use Maven 3.2.2 or newer.";
+	}
+
+	$tar = `which gnutar tar |head -n1`;
+	chomp($tar);
+}#
+
+my($tomcatTarballPath);
+{# find or download the tomcat tarball
+	
+	my $tomcatTarballUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v$tomcatVersion/bin/apache-tomcat-$tomcatVersion.tar.gz";
+	my $tomcatTarball = "apache-tomcat-$tomcatVersion.tar.gz";
+	
+	for my $checkTarballPath ( qw/. .. tars tarballs keepzips ..\/tars ..\/tarballs/ ) {
+		if ( -f "$checkTarballPath/$tomcatTarball" ) {
+			$tomcatTarballPath = abs_path("$checkTarballPath/$tomcatTarball");
+			warn "Found Tomcat tarball at $tomcatTarballPath\n";
+			last;
+		}
+	}#
+	
+	if ( !defined($tomcatTarballPath) ) {
+		my $which = `which wget curl`;
+		if ( $which =~ m/wget/ ) {
+			system("wget ".quotemeta($tomcatTarballUrl)." -O $tomcatTarball");
+
+		} elsif ( $which =~ m/curl/ ) {
+			system("curl ".quotemeta($tomcatTarballUrl)." -o $tomcatTarball");
+		}
+		
+		$tomcatTarballPath = abs_path($tomcatTarball);
+
+		if ( -e $tomcatTarballPath ) {
+			warn("Downloaded Tomcat tarball to $tomcatTarballPath\n");
+
+		} else {
+			die("Couldn't download tomcat.\n");
+		}
+	}
+}#
+
+my($buildVersion);
+{#
+	my($sourceRevisionNumber,$sourceBranch);
+	
+	warn "Figuring out what revision this source tree is...\n";
+	my $hgSummary = readpipe("cd ".quotemeta($sourceTreePath).";hg summary");
+	($sourceRevisionNumber) = $hgSummary =~ m/^parent: \d+:([a-f0-9]+) /m;
+	($sourceBranch) = $hgSummary =~ m/^branch: (.*)/m;
+
+	if ( !($hgSummary =~ m/^commit: .*\(clean\)$/m) ) {
+		$sourceRevisionNumber .= "M";
+	}
+	
+	warn "Appears to be revision $sourceRevisionNumber in branch $sourceBranch.".
+		($sourceRevisionNumber =~ m/M$/?" (The M means local modifications exist that are not checked in.)":"")."\n";
+	
+	if ( $releaseName && $sourceRevisionNumber =~ m/[M]$/ ) {
+		die("\n\tA release build should be built from a clean\n".
+            "\tsource tree.  If you really really want to build\n".
+            "\tfrom this tree, comment this out in bootstrapTracs.\n\n");
+	}
+	
+	if ( $releaseName ) {
+		$buildVersion = "tracs-$releaseName";
+	} else {
+		$buildVersion = "tracs-${sakaiVersion}dev-$sourceBranch-$sourceRevisionNumber";
+	}
+	
+	warn "Starting build of $buildVersion\n";
+}#
+
+
+my($tomcatPath);
+{# create tomcat environment
+	
+	mkdir("$tempDir/$buildVersion");
+	$tomcatPath = abs_path("$tempDir/$buildVersion");
+
+	my $tarHelp = `$tar --help`;
+	if ( $tarHelp =~ m/strip-components/ ) {
+		system("$tar -zxf ".quotemeta($tomcatTarballPath)." -C ".quotemeta($tomcatPath)." --strip-components 1");
+
+	} elsif ( $tarHelp =~ m/strip-path/ ) {
+		system("$tar -zxf ".quotemeta($tomcatTarballPath)." -C ".quotemeta($tomcatPath)." --strip-path 1");
+
+	} else {
+		warn "No compatible tar program was found.  Please install gnutar.\n";
+		exit(1);
+	}
+
+	system("cd ".quotemeta($tomcatOverlayPath).";find . -type f|$tar -czf $tempDir/tomcat_overlay.tgz -T -");
+	system("cd ".quotemeta($tomcatPath).";$tar -vxzf $tempDir/tomcat_overlay.tgz");
+	system("cd ".quotemeta($tomcatPath).";patch -p0 <conf/server.xml.patch;rm -f conf/server.xml.patch");
+	system("rm -rf ".quotemeta($tomcatPath)."/webapps/*");
+	system("perl -i -pe 's/^(version.service)=.*/\$1=$buildVersion/' ".quotemeta($tomcatPath)."/sakai/sakai.properties");
+}#
+
+#system("cd $tempDir;/bin/bash");
+#exit(0);
+
+my($mavenOptions);
+{#
+	my(%mavenOptions);
+
+	$mavenOptions{'maven.tomcat.home'} = $tomcatPath;
+
+	if ( $skipSlowStuff ) {
+		$mavenOptions{'skipTests'} = 'true';
+		$mavenOptions{'gwt.compiler.skip'} = 'true';
+	} else {
+		$mavenOptions{'gwt.compiler.force'} = 'true';
+	}
+
+	if ( $^O eq 'linux' ) {
+		$mavenOptions{'gwt.platform'} = 'linux';
+
+	} elsif ( $^O eq 'darwin' ) {
+		$mavenOptions{'gwt.platform'} = 'mac';
+
+	} elsif ( $^O eq 'MSWin32' || $^O eq 'cygwin' ) {
+		$mavenOptions{'gwt.platform'} = 'windows';
+
+	} else {
+		warn "Platform autodetect failed.\n";
+		exit(1);
+	}
+
+	$mavenOptions = join(" ",map({"-D".quotemeta($_)."=".quotemeta($mavenOptions{$_})} keys(%mavenOptions)));
+}#
+
+if ( system("cd ".quotemeta($sourceTreePath).";export MAVEN_OPTS=\"-Xmx1024m -XX:MaxPermSize=256m \$MAVEN_OPTS\";mvn".($skipSlowStuff?"":" clean")." install sakai:deploy $mavenOptions") ) {
+	warn "Build failed.\n";
+	exit(1);
+}
+
+warn "Tarring build...\n";
+system("cd $tempDir;$tar -czf ".quotemeta($currentDirectory)."/$buildVersion.tgz $buildVersion");
+warn "Tar file $buildVersion.tgz created.\n";
+
+if ( $releaseName ) {
+	my $buildVersion = $buildVersion;
+	$buildVersion =~ s/^tracs-//;
+	system("cd ".quotemeta($sourceTreePath)."; hg tag $buildVersion");
+}

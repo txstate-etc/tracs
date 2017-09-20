@@ -1,0 +1,12 @@
+.project
+.classpath
+.settings
+*.iml
+*.swp
+*.orig
+*.rej
+target
+.metadata
+.DS_Store
+.envrc
+

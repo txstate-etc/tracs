@@ -232,8 +232,13 @@ body.Mrphs-portalBody{
 
 // lessons
 .Mrphs-sakai-lessonbuildertool {
-  .checklistDiv {
+  .checklistDiv, .questionDiv .contentCol, .commentDiv, .studentContentTable {
     background-color: $lessons-checklist-background;
+  }
+  input.question-submit[type="submit"]{
+    &:hover {
+      color: white !important;
+    }
   }
   .neoPortletTitleWrap {
     .title .breadcrumbs h2 {

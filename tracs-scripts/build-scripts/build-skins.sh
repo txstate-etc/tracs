@@ -1,4 +1,4 @@
-REPO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+REPO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../.. && pwd )"
 
 echo "building skins..."
 
@@ -10,8 +10,6 @@ mvn clean compile  -Dsakai.skin.target=tracs-yellow -Dsakai.skin.customization.f
 
 #clear the customizations so that the default sakai skin can be built
 > library/src/morpheus-master/sass/_customization.scss
-
-cd $REPO_ROOT
 
 mvn clean install sakai:deploy -Dmaven.tomcat.home=$REPO_ROOT/tracs-docker/
 

@@ -1,4 +1,4 @@
-REPO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+REPO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../.. && pwd )"
 
 echo "Removing files from previous builds..."
 rm -r $REPO_ROOT/tracs-docker/components $REPO_ROOT/tracs-docker/lib $REPO_ROOT/tracs-docker/webapps

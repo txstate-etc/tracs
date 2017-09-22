@@ -1,6 +1,7 @@
 package org.sakaiproject.gradebookng.business;
 
 import java.math.RoundingMode;
+import java.math.BigDecimal;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -1448,6 +1449,48 @@ public class GradebookNgBusinessService {
 
 		return false;
 
+	}
+
+	public boolean rescaleGrades(final Long assignmentId, final double oldPointValue, final double newPointValue) {
+		final String siteId = getCurrentSiteId();
+		final Gradebook gradebook = getGradebook(siteId);
+		final List<String> studentUuids = this.getGradeableUsers();
+		final List<GradeDefinition> defs = this.gradebookService.getGradesForStudentsForItem(gradebook.getUid(), assignmentId, studentUuids);
+
+		try
+		{
+			for (final GradeDefinition def : defs)
+			{
+				String grade = def.getGrade();
+				if(grade == null || grade.isEmpty()) {
+					log.warn("Ignored one Grade Definition due to empty Grade");
+					continue;
+				}
+				//TODO: If we add the ability to enter letter grades, we might need
+				//to handle that case and rescale them too. This is handling the
+				//points grade type, the percentage type is not relevant here.
+				double percentageScore = Double.parseDouble(grade) / oldPointValue;
+				double newScore = percentageScore * newPointValue;
+				//The gradebook service won't accept grades with more than 2 decimal places
+				String strScore = String.valueOf(newScore);
+				newScore = new BigDecimal(strScore).setScale(2,RoundingMode.HALF_UP).doubleValue();
+				def.setGrade(String.valueOf(newScore));
+
+				this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
+							assignmentId,
+							def.getStudentUid(),
+							def.getGrade(), null);
+			}
+
+			return true;
+		}
+
+		catch (final Exception e)
+		{
+			log.error("An error occurred while scaling student grades", e);
+		}
+
+		return false;
 	}
 
 

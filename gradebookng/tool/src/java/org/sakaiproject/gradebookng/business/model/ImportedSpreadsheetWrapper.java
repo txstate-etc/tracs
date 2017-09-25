@@ -1,6 +1,7 @@
 package org.sakaiproject.gradebookng.business.model;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,13 @@ public class ImportedSpreadsheetWrapper implements Serializable {
 	public void addRawDataRow(String[] stringArray)
 	{
 		rawData.add(Arrays.asList(stringArray));
+	}
+
+	public void swapRawDataColumns(int col1, int col2)
+	{
+		for(List<String> raw : rawData) {
+			Collections.swap(raw, col1, col2);
+		}
 	}
 
 }

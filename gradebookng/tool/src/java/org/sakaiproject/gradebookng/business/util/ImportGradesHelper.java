@@ -323,11 +323,6 @@ public class ImportGradesHelper {
 		// maintain a list of comment columns so we can check they have a corresponding item
 		final List<String> commentColumns = new ArrayList<>();
 
-		for (ImportedRow myRow : spreadsheetWrapper.getRows())
-		{
-			log.info(myRow.PrintRow());
-		}
-
 		//for every column, setup the data
 		for (final ImportedColumn column : spreadsheetWrapper.getColumns()) {
 			log.info("Processing column: " + column.getColumnTitle());
@@ -402,6 +397,11 @@ public class ImportGradesHelper {
 			}
 		}
 
+		for (ImportedRow myRow : spreadsheetWrapper.getRows())
+		{
+			log.info(myRow.PrintRow());
+		}
+
 		// get just a list
 		final List<ProcessedGradeItem> processedGradeItems = new ArrayList<>(assignmentProcessedGradeItemMap.values());
 
@@ -454,6 +454,9 @@ public class ImportGradesHelper {
 					if (actualGradeInfo != null) {
 						actualScore = actualGradeInfo.getGrade();
 						actualComment = actualGradeInfo.getGradeComment();
+
+						importedGradeItem.setPreviousScore(StringUtils.removeEnd(actualScore, ".0"));
+						importedGradeItem.setPreviousComment(actualComment);
 					}
 				}
 				String importedScore = null;
@@ -469,12 +472,12 @@ public class ImportGradesHelper {
 					final String trimmedActualScore = StringUtils.removeEnd(actualScore, ".0");
 					if (trimmedImportedScore != null && !trimmedImportedScore.equals(trimmedActualScore)) {
 						status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_UPDATE);
-						break;
+						//break;
 					}
 				} else if (column.getType() == ImportedColumn.Type.COMMENTS) {
 					if (importedComment != null && !importedComment.equals(actualComment)) {
 						status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_UPDATE);
-						break;
+						//break;
 					}
 				} else if (column.getType() == ImportedColumn.Type.GB_ITEM_WITHOUT_POINTS) {
 					//must be NA if it isn't new
@@ -483,7 +486,7 @@ public class ImportGradesHelper {
 					final String trimmedActualScore = StringUtils.removeEnd(actualScore, ".0");
 					if (trimmedImportedScore != null && !trimmedImportedScore.equals(trimmedActualScore)) {
 						status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_UPDATE);
-						break;
+						//break;
 					}
 				}
 

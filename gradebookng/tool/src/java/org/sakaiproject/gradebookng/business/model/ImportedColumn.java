@@ -56,11 +56,11 @@ public class ImportedColumn implements Serializable {
 		{
 			case GB_ITEM_WITHOUT_POINTS:
 			case GB_ITEM_WITH_POINTS:
-				returnVal = "Gradebook Item - grades";
+				returnVal = "Grades";
 				break;
 
 			case COMMENTS:
-				returnVal = "Gradebook Item - comments";
+				returnVal = "Comments";
 				break;
 
 			case USER_ID:

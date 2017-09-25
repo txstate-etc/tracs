@@ -5,11 +5,22 @@
                 <p>Automatic mapping failed. Please specify columns below:</p>
             </div>
 
+            <table>
+            <tr>
+                <th>Column #</th>
+                <th>Column Type</th>
+                <th>Gradebook Assignment</th>
+                <th>Assignment Max Points</th>
+            </tr>
             <div wicket:id="listItems" class="form-group form-group-sm">
-                <div wicket:id="columnLabel" /><select wicket:id="columnType" /><select wicket:id="columnAssignment" />
-                <br>
+                <tr>
+                    <td><div wicket:id="columnLabel" /></td>
+                    <td><select wicket:id="columnType" /></td>
+                    <td><select wicket:id="columnAssignment" /></td>
+                    <!-- <td><input wicket:id="columnPoints" type="number" class="form-control gb-add-scale-points" placeholder="100" /></td> -->
+                </tr>
             </div>
-
+            </table>
             <div class="act">
                 <input type="submit" wicket:id="continuebutton" wicket:message="value:importExport.button.continue"/>
                 <input type="submit" wicket:id="backbutton" wicket:message="value:importExport.button.back"/>

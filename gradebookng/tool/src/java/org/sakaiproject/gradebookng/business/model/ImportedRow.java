@@ -41,11 +41,20 @@ public class ImportedRow implements Serializable {
 		returnVal += "Eid = " + studentEid + "\n";
 		returnVal += "Uuid = " + studentUuid + "\n";
 		returnVal += "Name = " + studentName + "\n";
-		returnVal += "Cell Maps:\n";
+		returnVal += "GB Items:\n";
 		for(String keyString : cellMap.keySet())
 		{
 			ImportedCell value = cellMap.get(keyString);
-			returnVal += String.format("%s : Score: %s Comment: %s \n", keyString, value.getScore(), value.getComment());
+
+			returnVal += String.format("%s : Score: %s ", keyString, value.getPreviousScore());
+			if (value.hasScoreChange()) {
+				returnVal += String.format("=> %s ", value.getScore());
+			} 
+			returnVal += String.format("Comment: %s ", value.getPreviousComment());
+			if (value.hasCommentChange()) {
+				returnVal += String.format("=> %s ", value.getComment());
+			}
+			returnVal += "\n";
 		}
 
 		return returnVal;

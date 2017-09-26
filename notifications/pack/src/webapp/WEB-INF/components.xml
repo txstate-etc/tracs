@@ -20,4 +20,11 @@
     <property name="messageManager" ref="org.sakaiproject.api.app.messageforums.MessageForumsMessageManager"/>
     <property name="discussionForumManager" ref="org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager"/>
   </bean>
+  <bean class="edu.txstate.tracs.notifications.AssignmentsNotifier" init-method="init">
+    <property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService"/>
+    <property name="entityManager" ref="org.sakaiproject.entity.api.EntityManager"/>
+    <property name="assignService" ref="org.sakaiproject.assignment.api.AssignmentService"/>
+    <property name="notifyUtils" ref="edu.txstate.tracs.notifications.NotifyUtils"/>
+    <property name="siteService" ref="org.sakaiproject.site.api.SiteService"/>
+  </bean>
 </beans>

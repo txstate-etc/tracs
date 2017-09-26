@@ -28,6 +28,7 @@
   <modules>
     <module>announcements</module>
     <module>forums</module>
+    <module>assignments</module>
     <module>pack</module>
     <module>util</module>
   </modules>

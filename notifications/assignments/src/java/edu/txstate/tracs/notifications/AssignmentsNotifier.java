@@ -80,7 +80,7 @@ public class AssignmentsNotifier implements Observer {
         updates.add(AssignmentConstants.EVENT_ADD_ASSIGNMENT);
         updates.add(AssignmentConstants.EVENT_ADD_ASSIGNMENT_SUBMISSION);
         updates.add(AssignmentConstants.EVENT_SUBMIT_ASSIGNMENT_SUBMISSION);
-        updates.add(AssignmentConstants.EVENT_GRADE_ASSIGNMENT_SUBMISSION); //save grade and release to student or dont. same event!
+        updates.add(AssignmentConstants.EVENT_GRADE_RELEASED);
         eventTrackingService.addObserver(this);
     }
 
@@ -112,7 +112,6 @@ public class AssignmentsNotifier implements Observer {
                         Calendar releaseDate = Calendar.getInstance();
                         releaseDate.setTimeInMillis(releaseDateTime.getTime());
                         Calendar now = Calendar.getInstance();
-                        //boolean assignmentAvailable = releaseDate.before(now)) || releaseDate.equals(now);
 
                         //Get list of users to notify
                         List<String> userids = getNotifyList(event.getContext(), creatorId, assignment);
@@ -154,8 +153,23 @@ public class AssignmentsNotifier implements Observer {
                         e.printStackTrace();
                     }
                     break;
-                case AssignmentConstants.EVENT_GRADE_ASSIGNMENT_SUBMISSION:
-                    //TODO: it's the same event whether the grade is released or not. We need another event
+                case AssignmentConstants.EVENT_GRADE_RELEASED:
+                    try {
+                        String submissionId = ref.getId();
+                        AssignmentSubmission submission = assignService.getSubmission(submissionId);
+                        String assignmentId = submission.getAssignmentId();
+                        //TODO: Not sure what to use for content hash here?
+                        String contenthash = notifyUtils.hashContent("Your assignment has been graded", submission.getGrade());
+                        List<String> submitters = notifyUtils.convertUserIdsInSite(event.getContext(),submission.getSubmitterIds());
+                        for(String submitter : submitters) {
+                            //System.out.println(submitter);
+                        }
+                        //TODO: should the object ID here be the assignment or the submission?
+                        notifyUtils.sendNotification("assignment", "creation", assignmentId, event.getContext(), submitters, Calendar.getInstance() , contenthash, true);
+                    }
+                    catch(Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default:
             }

@@ -32,4 +32,12 @@ public class ProcessedGradeItemDetail implements Serializable {
 	@Setter
 	private String comment;
 
+	@Getter
+	@Setter
+	private String previousGrade;
+
+	@Getter
+	@Setter
+	private String previousComment;
+
 }

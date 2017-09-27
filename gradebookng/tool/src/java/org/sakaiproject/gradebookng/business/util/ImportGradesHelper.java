@@ -385,6 +385,8 @@ public class ImportGradesHelper {
 					processedGradeItemDetail.setStudentUuid(row.getStudentUuid());
 					processedGradeItemDetail.setGrade(cell.getScore());
 					processedGradeItemDetail.setComment(cell.getComment());
+					processedGradeItemDetail.setPreviousGrade(cell.getPreviousScore());
+					processedGradeItemDetail.setPreviousComment(cell.getPreviousComment());
 					processedGradeItemDetails.add(processedGradeItemDetail);
 				}
 

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.AjaxEventBehavior;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
@@ -142,61 +144,58 @@ public class MapInputColumnsStep extends Panel {
 			};
 
 			//ListView contains one ListItem per column. 
-			//Each ListItem holds a set of controls for the User to adjust column data
+			//Each ListItem holds a set of controls allowing the User to adjust column data
 			listItems = new ListView<ColumnListItem>("listItems", listViewData) {
 
 				@Override
 				public void populateItem(final ListItem<ColumnListItem> item) {
 					ColumnListItem newItem = item.getModelObject();
 
+					//Label with the Column Number and contents of the first cell
 					Label columnDesc = new Label("columnLabel", String.format("* Column %d (%s)", this.size(), newItem.getColumn().getUnparsedTitle()));
 					item.add(columnDesc);
-				
-					DropDownChoice ddcType = new DropDownChoice("columnType", Model.of(newItem.getColumn().getFriendlyType()), newItem.getColumnTypeList()) {
-						// @Override
-						// protected boolean wantOnSelectionChangedNotifications() {
-						// 	return true;
-						// }
-
-						// @Override
-						// protected void onSelectionChanged(Object newSelection) {
-						// 	this.setModel(Model.of((String)newSelection));
-						// 	ColumnTypeDropDownChanged();
-						// }
-					};
+					
+					//Dropdown menu to select Column Type. The value determines visibility status of the next two controls
+					DropDownChoice ddcType = new DropDownChoice("columnType", Model.of(newItem.getColumn().getFriendlyType()), newItem.getColumnTypeList());
 					ddcType.setChoiceRenderer(columnTypeRender);
+					ddcType.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+						@Override
+						protected void onUpdate(AjaxRequestTarget target) {
+							log.info("Made it inside the event");
+							ColumnTypeDropDownChanged(target);
+						}
+
+					});
 					item.add(ddcType);
 
+					//Dropdown menu to select the Assignment. Visible only for Columns containing Grades or Comments
 					Assignment matchingAssignment = newItem.FindAssignmentByName();					
-					DropDownChoice ddcAssignment = new DropDownChoice("columnAssignment", Model.of(matchingAssignment), newItem.getAssignmentList()) {
-						// @Override
-						// protected boolean wantOnSelectionChangedNotifications() {
-						// 	return true;
-						// }
-
-						// @Override
-						// protected void onSelectionChanged(Object newSelection) {
-
-						// }
-					};
+					DropDownChoice ddcAssignment = new DropDownChoice("columnAssignment", Model.of(matchingAssignment), newItem.getAssignmentList());
 					ddcAssignment.setChoiceRenderer(assignmentRender);
+					ddcAssignment.setOutputMarkupId(true);
+					ddcAssignment.setOutputMarkupPlaceholderTag(true);
 					item.add(ddcAssignment);
 
-					// Long longModel;
-					// try {
-					// 	longModel = Long.parseLong(newItem.getColumn().getPoints());
-					// } catch (Exception ex) {
-					// 	longModel = 0L;
-					// }
-					// NumberTextField<Long> pointsTextField = new NumberTextField<Long>("columnPoints", Model.of(longModel), Long.class) {
-					// 	@Override
-					// 	public boolean isInputNullable() {
-					// 		return true;
-					// 	}
-					// };
-     //    			pointsTextField.setStep(10L);
-     //    			pointsTextField.add(new NullNumberValidator());
-     //    			item.add(pointsTextField);
+					//Text field to enter the Assignment's max points. Visible only for Columns containing Grades.
+					Long longModel;
+					try {
+						longModel = Long.parseLong(newItem.getColumn().getPoints());
+					} catch (Exception ex) {
+						longModel = 0L;
+					}
+					NumberTextField<Long> pointsTextField = new NumberTextField<Long>("columnPoints", Model.of(longModel), Long.class) {
+						@Override
+						public boolean isInputNullable() {
+							return true;
+						}
+					};
+        			pointsTextField.setStep(10L);
+        			pointsTextField.add(new NullNumberValidator());
+        			pointsTextField.setOutputMarkupId(true);
+        			pointsTextField.setOutputMarkupPlaceholderTag(true);
+         			item.add(pointsTextField);
+
+         			SetListItemVisibility(item);
 				}	
 			};
 			add(listItems);
@@ -214,24 +213,24 @@ public class MapInputColumnsStep extends Panel {
                 		String oldTitle = currentColumn.getColumnTitle();
 
                 		ListItem<ColumnListItem> currentListItem = (ListItem<ColumnListItem>)listItems.get(i);
-                		DropDownChoice columnType = (DropDownChoice)currentListItem.get("columnType");
+                		DropDownChoice columnType = (DropDownChoice)currentListItem.get("columnType"); 
                 		DropDownChoice columnAssignment = (DropDownChoice)currentListItem.get("columnAssignment");
-
-						log.info("i = " + Integer.toString(i));
-						log.info("ColumnType = " + columnType.getValue());
-
-						
-
+                		NumberTextField columnPoints = (NumberTextField)currentListItem.get("columnPoints");
+                		
                 		switch(columnType.getValue())
                 		{
                 			case "Grades":
-                				spreadSheetWrapper.setRawDataValue(0, i, columnAssignment.getValue());
-                				log.info("Set header to " + columnAssignment.getValue());
+                				String gradeColumnName = columnAssignment.getValue();
+                				Long pointValue = Long.parseLong(columnPoints.getValue());
+                				pointValue = pointValue == null ? 0L : pointValue;
+                				if (pointValue > 0) {
+                					gradeColumnName += " [" + pointValue.toString() + "]";
+                				}
+                				spreadSheetWrapper.setRawDataValue(0, i, gradeColumnName);
                 				break;
 
                 			case "Comments":
                 				spreadSheetWrapper.setRawDataValue(0, i, "* " + columnAssignment.getValue());
-                				log.info("Set header to * " + columnAssignment.getValue());
                 				break;
 
                 			case "Student ID":
@@ -245,12 +244,6 @@ public class MapInputColumnsStep extends Panel {
                 			case "Ignore":
                 				spreadSheetWrapper.setRawDataValue(0, i, "# " + oldTitle);
                 				break;
-
-                			default:
-                				//Should never happen
-                				//Error message?
-                				break;
-
                 		}
                 	}
 
@@ -309,43 +302,54 @@ public class MapInputColumnsStep extends Panel {
 
 		}
 
-		private void ColumnTypeDropDownChanged()
+		private void ColumnTypeDropDownChanged(AjaxRequestTarget target)
 		{
 			for(int i = 0; i < listItems.size(); i ++) {
 
 				ListItem<ColumnListItem> currentListItem = (ListItem<ColumnListItem>)listItems.get(i);
-				DropDownChoice columnType = (DropDownChoice)currentListItem.get("columnType");
+				SetListItemVisibility(currentListItem);
+
                 DropDownChoice columnAssignment = (DropDownChoice)currentListItem.get("columnAssignment");
-                //NumberTextField columnPoints = (NumberTextField)currentListItem.get("columnPoints");
+        		target.add(columnAssignment);
 
-                switch(columnType.getValue())
-        		{
-        			case "Grades":
-        				columnAssignment.setEnabled(true);
-        				//columnPoints.setEnabled(true);
-        				break;
-
-        			case "Comments":
-        				columnAssignment.setEnabled(true);
-        				//columnPoints.setEnabled(false);
-        				break;
-
-        			case "Student ID":
-        				columnAssignment.setEnabled(false);
-        				//columnPoints.setEnabled(false);
-        				break;
-
-      		  		case "Student Name":
-      		  			columnAssignment.setEnabled(false);
-        				//columnPoints.setEnabled(false);
-        				break;
-
-        			case "Ignore":
-        				columnAssignment.setEnabled(false);
-        				//columnPoints.setEnabled(false);
-        				break;
-        		}
+        		NumberTextField columnPoints = (NumberTextField)currentListItem.get("columnPoints");
+        		target.add(columnPoints);
 			}
+		}
+
+		private void SetListItemVisibility(ListItem<ColumnListItem> listItem)
+		{
+			DropDownChoice columnType = (DropDownChoice)listItem.get("columnType");
+            DropDownChoice columnAssignment = (DropDownChoice)listItem.get("columnAssignment");
+            NumberTextField columnPoints = (NumberTextField)listItem.get("columnPoints");
+
+            switch(columnType.getValue())
+    		{
+    			case "Grades":
+    				columnAssignment.setVisible(true);
+    				columnPoints.setVisible(true);
+    				break;
+
+    			case "Comments":
+    				columnAssignment.setVisible(true);
+    				columnPoints.setVisible(false);
+    				break;
+
+    			case "Student ID":
+    				columnAssignment.setVisible(false);
+    				columnPoints.setVisible(false);
+    				break;
+
+  		  		case "Student Name":
+  		  			columnAssignment.setVisible(false);
+    				columnPoints.setVisible(false);
+    				break;
+
+    			case "Ignore":
+    				columnAssignment.setVisible(false);
+    				columnPoints.setVisible(false);
+    				break;
+    		}
 		}
 
 	}

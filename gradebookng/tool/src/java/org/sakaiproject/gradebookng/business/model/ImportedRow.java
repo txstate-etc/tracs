@@ -38,9 +38,9 @@ public class ImportedRow implements Serializable {
 	{
 		String returnVal = "\n";
 
-		returnVal += "Eid = " + studentEid + "\n";
-		returnVal += "Uuid = " + studentUuid + "\n";
-		returnVal += "Name = " + studentName + "\n";
+		returnVal += "StudentId = " + studentEid + "\n";
+		//returnVal += "Uuid = " + studentUuid + "\n";
+		returnVal += "StudentName = " + studentName + "\n";
 		returnVal += "GB Items:\n";
 		for(String keyString : cellMap.keySet())
 		{
@@ -50,9 +50,11 @@ public class ImportedRow implements Serializable {
 			if (value.hasScoreChange()) {
 				returnVal += String.format("=> %s ", value.getScore());
 			} 
-			returnVal += String.format("Comment: %s ", value.getPreviousComment());
+			String commentString = value.getPreviousComment() == null ? "-" : value.getPreviousComment();
+			returnVal += String.format("Comment: %s ", commentString);
 			if (value.hasCommentChange()) {
-				returnVal += String.format("=> %s ", value.getComment());
+				commentString = value.getComment() == null ? "-" : value.getComment();
+				returnVal += String.format("=> %s ", commentString);
 			}
 			returnVal += "\n";
 		}

@@ -112,6 +112,10 @@ public class AssignmentConstants {
 	/** Event for grading an assignment submission. */
 	public static final String EVENT_GRADE_ASSIGNMENT_SUBMISSION = "asn.grade.submission";
 
+	/** Event for releasing a submission grade to student. */
+	/* Added by Anne 9/26/17 for TRACS notifications */
+	public static final String EVENT_GRADE_RELEASED = "asn.grade.released";
+
 	/** Calendar event field for assignment due dates */
 	public static final String NEW_ASSIGNMENT_DUEDATE_CALENDAR_ASSIGNMENT_ID = "new_assignment_duedate_calendar_assignment_id";
 

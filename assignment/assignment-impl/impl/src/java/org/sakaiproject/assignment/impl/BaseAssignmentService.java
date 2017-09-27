@@ -2549,6 +2549,9 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 				// releasing a submitted assignment or releasing grade to an unsubmitted assignment
                 Event event = EventTrackingService.newEvent(AssignmentConstants.EVENT_GRADE_ASSIGNMENT_SUBMISSION, submissionRef, true);
                 EventTrackingService.post(event);
+                /* grade release event added by Anne 9/26/17 for TRACS notifications */
+                Event gradeReleaseEvent = EventTrackingService.newEvent(AssignmentConstants.EVENT_GRADE_RELEASED, submissionRef, true);
+                EventTrackingService.post(gradeReleaseEvent);
                 LearningResourceStoreService lrss = (LearningResourceStoreService) ComponentManager
                         .get("org.sakaiproject.event.api.LearningResourceStoreService");
                 if (null != lrss && StringUtils.isNotEmpty(s.getGrade())) {

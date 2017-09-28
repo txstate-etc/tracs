@@ -22,3 +22,4 @@ rsf/sakai-rsf-web/templates/overlays/
 rsf/sakai-rsf-web/test/overlays/
 velocity.log
 bin/
+tracs-scripts/build-scripts/apache-tomcat*

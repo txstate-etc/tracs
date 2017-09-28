@@ -6,8 +6,8 @@ use Cwd qw/abs_path/;
 use File::Temp qw/tempdir/;
 
 
-our $sakaiVersion = '10.7';
-our $tomcatVersion = '7.0.59';
+our $sakaiVersion = '11.3';
+our $tomcatVersion = '8.0.36';
 
 my $tempDir = tempdir( CLEANUP => 1 );
 my $currentDirectory = abs_path();
@@ -52,13 +52,14 @@ my($sourceTreePath,$tomcatOverlayPath,$releaseName,$skipSlowStuff);
 	}
 	
 	$sourceTreePath = abs_path($sourceTreePath);
-	$tomcatOverlayPath = abs_path("$sourceTreePath/../tomcat_overlay");
+	$skinLibPath = $sourceTreePath
+	$tomcatOverlayPath = abs_path("$sourceTreePath/tracs-scripts/build-scripts/tomcat_overlay");
 	if ( ! -d $sourceTreePath ) {
 		warn "$sourceTreePath is not a directory.\n\n";
 		help(1);
 	}
 	if ( ! -d $tomcatOverlayPath ) {
-		warn "The tomcat_overlay directory must exist in the same directory as the source tree.\n\n";
+		warn "The tomcat_overlay directory must exist in the source tree.\n\n";
 		help(1);
 	}
 }#
@@ -77,8 +78,8 @@ my($tar);
 		die "Unable to parse version numbers. Please check that Maven and Java are installed and working.\n";
 	}
 
-	if ( $javaVersion < 1007000060 || $javaVersion >= 1008000000 ) {
-		die "Please use Java 1.7.0, update 60 or newer.";
+	if ( $javaVersion < 1008000092 || $javaVersion >= 1009000000 ) {
+		die "Please use Java 8, update 92 or newer.";
 	}
 
 	if ( $mvnVersion < 3002002 ) {
@@ -92,7 +93,7 @@ my($tar);
 my($tomcatTarballPath);
 {# find or download the tomcat tarball
 	
-	my $tomcatTarballUrl = "http://archive.apache.org/dist/tomcat/tomcat-7/v$tomcatVersion/bin/apache-tomcat-$tomcatVersion.tar.gz";
+	my $tomcatTarballUrl = "http://archive.apache.org/dist/tomcat/tomcat-8/v$tomcatVersion/bin/apache-tomcat-$tomcatVersion.tar.gz";
 	my $tomcatTarball = "apache-tomcat-$tomcatVersion.tar.gz";
 	
 	for my $checkTarballPath ( qw/. .. tars tarballs keepzips ..\/tars ..\/tarballs/ ) {
@@ -173,9 +174,9 @@ my($tomcatPath);
 		exit(1);
 	}
 
-	system("cd ".quotemeta($tomcatOverlayPath).";find . -type f|$tar -czf $tempDir/tomcat_overlay.tgz -T -");
+	system("cd ".quotemeta($tomcatOverlayPath).";cp -r $sourceTreePath/tracs-docker/sakai .;find . -type f|$tar -czf $tempDir/tomcat_overlay.tgz -T -";rm -rf $sourceTreePath/tracs-docker/sakai);
 	system("cd ".quotemeta($tomcatPath).";$tar -vxzf $tempDir/tomcat_overlay.tgz");
-	system("cd ".quotemeta($tomcatPath).";patch -p0 <conf/server.xml.patch;rm -f conf/server.xml.patch");
+	system("cd ".quotemeta($tomcatPath).";patch -p1 <conf/tomcat-conf.patch;rm -f conf/tomcat-conf.patch");
 	system("rm -rf ".quotemeta($tomcatPath)."/webapps/*");
 	system("perl -i -pe 's/^(version.service)=.*/\$1=$buildVersion/' ".quotemeta($tomcatPath)."/sakai/sakai.properties");
 }#
@@ -213,7 +214,7 @@ my($mavenOptions);
 	$mavenOptions = join(" ",map({"-D".quotemeta($_)."=".quotemeta($mavenOptions{$_})} keys(%mavenOptions)));
 }#
 
-if ( system("cd ".quotemeta($sourceTreePath).";export MAVEN_OPTS=\"-Xmx1024m -XX:MaxPermSize=256m \$MAVEN_OPTS\";mvn".($skipSlowStuff?"":" clean")." install sakai:deploy $mavenOptions") ) {
+if ( system("cd ".quotemeta($sourceTreePath).";export MAVEN_OPTS=\"-Xmx1024m -XX:MaxMetaspaceSize=512m \$MAVEN_OPTS\";mvn".($skipSlowStuff?"":" clean")." install sakai:deploy $mavenOptions") ) {
 	warn "Build failed.\n";
 	exit(1);
 }

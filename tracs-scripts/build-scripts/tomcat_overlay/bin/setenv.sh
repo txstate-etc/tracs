@@ -7,10 +7,10 @@ STANDARD_OPTS="-XX:+UseConcMarkSweepGC -XX:+UseParNewGC \
 -Dsakai.security=/etc/sakai \
 $GARBAGECOLLECTOR_OPTS $TIMEOUT_OPTS $COMPATABILITY_OPTS $JVM_OPTS $RUN_OPTS"
 
-SMALL_MEMORY_OPTS="-Xmx1024m -XX:MaxPermSize=512m -XX:NewSize=256m"
-SMALL2_MEMORY_OPTS="-Xmx2304m -XX:MaxPermSize=512m -XX:NewSize=512m"
-MEDIUM_MEMORY_OPTS="-Xmx3072m -XX:MaxPermSize=512m -XX:NewSize=512m"
-LARGE_MEMORY_OPTS="-Xmx10240m -XX:MaxPermSize=768m -XX:NewSize=1024m"
+SMALL_MEMORY_OPTS="-Xmx1024m -XX:MaxMetaspaceSize=512m -XX:NewSize=256m"
+SMALL2_MEMORY_OPTS="-Xmx2304m -XX:MaxMetaspaceSize=512m -XX:NewSize=512m"
+MEDIUM_MEMORY_OPTS="-Xmx3072m -XX:MaxMetaspaceSize=512m -XX:NewSize=512m"
+LARGE_MEMORY_OPTS="-Xmx10240m -XX:MaxMetaspaceSize=768m -XX:NewSize=1024m"
 
 DEBUGGER_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"
 

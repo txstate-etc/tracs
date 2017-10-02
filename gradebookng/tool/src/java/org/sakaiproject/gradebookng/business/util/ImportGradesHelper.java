@@ -232,7 +232,6 @@ public class ImportGradesHelper {
 	 */
 	private static ImportedRow mapLine(final String[] line, final Map<Integer, ImportedColumn> mapping, final Map<String, String> userMap) {
 
-		log.warn("***Inside mapLine");
 		final ImportedRow row = new ImportedRow();
 
 		for (final Map.Entry<Integer, ImportedColumn> entry : mapping.entrySet()) {
@@ -399,10 +398,10 @@ public class ImportGradesHelper {
 			}
 		}
 
-		for (ImportedRow myRow : spreadsheetWrapper.getRows())
-		{
-			log.info(myRow.PrintRow());
-		}
+		// for (ImportedRow myRow : spreadsheetWrapper.getRows())
+		// {
+		// 	log.info(myRow.PrintRow());
+		// }
 
 		// get just a list
 		final List<ProcessedGradeItem> processedGradeItems = new ArrayList<>(assignmentProcessedGradeItemMap.values());
@@ -417,6 +416,10 @@ public class ImportGradesHelper {
 				//throw new GbImportCommentMissingItemException("The comment column '" + c + "' does not have a corresponding gradebook item.");
 			}
 		});
+
+		for (ProcessedGradeItem item : processedGradeItems) {
+			log.info(item.PrintDetails());
+		}
 
 		return processedGradeItems;
 
@@ -540,7 +543,6 @@ public class ImportGradesHelper {
 	private static Map<Integer, ImportedColumn> mapHeaderRow(final String[] line) throws GbImportExportInvalidColumnException, GbImportExportDuplicateColumnException {
 
 		// retain order
-		log.warn("***Inside mapHeaderRow");
 		final Map<Integer, ImportedColumn> mapping = new LinkedHashMap<Integer, ImportedColumn>();
 
 		for (int i = 0; i < line.length; i++) {

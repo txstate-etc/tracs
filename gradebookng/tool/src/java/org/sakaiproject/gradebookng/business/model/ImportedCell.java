@@ -39,7 +39,6 @@ public class ImportedCell implements Serializable {
 			Double prevDouble = Double.parseDouble(previousScore);
 			Double curDouble = Double.parseDouble(score);
 			return prevDouble.doubleValue() != curDouble.doubleValue();
-			//return Double.parseDouble(previousScore) != Double.parseDouble(score);
 		}
 	}
 

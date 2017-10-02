@@ -66,4 +66,29 @@ public class ProcessedGradeItem implements Serializable {
 	@Setter
 	private Double assignmentPoints;
 
+	public String PrintDetails() {
+		String returnVal = "\n";
+
+		returnVal += "GB Item: " + itemTitle + "\n";
+		for(ProcessedGradeItemDetail value : processedGradeItemDetails)
+		{
+			String scoreString = value.getPreviousGrade() == null ? "-" : value.getPreviousGrade();
+			returnVal += String.format("%s : Score: %s ", value.getStudentEid(), scoreString);
+			if (value.hasGradeChange()) {
+				scoreString = value.getGrade() == null ? "-" : value.getGrade();
+				returnVal += String.format("=> %s ", scoreString);
+			} 
+			
+			String commentString = value.getPreviousComment() == null ? "-" : value.getPreviousComment();
+			returnVal += String.format("Comment: %s ", commentString);
+			if (value.hasCommentChange()) {
+				commentString = value.getComment() == null ? "-" : value.getComment();
+				returnVal += String.format("=> %s ", commentString);
+			}
+			returnVal += "\n";
+		}
+
+		return returnVal;
+	}
+
 }

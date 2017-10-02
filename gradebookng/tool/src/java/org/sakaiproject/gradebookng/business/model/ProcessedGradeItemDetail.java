@@ -40,4 +40,20 @@ public class ProcessedGradeItemDetail implements Serializable {
 	@Setter
 	private String previousComment;
 
+	public boolean hasGradeChange() {
+		if (previousGrade == null) {
+			return grade != null;
+		} else if (grade == null) {
+			return true;
+		} else {
+			Double prevDouble = Double.parseDouble(previousGrade);
+			Double curDouble = Double.parseDouble(grade);
+			return prevDouble.doubleValue() != curDouble.doubleValue();
+		}
+	}
+
+	public boolean hasCommentChange() {
+		return previousComment == null ? comment != null : !previousComment.equals(comment);
+	}
+
 }

@@ -59,7 +59,10 @@ public class MapInputColumnsStep extends Panel {
 	private ListView<ColumnListItem> listItems;
 	private List<ImportedColumn> importedColumns;
 	private List<Assignment> assignmentList;
+	private List<String> assignmentStringList;
 	private List<String> columnTypeList;
+
+	private final String NEW_GB_ASSIGNMENT = "NEW Gradebook Item";
 
 	@SpringBean(name = "org.sakaiproject.gradebookng.business.GradebookNgBusinessService")
 	protected GradebookNgBusinessService businessService;
@@ -79,7 +82,7 @@ public class MapInputColumnsStep extends Panel {
 		final ColumnMap columnMap = this.model.getObject();
 		spreadSheetWrapper = columnMap.getWrapper();
 		importedColumns = spreadSheetWrapper.getColumns();
-		assignmentList = this.GenerateAssignmentList();
+		assignmentStringList = this.GenerateAssignmentList();
 		userMap = this.getUserMap();
 
 		columnTypeList = Arrays.asList("Grades", 
@@ -91,15 +94,16 @@ public class MapInputColumnsStep extends Panel {
 		add(new MappingForm("form"));		       
 	}
 
-	private List<Assignment> GenerateAssignmentList()
+	private List<String> GenerateAssignmentList()
 	{
-		List<Assignment> list = MapInputColumnsStep.this.businessService.getGradebookAssignments();
-		Assignment newAssignment = new Assignment();
-		newAssignment.setName("NEW Gradebook Item");
-		newAssignment.setId(-1L);
-		list.add(0, newAssignment);
+		ArrayList<String> returnList = new ArrayList<String>();
+		returnList.add(NEW_GB_ASSIGNMENT);
+		assignmentList = MapInputColumnsStep.this.businessService.getGradebookAssignments();
+		for (Assignment assignment : assignmentList) {
+			returnList.add(assignment.getName());
+		}
 
-		return list;
+		return returnList;
 	}
 
 	private Map<String, String> getUserMap() {
@@ -119,16 +123,16 @@ public class MapInputColumnsStep extends Panel {
 
 			ArrayList<ColumnListItem> listViewData = new ArrayList<ColumnListItem>();
 				for(ImportedColumn ic : importedColumns) {
-				listViewData.add(new ColumnListItem(ic, columnTypeList, assignmentList));
+				listViewData.add(new ColumnListItem(ic, columnTypeList, assignmentStringList));
 			}
 
 			IChoiceRenderer assignmentRender = new IChoiceRenderer() {
 				public Object getDisplayValue(Object object) {
-					return ((Assignment)object).getName();
+					return (String)object;
 				}
 
 				public String getIdValue(Object object, int index) {
-					return ((Assignment)object).getName();
+					return (String)object;
 				}
 
 			};
@@ -161,15 +165,48 @@ public class MapInputColumnsStep extends Panel {
 					ddcType.add(new AjaxFormComponentUpdatingBehavior("onchange") {
 						@Override
 						protected void onUpdate(AjaxRequestTarget target) {
-							log.info("Made it inside the event");
-							ColumnTypeDropDownChanged(target);
+							ListItem<ColumnListItem> listItem = (ListItem<ColumnListItem>)getComponent().getParent();
+							DropDownChoice columnType = (DropDownChoice)listItem.get("columnType"); 
+                			DropDownChoice columnAssignment = (DropDownChoice)listItem.get("columnAssignment");
+                			NumberTextField columnPoints = (NumberTextField)listItem.get("columnPoints");
+
+							switch(columnType.getValue())
+				    		{
+				    			case "Grades":
+				    				columnAssignment.setVisible(true);
+				    				columnPoints.setVisible(true);
+				    				break;
+
+				    			case "Comments":
+				    				columnAssignment.setVisible(true);
+				    				columnPoints.setVisible(false);
+				    				break;
+
+				    			case "Student ID":
+				    				columnAssignment.setVisible(false);
+				    				columnPoints.setVisible(false);
+				    				break;
+
+				  		  		case "Student Name":
+				  		  			columnAssignment.setVisible(false);
+				    				columnPoints.setVisible(false);
+				    				break;
+
+				    			case "Ignore":
+				    				columnAssignment.setVisible(false);
+				    				columnPoints.setVisible(false);
+				    				break;
+				    		}
+
+				    		target.add(columnAssignment);
+				    		target.add(columnPoints);
 						}
 
 					});
 					item.add(ddcType);
 
 					//Dropdown menu to select the Assignment. Visible only for Columns containing Grades or Comments
-					Assignment matchingAssignment = newItem.FindAssignmentByName();					
+					String matchingAssignment = newItem.FindAssignmentByName();					
 					DropDownChoice ddcAssignment = new DropDownChoice("columnAssignment", Model.of(matchingAssignment), newItem.getAssignmentList());
 					ddcAssignment.setChoiceRenderer(assignmentRender);
 					ddcAssignment.setOutputMarkupId(true);
@@ -216,21 +253,23 @@ public class MapInputColumnsStep extends Panel {
                 		DropDownChoice columnType = (DropDownChoice)currentListItem.get("columnType"); 
                 		DropDownChoice columnAssignment = (DropDownChoice)currentListItem.get("columnAssignment");
                 		NumberTextField columnPoints = (NumberTextField)currentListItem.get("columnPoints");
+                		String columnName = columnAssignment.getValue();
+                		columnName = columnName.equals(NEW_GB_ASSIGNMENT) ? oldTitle : columnName;
                 		
                 		switch(columnType.getValue())
                 		{
                 			case "Grades":
-                				String gradeColumnName = columnAssignment.getValue();
+                				
                 				Long pointValue = Long.parseLong(columnPoints.getValue());
                 				pointValue = pointValue == null ? 0L : pointValue;
                 				if (pointValue > 0) {
-                					gradeColumnName += " [" + pointValue.toString() + "]";
+                					columnName += " [" + pointValue.toString() + "]";
                 				}
-                				spreadSheetWrapper.setRawDataValue(0, i, gradeColumnName);
+                				spreadSheetWrapper.setRawDataValue(0, i, columnName);
                 				break;
 
                 			case "Comments":
-                				spreadSheetWrapper.setRawDataValue(0, i, "* " + columnAssignment.getValue());
+                				spreadSheetWrapper.setRawDataValue(0, i, "* " + columnName);
                 				break;
 
                 			case "Student ID":
@@ -242,7 +281,7 @@ public class MapInputColumnsStep extends Panel {
                 				break;
 
                 			case "Ignore":
-                				spreadSheetWrapper.setRawDataValue(0, i, "# " + oldTitle);
+                				spreadSheetWrapper.setRawDataValue(0, i, "# " + columnName);
                 				break;
                 		}
                 	}
@@ -253,7 +292,6 @@ public class MapInputColumnsStep extends Panel {
                 	List<List<String>> modifiedRawData = spreadSheetWrapper.getRawData();
                 	spreadSheetWrapper = ImportGradesHelper.parseStringLists(modifiedRawData, userMap);
 
-					assignmentList.remove(0); //To remove the "New Gradebook Item" assignment placeholder
                 	final List<GbStudentGradeInfo> grades = MapInputColumnsStep.this.businessService.buildGradeMatrix(assignmentList);
 
 					List<ProcessedGradeItem> processedGradeItems = null;
@@ -286,71 +324,62 @@ public class MapInputColumnsStep extends Panel {
 
             	@Override
             	public void onError() {
-                	log.info("Inside onERROR!!!");
+               
             	}
    		 	};
         	add(submit);
 
         	final Button cancel = new Button("backbutton") {
-        	
+        		private static final long serialVersionUID = 1L;
+        		
         		@Override
         		public void onSubmit() {
-        		
+        			// clear any previous errors
+				final ImportExportPage page = (ImportExportPage) getPage();
+				page.clearFeedback();
+
+				final Component newPanel = new GradeImportUploadStep(MapInputColumnsStep.this.panelId);
+				newPanel.setOutputMarkupId(true);
+				MapInputColumnsStep.this.replaceWith(newPanel);
         		}
         	};
         add(cancel);
 
 		}
 
-		private void ColumnTypeDropDownChanged(AjaxRequestTarget target)
-		{
-			for(int i = 0; i < listItems.size(); i ++) {
-
-				ListItem<ColumnListItem> currentListItem = (ListItem<ColumnListItem>)listItems.get(i);
-				SetListItemVisibility(currentListItem);
-
-                DropDownChoice columnAssignment = (DropDownChoice)currentListItem.get("columnAssignment");
-        		target.add(columnAssignment);
-
-        		NumberTextField columnPoints = (NumberTextField)currentListItem.get("columnPoints");
-        		target.add(columnPoints);
-			}
-		}
-
-		private void SetListItemVisibility(ListItem<ColumnListItem> listItem)
-		{
+		private void SetListItemVisibility(ListItem<ColumnListItem> listItem) {
 			DropDownChoice columnType = (DropDownChoice)listItem.get("columnType");
-            DropDownChoice columnAssignment = (DropDownChoice)listItem.get("columnAssignment");
-            NumberTextField columnPoints = (NumberTextField)listItem.get("columnPoints");
+			DropDownChoice columnAssignment = (DropDownChoice)listItem.get("columnAssignment");
+			NumberTextField columnPoints = (NumberTextField)listItem.get("columnPoints");
 
             switch(columnType.getValue())
-    		{
-    			case "Grades":
-    				columnAssignment.setVisible(true);
-    				columnPoints.setVisible(true);
-    				break;
+               {
+               		case "Grades":
+               			columnAssignment.setVisible(true);
+               			columnPoints.setVisible(true);
+                        break;
 
-    			case "Comments":
-    				columnAssignment.setVisible(true);
-    				columnPoints.setVisible(false);
-    				break;
+                    case "Comments":
+                        columnAssignment.setVisible(true);
+                        columnPoints.setVisible(false);
+                        break;
 
-    			case "Student ID":
-    				columnAssignment.setVisible(false);
-    				columnPoints.setVisible(false);
-    				break;
+                    case "Student ID":
+                        columnAssignment.setVisible(false);
+                        columnPoints.setVisible(false);
+                        break;
 
-  		  		case "Student Name":
-  		  			columnAssignment.setVisible(false);
-    				columnPoints.setVisible(false);
-    				break;
+                    case "Student Name":
+                        columnAssignment.setVisible(false);
+                        columnPoints.setVisible(false);
+                        break;
 
-    			case "Ignore":
-    				columnAssignment.setVisible(false);
-    				columnPoints.setVisible(false);
-    				break;
-    		}
-		}
+                    case "Ignore":
+                        columnAssignment.setVisible(false);
+                        columnPoints.setVisible(false);
+                        break;
+               }              
+           }
 
 	}
 }
@@ -364,7 +393,7 @@ class NullNumberValidator implements INullAcceptingValidator<Long> {
 
 class ColumnListItem implements Serializable {
 
-	public ColumnListItem(ImportedColumn c, List<String> lct, List<Assignment> la) {
+	public ColumnListItem(ImportedColumn c, List<String> lct, List<String> la) {
 		column = c;
 		columnTypeList = lct;
 		assignmentList = la;
@@ -380,14 +409,14 @@ class ColumnListItem implements Serializable {
 
 	@Getter
 	@Setter
-	private List<Assignment> assignmentList;
+	private List<String> assignmentList;
 
 
-	public Assignment FindAssignmentByName()
+	public String FindAssignmentByName()
 	{
 		String compString = column.getColumnTitle();
-		for (Assignment assignment : assignmentList) {
-			if (assignment.getName().equals(compString)) {
+		for (String assignment : assignmentList) {
+			if (assignment.equals(compString)) {
 				return assignment;
 			}
 		}

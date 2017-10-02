@@ -26,6 +26,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItem;
+import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemDetail;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemStatus;
 import org.sakaiproject.gradebookng.tool.model.ImportWizardModel;
 import org.sakaiproject.gradebookng.tool.pages.ImportExportPage;
@@ -211,6 +212,14 @@ public class GradeItemImportSelectionStep extends Panel {
 				item.add(itemPointValue);
 				item.add(itemStatus);
 
+				List<ProcessedGradeItemDetail> changeList = new ArrayList<ProcessedGradeItemDetail>();
+
+				for (ProcessedGradeItemDetail detail : importedItem.getProcessedGradeItemDetails()) {
+					if (detail.hasGradeChange() || detail.hasCommentChange()) {
+						changeList.add(detail);
+					}
+				}
+
 				// Determine status label
 				final ProcessedGradeItemStatus status = importedItem.getStatus();
 
@@ -227,6 +236,9 @@ public class GradeItemImportSelectionStep extends Panel {
 					if (status.getStatusCode() == ProcessedGradeItemStatus.STATUS_NA) {
 						checkbox.setVisible(false);
 						item.add(new AttributeAppender("class", Model.of("no_changes"), " "));
+					} else {
+						String changeString = String.format(" (%d %s)", changeList.size(), changeList.size() == 1 ? "change" : "changes");
+						itemStatus.setDefaultModelObject((String)itemStatus.getDefaultModelObject() + changeString);
 					}
 
 				}

@@ -128,7 +128,7 @@ public class GradeImportUploadStep extends Panel {
 
 				//if(ImportGradesHelper.ErrorsList.length() > 0)
 				//{
-					log.info("Completed with errors. Prompting user to manually select columns");
+					//log.info("Completed with errors. Prompting user to manually select columns");
 					ColumnMap columnMap = new ColumnMap(spreadsheetWrapper, ImportGradesHelper.ErrorsList);
 					final MapInputColumnsStep mapInputColumns = new MapInputColumnsStep(GradeImportUploadStep.this.panelId, Model.of(columnMap));
 					mapInputColumns.setOutputMarkupId(true);

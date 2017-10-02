@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sakaiproject.rest</groupId>
     <artifactId>sakai-rest</artifactId>
-    <version>11.3</version>
+    <version>11.4</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

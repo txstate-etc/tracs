@@ -50,14 +50,23 @@
 
         $('.roster-print-button').click(function (e) {
 
-            e.preventDefault();
-            roster.renderMembership({renderAll: true, callback: function () {
+            var button = $(this);
 
-                    //$(window).on('load', function () {
+            button.prop('disabled', true);
+
+            e.preventDefault();
+            roster.renderMembership({
+                renderAll: true,
+                forceOfficialPicture: roster.officialPictureMode,
+                callback: function () {
+
                     $('#roster-members').waitForImages(function () {
+
+                        button.prop('disabled', false);
                         window.print();
                     });
-            }});
+                }
+            });
         });
     };
 
@@ -138,7 +147,7 @@
 
             var showOfficialPictures = false;
 
-            if ((arg && arg.forceOfficialPicture) || roster.rosterOfficialPictureMode) {
+            if ((arg && arg.forceOfficialPicture) || roster.officialPictureMode) {
                 showOfficialPictures = true;
             }
 
@@ -181,13 +190,13 @@
 
                     $('#roster_official_picture_button').click(function (e) {
 
-                        roster.rosterOfficialPictureMode = true;
+                        roster.officialPictureMode = true;
                         roster.renderMembership({ forceOfficialPicture: true, replace: true });
                     });
         
                     $('#roster_profile_picture_button').click(function (e) {
 
-                        roster.rosterOfficialPictureMode = false;
+                        roster.officialPictureMode = false;
                         roster.renderMembership({ forceOfficialPicture: false, replace: true });
                     });
                 }
@@ -228,7 +237,7 @@
 
             var showOfficialPictures = false;
 
-            if ((arg && arg.forceOfficialPicture) || roster.rosterOfficialPictureMode) {
+            if ((arg && arg.forceOfficialPicture) || roster.officialPictureMode) {
                 showOfficialPictures = true;
             }
 
@@ -260,13 +269,13 @@
 
                     $('#roster_official_picture_button').click(function (e) {
 
-                        roster.rosterOfficialPictureMode = true;
+                        roster.officialPictureMode = true;
                         roster.renderMembership({ forceOfficialPicture: true, replace: true });
                     });
         
                     $('#roster_profile_picture_button').click(function (e) {
 
-                        roster.rosterOfficialPictureMode = false;
+                        roster.officialPictureMode = false;
                         roster.renderMembership({ forceOfficialPicture: false, replace: true });
                     });
                 }
@@ -315,8 +324,6 @@
 
         if (groupId === roster.DEFAULT_GROUP_ID) {
             groupId = null;
-        } else {
-            $('#roster-members').empty();
         }
 
         $('#roster-search-field').val('');
@@ -423,14 +430,11 @@
                         m.formattedProfileUrl = "/direct/profile/" + m.userId + "/formatted/official?siteId=" + encodeURIComponent(roster.siteId);
                     }
                     m.profileImageUrl += "?siteId=" + encodeURIComponent(roster.siteId);
+
                     var groupIds = Object.keys(m.groups);
                     m.hasGroups = groupIds.length > 0;
-
-                    m.singleGroup = null;
-                    if (groupIds.length == 1) {
-                        var singleGroupId = groupIds[0];
-                        m.singleGroup = { id: groupIds[0], title: m.groups[groupIds[0]] };
-                    }
+                    var groups = groupIds.map(function (id) { return {id: id, title: m.groups[id]} });
+                    m.groups = groups;
 
                     m.enrollmentStatusText = roster.site.enrollmentStatusCodes[m.enrollmentStatusId];
 
@@ -554,7 +558,7 @@
             }
 
             if (userIds.length > 0) {
-                roster.renderMembership({ showOfficialPictures: roster.rosterOfficialPictureMode,
+                roster.renderMembership({ showOfficialPictures: roster.officialPictureMode,
                                             replace: true,
                                             userIds: userIds });
             } else {
@@ -741,11 +745,11 @@
         roster.enrollmentSetToView = null;
         roster.enrollmentSetToViewText = null;
         roster.enrollmentStatusToViewText = roster.i18n.roster_enrollment_status_all;
-        roster.rosterOfficialPictureMode = false;
+        roster.officialPictureMode = false;
         roster.nextPage = 0;
         roster.currentState = null;
 
-        roster.rosterOfficialPictureMode = roster.officialPicturesByDefault;
+        roster.officialPictureMode = roster.officialPicturesByDefault;
 
         // We need the toolbar in a template so we can swap in the translations
         roster.render('navbar', {}, 'roster_navbar');

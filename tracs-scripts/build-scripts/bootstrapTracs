@@ -52,7 +52,7 @@ my($sourceTreePath,$tomcatOverlayPath,$releaseName,$skipSlowStuff);
 	}
 	
 	$sourceTreePath = abs_path($sourceTreePath);
-	$skinLibPath = $sourceTreePath
+	$skinLibPath = $sourceTreePath;
 	$tomcatOverlayPath = abs_path("$sourceTreePath/tracs-scripts/build-scripts/tomcat_overlay");
 	if ( ! -d $sourceTreePath ) {
 		warn "$sourceTreePath is not a directory.\n\n";
@@ -174,7 +174,7 @@ my($tomcatPath);
 		exit(1);
 	}
 
-	system("cd ".quotemeta($tomcatOverlayPath).";cp -r $sourceTreePath/tracs-docker/sakai .;find . -type f|$tar -czf $tempDir/tomcat_overlay.tgz -T -";rm -rf $sourceTreePath/tracs-docker/sakai);
+	system("cd ".quotemeta($tomcatOverlayPath).";cp -r $sourceTreePath/tracs-docker/sakai .;find . -type f|$tar -czf $tempDir/tomcat_overlay.tgz -T - ;rm -rf $sourceTreePath/tracs-docker/sakai");
 	system("cd ".quotemeta($tomcatPath).";$tar -vxzf $tempDir/tomcat_overlay.tgz");
 	system("cd ".quotemeta($tomcatPath).";patch -p1 <conf/tomcat-conf.patch;rm -f conf/tomcat-conf.patch");
 	system("rm -rf ".quotemeta($tomcatPath)."/webapps/*");

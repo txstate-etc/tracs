@@ -3,7 +3,7 @@
   <parent>
     <artifactId>master</artifactId>
     <groupId>org.sakaiproject</groupId>
-    <version>11.3</version>
+    <version>11.4</version>
     <relativePath>../master/pom.xml</relativePath>
   </parent>
 
@@ -81,7 +81,7 @@
       <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
-        <version>2.5.1</version>
+        <version>2.6.1</version>
         <scope>compile</scope>
       </dependency>
     </dependencies>

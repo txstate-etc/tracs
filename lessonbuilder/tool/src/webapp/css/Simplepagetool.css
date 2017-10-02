@@ -891,6 +891,9 @@ a.peer-eval-stats {
     margin-left: 2em;
     font-size: 110%;
 }
+.missingStudentTitle {
+    margin-left: 23px;
+}
 .studentContentTable {
         margin-top:10px;
 	border: none;
@@ -906,7 +909,9 @@ a.peer-eval-stats {
 .studentContentTable .studentLink{
     padding-left:8px;
 }
-
+.studentContentTable .missingStudent {
+    padding-left:43px;
+}
 
 .duecol {
 	padding-left: 2em !important
@@ -1097,16 +1102,7 @@ img {
 .question-multiplechoice-answer, .question-shortanswer-answer {
 	width: 250px;
 }
-
-.addStudentContent {
- -webkit-border-radius: 3px;
- -moz-border-radius: 3px;
- border-radius: 3px;
- border:solid black 1px;
- text-decoration:none;
- font-size:85%;
-}
-input[type="submit"].question-submit,.addStudentContent {
+input[type="submit"].question-submit,.linkCell .addStudentContent, input[type="submit"].setStudentZero {
    margin: inherit;
    margin-top:15px;
    border:1px solid #999;
@@ -1121,6 +1117,15 @@ input[type="submit"].question-submit,.addStudentContent {
    line-height: inherit;
    border-radius: 3px;
    position: static;
+}
+.linkCell .addStudentContent {
+ -webkit-border-radius: 3px;
+ -moz-border-radius: 3px;
+ background-image:none;
+ border-radius: 3px;
+ border:solid #999 1px;
+ text-decoration:none;
+ margin-top:0px;
 }
 
 .questionDiv .contentCol, .checklistDiv {
@@ -1346,6 +1351,14 @@ div[role="dialog"] {
 }
 div.navIntraTool {
   border-top:none;
+}
+/* our additions to the top menu */
+
+.top-icon:before {
+   margin-right: 5px;
+}
+#print-view {
+   margin-right: 7px;
 }
 
 /* temporary, to avoid changing old stuff for the moment */
@@ -1653,12 +1666,14 @@ span.nextprev {
 .fa-button-text{
   font-size:125%;
 }
-.navIntraTool li.contentButton a {
+.navIntraTool li.contentButton a, .topaction a {
   padding-top:2px !important;
   padding-bottom:2px !important;
+  text-transform: uppercase;
 }
 .navIntraTool li.contentButton a .fa-button-text, .fa-fw {
   font-family:FontAwesome;
+  font-size: 0.8em;
 }
 .studentRow > .fa-fw {
   width: 1em !important;
@@ -1845,7 +1860,7 @@ nav.Mrphs-container--toolTitleNav {
         z-index: 100001 !important;
 }
 /* menu off user icon, site menu in narrow, site menu in  wide mode */
-.Mrphs-mainHeader, .Mrphs-skipNav__menu, #selectSiteModal {
+.Mrphs-mainHeader, .Mrphs-skipNav__menu, #selectSiteModal, #toolMenuWrap {
         z-index: 100002 !important;
 	position:relative;
 }
@@ -1882,6 +1897,7 @@ nav.Mrphs-container--toolTitleNav {
 .saveChecklistError {
     color: #D8000C;
     background-image: url('../images/failed.png');
+    background-size: 16px 16px;
 }
 .saveChecklistSaving {
     margin-left: 2em;

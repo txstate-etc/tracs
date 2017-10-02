@@ -5,7 +5,7 @@
     <parent>
         <artifactId>portal</artifactId>
         <groupId>org.sakaiproject.portal</groupId>
-        <version>11.3</version>
+        <version>11.4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -20,7 +20,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>castor</groupId>
+            <groupId>org.codehaus.castor</groupId>
             <artifactId>castor</artifactId>
             <scope>compile</scope>
         </dependency>

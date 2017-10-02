@@ -209,7 +209,7 @@
 							<value>F</value>
 						</list>
 					</property>
-					<property name="defaultBottomPercents">
+					<property name="defaultBottomPercentsAsList">
 						<list>
 							<value>100.0</value>
 							<value>95.0</value>
@@ -239,7 +239,7 @@
 							<value>F</value>
 						</list>
 					</property>
-					<property name="defaultBottomPercents">
+					<property name="defaultBottomPercentsAsList">
 						<list>
 							<value>90.0</value>
 							<value>80.0</value>
@@ -296,7 +296,7 @@
 							<value>F!?</value>
 						</list>
 					</property>
-					<property name="defaultBottomPercents">
+					<property name="defaultBottomPercentsAsList">
 						<list>
 							<value>100.0</value>
 							<value>90.0</value>
@@ -322,7 +322,7 @@
 							<value>F</value>
 						</list>
 					</property>
-					<property name="defaultBottomPercents">
+					<property name="defaultBottomPercentsAsList">
 						<list>
 							<value>50.0</value>
 							<value>30.0</value>
@@ -342,7 +342,7 @@
 							<value>I</value>
 						</list>
 					</property>
-					<property name="defaultBottomPercents">
+					<property name="defaultBottomPercentsAsList">
 						<list>
 							<value>75.0</value>
 							<value>0.0</value>

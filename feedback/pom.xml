@@ -13,7 +13,7 @@
 	<parent>
         <groupId>org.sakaiproject</groupId>
         <artifactId>master</artifactId>
-        <version>11.3</version>
+        <version>11.4</version>
         <relativePath>../master/pom.xml</relativePath>
     </parent>
 
@@ -145,7 +145,7 @@
                                     <templates>
                                         <template>content</template>
                                         <template>home</template>
-                                        <template>technical</template>
+                                        <template>emailForm</template>
                                         <template>toolbar</template>
                                     </templates>
                                 </configuration>
@@ -181,7 +181,7 @@
                             <templates>
                                 <template>content</template>
                                 <template>home</template>
-                                <template>technical</template>
+                                <template>emailForm</template>
                                 <template>toolbar</template>
                             </templates>
                         </configuration>

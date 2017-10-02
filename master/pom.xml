@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
   <name>Sakai Master</name>
   <description>Corporate POM for the Sakai Open Source Collaborative Learning Environment/Learning Management System</description>
-  <version>11.3</version>
+  <version>11.4</version>
   <url>http://sakaiproject.org</url>
   <organization>
     <name>Sakai Project</name>
@@ -73,7 +73,7 @@
   </scm>
 
   <properties>
-    <sakai.version>11.3</sakai.version>
+    <sakai.version>11.4</sakai.version>
     <!-- Retain this for backward compatibility -->
     <sakai.kernel.version>${sakai.version}</sakai.kernel.version>
     <kernel.spring.version>${sakai.spring.version}</kernel.spring.version>
@@ -115,7 +115,7 @@
     <sakai.spring.test.artifactId>spring-test</sakai.spring.test.artifactId>
     <sakai.spring.test.version>4.1.9.RELEASE</sakai.spring.test.version>
     <sakai.tika.version>1.12</sakai.tika.version>
-    <sakai.tomcat.version>8.0.32</sakai.tomcat.version>
+    <sakai.tomcat.version>8.0.41</sakai.tomcat.version>
     <sakai.velocity.version>1.6.4</sakai.velocity.version>
     <sakai.xerces.impl.version>2.6.2</sakai.xerces.impl.version>
     <sakai.xerces.api.version>2.6.2</sakai.xerces.api.version>
@@ -832,9 +832,9 @@
       </dependency>
       <!-- shared/lib -->
       <dependency>
-        <groupId>castor</groupId>
+        <groupId>org.codehaus.castor</groupId>
         <artifactId>castor</artifactId>
-        <version>1.0</version>
+        <version>1.1.1</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -1647,12 +1647,12 @@
       <dependency>
           <groupId>mysql</groupId>
           <artifactId>mysql-connector-java</artifactId>
-          <version>5.1.36</version>
+          <version>5.1.40</version>
       </dependency>
       <dependency>
           <groupId>org.mariadb.jdbc</groupId>
           <artifactId>mariadb-java-client</artifactId>
-          <version>1.3.6</version>
+          <version>1.5.7</version>
       </dependency>
       <!-- dependencies for melete -->
       <dependency>
@@ -2008,7 +2008,28 @@
               </rules>
             </configuration>
           </execution>
+          <execution>
+              <id>enforce-ban-circular-dependencies</id>
+              <goals>
+                  <goal>enforce</goal>
+              </goals>
+              <!-- Against a clean repository you can't run `mvn validate` with enforcer enabled -->
+              <phase>install</phase>
+              <configuration>
+                  <rules>
+                      <banCircularDependencies/>
+                  </rules>
+                  <fail>true</fail>
+              </configuration>
+          </execution>
         </executions>
+        <dependencies>
+            <dependency>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>extra-enforcer-rules</artifactId>
+                <version>1.0-beta-4</version>
+            </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <inherited>true</inherited>

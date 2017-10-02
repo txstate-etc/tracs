@@ -45,7 +45,7 @@ public class GradeImportConfirmationStep extends Panel {
 	private static final long serialVersionUID = 1L;
 
 	@SpringBean(name = "org.sakaiproject.gradebookng.business.GradebookNgBusinessService")
-	protected GradebookNgBusinessService businessService;
+	private GradebookNgBusinessService businessService;
 
 	private final String panelId;
 	private final IModel<ImportWizardModel> model;
@@ -224,6 +224,22 @@ public class GradeImportConfirmationStep extends Panel {
 		};
 		backButton.setDefaultFormProcessing(false);
 		form.add(backButton);
+
+		// cancel button
+		final Button cancelButton = new Button("cancelbutton") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onSubmit() {
+				// clear any previous errors
+				final ImportExportPage page = (ImportExportPage) getPage();
+				page.clearFeedback();
+
+				setResponsePage(ImportExportPage.class);
+			}
+		};
+		cancelButton.setDefaultFormProcessing(false);
+		form.add(cancelButton);
 
 		// finish button
 		form.add(new Button("finishbutton"));

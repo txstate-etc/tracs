@@ -99,6 +99,7 @@ public class LTIAdminTool extends VelocityPortletPaneledAction
 	private static String STATE_LTI2_TOOL_ID = "lti2:state_tool_id";
 
 	private static String ALLOW_MAINTAINER_ADD_SYSTEM_TOOL = "lti:allow_maintainer_add_system_tool";
+	private static String ALLOW_MAINTAINER_ADD_TOOL_SITE = "lti:allow_maintainer_add_tool_site";
 
 	/** Service Implementations */
 	protected static ToolManager toolManager = null; 
@@ -175,6 +176,7 @@ public class LTIAdminTool extends VelocityPortletPaneledAction
 		// if ( returnUrl != null ) state.setAttribute(STATE_REDIRECT_URL, returnUrl);
 		context.put("ltiService", ltiService);
 		context.put("isAdmin",new Boolean(ltiService.isAdmin()) );
+		context.put("allowMaintainerAddToolSite", serverConfigurationService.getBoolean(ALLOW_MAINTAINER_ADD_TOOL_SITE, true));
 		context.put("getContext",toolManager.getCurrentPlacement().getContext());
 		context.put("doEndHelper", BUTTON + "doEndHelper");
 		state.removeAttribute(STATE_POST);
@@ -1649,8 +1651,9 @@ public class LTIAdminTool extends VelocityPortletPaneledAction
 		if ( url != null ) reqProps.setProperty("launch", url);
 		if ( title == null ) title = text;
 		if ( text == null ) text = title;
+		if ( title != null ) reqProps.setProperty(LTIService.LTI_TITLE, title);
 		if ( title != null ) reqProps.setProperty(LTIService.LTI_PAGETITLE, title);
-		if ( text != null ) reqProps.setProperty(LTIService.LTI_TITLE, text);
+		if ( text != null ) reqProps.setProperty(LTIService.LTI_DESCRIPTION, text);
 		if ( icon != null ) reqProps.setProperty(LTIService.LTI_FA_ICON, icon);
 		if ( custom_str.length() > 0 ) reqProps.setProperty(LTIService.LTI_CUSTOM, custom_str);
 

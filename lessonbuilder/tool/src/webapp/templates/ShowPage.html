@@ -118,19 +118,19 @@
 				       <span rsf:id="pagetitle"></span><a role="button" class="portlet title-tools title reset" rsf:id="pagetitlelink"><span class="Mrphs-toolTitleNav__link Mrphs-toolTitleNav__link--reset"></span><span rsf:id="pagetitletext"></span></a>
 			   </h2>
 		       </div>
-	     <div class="action">
+	     <div class="action topaction">
                  <span id="expandCollapseButtons" style="display:none;">
                    <a href="#" role="button" id="expandAllSections"><span class="fa fa-toggle-down" aria-hidden="true" style="padding-right:5px;"></span><span rsf:id="msg=simplepage.expand.all"></span></a>
                    <a href="#" role="button" id="collapseAllSections" style="display:none;"><span class="fa fa-toggle-up" aria-hidden="true" style="padding-right:5px;"></span><span rsf:id="msg=simplepage.collapse.all"></span></a>
 		 </span>
 
-		 <a role="button"  href="#" rsf:id="print-view" id="print-view" onclick="window.open(printView(window.location.href));return false"></a>
-		 <a role="button" href="#" rsf:id="show-pages" id="show-pages"></a>
+		 <a role="button"  href="#" rsf:id="print-view" id="print-view" onclick="window.open(printView(window.location.href));return false" class="Mrphs-toolTitleNav__link top-icon fa fa-print"><span rsf:id="msg=simplepage.print_view" class="Mrphs-itemTitle"></span></a>
+		 <a role="button" href="#" rsf:id="show-pages" id="show-pages" class="Mrphs-toolTitleNav__link top-icon fa fa-list-ul"><span rsf:id="msg=simplepage.showallpages" class="Mrphs-itemTitle"></span></a>
 
 		 <span rsf:id="gradingSpan" class="gradingarea">
 		     <a role="button" href="#" rsf:id="gradingBack" style="margin-right:2px;background:none" class="usebutton grading-nextprev">&#60;</a><img class="statusImg" src="$context/images/no-status.png" id="statusImg" height="16px" width="16px" alt=""></img><span style="*vertical-align:13%"  rsf:id="msg=simplepage.comments-points"></span><span style="display:none" class="uuidBox" rsf:id="commentsUUID"></span><span style="display:none" class="pointsSpan" rsf:id="commentPoints"></span> <input rsf:id="studentPointsBox"  id="studentPointsBox" type="text" style="font-size:100%"  size="3"></input> / <span rsf:id="topmaxpoints"></span> <a role="button" class="usebutton" href="#" rsf:id="msg=simplepage.submit" style="background:none; width:auto; *vertical-align:13%;margin-right:.5em" id="submit-grading"></a> <a role="button" style="background:none" href="#" rsf:id="gradingForward" class="usebutton grading-nextprev">&#62;</a>
 		 </span>
-		 <span class="nextprev buttonset"> <a role="button" style="background:none" href="#" rsf:id="prev" class="nextprev nextbutton">next</a> <a role="button" style="background:none"  href="#" rsf:id="next" class="nextprev nextbutton">next</a> </span>
+		 <span class=""> <a role="button" style="" href="#" rsf:id="prev" class="nexprev menuitem button">next</a> <a role="button" href="#" rsf:id="next" class="nextprev menuitem button">next</a> </span>
 		   <a role="button" aria-haspopup="dialog" aria-controls="direct-dialog" href="#" rsf:id="directurl" id="directurl" class="title-tools tool-directurl Mrphs-toolTitleNav__link Mrphs-toolTitleNav__link--directurl">
 		       <img rsf:id="directimage" src="/library/image/transparent.gif"/>
 		   </a>
@@ -186,7 +186,7 @@
 				<li class="contentButton dropdown" id="dropdownc">
 					<span>
 					    <a aria-haspopup="true" aria-controls="addContentDiv" href="#" rsf:id="addcontent" onclick="return false;" class="add-at-end" role="menuitem button">
-						<span rsf:id="msg=simplepage.add-content"></span>&nbsp;&nbsp;
+					      <span rsf:id="msg=simplepage.add-content"></span>&nbsp;&nbsp;
 					        <span aria-hidden="true" class="fa-button-text fa-plus"></span>
 					    </a>				
 					</span>
@@ -229,6 +229,10 @@
 	 //    jQuery(".Mrphs-siteHierarchy").append(jQuery("span.nextprev"));
 	    jQuery(".neoPortletTitleWrap").after('<h2 class="genTitle"></h2>');
 	    jQuery(".genTitle").text(title);
+
+	    jQuery(".Mrphs-toolTitleNav__addRight").before(jQuery(".topaction > a"));
+	    jQuery(".Mrphs-toolTitleNav__button_container > a").addClass("Mrphs-toolTitleNav__link");
+
 	    // the top is position:fixed. The rest of the page is position static, put below the
 	    // fixed by a magic margin. However if the siteHierarchy is large, the magic margin
 	    // has to be adjusted.
@@ -273,6 +277,8 @@
         resizeContent();
 	    jQuery(window).load(resizeContent);
 	    jQuery(window).resize(resizeContent);
+         } else {
+	     jQuery(".topaction > a").addClass("button");
          }
 	 if (jQuery(".navIntraTool").size() > 0)
   	   jQuery(".navIntraTool").append(jQuery(".action"));
@@ -326,10 +332,21 @@
 		    <a role="menuitem button" aria-haspopup="dialog" aria-controls="question-dialog"  href="#" rsf:id="question-link" class="question-link"><span rsf:id="msg=simplepage.questionLinkText"></span></a>
 		  </li>
                   <li rsf:id="student-li">
-                    <a href="#" role="menuitem button" rsf:id="add-comments" class="add-before-param"><span rsf:id="msg.simplepage.comments"></span></a>
+		     <a id="add-comments-link" rsf:id="add-comments-link" href="#" role="menuitem button"><span rsf:id="msg=simplepage.comments"></span></a>
+		     <form rsf:id="add-comments-form" style="display:none" action="#" id="add-comments-form" method="post" enctype="multipart/form-data">
+		      <input type="hidden" rsf:id="comments-addBefore" id="comments-addBefore" />
+		      <input type="hidden" rsf:id="csrf25" />
+		      <input type="submit" rsf:id="add-comments" id="add-comments"/>
+		    </form>
                   </li>
                   <li rsf:id="studentcontent-li">
-                    <a href="#" role="menuitem button" rsf:id="add-content" class="add-before-param"><span rsf:id="msg.simplepage.add-student-content"></span></a>
+		    <a id="add-student-link" rsf:id="add-student-link" href="#" role="menuitem button"><span rsf:id="msg=simplepage.add-student-content"></span></a>
+		    <form rsf:id="add-student-form" style="display:none" action="#" id="add-student-form" method="post" enctype="multipart/form-data">
+		      <input type="hidden" rsf:id="add-student-addBefore" id="add-student-addBefore" />
+		      <input type="hidden" rsf:id="csrf26" />
+		      <input type="submit" rsf:id="add-student" id="add-student"/>
+		    </form>
+
                   </li>
                   <li rsf:id="addwebsite-li">
                     <a href="#" role="menuitem button" aria-haspopup="dialog" aria-controls="add-multimedia-dialog" rsf:id="add-website" class="add-website add-before-param"><span rsf:id="msg.simplepage.website"></span></a>
@@ -661,8 +678,22 @@
                                 <span rsf:id="studentGradingCell" class="gradingCell"></span>
                                 <div rsf:id="linkCell" class="linkCell">
                                   <img rsf:id="student-required-image" src="/lessonbuilder-tool/images/available.png" class="status-image icon-image" style="margin-right:3px"/>
-                                  <a role="button" class="addStudentContent" href="#" rsf:id="linkLink"></a>
+				  <form rsf:id="add-content-form" action="#" id="add-content-form" method="post" enctype="multipart/form-data">
+				    <input type="hidden" rsf:id="csrf27" />
+				    <input type="hidden" rsf:id="add-content-itemId" />
+				    <input type="submit" rsf:id="add-content" id="add-content" class="addStudentContent" />
+				  </form>
+
                                 </div>
+				<h3 class="missingStudentTitle studentContentTitle" rsf:id="missingStudentTitle"></h3>
+				<div class="missingStudent" rsf:id="missingStudent"></div>
+				<div rsf:id="student-zero-div">
+				<form rsf:id="student-zero-form" action="#" id="student-zero-form" method="post" enctype="multipart/form-data">
+				  <input type="hidden" rsf:id="student-zero-csrf" />
+				  <input type="hidden" rsf:id="student-zero-item" />
+				  <input type="submit" rsf:id="student-zero" id="student-zero" class="setStudentZero" />
+				</form>
+				</div>
                               </div>
                             </div>
  			    <div class="add-comment-button">

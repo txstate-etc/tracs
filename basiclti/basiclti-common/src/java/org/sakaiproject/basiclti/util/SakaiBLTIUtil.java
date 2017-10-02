@@ -104,6 +104,7 @@ import net.oauth.OAuthValidator;
 import net.oauth.SimpleOAuthValidator;
 import net.oauth.signature.OAuthSignatureMethod;
 
+import org.apache.commons.math3.util.Precision;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -112,6 +113,7 @@ import org.sakaiproject.site.api.Group;
 import org.sakaiproject.coursemanagement.api.CourseManagementService;
 import org.sakaiproject.coursemanagement.api.Section;
 import org.sakaiproject.coursemanagement.api.exception.IdNotFoundException;
+
 
 /**
  * Some Sakai Utility code for IMS Basic LTI
@@ -1811,8 +1813,9 @@ public class SakaiBLTIUtil {
 				assignmentObject.setName(assignment);
 				assignmentObject.setReleased(true);
 				assignmentObject.setUngraded(false);
-				g.addAssignment(siteId, assignmentObject);
-				M_log.info("Added assignment: "+assignment);
+				Long assignmentId = g.addAssignment(siteId, assignmentObject);
+				assignmentObject.setId(assignmentId);
+				M_log.info("Added assignment: " +assignment + " with Id: " + assignmentId);
 			}
 			catch (ConflictingAssignmentNameException e) {
 				M_log.warn("ConflictingAssignmentNameException while adding assignment" + e.getMessage());
@@ -1823,7 +1826,10 @@ public class SakaiBLTIUtil {
 				assignmentObject = null; // Just to make double sure
 			}
 		}
-
+		if (assignmentObject == null || assignmentObject.getId() == null) {
+			M_log.warn("assignmentObject or Id is null, cannot proceed with grading.");
+			return "Grade failure siteId="+siteId;
+		}
 		// Now read, set, or delete the grade...
 		Session sess = SessionManager.getCurrentSession();
 		String message = null;
@@ -1847,7 +1853,9 @@ public class SakaiBLTIUtil {
 				message = "Result read";
 				Map<String, Object> retMap = new TreeMap<String, Object> ();
 				retMap.put("grade",dGrade);
-				retMap.put("comment",commentDef.getCommentText());
+				if (commentDef != null) {
+					retMap.put("comment",commentDef.getCommentText());
+				}
 				retval = retMap;
 			} else if ( isDelete ) {
 				g.setAssignmentScoreString(siteId, assignmentObject.getId(), user_id, null, "External Outcome");
@@ -1855,14 +1863,10 @@ public class SakaiBLTIUtil {
 				message = "Result deleted";
 				retval = Boolean.TRUE;
 			} else {
-				if ( theGrade < 0.0 || theGrade > 1.0 ) {
-					throw new Exception("Grade out of range");
-				}
-				theGrade = theGrade * assignmentObject.getPoints();
 				if (assignmentObject.isExternallyMaintained()) {
-					gex.updateExternalAssessmentScore(siteId, assignmentObject.getExternalId(), user_id, theGrade.toString());
+					gex.updateExternalAssessmentScore(siteId, assignmentObject.getExternalId(), user_id, getRoundedGrade(theGrade,assignmentObject.getPoints()));
 				} else {
-				g.setAssignmentScoreString(siteId, assignmentObject.getId(), user_id, String.valueOf(theGrade), "External Outcome");
+				g.setAssignmentScoreString(siteId, assignmentObject.getId(), user_id, getRoundedGrade(theGrade,assignmentObject.getPoints()), "External Outcome");
 				g.setAssignmentScoreComment(siteId, assignmentObject.getId(), user_id, comment);
 				}
 
@@ -1872,12 +1876,24 @@ public class SakaiBLTIUtil {
 			}
 		} catch (Exception e) {
 			retval = "Grade failure "+e.getMessage()+" siteId="+siteId;
+			M_log.warn("handleGradebook Grade failure in site:" + siteId,e);
 		} finally {
 			sess.invalidate(); // Make sure to leave no traces
 			popAdvisor();
 		}
 
 		return retval;
+	}
+
+	// Returns theGrade * points rounded to 2 digits (as a String)
+	// Used for testing and to avoid precision problems
+	public static String getRoundedGrade(Double theGrade, Double points) throws Exception {
+		if ( theGrade < 0.0 || theGrade > 1.0 ) {
+			throw new Exception("Grade out of range");
+		}
+		theGrade = theGrade * points;
+		theGrade = Precision.round(theGrade,2);
+		return String.valueOf(theGrade);
 	}
 
 	// Extract the necessary properties from a placement

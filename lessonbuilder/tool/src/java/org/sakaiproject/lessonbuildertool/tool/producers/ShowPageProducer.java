@@ -77,6 +77,7 @@ import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.event.api.UsageSession;
 import org.sakaiproject.event.cover.UsageSessionService;
 import org.sakaiproject.authz.api.AuthzGroupService;
+import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.lessonbuildertool.SimplePage;
 import org.sakaiproject.lessonbuildertool.SimplePageComment;
@@ -114,6 +115,7 @@ import org.sakaiproject.tool.api.ToolSession;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.user.api.User;
+import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.cover.UserDirectoryService;
@@ -173,6 +175,8 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 	private SimplePageBean simplePageBean;
 	private SimplePageToolDao simplePageToolDao;
 	private AuthzGroupService authzGroupService;
+	private SecurityService securityService;
+	private SiteService siteService;
 	private FormatAwareDateInputEvolver dateevolver;
 	private TimeService timeService;
 	private HttpServletRequest httpServletRequest;
@@ -476,17 +480,6 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 			return;
 		}
 
-		String addBefore = params.getAddBefore();
-		if (params.addTool == GeneralViewParameters.COMMENTS) {
-			simplePageBean.addCommentsSection(addBefore);
-		}else if(params.addTool == GeneralViewParameters.STUDENT_CONTENT) {
-			simplePageBean.addStudentContentSection(addBefore);
-		}else if(params.addTool == GeneralViewParameters.STUDENT_PAGE) {
-		    simplePageBean.createStudentPage(params.studentItemId);
-			canEditPage = simplePageBean.canEditPage();
-		}
-
-
 		// Find the MSIE version, if we're running it.
 		int ieVersion = checkIEVersion();
 		// as far as I can tell, none of these supports fck or ck
@@ -740,8 +733,10 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 		// put out link to index of pages
 		GeneralViewParameters showAll = new GeneralViewParameters(PagePickerProducer.VIEW_ID);
 		showAll.setSource("summary");
-		UIInternalLink.make(tofill, "print-view", messageLocator.getMessage("simplepage.print_view"), showAll);
-		UIInternalLink.make(tofill, "show-pages", messageLocator.getMessage("simplepage.showallpages"), showAll);
+		UIInternalLink.make(tofill, "print-view", showAll)
+		    .decorate(new UITooltipDecorator(messageLocator.getMessage("simplepage.print_view")));
+		UIInternalLink.make(tofill, "show-pages", showAll)
+		    .decorate(new UITooltipDecorator(messageLocator.getMessage("simplepage.showallpages")));
 		
 		if (canEditPage) {
 			// show tool bar, but not if coming from grading pane
@@ -2571,10 +2566,25 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 					if (!isAvailable && !canSeeAll)
 					    UIOutput.make(tableRow, "student-missing-prereqs", messageLocator.getMessage("simplepage.student-missing-prereqs"));
 					else {
+						boolean isGrader = simplePageBean.getEditPrivs() == 0;
+
 						UIOutput.make(tableRow, "studentDiv");
 						
 						HashMap<Long, SimplePageLogEntry> cache = simplePageBean.cacheStudentPageLogEntries(i.getId());
 						List<SimpleStudentPage> studentPages = simplePageToolDao.findStudentPages(i.getId());
+
+						// notSubmitted will be list of students or groups that didn't submit. Start with those who
+						// should submit and remove as we see them
+						Set<String> notSubmitted = new HashSet<String>();
+						if (i.isGroupOwned()) {
+						    notSubmitted = simplePageBean.getOwnerGroups(i);
+						} else {
+						    String siteRef = simplePageBean.getCurrentSite().getReference();
+						    // only check students
+						    List<User> studentUsers = securityService.unlockUsers("section.role.student", siteRef);
+						    for (User u: studentUsers)
+							notSubmitted.add(u.getId());
+						}
 					
 						boolean hasOwnPage = false;
 						String userId = UserDirectoryService.getCurrentUser().getId();
@@ -2608,6 +2618,15 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 								continue;
 							}
 
+							// remove this from notSubmitted
+							if (i.isGroupOwned()) {
+							    String pageGroup = page.getGroup();
+							    if (pageGroup != null)
+								notSubmitted.remove(pageGroup);
+							} else {
+							    notSubmitted.remove(page.getOwner());
+							}
+							    
 							SimplePageLogEntry entry = cache.get(page.getPageId());
 							UIBranchContainer row = UIBranchContainer.make(tableRow, "studentRow:");
 							
@@ -2665,8 +2684,52 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 							if(i.getGradebookId() != null && simplePageBean.getEditPrivs() == 0) {
 								UIOutput.make(row, "studentGradingCell", String.valueOf((page.getPoints() != null? page.getPoints() : "")));
 							}
-					    }
+						}
 					
+						// if grader, show people who didn't submit
+						if (simplePageBean.getEditPrivs() == 0) {
+						    if (notSubmitted.size() > 0) {
+							UIBranchContainer row = UIBranchContainer.make(tableRow, "studentRow:");
+							UIOutput.make(row, "missingStudentTitle", messageLocator.getMessage("simplepage.missing-students"));
+						    }
+						    List<String> missingUsers = new ArrayList<String>();
+						    for(String owner: notSubmitted) {
+							String sownerName;
+							if (i.isGroupOwned()) {
+							    try {
+								sownerName = simplePageBean.getCurrentSite().getGroup(owner).getTitle();
+							    } catch (Exception e) {
+								// the only way I can make this happen is to add a group
+								// to the item and then delete the group. If we can't find the
+								// group, don't show the item.
+								continue;
+							    }
+							} else {
+							    try {
+								sownerName = UserDirectoryService.getUser(owner).getDisplayName();
+							    } catch (Exception e) {
+								// can't find user, just show userid. Not very useful, but at least shows
+								// what happened
+								sownerName = owner;
+							    }
+							}
+							missingUsers.add(sownerName);
+						    }
+						    Collections.sort(missingUsers);
+						    for(String owner: missingUsers) {
+							UIBranchContainer row = UIBranchContainer.make(tableRow, "studentRow:");
+							UIOutput.make(row, "missingStudent", owner);
+						    }
+						    if (notSubmitted.size() > 0 && i.getGradebookId() != null) {
+							UIBranchContainer row = UIBranchContainer.make(tableRow, "studentRow:");
+							UIOutput zeroRow = UIOutput.make(row, "student-zero-div");
+							UIForm zeroForm = UIForm.make(row, "student-zero-form");
+							makeCsrf(zeroForm, "student-zero-csrf");
+							UIInput.make(zeroForm, "student-zero-item", "#{simplePageBean.itemId}", String.valueOf(i.getId()));
+							UICommand.make(zeroForm, "student-zero", messageLocator.getMessage("simplepage.zero-missing"), "#{simplePageBean.missingStudentSetZero}");
+						    }
+						}
+
 						if(!hasOwnPage && simplePageBean.myStudentPageGroupsOk(i)) {
 							UIBranchContainer row = UIBranchContainer.make(tableRow, "studentRow:");
 							UIOutput.make(row, "linkRow");
@@ -2674,10 +2737,11 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 							
 							if (i.isRequired() && !simplePageBean.isItemComplete(i))
 								UIOutput.make(row, "student-required-image");
-							GeneralViewParameters eParams = new GeneralViewParameters(ShowPageProducer.VIEW_ID);
-							eParams.addTool = GeneralViewParameters.STUDENT_PAGE;
-							eParams.studentItemId = i.getId();
-							UIInternalLink.make(row, "linkLink", messageLocator.getMessage("simplepage.add-page"), eParams);
+
+							UIForm studentForm = UIForm.make(row, "add-content-form");
+							makeCsrf(studentForm, "csrf27");
+							UIInput.make(studentForm, "add-content-itemId", "#{simplePageBean.itemId}", "" + i.getId());
+							UICommand.make(studentForm, "add-content", messageLocator.getMessage("simplepage.add-page"), "#{simplePageBean.createStudentPage}");;
 						}
 					
 						String itemGroupString = null;
@@ -3228,6 +3292,14 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 		this.authzGroupService = authzGroupService;
 	}
 
+	public void setSecurityService(SecurityService securityService) {
+		this.securityService = securityService;
+	}
+
+	public void setSiteService(SiteService siteService) {
+		this.siteService = siteService;
+	}
+
 	public void setHttpServletRequest(HttpServletRequest httpServletRequest) {
 		this.httpServletRequest = httpServletRequest;
 	}
@@ -3708,17 +3780,19 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 		    UIComponent questionlink = UIInternalLink.makeURL(tofill, "question-link", "#");
 		    questionlink.decorate(new UITooltipDecorator(messageLocator.getMessage("simplepage.question-descrip")));
 
-		    GeneralViewParameters eParams = new GeneralViewParameters(VIEW_ID);
-		    eParams.addTool = GeneralViewParameters.COMMENTS;
 		    UIOutput.make(tofill, "student-li");
-		    UIInternalLink.make(tofill, "add-comments", messageLocator.getMessage("simplepage.comments"), eParams).
-			decorate(new UITooltipDecorator(messageLocator.getMessage("simplepage.comments.tooltip")));
-			
-		    eParams = new GeneralViewParameters(VIEW_ID);
-		    eParams.addTool = GeneralViewParameters.STUDENT_CONTENT;
+		    UIOutput.make(tofill, "add-comments-link").	decorate(new UITooltipDecorator(messageLocator.getMessage("simplepage.comments.tooltip")));
+		    UIForm form = UIForm.make(tofill, "add-comments-form");
+		    UIInput.make(form, "comments-addBefore", "#{simplePageBean.addBefore}");
+		    makeCsrf(form, "csrf25");
+		    UICommand.make(form, "add-comments", "#{simplePageBean.addCommentsSection}");
+
 		    UIOutput.make(tofill, "studentcontent-li");
-		    UIInternalLink.make(tofill, "add-content", messageLocator.getMessage("simplepage.add-student-content"), eParams).
-			decorate(new UITooltipDecorator(messageLocator.getMessage("simplepage.student-descrip")));
+		    UIOutput.make(tofill, "add-student-link").	decorate(new UITooltipDecorator(messageLocator.getMessage("simplepage.student-descrip")));
+		    form = UIForm.make(tofill, "add-student-form");
+		    UIInput.make(form, "add-student-addBefore", "#{simplePageBean.addBefore}");
+		    makeCsrf(form, "csrf26");
+		    UICommand.make(form, "add-student", "#{simplePageBean.addStudentContentSection}");
 
 		    // in case we're on an old system without current BLTI
 		    if (bltiEntity != null && ((BltiInterface)bltiEntity).servicePresent()) {
@@ -3911,7 +3985,7 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 		try {
 			releaseDateString = isoDateFormat.format(new Date());
 		} catch (Exception e) {
-			System.out.println(e + "bad format releasedate " + new Date());
+			log.error(e + "bad format releasedate " + new Date());
 		}
 
 		UIOutput releaseForm2 = UIOutput.make(form, "releaseDate2:");
@@ -4022,7 +4096,7 @@ public class ShowPageProducer implements ViewComponentProducer, DefaultView, Nav
 		UIForm form = UIForm.make(tofill, "import-cc-form");
 		makeCsrf(form, "csrf11");
 
-		UICommand.make(form, "import-cc-submit", messageLocator.getMessage("simplepage.save_message"), "#{simplePageBean.importCc}");
+		UICommand.make(form, "import-cc-submit", messageLocator.getMessage("simplepage.import_message"), "#{simplePageBean.importCc}");
 		UICommand.make(form, "mm-cancel", messageLocator.getMessage("simplepage.cancel"), null);
 
 		UIBoundBoolean.make(form, "import-toplevel", "#{simplePageBean.importtop}", false);

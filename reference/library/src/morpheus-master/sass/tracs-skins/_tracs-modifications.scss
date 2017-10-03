@@ -4,9 +4,10 @@
 //variables used in this file should have default values because they
 //might not be defined in the custom variables file 
 
-$top-header-text-color: $white !default;
+$top-header-text-color: #ffffff !default;
 $selected-tool-border: none !default;
-$selected-tool-background: $white !default;
+$selected-tool-background: #ffffff !default;
+$avatar-border-color: transparent !default;
 
 $tool-tab-background: #F0F0F0 !default;
 $tool-tab-border: silver !default;
@@ -31,6 +32,9 @@ $soft-accent: #85c8e4 !default;
 
 //tools
 $lessons-checklist-background: $soft-color;
+$samigo-info-background: $soft-color;
+$samigo-info-border-color: darken($soft-color, 10%);
+$samigo-info-color: black !default;
 
 .Mrphs-topHeader {
   a{
@@ -117,11 +121,11 @@ $lessons-checklist-background: $soft-color;
 .instruction{
    background: $info-background-color !important;
    border-color: $info-color !important;
-   color: $black !important;
+   color: black !important;
 }
 
 .bs-callout-primary, .bs-callout-info, .messageInformation, .messageInstruction, .messageProgress {
-  color: $black;
+  color: black;
   background: $soft-color;
 }
 

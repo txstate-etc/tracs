@@ -90,6 +90,7 @@ public class GradebookPage extends BasePage {
 	GbModalWindow updateUngradedItemsWindow;
 	GbModalWindow gradeLogWindow;
 	GbModalWindow gradeCommentWindow;
+	GbModalWindow excuseGradeWindow;
 	GbModalWindow deleteItemWindow;
 	GbModalWindow gradeStatisticsWindow;
 	GbModalWindow courseGradeStatisticsWindow;
@@ -163,6 +164,9 @@ public class GradebookPage extends BasePage {
 
 		this.gradeCommentWindow = new GbModalWindow("gradeCommentWindow");
 		this.form.add(this.gradeCommentWindow);
+
+		this.excuseGradeWindow = new GbModalWindow("excuseGradeWindow");
+		this.form.add(this.excuseGradeWindow);
 
 		this.deleteItemWindow = new GbModalWindow("deleteItemWindow");
 		this.form.add(this.deleteItemWindow);
@@ -725,6 +729,10 @@ public class GradebookPage extends BasePage {
 
 	public GbModalWindow getGradeCommentWindow() {
 		return this.gradeCommentWindow;
+	}
+
+	public GbModalWindow getExcuseGradeWindow() {
+		return this.excuseGradeWindow;
 	}
 
 	public GbModalWindow getDeleteItemWindow() {

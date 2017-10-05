@@ -880,4 +880,6 @@ public interface GradebookService {
 	 */
 	List getGradingEvents(final List<Long> assignmentIds, final Date since);
 
+	void updateIsExcludedFromGradeForStudent(final String gradebookUid, final String studentUuid, final Long assignmentId, final boolean excludeFromGrade);
+
 }

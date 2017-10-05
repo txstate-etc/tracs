@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd" >
+
+<body>
+<wicket:panel>
+    <form class="form-vertical" wicket:id="form">
+        <div class="checkbox">
+            <label>
+                <input  type="checkbox" />
+                <span>Excuse </span><span wicket:id="assignment_name"></span><span> grade</span>
+            </label>
+        </div>
+        <div class="">
+            <input type="submit" wicket:id="submit" wicket:message="value:button.saveexcused" />
+            <input type="submit" wicket:id="cancel" wicket:message="value:button.cancel" />
+        </div>
+    </form>
+</wicket:panel>
+</body>
+</html>

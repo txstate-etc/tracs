@@ -1445,6 +1445,15 @@ public class GradebookNgBusinessService {
 
 	}
 
+	//excuse a student's grade for an assignment
+	public boolean saveExcusedGrade(final Long assignmentId, final String studentUuid, final boolean excludeFromGrade) {
+		final String siteId = getCurrentSiteId();
+		final Gradebook gradebook = getGradebook(siteId);
+		this.gradebookService.updateIsExcludedFromGradeForStudent(gradebook.getUid(), studentUuid, assignmentId, excludeFromGrade );
+		//figure out boolean vs void returns. return true for now to make it compile
+		return true;
+	}
+
 
 	/**
 	 * Updates ungraded items in the given assignment with the given grade

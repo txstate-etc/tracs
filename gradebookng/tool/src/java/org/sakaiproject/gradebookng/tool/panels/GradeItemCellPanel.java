@@ -25,12 +25,14 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GbRole;
 import org.sakaiproject.gradebookng.business.GradeSaveResponse;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.business.model.GbGradeInfo;
+import org.sakaiproject.gradebookng.business.model.GbUser;
 import org.sakaiproject.gradebookng.business.util.FormatHelper;
 import org.sakaiproject.gradebookng.tool.model.GbModalWindow;
 import org.sakaiproject.gradebookng.tool.model.ScoreChangedEvent;
@@ -419,6 +421,26 @@ public class GradeItemCellPanel extends Panel {
 							refreshNotifications();
 						}
 					});
+					window.show(target);
+				}
+			});
+
+			this.gradeCell.add(new AjaxEventBehavior("excusegrade.sakai") {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				protected void onEvent(final AjaxRequestTarget target) {
+					final GradebookPage gradebookPage = (GradebookPage) getPage();
+					final GbModalWindow window = gradebookPage.getExcuseGradeWindow();
+
+					final ExcuseGradePanel panel = new ExcuseGradePanel(window.getContentId(), GradeItemCellPanel.this.model, window);
+					final GbUser user = businessService.getUser(studentUuid);
+					window.setTitle((new StringResourceModel("heading.excusegrade", null,
+						new Object[] { user.getDisplayName(), user.getDisplayId() })).getString());
+					window.setContent(panel);
+					window.showUnloadConfirmation(false);
+					window.clearWindowClosedCallbacks();
+					window.setComponentToReturnFocusTo(getParentCellFor(GradeItemCellPanel.this.gradeCell));
 					window.show(target);
 				}
 			});

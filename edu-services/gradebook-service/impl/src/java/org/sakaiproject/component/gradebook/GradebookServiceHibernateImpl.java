@@ -3791,5 +3791,37 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
         batchPersistEntities(assignments);
         
 	}
+
+	public void updateIsExcludedFromGradeForStudent(final String gradebookUid, final String studentUuid, final Long assignmentId, final boolean excludeFromGrade){
+		//must be instructor type person
+		if (!currentUserHasEditPerm(gradebookUid)) {
+			log.error("AUTHORIZATION FAILURE: User " + getUserUid() + " in gradebook " + gradebookUid + " attempted to update course grade for student: " + studentUuid);
+			throw new SecurityException("You do not have permission to update course grades in " + gradebookUid);
+		}
+
+		final Gradebook gradebook = getGradebook(gradebookUid);
+		if(gradebook==null) {
+			throw new IllegalArgumentException("There is no gradebook associated with this id: " + gradebookUid);
+		}
+
+		//get assignment grade record
+		AssignmentGradeRecord assignmentGradeRecord = (AssignmentGradeRecord)getHibernateTemplate().execute(new HibernateCallback() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				Assignment assignment = getAssignmentWithoutStats(gradebookUid, assignmentId, session);
+				return getAssignmentGradeRecord(assignment, studentUuid, session);
+			}
+		});
+
+		if (null == assignmentGradeRecord) {
+			//hmmmm... it shouldn't be....
+		}
+		else {
+			System.out.println("*** The assignment grade record is NOT null.");
+
+			assignmentGradeRecord.setExcludedFromGrade(excludeFromGrade);
+			getHibernateTemplate().saveOrUpdate(assignmentGradeRecord);
+		}
+	}
 	
 }

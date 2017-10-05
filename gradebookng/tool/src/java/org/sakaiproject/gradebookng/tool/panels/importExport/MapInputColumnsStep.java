@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -211,7 +212,32 @@ public class MapInputColumnsStep extends Panel {
 					ddcAssignment.setChoiceRenderer(assignmentRender);
 					ddcAssignment.setOutputMarkupId(true);
 					ddcAssignment.setOutputMarkupPlaceholderTag(true);
+					ddcAssignment.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+						@Override
+						protected void onUpdate(AjaxRequestTarget target) {
+							ListItem<ColumnListItem> listItem = (ListItem<ColumnListItem>)getComponent().getParent();
+							DropDownChoice columnAssignment = (DropDownChoice)listItem.get("columnAssignment");
+							DropDownChoice newIndex = (DropDownChoice)listItem.get("columnNewAssignmentIndex");
+
+							if (columnAssignment.getValue().equals(NEW_GB_ASSIGNMENT)) {
+								newIndex.setVisible(true);
+							} else {
+								newIndex.setVisible(false);
+							}
+
+							target.add(newIndex);
+						}
+
+					});
 					item.add(ddcAssignment);
+
+
+					List<Integer> assignmentIndexes = IntStream.rangeClosed(1,9).boxed().collect(Collectors.toList());
+					DropDownChoice ddcNewAssignmentIndex = new DropDownChoice("columnNewAssignmentIndex", Model.of(""), assignmentIndexes);
+					ddcNewAssignmentIndex.setOutputMarkupId(true);
+					ddcNewAssignmentIndex.setOutputMarkupPlaceholderTag(true);
+					ddcNewAssignmentIndex.setVisible(false);
+					item.add(ddcNewAssignmentIndex);
 
 					//Text field to enter the Assignment's max points. Visible only for Columns containing Grades.
 					Long longModel;
@@ -253,13 +279,16 @@ public class MapInputColumnsStep extends Panel {
                 		DropDownChoice columnType = (DropDownChoice)currentListItem.get("columnType"); 
                 		DropDownChoice columnAssignment = (DropDownChoice)currentListItem.get("columnAssignment");
                 		NumberTextField columnPoints = (NumberTextField)currentListItem.get("columnPoints");
+                		DropDownChoice columnNewAssignmentIndex = (DropDownChoice)currentListItem.get("columnNewAssignmentIndex");
+
                 		String columnName = columnAssignment.getValue();
-                		columnName = columnName.equals(NEW_GB_ASSIGNMENT) ? oldTitle : columnName;
+                		if (columnName.equals(NEW_GB_ASSIGNMENT)) {
+                			columnName = String.format("%s %s", NEW_GB_ASSIGNMENT, columnNewAssignmentIndex.getValue());
+                		}
                 		
                 		switch(columnType.getValue())
                 		{
-                			case "Grades":
-                				
+                			case "Grades":                				
                 				Long pointValue = Long.parseLong(columnPoints.getValue());
                 				pointValue = pointValue == null ? 0L : pointValue;
                 				if (pointValue > 0) {

@@ -4,12 +4,12 @@ echo "building skins..."
 
 cd $REPO_ROOT/reference
 
-mvn clean compile  -Dsakai.skin.target=tracs-default -Dsakai.skin.customization.file=./src/morpheus-master/sass/tracs-skins/_tracs-default.scss
-mvn clean compile  -Dsakai.skin.target=tracs-blue -Dsakai.skin.customization.file=./src/morpheus-master/sass/tracs-skins/_tracs-blue.scss
-mvn clean compile  -Dsakai.skin.target=tracs-yellow -Dsakai.skin.customization.file=./src/morpheus-master/sass/tracs-skins/_tracs-yellow.scss
+SKINS="tracs-default tracs-blue tracs-yellow morpheus-default"
 
-#clear the customizations so that the default sakai skin can be built
-> library/src/morpheus-master/sass/_customization.scss
+for SKIN in $SKINS
+ do
+   mvn clean compile -P $SKIN,compile-skin
+done
 
 mvn clean install sakai:deploy -Dmaven.tomcat.home=$REPO_ROOT/tracs-docker/
 

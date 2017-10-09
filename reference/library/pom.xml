@@ -178,9 +178,12 @@
 			</dependencies>
 		</profile>
 		<profile>
-			<id>default-skin</id>
+			<id>morpheus-default</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>skin</name>
+					<value>morpheus-default</value>
+				</property>
 			</activation>
 			<properties>
 				<sakai.skin.target>morpheus-default</sakai.skin.target>
@@ -188,13 +191,43 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>tracs-skin</id>
+			<id>tracs-default</id>
 			<activation>
+				<property>
+					<name>skin</name>
+					<value>tracs-default</value>
+				</property>
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
 				<sakai.skin.target>tracs-default</sakai.skin.target>
 				<sakai.skin.customization.file>src/${sakai.skin.source}/sass/tracs-skins/_tracs-default.scss</sakai.skin.customization.file>
+			</properties>
+		</profile>
+		<profile>
+			<id>tracs-blue</id>
+			<activation>
+				<property>
+					<name>skin</name>
+					<value>tracs-blue</value>
+				</property>
+			</activation>
+			<properties>
+				<sakai.skin.target>tracs-blue</sakai.skin.target>
+				<sakai.skin.customization.file>src/${sakai.skin.source}/sass/tracs-skins/_tracs-blue.scss</sakai.skin.customization.file>
+			</properties>
+		</profile>
+		<profile>
+			<id>tracs-yellow</id>
+			<activation>
+				<property>
+					<name>skin</name>
+					<value>tracs-yellow</value>
+				</property>
+			</activation>
+			<properties>
+				<sakai.skin.target>tracs-yellow</sakai.skin.target>
+				<sakai.skin.customization.file>src/${sakai.skin.source}/sass/tracs-skins/_tracs-yellow.scss</sakai.skin.customization.file>
 			</properties>
 		</profile>
 		<profile>

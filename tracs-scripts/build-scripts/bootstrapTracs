@@ -6,7 +6,7 @@ use Cwd qw/abs_path/;
 use File::Temp qw/tempdir/;
 
 
-our $sakaiVersion = '11.3';
+our $sakaiVersion = '11.4';
 our $tomcatVersion = '8.0.36';
 
 my $tempDir = tempdir( CLEANUP => 1 );
@@ -30,7 +30,7 @@ EOF
 	exit($exitValue);
 }#
 
-my($sourceTreePath,$tomcatOverlayPath,$releaseName,$skipSlowStuff);
+my($sourceTreePath,$tomcatOverlayPath,$releaseName,$skipSlowStuff,$skinLibraryPath);
 {# Parse and check command line
 	GetOptions(
 		"help|h"=>\&help,
@@ -52,7 +52,7 @@ my($sourceTreePath,$tomcatOverlayPath,$releaseName,$skipSlowStuff);
 	}
 	
 	$sourceTreePath = abs_path($sourceTreePath);
-	$skinLibPath = $sourceTreePath;
+	$skinLibraryPath = abs_path("$sourceTreePath/reference/library");
 	$tomcatOverlayPath = abs_path("$sourceTreePath/tracs-scripts/build-scripts/tomcat_overlay");
 	if ( ! -d $sourceTreePath ) {
 		warn "$sourceTreePath is not a directory.\n\n";
@@ -127,16 +127,18 @@ my($tomcatTarballPath);
 my($buildVersion);
 {#
 	my($sourceRevisionNumber,$sourceBranch);
-	
-	warn "Figuring out what revision this source tree is...\n";
-	my $hgSummary = readpipe("cd ".quotemeta($sourceTreePath).";hg summary");
-	($sourceRevisionNumber) = $hgSummary =~ m/^parent: \d+:([a-f0-9]+) /m;
-	($sourceBranch) = $hgSummary =~ m/^branch: (.*)/m;
 
-	if ( !($hgSummary =~ m/^commit: .*\(clean\)$/m) ) {
-		$sourceRevisionNumber .= "M";
+	warn "Figuring out what revision this source tree is...\n";
+	my $gitStatusVerbose = readpipe("cd ".quotemeta($sourceTreePath).";git status");
+	my $gitStatus = readpipe("cd ".quotemeta($sourceTreePath).";git status -s -b");
+	my $gitLog = readpipe("cd ".quotemeta($sourceTreePath).";git log -1");
+	($sourceBranch) = $gitStatus =~ m/^## (.*)[\.]{3}origin\/*/m;
+	($sourceRevisionNumber) = $gitLog =~ m/^commit ([a-f0-9]+)/m;
+
+	if ( !($gitStatusVerbose =~ m/^nothing to commit.* clean$/m) ) {
+			$sourceRevisionNumber .= "M";
 	}
-	
+
 	warn "Appears to be revision $sourceRevisionNumber in branch $sourceBranch.".
 		($sourceRevisionNumber =~ m/M$/?" (The M means local modifications exist that are not checked in.)":"")."\n";
 	
@@ -174,7 +176,7 @@ my($tomcatPath);
 		exit(1);
 	}
 
-	system("cd ".quotemeta($tomcatOverlayPath).";cp -r $sourceTreePath/tracs-docker/sakai .;find . -type f|$tar -czf $tempDir/tomcat_overlay.tgz -T - ;rm -rf $sourceTreePath/tracs-docker/sakai");
+	system("cd ".quotemeta($tomcatOverlayPath).";cp -r $sourceTreePath/tracs-docker/sakai .;find . -type f|$tar -czf $tempDir/tomcat_overlay.tgz -T - ;rm -rf sakai");
 	system("cd ".quotemeta($tomcatPath).";$tar -vxzf $tempDir/tomcat_overlay.tgz");
 	system("cd ".quotemeta($tomcatPath).";patch -p1 <conf/tomcat-conf.patch;rm -f conf/tomcat-conf.patch");
 	system("rm -rf ".quotemeta($tomcatPath)."/webapps/*");
@@ -214,6 +216,18 @@ my($mavenOptions);
 	$mavenOptions = join(" ",map({"-D".quotemeta($_)."=".quotemeta($mavenOptions{$_})} keys(%mavenOptions)));
 }#
 
+# compile skin
+my($skin,@SKINS);
+@SKINS=qw(tracs-default tracs-blue tracs-yellow morpheus-default);
+foreach $skin (@SKINS) {
+  warn "Compiling skin $skin ... \n";
+  if(system("cd ".quotemeta($skinLibraryPath).";export MAVEN_OPTS=\"-Xmx1024m -XX:MaxMetaspaceSize=512m \$MAVEN_OPTS\"; mvn clean compile -P$skin,compile-skin")){
+    warn "Failed to build skin $skin \n";
+		exit(1);
+  };
+  warn "Skin $skin was build successfully. \n";
+}
+
 if ( system("cd ".quotemeta($sourceTreePath).";export MAVEN_OPTS=\"-Xmx1024m -XX:MaxMetaspaceSize=512m \$MAVEN_OPTS\";mvn".($skipSlowStuff?"":" clean")." install sakai:deploy $mavenOptions") ) {
 	warn "Build failed.\n";
 	exit(1);
@@ -226,5 +240,5 @@ warn "Tar file $buildVersion.tgz created.\n";
 if ( $releaseName ) {
 	my $buildVersion = $buildVersion;
 	$buildVersion =~ s/^tracs-//;
-	system("cd ".quotemeta($sourceTreePath)."; hg tag $buildVersion");
+	system("cd ".quotemeta($sourceTreePath)."; git tag $buildVersion");
 }

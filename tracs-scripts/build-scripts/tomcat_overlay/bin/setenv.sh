@@ -23,23 +23,31 @@ set_properties () {
 	ln -s $1 "$CATALINA_HOME/sakai/local.properties"
 }
 
+set_casLoginConfig () {
+	rm -f "$CATALINA_HOME/sakai/xlogin-context.xml"
+	ln -s $1 "$CATALINA_HOME/sakai/xlogin-context.xml"
+}
+
 case `hostname` in
 
 	tracs-app-jck-1.its.txstate.edu|\
 	tracs-app-mcs-1.its.txstate.edu)
 		export CATALINA_OPTS="$STANDARD_OPTS $LARGE_MEMORY_OPTS"
 		set_properties local.production.properties
+		set_casLoginConfig xlogin-production-context.xml
 		;;
 
 	tracsappqa1.its.qual.txstate.edu|\
 	tracsappqa2.its.qual.txstate.edu)
 		export CATALINA_OPTS="$STANDARD_OPTS $MEDIUM_MEMORY_OPTS"
 		set_properties local.staging.properties
+		set_casLoginConfig xlogin-staging-context.xml
 		;;
 
 	tracscidev1.its.dev.txstate.edu)
 		export CATALINA_OPTS="$STANDARD_OPTS $SMALL2_MEMORY_OPTS $DEBUGGER_OPTS"
 		set_properties local.dev.properties
+		set_casLoginConfig xlogin-dev-context.xml
 		;;
 
 	NickTxState.its.txstate.edu|\
@@ -47,6 +55,7 @@ case `hostname` in
 	amysintelmac.rrhec.txstate.edu)
 		export CATALINA_OPTS="$STANDARD_OPTS $SMALL2_MEMORY_OPTS $DEBUGGER_OPTS"
 		set_properties local.dev.properties
+		set_casLoginConfig xlogin-dev-context.xml
 		;;
 
 	yq12.its.txstate.edu|\
@@ -55,12 +64,14 @@ case `hostname` in
 		#export CATALINA_OPTS="$STANDARD_OPTS $SMALL_MEMORY_OPTS $DEBUGGER_OPTS   $DEMO_OPTS"
 		export CATALINA_OPTS="$STANDARD_OPTS $SMALL_MEMORY_OPTS    $DEBUGGER_OPTS"
 		set_properties local.yq12.properties
+		set_casLoginConfig xlogin-dev-context.xml
 		;;
 
 	vanderbilt*)
 		#export CATALINA_OPTS="$STANDARD_OPTS $SMALL_MEMORY_OPTS $DEBUGGER_OPTS   $DEMO_OPTS"
 		export CATALINA_OPTS="$STANDARD_OPTS $SMALL_MEMORY_OPTS    $DEBUGGER_OPTS"
 		set_properties local.anne.properties
+		set_casLoginConfig xlogin-dev-context.xml
 		;;
 
 	*)

@@ -119,7 +119,7 @@ function saveTime()
 	  <h:panelGroup>
 	    <h:outputText value="#{deliveryMessages.submit_warning_2}" />
         <h:outputText value=" <b>#{deliveryMessages.button_submit_grading}</b> "  escape="false"/>
-	    <h:outputText value="#{deliveryMessages.submit_warning_3}" /
+	    <h:outputText value="#{deliveryMessages.submit_warning_3}" />
 	  </h:panelGroup>
 	  <h:panelGroup rendered="#{delivery.navigation ne '1'}">
 	    <h:outputText value="#{deliveryMessages.submit_warning_4}" />
@@ -202,7 +202,7 @@ function saveTime()
     rendered="#{(delivery.actionString=='previewAssessment'
                  || delivery.actionString=='takeAssessment'
                  || delivery.actionString=='takeAssessmentViaUrl')
-              && delivery.navigation ne '1'}" "
+              && delivery.navigation ne '1'}"
     onclick="disablePrevious();return alert('Assessment has NOT been submitted for grading.')" onkeypress=""
     />
 

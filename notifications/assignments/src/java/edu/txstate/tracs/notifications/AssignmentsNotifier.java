@@ -36,9 +36,9 @@ import org.sakaiproject.assignment.api.AssignmentSubmission;
 * Assignment due date approaching (reminder) HOW LONG BEFORE DUE DATE?
 Group Assignment - Member of group submits
 Turnitin report generated for submission
-Assignment grade released (No email notification option selected in settings)
-Assignment grade released (Email notification option selected in settings)
-Peer evaluation opens on Assignment
+* Assignment grade released (No email notification option selected in settings)
+* Assignment grade released (Email notification option selected in settings)
+Peer evaluation opens on Assignment- Does this start after the due date?
 Peer evaluation posted for Assignment (non-anonymous evaluation)
 Peer evaluation posted for Assignment (anonymous evaluation)
 Multiple peer evaluations set on assignment, and assignment is evaluated
@@ -125,7 +125,10 @@ public class AssignmentsNotifier implements Observer {
                         else  {
                             notifyUtils.sendNotification("assignment", "creation", assignmentId, event.getContext(), userids, releaseDate, contenthash, true);
                             //add notification to remind them when assignment is due. SET TO ONE DAY BEFORE
-                            Calendar reminderDate = (Calendar) releaseDate.clone();
+                            Time dueTime = assignment.getDueTime();
+                            Calendar dueDate = Calendar.getInstance();
+                            dueDate.setTimeInMillis(dueTime.getTime());
+                            Calendar reminderDate = (Calendar) dueDate.clone();
                             reminderDate.add(Calendar.DAY_OF_YEAR, -1);
                             notifyUtils.sendNotification("assignment", "creation", assignmentId, event.getContext(), userids, reminderDate , contenthash, true);
                         }

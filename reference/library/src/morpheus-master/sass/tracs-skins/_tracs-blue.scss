@@ -95,6 +95,9 @@ $samigo-info-background:                    $soft-color;
 $samigo-info-border-color:                  darken($soft-color, 10%);
 $samigo-info-color:                         $black;
 $samigo-settings-accordion-header-active:   $azulito;
+$samigo-active-tab-background: $alice-blue;
+$samigo-active-tab-color: $black;
+$samigo-active-tab-border: darken($samigo-active-tab-background, 20%);
 
 $lessons-checklist-background:              $soft-color;
 

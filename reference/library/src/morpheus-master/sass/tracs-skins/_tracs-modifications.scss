@@ -36,6 +36,9 @@ $samigo-info-background: $soft-color;
 $samigo-info-border-color: darken($soft-color, 10%);
 $samigo-info-color: black !default;
 $samigo-settings-accordion-header-active: #007fff !default;
+$samigo-active-tab-background: $samigo-settings-accordion-header-active !default;
+$samigo-active-tab-color: #fff !default;
+$samigo-active-tab-border: #003eff !default;
 
 .Mrphs-topHeader {
   a{
@@ -245,6 +248,17 @@ body.Mrphs-portalBody{
         }
         span {
           background-image: url("images/ui-icons_777777_256x240.png");
+        }
+      }
+    }
+  }
+  #authorIndexForm {
+    #tabs {
+      .ui-tabs-active {
+        background-color: $samigo-active-tab-background;
+        border-color: $samigo-active-tab-border;
+        a {
+          color: $samigo-active-tab-color;
         }
       }
     }

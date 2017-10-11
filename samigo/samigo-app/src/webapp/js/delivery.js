@@ -13,6 +13,8 @@ function checkAllPoolQs(btn){
 			elems[i].checked=true;
 		}
 	}
+    //enable the 'Copy' button
+    updateButtonStatusOnCheck(document.getElementById('editform:import'), document.getElementById('editform'));
 	return false;
 }
 
@@ -24,6 +26,8 @@ function unCheckAllPoolQs(btn){
 			elems[i].checked=false;
 		}
 	}
+    //disable the 'Copy' button
+    updateButtonStatusOnCheck(document.getElementById('editform:import'), document.getElementById('editform'));
 	return false;
 }
 

@@ -35,6 +35,7 @@ $lessons-checklist-background: $soft-color;
 $samigo-info-background: $soft-color;
 $samigo-info-border-color: darken($soft-color, 10%);
 $samigo-info-color: black !default;
+$samigo-settings-accordion-header-active: #007fff !default;
 
 .Mrphs-topHeader {
   a{
@@ -230,6 +231,22 @@ body.Mrphs-portalBody{
     color: $samigo-info-color;
     h4 {
       color: $samigo-info-color;
+    }
+  }
+  #assessmentSettingsAction {
+    #jqueryui-accordion {
+      .ui-accordion-content {
+        background-color: transparent;
+      }
+      .ui-accordion-header.ui-accordion-header-active.ui-state-active {
+        background-color: $samigo-settings-accordion-header-active;
+        a {
+          color: #454545;
+        }
+        span {
+          background-image: url("images/ui-icons_777777_256x240.png");
+        }
+      }
     }
   }
 }

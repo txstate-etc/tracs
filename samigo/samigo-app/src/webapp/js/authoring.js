@@ -697,14 +697,14 @@ function timerValidation()
 /*Added by -Qu for bugid:5551 10/16/2013  */
 function feedbackAlertAuthor()
 {
-  if(document.getElementById("assessmentSettingsAction:feedbackDelivery").getElementsByTagName("input")[0].checked==true){
+  if(document.getElementById("assessmentSettingsAction:feedbackDelivery:1").checked==true){
     alert("Warning!\n\nA Show Feedback button will appear at the top of each question screen.  Depending upon the feedback options you have chosen, students may be able to see points earned or correct and incorrect answers.  If you do not wish for students to see feedback during the assessment, please choose another delivery option.");
   }
 }
 
 function feedbackAlertPublished()
 {
-  if(document.getElementById("assessmentSettingsAction:feedbackDelivery2").getElementsByTagName("input")[0].checked==true){
+  if(document.getElementById("assessmentSettingsAction:feedbackDelivery:1").checked==true){
     alert("Warning!\n\nA Show Feedback button will appear at the top of each question screen.  Depending upon the feedback options you have chosen, students may be able to see points earned or correct and incorrect answers.  If you do not wish for students to see feedback during the assessment, please choose another delivery option.");
   }
 }

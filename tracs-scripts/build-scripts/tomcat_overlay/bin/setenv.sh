@@ -75,8 +75,8 @@ case `hostname` in
 		;;
 
 	*)
-		echo "Hostname '"`hostname`"' not recognized."
-		exit 1;
+		set_properties local.dev.properties
+		set_casLoginConfig xlogin-dev-context.xml
 		;;
 
 esac
@@ -86,8 +86,8 @@ export TZ="US/Central"
 (
 	JAVA=$(which $JAVA_HOME/bin/java java|head -n1)
 	JAVA_VERSION=$(perl -e '($jV) = `'$JAVA' -version 2>&1`=~m/^java version "([\d._]+)"/m; print join("",map({sprintf("%03d",$_)} split(m/[._]/,$jV)));')
-	if [[ $JAVA_VERSION < 001007000076 || $JAVA_VERSION > 001007000999 ]]; then
-		echo "Java 1.7.0, update 76 or better is required. (java=$JAVA version=$JAVA_VERSION)"
+	if [[ $JAVA_VERSION < 1008000092 || $JAVA_VERSION >= 1009000000 ]]; then
+		echo "Please use Java 8, update 92 or newer. (java=$JAVA version=$JAVA_VERSION)"
 		exit 1
 	fi
 )

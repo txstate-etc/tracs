@@ -1,6 +1,6 @@
 /* css added for assessment content page UI change bugid:796  -Qu 1/19/10  */
 
-table.allQuestions tr{
+/*table.allQuestions tr{
 	height:1.5em;
 }
 
@@ -23,4 +23,16 @@ tr.reviewOrUnanswered td.questions{
 
 .submitWarning.reason {
 	color:#BB1111;
+}*/
+
+.reviewOrUnanswered {
+    background-color: #ffffbb;
+}
+
+.warningMessage {
+    font-weight: bold;
+}
+
+.warningMessage .submitWarning.reason {
+    color: #BB1111;
 }

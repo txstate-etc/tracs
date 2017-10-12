@@ -49,7 +49,7 @@ remove the javascript onclick stuff.
       <head><%= request.getAttribute("html.head") %>
       <title> <h:outputText value="#{delivery.assessmentTitle}"/>
       </title>
-      <link rel="stylesheet" href="/samigo/css/tool_sam_tracs.css" type="text/css">
+      <link rel="stylesheet" href="/samigo-app/css/tool_sam_tracs.css" type="text/css">
       <%@ include file="/jsf/delivery/deliveryjQuery.jsp" %>
       </head>
        <body onload="<%= request.getAttribute("html.body.onload") %>; ">
@@ -160,7 +160,7 @@ function saveTime()
 <p class="warningMessage">
       <h:outputText styleClass="submitWarning" value="#{deliveryMessages.submitGradeConfirmation_message_5}" />
       <h:outputText>&nbsp;</h:outputText>
-      <h:outputText styleClass="submitWarning" value="#{deliveryMessages.submitGradeConfirmation_message_1}" rendered="#{delivery.reviewNeeded || delivery.unansweredExisted}"/>
+      <h:outputText styleClass="submitWarning" value="#{deliveryMessages.submitGradeConfirmation_message_1} " rendered="#{delivery.reviewNeeded || delivery.unansweredExisted}"/>
       <h:outputText styleClass="submitWarning reason" value="#{deliveryMessages.submitGradeConfirmation_message_2}"  rendered="#{delivery.reviewNeeded && delivery.unansweredExisted}" />
       <h:outputText styleClass="submitWarning reason" value="#{deliveryMessages.submitGradeConfirmation_message_3}"  rendered="#{delivery.reviewNeeded && !delivery.unansweredExisted}" />
       <h:outputText styleClass="submitWarning reason" value="#{deliveryMessages.submitGradeConfirmation_message_4}"  rendered="#{!delivery.reviewNeeded && delivery.unansweredExisted}" />

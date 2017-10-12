@@ -34,7 +34,6 @@
     <title><h:outputText value="#{deliveryMessages.table_of_contents}" /></title>
     <samigo:script path="/jsf/widget/hideDivision/hideDivision.js" />
     <script type="text/javascript" src="/library/webjars/jquery/1.11.3/jquery.min.js"></script>
-    <script type="text/javascript" src="/samigo-app/js/tracsTableOfContents.js"></script>
     <link rel="stylesheet" href="/samigo-app/css/tool_sam_tracs.css" type="text/css">
     <%@ include file="/jsf/delivery/deliveryjQuery.jsp" %>
     <h:outputText value="#{delivery.mathJaxHeader}" escape="false" rendered="#{delivery.actionString=='takeAssessmentViaUrl' and delivery.isMathJaxEnabled}"/>
@@ -154,8 +153,9 @@ function clickSubmitForGrade(){
   </h5>
   <h:graphicImage  alt="#{deliveryMessages.alt_unans_q}" url="/images/tree/AssessmentTriangle.png" />
   <h:outputText value="#{deliveryMessages.unans_q}" /><br/>
-  <h:graphicImage  alt="#{deliveryMessages.alt_ans_q}" url="/images/blackBubble15.png" />
-  <h:outputText value="#{deliveryMessages.ans_q}" /><br/>
+  <!-- Anne commented out 10/4/17 because we don't need to draw attention to answered questions -->
+  <!-- <h:graphicImage  alt="#{deliveryMessages.alt_ans_q}" url="/images/blackBubble15.png" />
+  <h:outputText value="#{deliveryMessages.ans_q}" /><br/> -->
   <h:graphicImage  alt="#{deliveryMessages.alt_q_marked}" url="/images/tree/AssessmentQuestion.png" rendered="#{delivery.displayMardForReview}" />
   <h:outputText value="#{deliveryMessages.q_marked}" rendered="#{delivery.displayMardForReview}"/>
 
@@ -179,14 +179,16 @@ function clickSubmitForGrade(){
             <%-- <h:panelGroup>  --%>
             <h:graphicImage alt="#{deliveryMessages.alt_unans_q}" 
                url="/images/tree/AssessmentTriangle.png" rendered="#{question.unanswered}"/>
-            <h:graphicImage alt="#{deliveryMessages.alt_unans_q}" 
-               url="/images/blackBubble15.png" rendered="#{!question.unanswered}"/>
+               <!-- Anne commented out 10/4/17 because we don't need to draw attention to answered questions -->
+            <!-- <h:graphicImage alt="#{deliveryMessages.alt_ans_q}" 
+               url="/images/blackBubble15.png" rendered="#{!question.unanswered}"/> -->
             <h:graphicImage alt="#{deliveryMessages.alt_q_marked}"
                url="/images/tree/AssessmentQuestion.png"  rendered="#{question.review}"/>
             <f:verbatim></div></f:verbatim>
            </h:column>
            <h:column>
             <f:verbatim><div class="tier3"></f:verbatim>
+              <f:verbatim rendered="#{question.unanswered || question.review}"><div class="reviewOrUnanswered"></f:verbatim>
               <h:commandLink title="#{deliveryMessages.t_takeAssessment}" immediate="true" action="takeAssessment"> 
                 <h:outputText escape="false" value="#{question.sequence}#{deliveryMessages.dot} #{question.strippedText}">
                 	<f:convertNumber maxFractionDigits="2"/>
@@ -200,6 +202,7 @@ function clickSubmitForGrade(){
                 <f:actionListener type="org.sakaiproject.tool.assessment.ui.listener.delivery.DeliveryActionListener" />
               </h:commandLink>
            <%--  </h:panelGroup>  --%>
+              <f:verbatim rendered="#{question.unanswered || question.review}"></div></f:verbatim>
             <f:verbatim></div></f:verbatim> 
           </h:column>
         </h:dataTable>

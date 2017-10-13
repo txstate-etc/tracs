@@ -30,6 +30,14 @@ should be included in file importing DeliveryMessages
 <h:panelGroup styleClass="hasTooltip toolTipLink">
 	<h:outputText value="#{deliveryMessages.additional_instructions_label}" />
 </h:panelGroup>
+<h:panelGroup layout="block" id="div_accepted_instruction" style="display:none;">
+<h:outputText value="#{deliveryMessages.fin_accepted_instruction} " escape="false" />
+<f:verbatim><br /></f:verbatim>
+<h:outputText value="#{deliveryMessages.fin_complex_note} " escape="false" />
+<f:verbatim><br /></f:verbatim>
+<h:outputText value="#{deliveryMessages.fin_complex_example} " escape="false" />
+<f:verbatim><br /></f:verbatim>
+</h:panelGroup>
 
 <h:outputText value="#{deliveryMessages.fin_invalid_characters_error} " escape="false" rendered="#{question.isInvalidFinInput}" styleClass="messageSamigo3"/>
 <f:verbatim><br /></f:verbatim>
@@ -64,15 +72,6 @@ should be included in file importing DeliveryMessages
 </samigo:dataLine>
 
 <f:verbatim><br /></f:verbatim>
-
-<h:panelGroup layout="block" id="div_accepted_instruction" style="display:none;">
-<h:outputText value="#{deliveryMessages.fin_accepted_instruction} " escape="false" />
-<f:verbatim><br /></f:verbatim>
-<h:outputText value="#{deliveryMessages.fin_complex_note} " escape="false" />
-<f:verbatim><br /></f:verbatim>
-<h:outputText value="#{deliveryMessages.fin_complex_example} " escape="false" />
-<f:verbatim><br /></f:verbatim>
-</h:panelGroup>
 
 <h:panelGroup rendered="#{(delivery.actionString=='previewAssessment'
                 || delivery.actionString=='takeAssessment' 

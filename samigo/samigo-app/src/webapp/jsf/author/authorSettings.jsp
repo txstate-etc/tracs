@@ -621,11 +621,10 @@
         <!-- Removed linear access option, because of skipped question 1 problem.  Ticket 237. - JeffSnider,11/14/08 -->
           <f:selectItem itemValue="2" itemLabel="#{assessmentSettingsMessages.random_access}"/>
         </t:selectOneRadio>
-   <%-- bugid:5185 -Qu 11/19/2012>
         <ul class="layout-navigation">
           <li><t:radio for="itemNavigation" index="0" /></li>
-          <li><t:radio for="itemNavigation" index="1" /></li>
         </ul>
+        <%-- bugid:5185 -Qu 11/19/2012>
         <div class="info-text help-block small">
           <h:outputText value="#{assessmentSettingsMessages.linear_access_warning} "/>
         </div>

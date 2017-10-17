@@ -148,6 +148,9 @@ public class NotifyUtils {
       final String objectid, final String siteid, final List<String> userids, final Calendar notifyafter,
       final String contenthash, final boolean sendupdates) throws Exception {
 
+      for (String user : userids) {
+        System.out.println("* " + user);
+      }
       notificationThread(new Runnable() {
       @Override
       public void run() {

@@ -55,6 +55,16 @@ public interface GradebookService {
 	public static final int CATEGORY_TYPE_ONLY_CATEGORY = 2;
 	public static final int CATEGORY_TYPE_WEIGHTED_CATEGORY = 3;
 
+	//Gradebook Events
+	public static final String GRADEBOOK_EVENT_PREFIX = "gradebook.";
+	public static final String GRADEBOOK_NEW_ITEM = GRADEBOOK_EVENT_PREFIX + "newItem";
+	public static final String GRADEBOOK_UPDATE_ITEM = GRADEBOOK_EVENT_PREFIX + "updateItem";
+	public static final String GRADEBOOK_DELETE_ITEM = GRADEBOOK_EVENT_PREFIX + "deleteItem";
+	public static final String GRADEBOOK_NEW_CATEGORY = GRADEBOOK_EVENT_PREFIX + "newCategory";
+	public static final String GRADEBOOK_UPDATE_CATEGORY = GRADEBOOK_EVENT_PREFIX + "updateCategory";
+	public static final String GRADEBOOK_DELETE_CATEGORY = GRADEBOOK_EVENT_PREFIX + "deleteCategory";
+	public static final String GRADEBOOK_ASSIGN_GRADE = GRADEBOOK_EVENT_PREFIX + "assignGrade";
+
 	public static final String[] validLetterGrade = {"a+", "a", "a-", "b+", "b", "b-",
     "c+", "c", "c-", "d+", "d", "d-", "f"};
 	

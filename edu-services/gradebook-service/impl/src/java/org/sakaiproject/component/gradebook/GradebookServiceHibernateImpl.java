@@ -739,7 +739,6 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void removeAssignment(final Long assignmentId) throws StaleObjectModificationException {
-    	
 		HibernateCallback hc = new HibernateCallback() {
             @Override
 			public Object doInHibernate(Session session) throws HibernateException {
@@ -753,7 +752,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
             }
         };
         getHibernateTemplate().execute(hc);
-        
+        //TODO: Need to get the gradebook Id from somewhere.
+        //postEvent(GRADEBOOK_DELETE_ITEM, "/gradebook/" + gradebook.getId() + "/" + assignmentId);
     }
 	
 	@Override
@@ -775,8 +775,9 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		if(assignmentDefinition.getCategoryId() != null) {
 			return createAssignmentForCategory(gradebook.getId(), assignmentDefinition.getCategoryId(), assignmentDefinition.getName(), points, assignmentDefinition.getDueDate(), !assignmentDefinition.isCounted(), assignmentDefinition.isReleased(), assignmentDefinition.isExtraCredit());
 		}
-		
-		return createAssignment(gradebook.getId(), assignmentDefinition.getName(), points, assignmentDefinition.getDueDate(), !assignmentDefinition.isCounted(), assignmentDefinition.isReleased(), assignmentDefinition.isExtraCredit());
+		Long assignmentId = createAssignment(gradebook.getId(), assignmentDefinition.getName(), points, assignmentDefinition.getDueDate(), !assignmentDefinition.isCounted(), assignmentDefinition.isReleased(), assignmentDefinition.isExtraCredit());
+		postEvent(GRADEBOOK_NEW_ITEM, "/gradebook/" + gradebook.getId() + "/" + assignmentId);
+		return assignmentId;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -849,6 +850,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				return null;
 			}
 		});
+		postEvent(GRADEBOOK_UPDATE_ITEM, "/gradebook/" + gradebook.getId() + "/" + assignmentId);
 	}
 
 	@Override
@@ -2062,7 +2064,16 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	  List<GradeDefinition> gradeDefList = new ArrayList<GradeDefinition>();
 	  gradeDefList.add(gradeDef);
 
+	  System.out.println("gradebookUid: " + gradebookUid + " gradableObjectId: " + gradableObjectId);
+
 	  saveGradesAndComments(gradebookUid, gradableObjectId, gradeDefList);
+	  try {
+		  Gradebook gradebook = getGradebook(gradebookUid);
+		  postEvent(GRADEBOOK_ASSIGN_GRADE, "/gradebook/" + gradebook.getId() + "/" + gradableObjectId + "/" + studentUid);
+	  } catch (GradebookNotFoundException gnfe) {
+		  throw new GradebookNotFoundException("No gradebook exists with the given gradebookUid: " +
+				  gradebookUid + "Error: " + gnfe.getMessage());
+	  }
   }
 
   @Override
@@ -3406,7 +3417,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			
 			//new
 			if(newDef.getId() == null) {
-				this.createCategory(gradebook.getId(), newDef.getName(), newDef.getWeight(), newDef.getDrop_lowest(), newDef.getDropHighest(), newDef.getKeepHighest(), newDef.isExtraCredit(), Integer.valueOf(categoryIndex));
+				Long categoryId = this.createCategory(gradebook.getId(), newDef.getName(), newDef.getWeight(), newDef.getDrop_lowest(), newDef.getDropHighest(), newDef.getKeepHighest(), newDef.isExtraCredit(), Integer.valueOf(categoryIndex));
+				postEvent(GRADEBOOK_NEW_CATEGORY, "/gradebook/" + gradebook.getId() + "/" + categoryId);
 				categoryIndex++;
 				continue;
 			} 
@@ -3422,7 +3434,9 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				existing.setExtraCredit(newDef.isExtraCredit());
 				existing.setCategoryOrder(categoryIndex);
 				this.updateCategory(existing);
-				
+				//TODO: If you update one category in the list, an event is generated for each event in the list
+				//even if they haven't changed. Is there any way to avoid that?
+				//postEvent(GRADEBOOK_UPDATE_CATEGORY, "/gradebook/" + gradebook.getId() + "/" + newDef.getId());
 				//remove from currentCategoryMap so we know not to delete it
 				currentCategoryMap.remove(newDef.getId());
 
@@ -3436,6 +3450,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		//anything left in currentCategoryMap was not included in the new list, delete them
 		for(Entry<Long, Category> cat: currentCategoryMap.entrySet()) {
 			this.removeCategory(cat.getKey());
+			postEvent(GRADEBOOK_DELETE_CATEGORY, "/gradebook/" + gradebook.getId() + "/" + cat.getKey());
 		}
 		
 		//if weighted categories, all uncategorised assignments are to be removed from course grade calcs

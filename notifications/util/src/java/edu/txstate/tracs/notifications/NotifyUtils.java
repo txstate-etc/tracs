@@ -225,6 +225,15 @@ public class NotifyUtils {
       params.put("keys.object_id", objectid);
       delete(params);
     }
+    public void deleteForObjectAndUser(String objecttype, String notifyType, String objectid, String userEid) {
+      Map<String,String> params = new HashMap<String,String>();
+      params.put("keys.provider_id", "tracs");
+      params.put("keys.object_type", objecttype);
+      params.put("keys.object_id", objectid);
+      params.put("keys.user_id", userEid);
+      params.put("keys.notification_type", notifyType);
+      delete(params);
+    }
 
     public <T> T unproxy(Object maybeProxy, Class<T> baseClass) throws ClassCastException {
        if (maybeProxy instanceof HibernateProxy) {

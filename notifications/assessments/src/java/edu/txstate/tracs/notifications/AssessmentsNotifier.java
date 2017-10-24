@@ -117,21 +117,19 @@ public class AssessmentsNotifier implements Observer {
                     notifyUtils.sendNotification("assessment", "creation", publishedAssessmentIdStr, event.getContext(), userids, releaseDate, contentHash, true);
 
                     //create a reminder notification (1 day before due date)
-                    //TODO: should this only go to users who have not submitted the assessment? If so, how can we cancel it when they submit?
                     String reminderContentHash = notifyUtils.hashContent(assessment.getTitle(), "Assessment Due Soon");
                     Calendar reminderDate = (Calendar) calendarDueDate.clone();
                     reminderDate.add(Calendar.DAY_OF_YEAR, -1);
-                    notifyUtils.sendNotification("assessment", "creation", publishedAssessmentIdStr, event.getContext(), userids, releaseDate, reminderContentHash, true);
+                    notifyUtils.sendNotification("assessment", "reminder", publishedAssessmentIdStr, event.getContext(), userids, releaseDate, reminderContentHash, true);
 
                     //is feedback set to be available on some particular day?
-                    //TODO: Is this assuming that they acutally took the assessment? Or would they get feedback on an assessment they forgot to take and won't take?
                     AssessmentFeedbackIfc assessmentFeedback = assessment.getAssessmentFeedback();
                     if (assessmentFeedback.getFeedbackDelivery() == AssessmentFeedbackIfc.FEEDBACK_BY_DATE) {
                         Date feedbackDate = accessControl.getFeedbackDate();
                         Calendar feedbackReleaseDate = Calendar.getInstance();
                         feedbackReleaseDate.setTime(feedbackDate);
                         String feedbackContentHash = notifyUtils.hashContent(assessment.getTitle(), "Feedback available on assessment");
-                        notifyUtils.sendNotification("assessment", "creation", publishedAssessmentIdStr, event.getContext(), userids, feedbackReleaseDate, feedbackContentHash, true);
+                        notifyUtils.sendNotification("assessment", "feedback", publishedAssessmentIdStr, event.getContext(), userids, feedbackReleaseDate, feedbackContentHash, true);
                     }
                 }
                 else if (SUBMIT_ASSESSMENT_EVENT.equals(event.getEvent())) {
@@ -141,14 +139,22 @@ public class AssessmentsNotifier implements Observer {
                     String publishedAssessmentId = map.get("publishedAssessmentId");
                     AssessmentIfc assessment = publishedAssessmentService.getAssessment(Long.valueOf(publishedAssessmentId));
                     AssessmentFeedbackIfc assessmentFeedback = assessment.getAssessmentFeedback();
+                    String submitter = event.getUserId();
                     if (assessmentFeedback.getFeedbackDelivery() == AssessmentFeedbackIfc.FEEDBACK_ON_SUBMISSION) {
                         Calendar submissionDate = Calendar.getInstance();
                         String contentHash = notifyUtils.hashContent(assessment.getTitle(), "Feedback available on assessment");
-                        String submitter = event.getUserId();
                         List<String> userids = new ArrayList<String>();
                         userids.add(submitter);
                         userids = notifyUtils.convertUserIdsInSite(event.getContext(), userids);
-                        notifyUtils.sendNotification("assessment", "creation", publishedAssessmentId, event.getContext(), userids, submissionDate, contentHash, true);
+                        notifyUtils.sendNotification("assessment", "submission", publishedAssessmentId, event.getContext(), userids, submissionDate, contentHash, true);
+                    }
+                    //Cancel the reminder notification no more submissions are allowed
+                    AssessmentAccessControlIfc accessControl = assessment.getAssessmentAccessControl();
+                    if (!accessControl.getUnlimitedSubmissions()) {
+                        int totalSubmissionsForUser = publishedAssessmentService.getTotalSubmission(submitter, publishedAssessmentId);
+                        int remainingSubmissions = accessControl.getSubmissionsAllowed() - totalSubmissionsForUser;
+                        if(remainingSubmissions == 0)
+                            notifyUtils.deleteForObjectAndUser("assessment", "reminder", publishedAssessmentId, submitter);
                     }
                 }
             }

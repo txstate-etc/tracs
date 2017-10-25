@@ -33,12 +33,12 @@ import org.sakaiproject.assignment.api.AssignmentSubmission;
 * Assignment opens - specific group
 * Assignment opens - section
 * Group Assignment opens
-* Assignment due date approaching (reminder) HOW LONG BEFORE DUE DATE?
+* Assignment due date approaching (reminder)
 Group Assignment - Member of group submits
 Turnitin report generated for submission
 * Assignment grade released (No email notification option selected in settings)
 * Assignment grade released (Email notification option selected in settings)
-Peer evaluation opens on Assignment- Does this start after the due date?
+* Peer evaluation opens on Assignment
 Peer evaluation posted for Assignment (non-anonymous evaluation)
 Peer evaluation posted for Assignment (anonymous evaluation)
 Multiple peer evaluations set on assignment, and assignment is evaluated
@@ -87,7 +87,7 @@ public class AssignmentsNotifier implements Observer {
     public void update(Observable o, Object arg) {
         Event event = (Event) arg;
         String eventType = event.getEvent();
-        System.out.println("received "+event.getEvent()+" event for ticket " + event.getResource());
+        //System.out.println("received "+event.getEvent()+" event for ticket " + event.getResource());
 
         if (updates.contains(event.getEvent())) {
             Reference ref = entityManager.newReference(event.getResource());
@@ -115,22 +115,33 @@ public class AssignmentsNotifier implements Observer {
 
                         //Get list of users to notify
                         List<String> userids = getNotifyList(event.getContext(), creatorId, assignment);
-                        for (String uid : userids) System.out.println("userid: "+uid);
+                        //for (String uid : userids) System.out.println("userid: "+uid);
 
                         //Send Notification
                         if (isDraft) {
-                            System.out.println("message is in draft mode, delete any scheduled notification");
-                            notifyUtils.deleteForObject("assignment", ref.getId());
+                            System.out.println("assignment is in draft mode, delete any scheduled notification");
+                            notifyUtils.deleteForObject("assignment", assignmentId);
                         }
                         else  {
                             notifyUtils.sendNotification("assignment", "creation", assignmentId, event.getContext(), userids, releaseDate, contenthash, true);
+
                             //add notification to remind them when assignment is due. SET TO ONE DAY BEFORE
                             Time dueTime = assignment.getDueTime();
                             Calendar dueDate = Calendar.getInstance();
                             dueDate.setTimeInMillis(dueTime.getTime());
                             Calendar reminderDate = (Calendar) dueDate.clone();
                             reminderDate.add(Calendar.DAY_OF_YEAR, -1);
-                            notifyUtils.sendNotification("assignment", "creation", assignmentId, event.getContext(), userids, reminderDate , contenthash, true);
+                            String reminderContentHash = notifyUtils.hashContent(assignment.getTitle(), "Assignment due soon");
+                            notifyUtils.sendNotification("assignment", "reminder", assignmentId, event.getContext(), userids, reminderDate , reminderContentHash, true);
+
+                            //if the assignment has peer evaulation, notify users when it begins
+                            Time closeTime = assignment.getCloseTime();
+                            Calendar closeDate = Calendar.getInstance();
+                            closeDate.setTimeInMillis(closeTime.getTime());
+                            if (assignment.getAllowPeerAssessment() ) {
+                                String peerEvalContentHash = notifyUtils.hashContent(assignment.getTitle(), "Peer evaluation open");
+                                notifyUtils.sendNotification("assignment", "peer_evaluation", assignmentId, event.getContext(), userids, closeDate, peerEvalContentHash, true);
+                            }
                         }
                     }
                     catch(Exception e) {
@@ -140,7 +151,7 @@ public class AssignmentsNotifier implements Observer {
                 case AssignmentConstants.EVENT_SUBMIT_ASSIGNMENT_SUBMISSION:
                     try {
                         String submissionId = ref.getId();
-                        System.out.println("Submission ID is " + submissionId);
+                        //System.out.println("Submission ID is " + submissionId);
                         // *** TODO: This is not working because the student submitting the assignment
                         // does not have permission to access the submission. ***
 
@@ -168,7 +179,7 @@ public class AssignmentsNotifier implements Observer {
                             //System.out.println(submitter);
                         }
                         //TODO: should the object ID here be the assignment or the submission?
-                        notifyUtils.sendNotification("assignment", "creation", assignmentId, event.getContext(), submitters, Calendar.getInstance() , contenthash, true);
+                        notifyUtils.sendNotification("assignment", "grade", assignmentId, event.getContext(), submitters, Calendar.getInstance() , contenthash, true);
                     }
                     catch(Exception e) {
                         e.printStackTrace();

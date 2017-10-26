@@ -2583,7 +2583,14 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			{
 				// submitting a submission
 				EventTrackingService.post(EventTrackingService.newEvent(AssignmentConstants.EVENT_SUBMIT_ASSIGNMENT_SUBMISSION, submissionRef, true));
-			
+
+				/* group assignment submission event added by Anne 10/26/17 for TRACS notifications */
+				if (a.isGroup())
+				{
+					String groupId = s.getSubmitterId();
+					EventTrackingService.post(EventTrackingService.newEvent(AssignmentConstants.EVENT_SUBMIT_GROUP_ASSIGNMENT_SUBMISSION, submissionRef + Entity.SEPARATOR + groupId, true));
+				}
+
 				// only doing the notification for real online submissions
 				if (a.getContent().getTypeOfSubmission() != Assignment.NON_ELECTRONIC_ASSIGNMENT_SUBMISSION)
 				{

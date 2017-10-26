@@ -108,6 +108,10 @@ public class AssignmentConstants {
 
 	/** Event for submitting an assignment submission. */
 	public static final String EVENT_SUBMIT_ASSIGNMENT_SUBMISSION = "asn.submit.submission";
+
+	/** Event for submitting a group assignment. */
+	/* Added by Anne 10/26/17 for TRACS notifications */
+	public static final String EVENT_SUBMIT_GROUP_ASSIGNMENT_SUBMISSION = "asn.submit.groupsubmission";
 	
 	/** Event for grading an assignment submission. */
 	public static final String EVENT_GRADE_ASSIGNMENT_SUBMISSION = "asn.grade.submission";

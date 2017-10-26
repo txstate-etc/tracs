@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.sakaiproject.authz.api.Member;
+import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.event.api.EventTrackingService;
@@ -44,6 +45,10 @@ Peer evaluation posted for Assignment (anonymous evaluation)
 Multiple peer evaluations set on assignment, and assignment is evaluated
 
 TODO: There are no events for turnitin or peer evaluations.
+TODO: If you duplicate an assignment, it creates a new one as a draft. When you later save it, 
+      the events sent out are asn.revise.assignmentcontent, asn.revise.assignment, and
+      asn.revise.{title | access | whateveryouchanged}. Need to capture that somehow to send
+      a notification that the new, duplicated assignment is available.
 */
 
 public class AssignmentsNotifier implements Observer {
@@ -79,7 +84,7 @@ public class AssignmentsNotifier implements Observer {
         updates = new ArrayList<String>();
         updates.add(AssignmentConstants.EVENT_ADD_ASSIGNMENT);
         updates.add(AssignmentConstants.EVENT_ADD_ASSIGNMENT_SUBMISSION);
-        updates.add(AssignmentConstants.EVENT_SUBMIT_ASSIGNMENT_SUBMISSION);
+        updates.add(AssignmentConstants.EVENT_SUBMIT_GROUP_ASSIGNMENT_SUBMISSION);
         updates.add(AssignmentConstants.EVENT_GRADE_RELEASED);
         eventTrackingService.addObserver(this);
     }
@@ -148,20 +153,25 @@ public class AssignmentsNotifier implements Observer {
                         e.printStackTrace();
                     }
                     break;
-                case AssignmentConstants.EVENT_SUBMIT_ASSIGNMENT_SUBMISSION:
+                case AssignmentConstants.EVENT_SUBMIT_GROUP_ASSIGNMENT_SUBMISSION:
                     try {
                         String submissionId = ref.getId();
-                        //System.out.println("Submission ID is " + submissionId);
-                        // *** TODO: This is not working because the student submitting the assignment
-                        // does not have permission to access the submission. ***
-
-                        // AssignmentSubmission submission = assignService.getSubmission(submissionId);
-                        // Assignment assignment = submission.getAssignment();
-                        // if (null == assignment) {
-                        //     //not a valid assignment
-                        //     return;
-                        // }
-                        // System.out.println("Submitted Assignment: " + assignment.getTitle());
+                        String contenthash = notifyUtils.hashContent("Group assignment submitted");
+                        String reference = ref.getReference();
+                        int index = reference.lastIndexOf(Entity.SEPARATOR);
+                        if (index == -1) return;
+                        String groupId = reference.substring(index + 1);
+                        Group group = siteService.findGroup(groupId);
+                        if (null == group) return;
+                        Set<Member> groupMembers = group.getMembers();
+                        List<String> userids = new ArrayList<String>();
+                        String submitterId = event.getUserId();
+                        for (Member m : groupMembers) {
+                            if (!submitterId.equals(m.getUserId()))
+                                userids.add(m.getUserEid());
+                        }
+                        //TODO: should the object ID be the submission ID or the assignment ID?
+                        notifyUtils.sendNotification("assignment", "groupsubmission", submissionId, event.getContext(), userids, Calendar.getInstance(), contenthash, true);
                     }
                     catch(Exception e) {
                         e.printStackTrace();
@@ -175,9 +185,6 @@ public class AssignmentsNotifier implements Observer {
                         //TODO: Not sure what to use for content hash here?
                         String contenthash = notifyUtils.hashContent("Your assignment has been graded", submission.getGrade());
                         List<String> submitters = notifyUtils.convertUserIdsInSite(event.getContext(),submission.getSubmitterIds());
-                        for(String submitter : submitters) {
-                            //System.out.println(submitter);
-                        }
                         //TODO: should the object ID here be the assignment or the submission?
                         notifyUtils.sendNotification("assignment", "grade", assignmentId, event.getContext(), submitters, Calendar.getInstance() , contenthash, true);
                     }

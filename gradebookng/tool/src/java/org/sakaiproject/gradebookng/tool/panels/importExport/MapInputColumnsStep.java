@@ -31,6 +31,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.model.StringResourceModel;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
+import org.sakaiproject.gradebookng.tool.component.GbFeedbackPanel;
 import org.sakaiproject.gradebookng.tool.pages.ImportExportPage;
 import org.sakaiproject.gradebookng.tool.panels.AddOrEditGradeItemPanelContent;
 import org.sakaiproject.service.gradebook.shared.Assignment;
@@ -269,7 +270,12 @@ public class MapInputColumnsStep extends Panel {
            		public void onSubmit() {
            			int studentIdIndex = 0;
 					int studentNameIndex = 1;
-
+					boolean valid = validateForm(listItems);
+					if (!valid) {
+						//Validation failed. Return and display the error messages added by the validateForm function
+						return;
+					}
+					
                 	for(int i = 0; i < listItems.size(); i ++) {
                 		
                 		ImportedColumn currentColumn = importedColumns.get(i);
@@ -353,10 +359,12 @@ public class MapInputColumnsStep extends Panel {
 
             	@Override
             	public void onError() {
-               
+              
             	}
    		 	};
         	add(submit);
+
+        	//add(new GbFeedbackPanel("mapInputColumnsStepFeedback"));
 
         	final Button cancel = new Button("backbutton") {
         		private static final long serialVersionUID = 1L;
@@ -374,6 +382,38 @@ public class MapInputColumnsStep extends Panel {
         	};
         add(cancel);
 
+		}
+
+		private boolean validateForm(ListView<ColumnListItem> listView) {
+			//TODO: Add more form validation here as needed
+			boolean returnVal = true;
+			int studentIdColumnCount = 0;
+			int studentNameColumnCount = 0;
+			for(int i = 0; i < listView.size(); i ++) {
+				ListItem<ColumnListItem> listItem = (ListItem<ColumnListItem>)listView.get(i);
+				DropDownChoice columnType = (DropDownChoice)listItem.get("columnType");
+				switch(columnType.getValue()) {
+					case "Student ID":
+						studentIdColumnCount++;
+						break;
+
+					case "Student Name":
+						studentNameColumnCount++;
+						break;
+				}
+			}
+
+			if (studentIdColumnCount != 1) {
+				error("One and only one Student ID column allowed");
+				returnVal = false;
+			}
+
+			if (studentNameColumnCount > 1) {
+				error("One and only one Student Name column allowed");
+				returnVal = false;
+			}
+
+			return returnVal;
 		}
 
 		private void SetListItemVisibility(ListItem<ColumnListItem> listItem) {

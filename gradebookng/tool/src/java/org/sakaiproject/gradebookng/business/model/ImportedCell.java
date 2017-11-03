@@ -22,6 +22,30 @@ public class ImportedCell implements Serializable {
 	@Setter
 	private String comment;
 
+	@Getter
+	@Setter
+	private String previousScore;
+
+	@Getter
+	@Setter
+	private String previousComment;
+
+	public boolean hasScoreChange() {
+		if (previousScore == null) {
+			return score != null;
+		} else if (score == null) {
+			return true;
+		} else {
+			Double prevDouble = Double.parseDouble(previousScore);
+			Double curDouble = Double.parseDouble(score);
+			return prevDouble.doubleValue() != curDouble.doubleValue();
+		}
+	}
+
+	public boolean hasCommentChange() {
+		return !(previousComment == null ? comment == null : previousComment.equals(comment));
+	}
+
 	public ImportedCell() {
 	}
 	

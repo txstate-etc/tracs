@@ -32,4 +32,47 @@ public class ProcessedGradeItemDetail implements Serializable {
 	@Setter
 	private String comment;
 
+	@Getter
+	@Setter
+	private String previousGrade;
+
+	@Getter
+	@Setter
+	private String previousComment;
+
+	public boolean hasGradeChange() {
+		if (previousGrade == null) {
+			return grade != null;
+		} else if (grade == null) {
+			return true;
+		} else {
+			Double prevDouble = Double.parseDouble(previousGrade);
+			Double curDouble = Double.parseDouble(grade);
+			return prevDouble.doubleValue() != curDouble.doubleValue();
+		}
+	}
+
+	public boolean hasCommentChange() {
+		return previousComment == null ? comment != null : !previousComment.equals(comment);
+	}
+
+	public String PrintDetail() {
+		String returnVal = "";
+		String scoreString = previousGrade == null ? "-" : previousGrade;
+		returnVal += String.format("%s : Grade: %s ", studentEid, scoreString);
+		if (hasGradeChange()) {
+			scoreString = grade == null ? "-" : grade;
+			returnVal += String.format("=> %s ", scoreString);
+		} 
+		
+		String commentString = previousComment == null ? "-" : previousComment;
+		returnVal += String.format("Comment: %s ", commentString);
+		if (hasCommentChange()) {
+			commentString = comment == null ? "-" : comment;
+			returnVal += String.format("=> %s ", commentString);
+		}
+
+		return returnVal;
+	}
+
 }

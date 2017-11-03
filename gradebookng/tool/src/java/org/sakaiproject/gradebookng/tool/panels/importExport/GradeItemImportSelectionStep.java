@@ -10,6 +10,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.basic.Label;
@@ -21,11 +22,13 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItem;
+import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemDetail;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemStatus;
 import org.sakaiproject.gradebookng.tool.model.ImportWizardModel;
 import org.sakaiproject.gradebookng.tool.pages.ImportExportPage;
@@ -51,6 +54,30 @@ public class GradeItemImportSelectionStep extends Panel {
 		super(id);
 		this.panelId = id;
 		this.model = importWizardModel;
+	}
+
+	private String createChangesString(List<ProcessedGradeItemDetail> details) {
+		String returnString = "";
+		int gradeChanges = 0;
+		int commentChanges = 0;
+		for (ProcessedGradeItemDetail detail : details) {
+			if (detail.hasGradeChange()) {
+				gradeChanges++;
+			}
+			if (detail.hasCommentChange()) {
+				commentChanges++;
+			}
+		}
+
+		if (gradeChanges != 0) {
+			returnString += String.format("%d %s", gradeChanges, gradeChanges == 1 ? "grade " : "grades ");
+		}
+
+		if (commentChanges != 0) {
+			returnString += String.format("%d %s", commentChanges, commentChanges == 1 ? "comment " : "comments ");
+		}
+
+		return returnString;
 	}
 
 	@Override
@@ -106,6 +133,12 @@ public class GradeItemImportSelectionStep extends Panel {
 			}
 		};
 		add(hideNoChanges);
+
+		TextArea textArea = new TextArea<String>("detailsArea", Model.of(""));
+		textArea.setOutputMarkupId(true);
+		textArea.setOutputMarkupPlaceholderTag(true);
+		textArea.setVisible(false);
+		add(textArea);
 
 		final CheckGroup<ProcessedGradeItem> group = new CheckGroup<ProcessedGradeItem>("group", new ArrayList<ProcessedGradeItem>());
 
@@ -221,10 +254,36 @@ public class GradeItemImportSelectionStep extends Panel {
 				final Label itemPointValue = new Label("itemPointValue", importedItem.getItemPointValue());
 				final Label itemStatus = new Label("itemStatus");
 
+				final Button detailButton = new Button("detailButton");
+				detailButton.add(new AjaxEventBehavior("onclick") {
+        			@Override
+        			protected void onEvent(final AjaxRequestTarget target) {
+            			ListItem<ProcessedGradeItem> listItem = (ListItem<ProcessedGradeItem>)getComponent().getParent();
+            			ProcessedGradeItem processedItem = listItem.getModelObject();
+						String changeString = "";
+						for (ProcessedGradeItemDetail detail : processedItem.getProcessedGradeItemDetails()) {
+							if (detail.hasGradeChange() || detail.hasCommentChange()) {
+								changeString += detail.PrintDetail() + "\n";
+							}
+						}
+						textArea.setModelObject(changeString);
+						textArea.setVisible(true);
+						target.add(textArea);
+        			}
+    			});
+				detailButton.setOutputMarkupId(true);
+
+				//final Label detailLabel = new Label("itemDetails", changeString);
+				//detailLabel.setOutputMarkupId(true);
+				//detailLabel.setOutputMarkupPlaceholderTag(true);
+
 				item.add(checkbox);
 				item.add(itemTitle);
 				item.add(itemPointValue);
 				item.add(itemStatus);
+				item.add(detailButton);
+				//item.add(detailLabel);
+				
 
 				// Determine status label
 				final ProcessedGradeItemStatus status = importedItem.getStatus();
@@ -241,7 +300,10 @@ public class GradeItemImportSelectionStep extends Panel {
 					// if no changes, grey it out and remove checkbox
 					if (status.getStatusCode() == ProcessedGradeItemStatus.STATUS_NA) {
 						checkbox.setVisible(false);
+						detailButton.setVisible(false);
 						item.add(new AttributeAppender("class", Model.of("no_changes"), " "));
+					} else {
+						itemStatus.setDefaultModelObject((String)itemStatus.getDefaultModelObject() + String.format(" (%s)", createChangesString(importedItem.getProcessedGradeItemDetails())));
 					}
 
 				}
@@ -251,38 +313,38 @@ public class GradeItemImportSelectionStep extends Panel {
 					item.add(new AttributeAppender("class", Model.of("comment"), " "));
 				}
 
-				// add an additional row for the comments for each
-				final ProcessedGradeItemStatus commentStatus = importedItem.getCommentStatus();
+				//// add an additional row for the comments for each
+				//final ProcessedGradeItemStatus commentStatus = importedItem.getCommentStatus();
 
-				item.add(new Behavior() {
-					private static final long serialVersionUID = 1L;
+				// item.add(new Behavior() {
+				// 	private static final long serialVersionUID = 1L;
 
-					@Override
-					public void afterRender(final Component component) {
-						super.afterRender(component);
-						if (importedItem.getType() == ProcessedGradeItem.Type.COMMENT) {
-							String rowClass = "comment";
-							String statusValue = getString("importExport.status." + commentStatus.getStatusCode());
-							if (commentStatus.getStatusCode() == ProcessedGradeItemStatus.STATUS_EXTERNAL) {
-								rowClass += " external";
-								statusValue = new StringResourceModel("importExport.status." + commentStatus.getStatusCode(), Model.of(commentStatus), null, commentStatus.getStatusValue()).getString();
-							}
-							if (commentStatus.getStatusCode() == ProcessedGradeItemStatus.STATUS_NA) {
-								rowClass += " no_changes";
-							}
+				// 	@Override
+				// 	public void afterRender(final Component component) {
+				// 		super.afterRender(component);
+				// 		if (importedItem.getType() == ProcessedGradeItem.Type.COMMENT) {
+				// 			String rowClass = "comment";
+				// 			String statusValue = getString("importExport.status." + commentStatus.getStatusCode());
+				// 			if (commentStatus.getStatusCode() == ProcessedGradeItemStatus.STATUS_EXTERNAL) {
+				// 				rowClass += " external";
+				// 				statusValue = new StringResourceModel("importExport.status." + commentStatus.getStatusCode(), Model.of(commentStatus), null, commentStatus.getStatusValue()).getString();
+				// 			}
+				// 			if (commentStatus.getStatusCode() == ProcessedGradeItemStatus.STATUS_NA) {
+				// 				rowClass += " no_changes";
+				// 			}
 
-							component.getResponse().write(
-									"<tr class=\"" + rowClass + "\">" +
-											"<td></td>" +
-											"<td class=\"item_title\">" + getString("importExport.commentname") + "</td>" +
-											"<td class=\"item_points\">" + naString + "</td>" +
-											"<td class=\"item_status\">" + statusValue + "</td>" +
-											"</tr>"
+				// 			component.getResponse().write(
+				// 					"<tr class=\"" + rowClass + "\">" +
+				// 							"<td></td>" +
+				// 							"<td class=\"item_title\">" + getString("importExport.commentname") + "</td>" +
+				// 							"<td class=\"item_points\">" + naString + "</td>" +
+				// 							"<td class=\"item_status\">" + statusValue + "</td>" +
+				// 							"</tr>"
 
-							);
-						}
-					}
-				});
+				// 			);
+				// 		}
+				// 	}
+				// });
 
 			}
 

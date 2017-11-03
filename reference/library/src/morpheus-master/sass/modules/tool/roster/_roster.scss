@@ -105,8 +105,9 @@
     
     .roster-group-cell {
         display: inline-block;
-        width: 40px !important;
-        max-width: 80px !important;
+        /* These lines were making the group overlap with the email */
+        // width: 40px !important;
+        // max-width: 80px !important;
         white-space: normal !important;
 
         .roster-group-link {

@@ -106,23 +106,9 @@ public class AddScalePointsPanel extends Panel {
         cancel.setDefaultFormProcessing(false);
         form.add(cancel);
 
-        if (gradeType == GbGradingType.PERCENTAGE) 
-        {
-            //pointsTextField.setMinimum(-50.0);
-            //pointsTextField.setMaximum(50.0);
-            pointsTextField.add(RangeValidator.range(-50.0, 50.0));
-            form.add(pointsTextField.setRequired(true));
-            form.add(new Label("pointsSuffix", "%"));
-        } 
-        else 
-        {
-            Double halfPoints = assignment.getPoints() / 2;
-            //pointsTextField.setMinimum(halfPoints * -1.0);
-            //pointsTextField.setMaximum(halfPoints);
-            pointsTextField.add(RangeValidator.range(halfPoints * -1, halfPoints));
-            form.add(pointsTextField.setRequired(true));
-            form.add(new Label("pointsSuffix", "points"));
-        }
+        form.add(pointsTextField.setRequired(true));
+        String suffixString = gradeType == GbGradingType.PERCENTAGE ? "%" : "points";
+        form.add(new Label("pointsSuffix", suffixString));
 
         add(form);
         

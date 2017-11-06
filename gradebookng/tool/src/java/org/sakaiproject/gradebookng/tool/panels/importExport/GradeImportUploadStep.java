@@ -54,7 +54,6 @@ public class GradeImportUploadStep extends Panel {
 	@Override
 	public void onInitialize() {
 		super.onInitialize();
-
 		add(new ExportPanel("export"));
 		add(new UploadForm("form"));
 	}
@@ -129,9 +128,24 @@ public class GradeImportUploadStep extends Panel {
 					return;
 				}
 
-				//get existing data
 				final List<Assignment> assignments = GradeImportUploadStep.this.businessService.getGradebookAssignments();
-				final List<GbStudentGradeInfo> grades = GradeImportUploadStep.this.businessService.buildGradeMatrix(assignments);
+
+				//if(ImportGradesHelper.ErrorsList.length() > 0)
+				//{
+					//log.info("Completed with errors. Prompting user to manually select columns");
+					ColumnMap columnMap = new ColumnMap(spreadsheetWrapper, ImportGradesHelper.ErrorsList);
+					final MapInputColumnsStep mapInputColumns = new MapInputColumnsStep(GradeImportUploadStep.this.panelId, Model.of(columnMap));
+					mapInputColumns.setOutputMarkupId(true);
+					GradeImportUploadStep.this.replaceWith(mapInputColumns);
+					//spreadsheetWrapper.setColumns(mapInputColumns.getImportedColumns());
+					//return;
+				//}
+
+				//get existing data
+
+				//ALAN TODO: If this works out the way I think it will, then remove all code below this comment...
+				
+				/*final List<GbStudentGradeInfo> grades = GradeImportUploadStep.this.businessService.buildGradeMatrix(assignments);
 
 				// process file
 				List<ProcessedGradeItem> processedGradeItems = null;
@@ -159,7 +173,7 @@ public class GradeImportUploadStep extends Panel {
 				importWizardModel.setProcessedGradeItems(processedGradeItems);
 				final Component newPanel = new GradeItemImportSelectionStep(GradeImportUploadStep.this.panelId, Model.of(importWizardModel));
 				newPanel.setOutputMarkupId(true);
-				GradeImportUploadStep.this.replaceWith(newPanel);
+				GradeImportUploadStep.this.replaceWith(newPanel);*/
 
 			}
 

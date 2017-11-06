@@ -33,4 +33,32 @@ public class ImportedRow implements Serializable {
 	public ImportedRow() {
 		this.cellMap = new HashMap<String, ImportedCell>();
 	}
+
+	public String PrintRow()
+	{
+		String returnVal = "\n";
+
+		returnVal += "StudentId = " + studentEid + "\n";
+		//returnVal += "Uuid = " + studentUuid + "\n";
+		returnVal += "StudentName = " + studentName + "\n";
+		returnVal += "GB Items:\n";
+		for(String keyString : cellMap.keySet())
+		{
+			ImportedCell value = cellMap.get(keyString);
+
+			returnVal += String.format("%s : Score: %s ", keyString, value.getPreviousScore());
+			if (value.hasScoreChange()) {
+				returnVal += String.format("=> %s ", value.getScore());
+			} 
+			String commentString = value.getPreviousComment() == null ? "-" : value.getPreviousComment();
+			returnVal += String.format("Comment: %s ", commentString);
+			if (value.hasCommentChange()) {
+				commentString = value.getComment() == null ? "-" : value.getComment();
+				returnVal += String.format("=> %s ", commentString);
+			}
+			returnVal += "\n";
+		}
+
+		return returnVal;
+	}
 }

@@ -14,14 +14,24 @@ import lombok.Setter;
  * Describes the type of column imported
  */
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 public class ImportedColumn implements Serializable {
+	
+	public ImportedColumn(String title, String points, Type type) {
+		columnTitle = unparsedTitle = title;
+		this.points = points;
+		this.type = type;
+	}
 
 	private static final long serialVersionUID = 1L;
 
 	@Getter
 	@Setter
 	private String columnTitle;
+
+	@Getter
+	@Setter
+	private String unparsedTitle;
 
 	@Getter
 	@Setter
@@ -38,6 +48,32 @@ public class ImportedColumn implements Serializable {
 		USER_ID,
 		USER_NAME,
 		IGNORE;
+	}
+
+	public String getFriendlyType()
+	{
+		String returnVal = "Ignore";
+		switch(this.type)
+		{
+			case GB_ITEM_WITHOUT_POINTS:
+			case GB_ITEM_WITH_POINTS:
+				returnVal = "Grades";
+				break;
+
+			case COMMENTS:
+				returnVal = "Comments";
+				break;
+
+			case USER_ID:
+				returnVal = "Student ID";
+				break;
+
+			case USER_NAME:
+				returnVal = "Student Name";
+				break;
+		}
+
+		return returnVal;
 	}
 
 	/**

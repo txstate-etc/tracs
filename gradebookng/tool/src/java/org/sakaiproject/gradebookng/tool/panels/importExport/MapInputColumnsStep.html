@@ -1,0 +1,32 @@
+<wicket:panel xmlns:wicket="http://wicket.apache.org">
+    <form wicket:id="form">
+        <!-- <div wicket:id="mapInputColumnsStepFeedback"></div> -->
+        <div class="form-group">
+            <div class="help-block">
+                <p>Automatic mapping failed. Please specify columns below:</p>
+            </div>
+
+            <table class="table table-striped table-condensed">
+            <tr>
+                <th>Column #</th>
+                <th>Column Type</th>
+                <th>Gradebook Assignment</th>
+                <th>Assignment Max Points</th>
+            </tr>
+            <div wicket:id="listItems" class="form-group form-group-sm">
+                <tr>
+                    <td><div wicket:id="columnLabel" /></td>
+                    <td><select wicket:id="columnType" /></td>
+                    <td><select wicket:id="columnAssignment" /><select wicket:id="columnNewAssignmentIndex" /></td>
+                    <td><input wicket:id="columnPoints" type="number" class="form-control gb-add-scale-points" placeholder="" /></td>
+                </tr>
+            </div>
+            </table>
+            <div class="act">
+                <input type="submit" wicket:id="backbutton" wicket:message="value:importExport.button.back"/>
+                <input type="submit" wicket:id="continuebutton" wicket:message="value:importExport.button.continue"/>
+            </div>
+        </div>
+    </form>
+</wicket:panel>
+

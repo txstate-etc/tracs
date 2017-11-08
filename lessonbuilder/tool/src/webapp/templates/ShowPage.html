@@ -381,7 +381,14 @@
                         <a rsf:id="delete-orphan-link" id="delete-orphan-link" href="#" role="menuitem button" class="delete-orphan"><span rsf:id="msg=simplepage.delete-orphan-pages"></span></a>
 		      </form>
                     </li>
-                    <!-- Removed import/export CC see #6512 --> 
+                    <li>
+                      <a href="#" role="menuitem button" aria-haspopup="dialog" aria-controls="import-cc-dialog" rsf:id="import-cc" id="import-cc"><span rsf:id="msg=simplepage.import_cc_button"></span></a>
+                      <!-- just a message, so will display when it should not-->
+                    </li>
+                    <li>
+                      <a href="#" role="menuitem button" aria-haspopup="dialog" aria-controls="export-cc-dialog" rsf:id="export-cc" id="export-cc"><span rsf:id="msg=simplepage.export_cc"></span></a>
+                      <!-- just a message, so will display when it should not-->
+                    </li>
                     <li rsf:id="show-lti-import">
                       <form action="#" rsf:id="lti-import-form" method="post" enctype="multipart/form-data">
 			<input type="hidden" rsf:id="csrf1" />

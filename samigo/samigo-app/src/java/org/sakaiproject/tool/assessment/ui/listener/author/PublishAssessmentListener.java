@@ -373,23 +373,25 @@ public class PublishAssessmentListener
 		  message.append(newline);
 	  }
 
-	  message.append("\"");
-	  message.append(bold_open);
-	  message.append(TextFormat.convertPlaintextToFormattedTextNoHighUnicode(log, title));
-	  message.append(bold_close);
-	  message.append("\"");
-	  message.append(" ");
+	  // message.append("\"");
+	  // message.append(bold_open);
+	  // message.append(TextFormat.convertPlaintextToFormattedTextNoHighUnicode(log, title));
+	  // message.append(bold_close);
+	  // message.append("\"");
+	  // message.append(" ");
 	  
-	  publishedURL = "<a target=\"_blank\" href=\"" + publishedURL + "\">" + publishedURL + "</a>";
-	  if ("Anonymous Users".equals(releaseTo)) {
-		  message.append(MessageFormat.format(rl.getString("available_anonymously_at"), startDateString, publishedURL));
-	  }
-	  else if (AssessmentAccessControlIfc.RELEASE_TO_SELECTED_GROUPS.equals(releaseTo)) {
-		  message.append(MessageFormat.format(rl.getString("available_group_at"), startDateString, releaseToGroupsAsString, publishedURL));
-	  }
-	  else {
-		  message.append(MessageFormat.format(rl.getString("available_class_at"), startDateString, publishedURL));
-	  }
+	  // publishedURL = "<a target=\"_blank\" href=\"" + publishedURL + "\">" + publishedURL + "</a>";
+	  // if ("Anonymous Users".equals(releaseTo)) {
+		 //  message.append(MessageFormat.format(rl.getString("available_anonymously_at"), startDateString, publishedURL));
+	  // }
+	  // else if (AssessmentAccessControlIfc.RELEASE_TO_SELECTED_GROUPS.equals(releaseTo)) {
+		 //  message.append(MessageFormat.format(rl.getString("available_group_at"), startDateString, releaseToGroupsAsString, publishedURL));
+	  // }
+	  // else {
+		 //  message.append(MessageFormat.format(rl.getString("available_class_at"), startDateString, publishedURL));
+	  // }
+    /* Commented out the above and added the following line for #6367 */
+    message.append(MessageFormat.format(rl.getString("tracs_assessment_published"), siteTitle));
 	  
 	  if (dueDateString != null && !dueDateString.trim().equals("")) {
 		  message.append(newline);
@@ -458,18 +460,34 @@ public class PublishAssessmentListener
 	  message.append(newline);
 	  message.append(newline);
 	  
-	  StringBuffer siteTitleSb = new StringBuffer();
-	  siteTitleSb.append(" \"");
-	  siteTitleSb.append(siteTitle);
-	  siteTitleSb.append("\" ");
-	  StringBuffer portalUrlSb = new StringBuffer();
-	  portalUrlSb.append(" <a href=\"");
-	  portalUrlSb.append(ServerConfigurationService.getPortalUrl());
-	  portalUrlSb.append("\" target=\"_blank\">");
-	  portalUrlSb.append(ServerConfigurationService.getPortalUrl());
-	  portalUrlSb.append("</a>");
-	  message.append(MessageFormat.format(rl.getString("notification_content"), siteTitleSb.toString(), portalUrlSb.toString()));
-	  
+	  // StringBuffer siteTitleSb = new StringBuffer();
+	  // siteTitleSb.append(" \"");
+	  // siteTitleSb.append(siteTitle);
+	  // siteTitleSb.append("\" ");
+	  // StringBuffer portalUrlSb = new StringBuffer();
+	  // portalUrlSb.append(" <a href=\"");
+	  // portalUrlSb.append(ServerConfigurationService.getPortalUrl());
+	  // portalUrlSb.append("\" target=\"_blank\">");
+	  // portalUrlSb.append(ServerConfigurationService.getPortalUrl());
+	  // portalUrlSb.append("</a>");
+	  // message.append(MessageFormat.format(rl.getString("notification_content"), siteTitleSb.toString(), portalUrlSb.toString()));
+	  //Link to the page on the site instead of directly to the assessment #6367
+    Site site = null;
+    try {
+      site = SiteService.getSite(ToolManager.getCurrentPlacement().getContext());
+    }
+    catch(IdUnusedException iue) {
+      log.warn(iue.toString());
+    }
+
+    if (site != null)
+      publishedURL = ServerConfigurationService.getPortalUrl() + "/site/" + ToolManager.getCurrentPlacement().getContext() + "/page/" + site.getToolForCommonId("sakai.samigo").getPageId();
+
+    publishedURL = "<a target=\"_blank\" href=\"" + publishedURL + "\">" + publishedURL + "</a>";
+    message.append(MessageFormat.format(rl.getString("tracs_available_on"), TextFormat.convertPlaintextToFormattedTextNoHighUnicode(log,title), startDateString));
+    message.append(" ");
+    message.append(MessageFormat.format(rl.getString("tracs_available_at"), publishedURL));
+
 	  message.append(newline);
 	  message.append(newline);
 	  

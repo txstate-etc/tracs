@@ -209,10 +209,16 @@ public class MapInputColumnsStep extends Panel {
 
 					//Dropdown menu to select the Assignment. Visible only for Columns containing Grades or Comments
 					String matchingAssignment = newItem.FindAssignmentByName();					
-					DropDownChoice ddcAssignment = new DropDownChoice("columnAssignment", Model.of(matchingAssignment), newItem.getAssignmentList());
+					DropDownChoice ddcAssignment = new DropDownChoice("columnAssignment", Model.of(matchingAssignment), newItem.getAssignmentList()) {
+						@Override
+						protected String getNullValidDisplayValue() {
+							return "Select One...";
+						}
+					};
 					ddcAssignment.setChoiceRenderer(assignmentRender);
 					ddcAssignment.setOutputMarkupId(true);
 					ddcAssignment.setOutputMarkupPlaceholderTag(true);
+					ddcAssignment.setNullValid(true);
 					ddcAssignment.add(new AjaxFormComponentUpdatingBehavior("onchange") {
 						@Override
 						protected void onUpdate(AjaxRequestTarget target) {
@@ -228,7 +234,6 @@ public class MapInputColumnsStep extends Panel {
 
 							target.add(newIndex);
 						}
-
 					});
 					item.add(ddcAssignment);
 
@@ -348,6 +353,10 @@ public class MapInputColumnsStep extends Panel {
 					final ImportExportPage page = (ImportExportPage) getPage();
 					page.clearFeedback();
 
+					for (String warningString : ImportGradesHelper.WarningsList) {
+						getSession().warn(warningString);
+					}
+					
 					// repaint panel
 					final ImportWizardModel importWizardModel = new ImportWizardModel();
 					importWizardModel.setProcessedGradeItems(processedGradeItems);
@@ -497,7 +506,7 @@ class ColumnMap implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public ColumnMap(ImportedSpreadsheetWrapper spreadSheetWrapper, final StringBuilder errorsb) {
+	public ColumnMap(ImportedSpreadsheetWrapper spreadSheetWrapper, final List<String> errorsb) {
 		this.wrapper = spreadSheetWrapper;
 		this.errorStrings = errorsb;
 	}
@@ -509,7 +518,7 @@ class ColumnMap implements Serializable {
 
 	@Getter
 	@Setter
-	private StringBuilder errorStrings;
+	private List<String> errorStrings;
 
 	@Getter
 	@Setter

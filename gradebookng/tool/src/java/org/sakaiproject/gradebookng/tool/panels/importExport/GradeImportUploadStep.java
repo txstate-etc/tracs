@@ -130,16 +130,11 @@ public class GradeImportUploadStep extends Panel {
 
 				final List<Assignment> assignments = GradeImportUploadStep.this.businessService.getGradebookAssignments();
 
-				//if(ImportGradesHelper.ErrorsList.length() > 0)
-				//{
-					//log.info("Completed with errors. Prompting user to manually select columns");
-					ColumnMap columnMap = new ColumnMap(spreadsheetWrapper, ImportGradesHelper.ErrorsList);
-					final MapInputColumnsStep mapInputColumns = new MapInputColumnsStep(GradeImportUploadStep.this.panelId, Model.of(columnMap));
-					mapInputColumns.setOutputMarkupId(true);
-					GradeImportUploadStep.this.replaceWith(mapInputColumns);
-					//spreadsheetWrapper.setColumns(mapInputColumns.getImportedColumns());
-					//return;
-				//}
+				ColumnMap columnMap = new ColumnMap(spreadsheetWrapper, ImportGradesHelper.WarningsList);
+				final MapInputColumnsStep mapInputColumns = new MapInputColumnsStep(GradeImportUploadStep.this.panelId, Model.of(columnMap));
+				mapInputColumns.setOutputMarkupId(true);
+				GradeImportUploadStep.this.replaceWith(mapInputColumns);
+
 
 				//get existing data
 

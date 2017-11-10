@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -64,8 +65,7 @@ public class ImportGradesHelper {
 	private static final String[] CSV_MIME_TYPES = { "text/csv", "text/plain", "text/comma-separated-values", "application/csv" };
 	private static final String[] CSV_FILE_EXTS = { ".csv", ".txt" };
 
-	public static StringBuilder ErrorsList = new StringBuilder();
-
+	public static List<String> WarningsList;
 
 	/**
 	 * Helper to parse the imported file into an {@link ImportedSpreadsheetWrapper} depending on its type
@@ -83,7 +83,7 @@ public class ImportGradesHelper {
 	public static ImportedSpreadsheetWrapper parseImportedGradeFile(final InputStream is, final String mimetype, final String filename, final Map<String, String> userMap) throws GbImportExportInvalidColumnException, GbImportExportInvalidFileTypeException, GbImportExportDuplicateColumnException, IOException, InvalidFormatException {
 
 		ImportedSpreadsheetWrapper rval = null;
-		ErrorsList = new StringBuilder();
+		WarningsList = new ArrayList<String>();
 		// It would be great if we could depend on the browser mimetype, but Windows + Excel will always send an Excel mimetype
 		if (StringUtils.endsWithAny(filename, CSV_FILE_EXTS) || ArrayUtils.contains(CSV_MIME_TYPES, mimetype)) {
 			rval = ImportGradesHelper.parseCsv(is, userMap);
@@ -102,6 +102,7 @@ public class ImportGradesHelper {
 		Map<Integer, ImportedColumn> mapping = new LinkedHashMap<>();
 		int lineCount = 0;
 		String[] nextLine;
+		WarningsList = new ArrayList<String>();
 
 		for (List<String> nextStringLine : inputList) {
 
@@ -261,13 +262,13 @@ public class ImportGradesHelper {
 				}
 
 				// check user is in the map (ie in the site)
+
 				final String studentUuid = userMap.get(lineVal);
 				if(StringUtils.isBlank(studentUuid)){
-					log.debug("Student was found in file but not in site: " + lineVal);
-					ErrorsList.append("Student was found in file but not in site: " + lineVal);
+					WarningsList.add(lineVal + ": Ignored. Student from CSV file not found in Gradebook");
 					return null;
-					//throw new GbImportExportUnknownStudentException("Student was found in file but not in site: " + lineVal);
 				}
+
 				row.setStudentEid(lineVal);
 				row.setStudentUuid(studentUuid);
 
@@ -412,8 +413,7 @@ public class ImportGradesHelper {
 			final boolean matchingItemExists = processedGradeItems.stream().filter(p -> StringUtils.equals(c, p.getItemTitle())).findFirst().isPresent();
 
 			if(!matchingItemExists) {
-				ErrorsList.append("The comment column '" + c + "' does not have a corresponding gradebook item.");
-				//throw new GbImportCommentMissingItemException("The comment column '" + c + "' does not have a corresponding gradebook item.");
+				WarningsList.add("The comment column '" + c + "' does not have a corresponding gradebook item.");
 			}
 		});
 
@@ -562,8 +562,7 @@ public class ImportGradesHelper {
 
 			// check for duplicates
 			if(mapping.values().contains(column)) {
-				ErrorsList.append("Duplicate column header: " + column.getColumnTitle());
-				//throw new GbImportExportDuplicateColumnException("Duplicate column header: " + column.getColumnTitle());
+				WarningsList.add("Duplicate column header: " + column.getColumnTitle());
 			}
 
 			mapping.put(i, column);
@@ -637,10 +636,9 @@ public class ImportGradesHelper {
 		}
 
 		// if we got here, couldn't parse the column header, throw an error
-		ErrorsList.append("Invalid column header: " + headerValue);
+		WarningsList.add("Invalid column header: " + headerValue);
 		column.setType(ImportedColumn.Type.IGNORE);
 		return column;
-		//throw new GbImportExportInvalidColumnException("Invalid column header: " + headerValue);
 
 	}
 

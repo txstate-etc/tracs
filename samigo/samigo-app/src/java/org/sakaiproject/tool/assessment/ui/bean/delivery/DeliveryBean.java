@@ -1895,22 +1895,22 @@ public class DeliveryBean
     if (needToCheck) {
     	if (this.actionMode == TAKE_ASSESSMENT_VIA_URL) {
     		returnValue = "anonymousQuit";
+        EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save.exit.via_url",
+            AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() +
+            ", agentId=" + getAgentString(), siteId, true, NotificationService.NOTI_REQUIRED));
     	}
     	else {
     		returnValue = "saveForLaterWarning";
+        EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save.exit",
+            AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", agentId=" + getAgentString(), true));
     	}
     }
     else {
     	if (this.actionMode == TAKE_ASSESSMENT_VIA_URL) {
     		returnValue = "notSubmitted";
-    		EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save.exit.via_url",
-    				AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() +
-    				", agentId=" + getAgentString(), siteId, true, NotificationService.NOTI_REQUIRED));
     	}
     	else {
     		returnValue = "select";
-    		EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.save.exit",
-    				AppConstants.SAMIGO_PUBASSES_ID_STRING + getAssessmentId() + ", agentId=" + getAgentString(), true));
     	}
     }
     

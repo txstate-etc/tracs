@@ -239,7 +239,7 @@ public class MapInputColumnsStep extends Panel {
 
 
 					List<Integer> assignmentIndexes = IntStream.rangeClosed(1,9).boxed().collect(Collectors.toList());
-					DropDownChoice ddcNewAssignmentIndex = new DropDownChoice("columnNewAssignmentIndex", Model.of(""), assignmentIndexes);
+					DropDownChoice ddcNewAssignmentIndex = new DropDownChoice("columnNewAssignmentIndex", Model.of(1), assignmentIndexes);
 					ddcNewAssignmentIndex.setOutputMarkupId(true);
 					ddcNewAssignmentIndex.setOutputMarkupPlaceholderTag(true);
 					ddcNewAssignmentIndex.setVisible(false);
@@ -264,7 +264,7 @@ public class MapInputColumnsStep extends Panel {
         			pointsTextField.setOutputMarkupPlaceholderTag(true);
          			item.add(pointsTextField);
 
-         			SetListItemVisibility(item);
+         			setListItemVisibility(item);
 				}	
 			};
 			add(listItems);
@@ -294,7 +294,7 @@ public class MapInputColumnsStep extends Panel {
 
                 		String columnName = columnAssignment.getValue();
                 		if (columnName.equals(NEW_GB_ASSIGNMENT)) {
-                			columnName = String.format("%s %s", NEW_GB_ASSIGNMENT, columnNewAssignmentIndex.getValue());
+                			columnName = String.format("%s %s", NEW_GB_ASSIGNMENT, columnNewAssignmentIndex.getModelObject());
                 		}
                 		
                 		switch(columnType.getValue())
@@ -401,6 +401,9 @@ public class MapInputColumnsStep extends Panel {
 			for(int i = 0; i < listView.size(); i ++) {
 				ListItem<ColumnListItem> listItem = (ListItem<ColumnListItem>)listView.get(i);
 				DropDownChoice columnType = (DropDownChoice)listItem.get("columnType");
+        		DropDownChoice columnAssignment = (DropDownChoice)listItem.get("columnAssignment");
+        		NumberTextField columnPoints = (NumberTextField)listItem.get("columnPoints");
+        		DropDownChoice columnNewAssignmentIndex = (DropDownChoice)listItem.get("columnNewAssignmentIndex");
 				switch(columnType.getValue()) {
 					case "Student ID":
 						studentIdColumnCount++;
@@ -425,7 +428,7 @@ public class MapInputColumnsStep extends Panel {
 			return returnVal;
 		}
 
-		private void SetListItemVisibility(ListItem<ColumnListItem> listItem) {
+		private void setListItemVisibility(ListItem<ColumnListItem> listItem) {
 			DropDownChoice columnType = (DropDownChoice)listItem.get("columnType");
 			DropDownChoice columnAssignment = (DropDownChoice)listItem.get("columnAssignment");
 			NumberTextField columnPoints = (NumberTextField)listItem.get("columnPoints");

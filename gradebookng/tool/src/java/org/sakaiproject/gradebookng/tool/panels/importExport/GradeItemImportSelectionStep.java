@@ -69,13 +69,13 @@ public class GradeItemImportSelectionStep extends Panel {
 			}
 		}
 
-		if (gradeChanges != 0) {
+		//if (gradeChanges != 0) {
 			returnString += String.format("%d %s", gradeChanges, gradeChanges == 1 ? "grade " : "grades ");
-		}
+		//}
 
-		if (commentChanges != 0) {
+		//if (commentChanges != 0) {
 			returnString += String.format("%d %s", commentChanges, commentChanges == 1 ? "comment " : "comments ");
-		}
+		//}
 
 		return returnString;
 	}

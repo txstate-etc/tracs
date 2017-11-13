@@ -78,9 +78,14 @@ public class AddScalePointsPanel extends Panel {
             @Override
             public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
 
-                final boolean success = AddScalePointsPanel.this.businessService.addScalePoints(assignment.getId(), assignment.getPoints(), Double.parseDouble(pointsTextField.getValue()));
+                final int success = AddScalePointsPanel.this.businessService.addScalePoints(assignment.getId(), assignment.getPoints(), Double.parseDouble(pointsTextField.getValue()));
 
-                if (success) {
+                if (success == 0) {
+                    getSession().info("Points added successfully!");
+                    AddScalePointsPanel.this.window.close(target);
+                    setResponsePage(GradebookPage.class);
+                } else if (success > 0) {
+                    getSession().warn("Points added successfully! Please note that some grades were capped at the limit of 150% maximum point value");
                     AddScalePointsPanel.this.window.close(target);
                     setResponsePage(GradebookPage.class);
                 } else {

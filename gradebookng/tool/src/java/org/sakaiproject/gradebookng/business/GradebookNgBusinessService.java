@@ -1397,8 +1397,18 @@ public class GradebookNgBusinessService {
 
 		return false;
 	}
-	public boolean addScalePoints(final Long assignmentId, final double assignmentMaxPoints, final double pointValue)
+
+	/**
+	* Scale grades by adding a fixed pointValue to all students' grades for an assignment
+	*
+	* @param assignmentId
+	* @param assignmentMaxPoints
+	* @param pointValue
+	* @return -1 if unsuccessful, N if completely successful where N = the number of grades exceeding the max grade points
+	**/
+	public int addScalePoints(final Long assignmentId, final double assignmentMaxPoints, final double pointValue)
 	{
+		int returnVal = 0;
 		final String siteId = getCurrentSiteId();
 		final Gradebook gradebook = getGradebook(siteId);
 		final List<String> studentUuids = this.getGradeableUsers();
@@ -1420,12 +1430,20 @@ public class GradebookNgBusinessService {
 				if(def.getGradeEntryType() == GradebookService.GRADE_TYPE_POINTS) {			
 					double newGrade = Double.parseDouble(grade) + pointValue;
 					newGrade = Math.max(newGrade, 0.0);
-					def.setGrade(String.valueOf(Math.min(newGrade, maxGradePoints)));
+					if (newGrade > maxGradePoints) {
+						newGrade = maxGradePoints;
+						returnVal++;
+					}
+					def.setGrade(String.valueOf(newGrade));
 				}
 				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_PERCENTAGE) {
 					double newGrade = Double.parseDouble(grade) + ((pointValue / 100.0) * assignmentMaxPoints);
 					newGrade = Math.max(newGrade, 0.0);
-					def.setGrade(String.valueOf(Math.min(newGrade, maxPercentage)));
+					if (newGrade > maxPercentage) {
+						newGrade = maxPercentage;
+						returnVal++;
+					}
+					def.setGrade(String.valueOf(newGrade));
 				}
 				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_LETTER) {
 					log.warn("Skipping unsupported Gradebook type of LETTER");
@@ -1438,7 +1456,7 @@ public class GradebookNgBusinessService {
 							def.getGrade(), null);				
 			}
 
-			return true;
+			return returnVal;
 		}
 
 		catch (final Exception e)
@@ -1446,7 +1464,7 @@ public class GradebookNgBusinessService {
 			log.error("An error occurred adding points to the assignment", e);
 		}
 
-		return false;
+		return -1;
 
 	}
 

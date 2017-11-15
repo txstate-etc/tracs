@@ -491,6 +491,17 @@
             </regexp-list>
         </attribute>
 
+        <attribute name="data-scayt-word">
+            <regexp-list>
+                <regexp name="anything" />
+            </regexp-list>
+        </attribute>
+        <attribute name="data-scayt-lang">
+            <regexp-list>
+                <regexp name="htmlClass" />
+            </regexp-list>
+        </attribute>
+
         <!-- MathML common attributes -->
         <attribute name="xref">
             <regexp-list>
@@ -1506,6 +1517,9 @@
                     <regexp name="anything"/>
                 </regexp-list>
             </attribute>
+            <!-- Added to make antisamy work better with spellcheck -->
+            <attribute name="data-scayt-word"/>
+            <attribute name="data-scayt-lang"/>
         </tag>
 
         <tag name="div" action="validate">

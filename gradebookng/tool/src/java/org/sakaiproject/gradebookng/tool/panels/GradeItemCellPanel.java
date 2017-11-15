@@ -208,7 +208,7 @@ public class GradeItemCellPanel extends Panel {
 					// perform validation here so we can bypass the backend
 					final DoubleValidator validator = new DoubleValidator();
 
-					if (StringUtils.isNotBlank(rawGrade) && (!validator.isValid(rawGrade) || Double.parseDouble(rawGrade) < 0)) {
+					if (StringUtils.isNotBlank(rawGrade) && (!validator.isValid(rawGrade) || !validator.isInRange(Double.parseDouble(rawGrade), 0, pointsLimit * 1.5))) {
 						// show warning and revert button
 						markWarning(getComponent());
 						target.add(page.updateLiveGradingMessage(getString("feedback.error")));

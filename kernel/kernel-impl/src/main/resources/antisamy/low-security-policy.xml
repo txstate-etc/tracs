@@ -501,6 +501,12 @@
                 <regexp name="htmlClass" />
             </regexp-list>
         </attribute>
+        <attribute name="data-cke-saved-href">
+            <regexp-list>
+                <regexp name="onsiteURL"/>
+                <regexp name="offsiteURL"/>
+            </regexp-list>
+        </attribute>
 
         <!-- MathML common attributes -->
         <attribute name="xref">
@@ -1486,6 +1492,7 @@
                     <regexp name="basicAlphaNumeric"/>
                 </regexp-list>
             </attribute>
+            <attribute name="data-cke-saved-href"/>
         </tag>
 
         <tag name="map" action="validate"/>

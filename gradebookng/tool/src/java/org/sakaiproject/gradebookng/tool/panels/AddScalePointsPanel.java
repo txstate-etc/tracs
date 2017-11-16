@@ -85,7 +85,7 @@ public class AddScalePointsPanel extends Panel {
                     AddScalePointsPanel.this.window.close(target);
                     setResponsePage(GradebookPage.class);
                 } else if (success > 0) {
-                    getSession().warn("Points added successfully! Please note that some grades were capped at the limit of 150% maximum point value");
+                    getSession().error("Error adding points: Performing this operation would cause one or more grades to exceed the limit of 150% maximum point value");
                     AddScalePointsPanel.this.window.close(target);
                     setResponsePage(GradebookPage.class);
                 } else {

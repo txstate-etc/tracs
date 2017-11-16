@@ -1404,7 +1404,9 @@ public class GradebookNgBusinessService {
 	* @param assignmentId
 	* @param assignmentMaxPoints
 	* @param pointValue
-	* @return -1 if unsuccessful, N if completely successful where N = the number of grades exceeding the max grade points
+	* @return -1 if unsuccessful due to unforseen error, 
+	* 		  0 if completely successful, 
+	*		  N if unsuccessful due to exceeding the 150% grade point limit (where N = the number of grades exceeding said limit)
 	**/
 	public int addScalePoints(final Long assignmentId, final double assignmentMaxPoints, final double pointValue)
 	{
@@ -1413,7 +1415,7 @@ public class GradebookNgBusinessService {
 		final Gradebook gradebook = getGradebook(siteId);
 		final List<String> studentUuids = this.getGradeableUsers();
 		final List<GradeDefinition> defs = this.gradebookService.getGradesForStudentsForItem(gradebook.getUid(), assignmentId, studentUuids);
-		
+		List<GradeDefinition> saveList = new ArrayList<GradeDefinition>();
 		final double maxGradePoints = assignmentMaxPoints * 1.5;
 		final double maxPercentage = 150.0;
 		
@@ -1431,29 +1433,36 @@ public class GradebookNgBusinessService {
 					double newGrade = Double.parseDouble(grade) + pointValue;
 					newGrade = Math.max(newGrade, 0.0);
 					if (newGrade > maxGradePoints) {
-						newGrade = maxGradePoints;
 						returnVal++;
+						continue;
 					}
 					def.setGrade(String.valueOf(newGrade));
+					saveList.add(def);
 				}
 				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_PERCENTAGE) {
 					double newGrade = Double.parseDouble(grade) + ((pointValue / 100.0) * assignmentMaxPoints);
 					newGrade = Math.max(newGrade, 0.0);
 					if (newGrade > maxPercentage) {
-						newGrade = maxPercentage;
 						returnVal++;
+						continue;
 					}
 					def.setGrade(String.valueOf(newGrade));
+					saveList.add(def);
 				}
 				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_LETTER) {
 					log.warn("Skipping unsupported Gradebook type of LETTER");
 					continue;
-				}
+				}							
+			}
 
-				this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
+			if (returnVal == 0) {
+				for (final GradeDefinition def : saveList) {
+					this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
 							assignmentId,
 							def.getStudentUid(),
-							def.getGrade(), null);				
+							def.getGrade(), null);	
+				}
+
 			}
 
 			return returnVal;

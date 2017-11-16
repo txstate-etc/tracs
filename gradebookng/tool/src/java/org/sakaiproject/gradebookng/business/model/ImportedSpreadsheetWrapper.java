@@ -18,7 +18,7 @@ public class ImportedSpreadsheetWrapper implements Serializable {
 
 	@Getter
 	@Setter
-	private ArrayList<List<String>> rawData;
+	private List<List<String>> rawData;
 
 	@Getter
 	@Setter

@@ -110,13 +110,6 @@ public class GradeImportUploadStep extends Panel {
 					log.debug("GBNG import error", e);
 					error(getString("importExport.error.incorrecttype"));
 					return;
-				} catch (final GbImportExportUnknownStudentException e) {
-					error(getString("importExport.error.unknownstudent"));
-					return;
-				} catch (final GbImportExportDuplicateColumnException e) {
-					log.debug("GBNG import error", e);
-					error(getString("importExport.error.duplicatecolumn"));
-					return;
 				} catch (final IOException e) {
 					log.debug("GBNG import error", e);
 					error(getString("importExport.error.unknown"));
@@ -128,48 +121,11 @@ public class GradeImportUploadStep extends Panel {
 					return;
 				}
 
-				final List<Assignment> assignments = GradeImportUploadStep.this.businessService.getGradebookAssignments();
-
-				ColumnMap columnMap = new ColumnMap(spreadsheetWrapper, ImportGradesHelper.WarningsList);
-				final MapInputColumnsStep mapInputColumns = new MapInputColumnsStep(GradeImportUploadStep.this.panelId, Model.of(columnMap));
+				final ImportWizardModel nextModel = new ImportWizardModel();
+				nextModel.setWrapper(spreadsheetWrapper);
+				final MapInputColumnsStep mapInputColumns = new MapInputColumnsStep(GradeImportUploadStep.this.panelId, Model.of(nextModel));
 				mapInputColumns.setOutputMarkupId(true);
 				GradeImportUploadStep.this.replaceWith(mapInputColumns);
-
-
-				//get existing data
-
-				//ALAN TODO: If this works out the way I think it will, then remove all code below this comment...
-				
-				/*final List<GbStudentGradeInfo> grades = GradeImportUploadStep.this.businessService.buildGradeMatrix(assignments);
-
-				// process file
-				List<ProcessedGradeItem> processedGradeItems = null;
-				try {
-					processedGradeItems = ImportGradesHelper.processImportedGrades(spreadsheetWrapper, assignments, grades);
-				} catch (final GbImportCommentMissingItemException e) {
-					// TODO would be good if we could show the column here, but would have to return it
-					error(getString("importExport.error.commentnoitem"));
-					return;
-				}
-				// if empty there are no users
-				if (processedGradeItems.isEmpty()) {
-					error(getString("importExport.error.empty"));
-					return;
-				}
-
-				// OK, GO TO NEXT PAGE
-
-				// clear any previous errors
-				final ImportExportPage page = (ImportExportPage) getPage();
-				page.clearFeedback();
-
-				// repaint panel
-				final ImportWizardModel importWizardModel = new ImportWizardModel();
-				importWizardModel.setProcessedGradeItems(processedGradeItems);
-				final Component newPanel = new GradeItemImportSelectionStep(GradeImportUploadStep.this.panelId, Model.of(importWizardModel));
-				newPanel.setOutputMarkupId(true);
-				GradeImportUploadStep.this.replaceWith(newPanel);*/
-
 			}
 
 		}

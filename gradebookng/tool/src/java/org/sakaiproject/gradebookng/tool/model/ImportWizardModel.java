@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItem;
 import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.gradebookng.business.model.ImportedSpreadsheetWrapper;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,13 @@ import lombok.Setter;
 public class ImportWizardModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	/**
+	* Spreadsheet wrapper containing column data from the imported file
+	**/
+	@Getter
+	@Setter
+	private ImportedSpreadsheetWrapper wrapper;
 
 	/**
 	 * List of items that have been uploaded

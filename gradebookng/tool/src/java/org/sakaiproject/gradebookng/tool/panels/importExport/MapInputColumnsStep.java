@@ -55,7 +55,7 @@ public class MapInputColumnsStep extends Panel {
 
 	private static final long serialVersionUID = 1L;
 	private final String panelId;
-	private final IModel<ColumnMap> model;
+	private final IModel<ImportWizardModel> model;
 	private Map<String, String> userMap;
 	private ImportedSpreadsheetWrapper spreadSheetWrapper;
 	private ListView<ColumnListItem> listItems;
@@ -70,7 +70,7 @@ public class MapInputColumnsStep extends Panel {
 	protected GradebookNgBusinessService businessService;
 
 
-	public MapInputColumnsStep(final String id, final IModel<ColumnMap> model) {
+	public MapInputColumnsStep(final String id, final IModel<ImportWizardModel> model) {
 		super(id);
 		panelId = id;
 		this.model = model;
@@ -81,8 +81,8 @@ public class MapInputColumnsStep extends Panel {
 	{
 		super.onInitialize();
 
-		final ColumnMap columnMap = this.model.getObject();
-		spreadSheetWrapper = columnMap.getWrapper();
+		final ImportWizardModel wizardModel = this.model.getObject();
+		spreadSheetWrapper = wizardModel.getWrapper();
 		importedColumns = spreadSheetWrapper.getColumns();
 		assignmentStringList = this.GenerateAssignmentList();
 		userMap = this.getUserMap();
@@ -503,29 +503,6 @@ class ColumnListItem implements Serializable {
 		}
 		return null;
 	}
-}
-
-class ColumnMap implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-
-	public ColumnMap(ImportedSpreadsheetWrapper spreadSheetWrapper, final List<String> errorsb) {
-		this.wrapper = spreadSheetWrapper;
-		this.errorStrings = errorsb;
-	}
-
-	public List<ImportedColumn> getColumnList()
-	{
-		return wrapper.getColumns();
-	}
-
-	@Getter
-	@Setter
-	private List<String> errorStrings;
-
-	@Getter
-	@Setter
-	private ImportedSpreadsheetWrapper wrapper;
 }
 
 

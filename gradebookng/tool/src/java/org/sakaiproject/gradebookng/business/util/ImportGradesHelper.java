@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,7 +13,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -49,8 +49,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ImportGradesHelper {
 
 	// column positions we care about. 0 is first column.
-	public final static int USER_ID_POS = 0;
-	public final static int USER_NAME_POS = 1;
+	public static int USER_ID_POS = 0;
+	public static int USER_NAME_POS = 1;
 
 	// patterns for detecting column headers and their types
 	final static Pattern ASSIGNMENT_WITH_POINTS_PATTERN = Pattern.compile("([^\\*\\[\\]\\*]+\\[[0-9]+(\\.[0-9][0-9]?)?\\])");
@@ -95,7 +95,20 @@ public class ImportGradesHelper {
 		return rval;
 	}
 
-	public static ImportedSpreadsheetWrapper parseStringLists(List<List<String>> inputList, final Map<String, String> userMap)
+	/**
+	 * parseImportedGradeFile will populate the ImportedSpreadsheetWrapper's rawData attribute (a list of string lists representing the actual file data)
+	 * The parseStringLists helper allows us to re-process this data after adjustments are made on the MapInputColumnsStep panel
+	 * @param inputList
+	 * @param userMap
+	 * @return
+	 * @throws GbImportExportInvalidColumnException
+	 * @throws GbImportExportInvalidFileTypeException
+	 * @throws GbImportExportDuplicateColumnException
+	 * @throws IOException
+	 * @throws InvalidFormatException
+	 */
+
+	public static ImportedSpreadsheetWrapper reParseStringLists(List<List<String>> inputList, final Map<String, String> userMap)
 	{
 		final ImportedSpreadsheetWrapper importedGradeWrapper = new ImportedSpreadsheetWrapper();
 		final List<ImportedRow> list = new ArrayList<ImportedRow>();
@@ -110,10 +123,8 @@ public class ImportGradesHelper {
 			importedGradeWrapper.addRawDataRow(nextLine);
 
 				if (lineCount == 0) {
-					// header row, capture it
 					mapping = mapHeaderRow(nextLine);
 				} else {
-					// map the fields into the object
 					final ImportedRow importedRow = mapLine(nextLine, mapping, userMap);
 					if(importedRow != null) {
 						list.add(importedRow);
@@ -221,6 +232,116 @@ public class ImportGradesHelper {
 		importedGradeWrapper.setColumns(new ArrayList<>(mapping.values()));
 		importedGradeWrapper.setRows(list);
 		return importedGradeWrapper;
+	}
+
+	/**
+	 * Takes a row of String[] data to determine the position of the columns so that we can correctly parse any arbitrary delimited file.
+	 * This is required because when we iterate over the rest of the lines, we need to know what the column header is, so we can take the appropriate action.
+	 *
+	 * Note that some columns are determined positionally
+	 *
+	 * @param line the already split line
+	 * @return LinkedHashMap to retain order
+	 * @throws GbImportExportInvalidColumnException if a column doesn't map to any known format
+	 * @throws GbImportExportDuplicateColumnException if there are duplicate column headers
+	 */
+	private static Map<Integer, ImportedColumn> mapHeaderRow(final String[] line) throws GbImportExportInvalidColumnException, GbImportExportDuplicateColumnException {
+
+		// retain order
+		final Map<Integer, ImportedColumn> mapping = new LinkedHashMap<Integer, ImportedColumn>();
+
+		for (int i = 0; i < line.length; i++) {
+
+			ImportedColumn column = new ImportedColumn();
+			column.setColumnTitle(line[i]);
+			if(i == USER_ID_POS) {
+				column.setType(ImportedColumn.Type.USER_ID);
+			} else if(i == USER_NAME_POS) {
+				column.setType(ImportedColumn.Type.USER_NAME);
+			} else {
+				column = parseHeaderToColumn(trim(line[i]));
+			}
+
+			column.setUnparsedTitle(line[i]);
+			// check for duplicates
+			if(mapping.values().contains(column)) {
+				WarningsList.add("Duplicate column header: " + column.getColumnTitle());
+			}
+
+			mapping.put(i, column);
+		}
+
+		return mapping;
+	}
+
+	/**
+	 * Helper to parse the header row into an {@link ImportedColumn}
+	 * @param headerValue
+	 * @return the mapped column or null if ignoring.
+	 * @throws GbImportExportInvalidColumnException if columns didn't match any known pattern
+	 */
+	private static ImportedColumn parseHeaderToColumn(final String headerValue) throws GbImportExportInvalidColumnException {
+
+		//NOTE: Special characters in the GB Item name will currently throw this parser off
+		if(StringUtils.isBlank(headerValue)) {
+			throw new GbImportExportInvalidColumnException("Invalid column header: " + headerValue);
+		}
+
+		log.debug("headerValue: " + headerValue);
+
+		final ImportedColumn column = new ImportedColumn();
+
+		// assignment with points header
+		final Matcher m1 = ASSIGNMENT_WITH_POINTS_PATTERN.matcher(headerValue);
+		if (m1.matches()) {
+			// extract title and score
+			final Matcher titleMatcher = STANDARD_HEADER_PATTERN.matcher(headerValue);
+			final Matcher pointsMatcher = POINTS_PATTERN.matcher(headerValue);
+
+			if (titleMatcher.find()) {
+				column.setColumnTitle(trim(titleMatcher.group()));
+			}
+			if (pointsMatcher.find()) {
+				column.setPoints(pointsMatcher.group());
+			}
+
+			column.setType(ImportedColumn.Type.GB_ITEM_WITH_POINTS);
+
+			return column;
+		}
+
+		final Matcher m2 = ASSIGNMENT_COMMENT_PATTERN.matcher(headerValue);
+		if (m2.matches()) {
+			// extract title
+			final Matcher titleMatcher = STANDARD_HEADER_PATTERN.matcher(headerValue);
+
+			if (titleMatcher.find()) {
+				column.setColumnTitle(trim(titleMatcher.group()));
+			}
+			column.setType(ImportedColumn.Type.COMMENTS);
+
+			return column;
+		}
+
+		final Matcher m3 = STANDARD_HEADER_PATTERN.matcher(headerValue);
+		if (m3.matches()) {
+			column.setColumnTitle(headerValue);
+			column.setType(ImportedColumn.Type.GB_ITEM_WITHOUT_POINTS);
+
+			return column;
+		}
+
+		final Matcher m4 = IGNORE_PATTERN.matcher(headerValue);
+		if (m4.matches()) {
+			column.setType(ImportedColumn.Type.IGNORE);
+			return column;
+		}
+
+		// if we got here, couldn't parse the column header, throw an error
+		WarningsList.add("Invalid column header: " + headerValue);
+		column.setType(ImportedColumn.Type.IGNORE);
+		return column;
+
 	}
 
 	/**
@@ -399,11 +520,6 @@ public class ImportGradesHelper {
 			}
 		}
 
-		// for (ImportedRow myRow : spreadsheetWrapper.getRows())
-		// {
-		// 	log.info(myRow.PrintRow());
-		// }
-
 		// get just a list
 		final List<ProcessedGradeItem> processedGradeItems = new ArrayList<>(assignmentProcessedGradeItemMap.values());
 
@@ -423,6 +539,11 @@ public class ImportGradesHelper {
 
 		return processedGradeItems;
 
+	}
+
+	public static void setUserInfoPositions(final int userIdPosition, final int userNamePosition) {
+		USER_ID_POS = userIdPosition;
+		USER_NAME_POS = userNamePosition;
 	}
 
 	/**
@@ -527,119 +648,6 @@ public class ImportGradesHelper {
 		}
 
 		return assignmentMap;
-	}
-
-	/**
-	 * Takes a row of String[] data to determine the position of the columns so that we can correctly parse any arbitrary delimited file.
-	 * This is required because when we iterate over the rest of the lines, we need to know what the column header is, so we can take the appropriate action.
-	 *
-	 * Note that some columns are determined positionally
-	 *
-	 * @param line the already split line
-	 * @return LinkedHashMap to retain order
-	 * @throws GbImportExportInvalidColumnException if a column doesn't map to any known format
-	 * @throws GbImportExportDuplicateColumnException if there are duplicate column headers
-	 */
-	private static Map<Integer, ImportedColumn> mapHeaderRow(final String[] line) throws GbImportExportInvalidColumnException, GbImportExportDuplicateColumnException {
-
-		// retain order
-		final Map<Integer, ImportedColumn> mapping = new LinkedHashMap<Integer, ImportedColumn>();
-
-		for (int i = 0; i < line.length; i++) {
-
-			ImportedColumn column = new ImportedColumn();
-			column.setUnparsedTitle(line[i]);
-			log.warn("i: " + i);
-			log.warn("line[i]: " + line[i]);
-
-			if(i == USER_ID_POS) {
-				column.setType(ImportedColumn.Type.USER_ID);
-			} else if(i == USER_NAME_POS) {
-				column.setType(ImportedColumn.Type.USER_NAME);
-			} else {
-				column = parseHeaderToColumn(trim(line[i]));
-			}
-
-			// check for duplicates
-			if(mapping.values().contains(column)) {
-				WarningsList.add("Duplicate column header: " + column.getColumnTitle());
-			}
-
-			mapping.put(i, column);
-		}
-
-		return mapping;
-	}
-
-	/**
-	 * Helper to parse the header row into an {@link ImportedColumn}
-	 * @param headerValue
-	 * @return the mapped column or null if ignoring.
-	 * @throws GbImportExportInvalidColumnException if columns didn't match any known pattern
-	 */
-	private static ImportedColumn parseHeaderToColumn(final String headerValue) throws GbImportExportInvalidColumnException {
-
-		//NOTE: Special characters in the GB Item name will currently throw this parser off
-		if(StringUtils.isBlank(headerValue)) {
-			throw new GbImportExportInvalidColumnException("Invalid column header: " + headerValue);
-		}
-
-		log.warn("headerValue: " + headerValue);
-
-		final ImportedColumn column = new ImportedColumn();
-		column.setUnparsedTitle(headerValue);
-
-		// assignment with points header
-		final Matcher m1 = ASSIGNMENT_WITH_POINTS_PATTERN.matcher(headerValue);
-		if (m1.matches()) {
-			// extract title and score
-			final Matcher titleMatcher = STANDARD_HEADER_PATTERN.matcher(headerValue);
-			final Matcher pointsMatcher = POINTS_PATTERN.matcher(headerValue);
-
-			if (titleMatcher.find()) {
-				column.setColumnTitle(trim(titleMatcher.group()));
-			}
-			if (pointsMatcher.find()) {
-				column.setPoints(pointsMatcher.group());
-			}
-
-			column.setType(ImportedColumn.Type.GB_ITEM_WITH_POINTS);
-
-			return column;
-		}
-
-		final Matcher m2 = ASSIGNMENT_COMMENT_PATTERN.matcher(headerValue);
-		if (m2.matches()) {
-			// extract title
-			final Matcher titleMatcher = STANDARD_HEADER_PATTERN.matcher(headerValue);
-
-			if (titleMatcher.find()) {
-				column.setColumnTitle(trim(titleMatcher.group()));
-			}
-			column.setType(ImportedColumn.Type.COMMENTS);
-
-			return column;
-		}
-
-		final Matcher m3 = STANDARD_HEADER_PATTERN.matcher(headerValue);
-		if (m3.matches()) {
-			column.setColumnTitle(headerValue);
-			column.setType(ImportedColumn.Type.GB_ITEM_WITHOUT_POINTS);
-
-			return column;
-		}
-
-		final Matcher m4 = IGNORE_PATTERN.matcher(headerValue);
-		if (m4.matches()) {
-			column.setType(ImportedColumn.Type.IGNORE);
-			return column;
-		}
-
-		// if we got here, couldn't parse the column header, throw an error
-		WarningsList.add("Invalid column header: " + headerValue);
-		column.setType(ImportedColumn.Type.IGNORE);
-		return column;
-
 	}
 
 	/**

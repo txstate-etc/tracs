@@ -96,9 +96,9 @@ public class GradeImportUploadStep extends Panel {
 
 				// get all users
 				final Map<String, String> userMap = getUserMap();
-
+				// reset our user id and name columns to defaults
+				ImportGradesHelper.setUserInfoPositions(0, 1);
 				// turn file into list
-				// TODO would be nice to capture the values from these exceptions
 				ImportedSpreadsheetWrapper spreadsheetWrapper = null;
 				try {
 					spreadsheetWrapper = ImportGradesHelper.parseImportedGradeFile(upload.getInputStream(), upload.getContentType(), upload.getClientFileName(), userMap);

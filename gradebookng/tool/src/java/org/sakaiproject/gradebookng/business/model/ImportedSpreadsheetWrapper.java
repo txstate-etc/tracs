@@ -57,12 +57,4 @@ public class ImportedSpreadsheetWrapper implements Serializable {
 	{
 		rawData.add(Arrays.asList(stringArray));
 	}
-
-	public void swapRawDataColumns(int col1, int col2)
-	{
-		for(List<String> raw : rawData) {
-			Collections.swap(raw, col1, col2);
-		}
-	}
-
 }

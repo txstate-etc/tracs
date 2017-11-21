@@ -215,7 +215,7 @@ public class GradeItemImportSelectionStep extends Panel {
 				final ImportExportPage page = (ImportExportPage) getPage();
 				page.clearFeedback();
 
-				final Component newPanel = new GradeImportUploadStep(GradeItemImportSelectionStep.this.panelId);
+				final Component newPanel = new MapInputColumnsStep(GradeItemImportSelectionStep.this.panelId, GradeItemImportSelectionStep.this.model);
 				newPanel.setOutputMarkupId(true);
 				GradeItemImportSelectionStep.this.replaceWith(newPanel);
 			}
@@ -273,17 +273,11 @@ public class GradeItemImportSelectionStep extends Panel {
     			});
 				detailButton.setOutputMarkupId(true);
 
-				//final Label detailLabel = new Label("itemDetails", changeString);
-				//detailLabel.setOutputMarkupId(true);
-				//detailLabel.setOutputMarkupPlaceholderTag(true);
-
 				item.add(checkbox);
 				item.add(itemTitle);
 				item.add(itemPointValue);
 				item.add(itemStatus);
 				item.add(detailButton);
-				//item.add(detailLabel);
-				
 
 				// Determine status label
 				final ProcessedGradeItemStatus status = importedItem.getStatus();
@@ -312,42 +306,7 @@ public class GradeItemImportSelectionStep extends Panel {
 				if (naString.equals(item.getModelObject().getItemPointValue())) {
 					item.add(new AttributeAppender("class", Model.of("comment"), " "));
 				}
-
-				//// add an additional row for the comments for each
-				//final ProcessedGradeItemStatus commentStatus = importedItem.getCommentStatus();
-
-				// item.add(new Behavior() {
-				// 	private static final long serialVersionUID = 1L;
-
-				// 	@Override
-				// 	public void afterRender(final Component component) {
-				// 		super.afterRender(component);
-				// 		if (importedItem.getType() == ProcessedGradeItem.Type.COMMENT) {
-				// 			String rowClass = "comment";
-				// 			String statusValue = getString("importExport.status." + commentStatus.getStatusCode());
-				// 			if (commentStatus.getStatusCode() == ProcessedGradeItemStatus.STATUS_EXTERNAL) {
-				// 				rowClass += " external";
-				// 				statusValue = new StringResourceModel("importExport.status." + commentStatus.getStatusCode(), Model.of(commentStatus), null, commentStatus.getStatusValue()).getString();
-				// 			}
-				// 			if (commentStatus.getStatusCode() == ProcessedGradeItemStatus.STATUS_NA) {
-				// 				rowClass += " no_changes";
-				// 			}
-
-				// 			component.getResponse().write(
-				// 					"<tr class=\"" + rowClass + "\">" +
-				// 							"<td></td>" +
-				// 							"<td class=\"item_title\">" + getString("importExport.commentname") + "</td>" +
-				// 							"<td class=\"item_points\">" + naString + "</td>" +
-				// 							"<td class=\"item_status\">" + statusValue + "</td>" +
-				// 							"</tr>"
-
-				// 			);
-				// 		}
-				// 	}
-				// });
-
 			}
-
 		};
 
 		gradeList.setReuseItems(true);

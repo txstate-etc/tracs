@@ -18,7 +18,7 @@ import lombok.Setter;
 public class ImportedColumn implements Serializable {
 	
 	public ImportedColumn(String title, String points, Type type) {
-		columnTitle = unparsedTitle = title;
+		columnTitle = title;
 		this.points = points;
 		this.type = type;
 	}

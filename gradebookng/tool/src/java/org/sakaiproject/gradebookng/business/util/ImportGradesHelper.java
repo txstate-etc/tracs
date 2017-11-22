@@ -66,6 +66,7 @@ public class ImportGradesHelper {
 	private static final String[] CSV_FILE_EXTS = { ".csv", ".txt" };
 
 	public static List<String> WarningsList;
+	public static String[] HeadersFromInputFile;
 
 	/**
 	 * Helper to parse the imported file into an {@link ImportedSpreadsheetWrapper} depending on its type
@@ -123,6 +124,8 @@ public class ImportGradesHelper {
 			importedGradeWrapper.addRawDataRow(nextLine);
 
 				if (lineCount == 0) {
+					// This is not a new file. We are re-processing a previous file's data
+					// Therefore, do not set HeadersFromInputFile here
 					mapping = mapHeaderRow(nextLine);
 				} else {
 					final ImportedRow importedRow = mapLine(nextLine, mapping, userMap);
@@ -165,6 +168,7 @@ public class ImportGradesHelper {
 
 				if (lineCount == 0) {
 					// header row, capture it
+					HeadersFromInputFile = nextLine.clone();
 					mapping = mapHeaderRow(nextLine);
 				} else {
 					// map the fields into the object
@@ -218,6 +222,7 @@ public class ImportGradesHelper {
 
 			if (lineCount == 0) {
 				// header row, capture it
+				HeadersFromInputFile = r.clone();
 				mapping = mapHeaderRow(r);
 			} else {
 				// map the fields into the object
@@ -262,7 +267,7 @@ public class ImportGradesHelper {
 				column = parseHeaderToColumn(trim(line[i]));
 			}
 
-			column.setUnparsedTitle(line[i]);
+			column.setUnparsedTitle(HeadersFromInputFile[i]);
 			// check for duplicates
 			if(mapping.values().contains(column)) {
 				WarningsList.add("Duplicate column header: " + column.getColumnTitle());
@@ -281,10 +286,8 @@ public class ImportGradesHelper {
 	 * @throws GbImportExportInvalidColumnException if columns didn't match any known pattern
 	 */
 	private static ImportedColumn parseHeaderToColumn(final String headerValue) throws GbImportExportInvalidColumnException {
-
-		//NOTE: Special characters in the GB Item name will currently throw this parser off
 		if(StringUtils.isBlank(headerValue)) {
-			throw new GbImportExportInvalidColumnException("Invalid column header: " + headerValue);
+			throw new GbImportExportInvalidColumnException("Blank or null column header found");
 		}
 
 		log.debug("headerValue: " + headerValue);

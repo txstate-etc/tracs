@@ -128,7 +128,7 @@ public class MapInputColumnsStep extends Panel {
 				listViewData.add(new ColumnListItem(ic, columnTypeList, assignmentStringList));
 			}
 
-			IChoiceRenderer assignmentRender = new IChoiceRenderer() {
+			IChoiceRenderer defaultRenderer = new IChoiceRenderer() {
 				public Object getDisplayValue(Object object) {
 					return (String)object;
 				}
@@ -137,16 +137,6 @@ public class MapInputColumnsStep extends Panel {
 					return (String)object;
 				}
 
-			};
-
-			IChoiceRenderer columnTypeRender = new IChoiceRenderer() {
-				public Object getDisplayValue(Object object) {
-					return (String)object;
-				}
-
-				public String getIdValue(Object object, int index) {
-					return (String)object;
-				}
 			};
 
 			//ListView contains one ListItem per column. 
@@ -157,13 +147,13 @@ public class MapInputColumnsStep extends Panel {
 				public void populateItem(final ListItem<ColumnListItem> item) {
 					ColumnListItem newItem = item.getModelObject();
 
-					//Label with the Column Number and contents of the first cell
+					//Label with the Column Number and column header
 					Label columnDesc = new Label("columnLabel", String.format("* Column %d (%s)", this.size(), newItem.getColumn().getUnparsedTitle()));
 					item.add(columnDesc);
 					
 					//Dropdown menu to select Column Type. The value determines visibility status of the next two controls
 					DropDownChoice ddcType = new DropDownChoice("columnType", Model.of(newItem.getColumn().getFriendlyType()), newItem.getColumnTypeList());
-					ddcType.setChoiceRenderer(columnTypeRender);
+					ddcType.setChoiceRenderer(defaultRenderer);
 					ddcType.add(new AjaxFormComponentUpdatingBehavior("onchange") {
 						@Override
 						protected void onUpdate(AjaxRequestTarget target) {
@@ -189,7 +179,7 @@ public class MapInputColumnsStep extends Panel {
 							return "Select One...";
 						}
 					};
-					ddcAssignment.setChoiceRenderer(assignmentRender);
+					ddcAssignment.setChoiceRenderer(defaultRenderer);
 					ddcAssignment.setOutputMarkupId(true);
 					ddcAssignment.setOutputMarkupPlaceholderTag(true);
 					ddcAssignment.setNullValid(true);
@@ -229,7 +219,6 @@ public class MapInputColumnsStep extends Panel {
 						}
 					};
         			pointsTextField.setStep(10L);
-        			pointsTextField.add(new NullNumberValidator());
         			pointsTextField.setOutputMarkupId(true);
         			pointsTextField.setOutputMarkupPlaceholderTag(true);
          			item.add(pointsTextField);
@@ -243,13 +232,11 @@ public class MapInputColumnsStep extends Panel {
 
             	@Override
            		public void onSubmit() {
-           			int studentIdIndex = 0;
-					int studentNameIndex = 1;
-					boolean valid = validateForm(listItems);
-					if (!valid) {
-						//Validation failed. Return and display the error messages added by the validateForm function
+           			if (!validateForm(listItems)) {
 						return;
 					}
+           			int studentIdIndex = 0;
+					int studentNameIndex = 1;
 					
                 	for(int i = 0; i < listItems.size(); i ++) {
                 		
@@ -365,21 +352,55 @@ public class MapInputColumnsStep extends Panel {
 		private boolean validateForm(ListView<ColumnListItem> listView) {
 			//TODO: Add more form validation here as needed
 			boolean returnVal = true;
+			boolean gradesNoAssignment = false;
+			boolean commentsNoAssignment = false;
 			int studentIdColumnCount = 0;
 			int studentNameColumnCount = 0;
+			List<String> gradeAssignmentsUsed = new ArrayList<String>();
+			List<String> commentAssignmentsUsed = new ArrayList<String>();
+
 			for(int i = 0; i < listView.size(); i ++) {
 				ListItem<ColumnListItem> listItem = (ListItem<ColumnListItem>)listView.get(i);
-				DropDownChoice columnType = (DropDownChoice)listItem.get("columnType");
-        		DropDownChoice columnAssignment = (DropDownChoice)listItem.get("columnAssignment");
-        		NumberTextField columnPoints = (NumberTextField)listItem.get("columnPoints");
-        		DropDownChoice columnNewAssignmentIndex = (DropDownChoice)listItem.get("columnNewAssignmentIndex");
-				switch(columnType.getValue()) {
+				String typeValue = ((DropDownChoice)listItem.get("columnType")).getValue();
+        		String assignmentValue = ((DropDownChoice)listItem.get("columnAssignment")).getValue();
+        		String points = ((NumberTextField)listItem.get("columnPoints")).getValue();
+        		Long assignmentIndex = Long.parseLong(((DropDownChoice)listItem.get("columnNewAssignmentIndex")).getValue());
+        		assignmentIndex++;
+        		String fullAssignmentName = assignmentValue == NEW_GB_ASSIGNMENT ? assignmentValue + " " + assignmentIndex : assignmentValue;
+
+				switch(typeValue) {
 					case "Student ID":
 						studentIdColumnCount++;
 						break;
 
 					case "Student Name":
 						studentNameColumnCount++;
+						break;
+
+					case "Grades":
+						if (fullAssignmentName == null || fullAssignmentName == "") {
+							gradesNoAssignment = true;
+							returnVal = false;
+							break;
+						}
+						if (gradeAssignmentsUsed.contains(fullAssignmentName)) {
+							error("More than one Grade column for " + fullAssignmentName);
+							returnVal = false;
+						}
+						gradeAssignmentsUsed.add(fullAssignmentName);
+						break;
+
+					case "Comments":
+					if (fullAssignmentName == null || fullAssignmentName == "") {
+							commentsNoAssignment = true;
+							returnVal = false;
+							break;
+						}
+						if (commentAssignmentsUsed.contains(fullAssignmentName)) {
+							error("More than one Comment column for " + fullAssignmentName);
+							returnVal = false;
+						}
+						commentAssignmentsUsed.add(fullAssignmentName);
 						break;
 				}
 			}
@@ -393,6 +414,9 @@ public class MapInputColumnsStep extends Panel {
 				error("One and only one Student Name column allowed");
 				returnVal = false;
 			}
+
+			if (gradesNoAssignment) error("All Grade columns must have an assignment selected");
+			if (commentsNoAssignment) error("All Comment columns must have an assignment selected");
 
 			return returnVal;
 		}
@@ -461,13 +485,6 @@ public class MapInputColumnsStep extends Panel {
                         break;
                }              
            }
-
-	}
-}
-
-class NullNumberValidator implements INullAcceptingValidator<Long> {
-	@Override
-	public void validate(IValidatable<Long> validatable) {
 
 	}
 }

@@ -226,6 +226,7 @@ public class MapInputColumnsStep extends Panel {
          			setListItemVisibility(item);
 				}	
 			};
+			listItems.setReuseItems(true);
 			add(listItems);
 
 			final Button submit = new Button("continuebutton") {

@@ -3,8 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://www.sakaiproject.org/samigo" prefix="samigo" %>
 <%@ taglib uri="http://sakaiproject.org/jsf/sakai" prefix="sakai" %>
-<script src="/library/webjars/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
-<script src="/library/js/expandCollapse.js" type="text/javascript"></script>
+<!-- <script src="/library/webjars/jquery/1.11.3/jquery.min.js" type="text/javascript"></script> -->
 
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -42,6 +41,7 @@
 			}
 		</style>
         <script src="/library/js/spinner.js" type="text/javascript"></script>
+        <script src="/library/js/expandCollapse.js" type="text/javascript"></script>
 <%@ include file="/js/delivery.js" %>
 
 <script type="text/javascript">
@@ -316,6 +316,8 @@ $(document).ready(function(){
 	<sakai:pager id="pager2" totalItems="#{totalScores.dataRows}" firstItem="#{totalScores.firstRow}" pageSize="#{totalScores.maxDisplayedRows}" textStatus="#{evaluationMessages.paging_status}" />
   </h:panelGroup>
 </h:panelGroup>
+
+<div class="hideUnhide" style="padding-left: 5px;"><a id="collapseAll" href="#">Hide</a> | <a id="expandAll" href="#">Show</a>  Inactive Participants </div>
 
   <!-- STUDENT RESPONSES AND GRADING -->
   <!-- note that we will have to hook up with the back end to get N at a time -->

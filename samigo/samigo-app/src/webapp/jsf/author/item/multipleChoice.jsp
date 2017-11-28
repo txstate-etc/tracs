@@ -261,7 +261,7 @@
   </h:commandLink>		 
 
   <!-- if single correct, use radiobuttons -->
-  <h:selectOneRadio onclick="uncheckOthers(this);" onkeypress="uncheckOthers(this);" id="mcradiobtn"
+  <h:selectOneRadio onclick="uncheckOthers(this);" id="mcradiobtn"
 	layout="pageDirection"
 	value="#{itemauthor.currentItem.corrAnswer}"
 	rendered="#{itemauthor.currentItem.itemType == 1}">

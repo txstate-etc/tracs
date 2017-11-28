@@ -207,17 +207,17 @@ $(document).ready(function(){
 
 <script>
 	$(document).ready(function(){
-		$("a.sam-scoretable-deleteattempt").each(function(){
-			this.existingOnclick = this.onclick;
-			this.onclick = null;
-			$(this).click(function(){
-				if ( confirm("Are you sure you want to delete this attempt?") ) {
-					this.existingOnclick();
-				} else {
-					return false;
-				}
-			});
-		});
+		// $("a.sam-scoretable-deleteattempt").each(function(){
+		// 	this.existingOnclick = this.onclick;
+		// 	this.onclick = null;
+		// 	$(this).click(function(){
+		// 		if ( confirm("Are you sure you want to delete this attempt?") ) {
+		// 			this.existingOnclick();
+		// 		} else {
+		// 			return false;
+		// 		}
+		// 	});
+		// });
 		$("tr.inactivePar").css("display","none");
 	});
 </script>

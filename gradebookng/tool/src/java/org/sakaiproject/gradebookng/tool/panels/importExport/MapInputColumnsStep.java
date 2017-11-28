@@ -39,14 +39,11 @@ import org.sakaiproject.gradebookng.business.model.GbStudentGradeInfo;
 import org.sakaiproject.gradebookng.business.model.ImportedSpreadsheetWrapper;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItem;
 import org.sakaiproject.gradebookng.business.util.ImportGradesHelper;
+import org.sakaiproject.gradebookng.business.util.MessageHelper;
 import org.sakaiproject.gradebookng.tool.model.ImportWizardModel;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.gradebookng.business.exception.GbImportCommentMissingItemException;
-import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.model.Model;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -393,7 +390,7 @@ public class MapInputColumnsStep extends Panel {
 							break;
 						}
 						if (gradeAssignmentsUsed.contains(fullAssignmentName)) {
-							error("More than one Grade column for " + fullAssignmentName);
+							error(MessageHelper.getString("importExport.mapping.duplicategrade", fullAssignmentName));
 							returnVal = false;
 						}
 						gradeAssignmentsUsed.add(fullAssignmentName);
@@ -406,7 +403,7 @@ public class MapInputColumnsStep extends Panel {
 							break;
 						}
 						if (commentAssignmentsUsed.contains(fullAssignmentName)) {
-							error("More than one Comment column for " + fullAssignmentName);
+							error(MessageHelper.getString("importExport.mapping.duplicatecomment", fullAssignmentName));
 							returnVal = false;
 						}
 						commentAssignmentsUsed.add(fullAssignmentName);
@@ -415,17 +412,17 @@ public class MapInputColumnsStep extends Panel {
 			}
 
 			if (studentIdColumnCount != 1) {
-				error("One and only one Student ID column allowed");
+				error(MessageHelper.getString("importExport.mapping.duplicateid"));
 				returnVal = false;
 			}
 
 			if (studentNameColumnCount > 1) {
-				error("One and only one Student Name column allowed");
+				error(MessageHelper.getString("importExport.mapping.duplicatename"));
 				returnVal = false;
 			}
 
-			if (gradesNoAssignment) error("All Grade columns must have an assignment selected");
-			if (commentsNoAssignment) error("All Comment columns must have an assignment selected");
+			if (gradesNoAssignment) error(MessageHelper.getString("importExport.mapping.noassignment-grade"));
+			if (commentsNoAssignment) error(MessageHelper.getString("importExport.mapping.noassignment-comment"));
 
 			return returnVal;
 		}

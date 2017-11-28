@@ -15,6 +15,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
 import org.sakaiproject.gradebookng.tool.component.GbFeedbackPanel;
@@ -26,6 +27,10 @@ import org.sakaiproject.service.gradebook.shared.ConflictingAssignmentNameExcept
 import org.sakaiproject.service.gradebook.shared.ConflictingExternalIdException;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.tool.gradebook.Gradebook;
+
+import org.sakaiproject.gradebookng.tool.model.GbModalWindow;
+import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
+import org.sakaiproject.gradebookng.tool.model.RescaleAnswer;
 
 /**
  * The panel for the add and edit grade item window
@@ -41,6 +46,8 @@ public class AddOrEditGradeItemPanel extends Panel {
 	protected GradebookNgBusinessService businessService;
 
 	IModel<Long> model;
+
+	protected RescaleAnswer rescaleAnswer;
 
 	/**
 	 * How this panel is rendered
@@ -66,10 +73,12 @@ public class AddOrEditGradeItemPanel extends Panel {
 		// setup the backing object
 		Assignment assignment;
 
+		final GbGradingType gradeType = GbGradingType.valueOf(this.businessService.getGradebook().getGrade_type());
+
 		if (this.mode == Mode.EDIT) {
 			final Long assignmentId = this.model.getObject();
 			assignment = this.businessService.getAssignment(assignmentId);
-
+			rescaleAnswer = new RescaleAnswer(null);
 			// TODO if we are in edit mode and don't have an assignment, need to error here
 
 		} else {
@@ -134,15 +143,47 @@ public class AddOrEditGradeItemPanel extends Panel {
 				// OK
 				if (validated) {
 					if (AddOrEditGradeItemPanel.this.mode == Mode.EDIT) {
+						Assignment currentAssignment = AddOrEditGradeItemPanel.this.businessService.getAssignment(assignment.getId());
+						double oldPointValue = currentAssignment.getPoints();
+						double newPointValue = assignment.getPoints();
+						if(gradeType == GbGradingType.POINTS && newPointValue != oldPointValue){
+							final GradebookPage gradebookPage = (GradebookPage) getPage();
+							final GbModalWindow window = gradebookPage.getRescalePointsWindow();
+							window.setTitle(new ResourceModel("label.editgradeitem.doRecalculatePointsTitle"));
+							window.setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
+								public void onClose(AjaxRequestTarget target) {
+									if ("cancel" == rescaleAnswer.getAnswer()) {
+										window.close(target);
+									}
+									else if ("no" == rescaleAnswer.getAnswer() || "yes" == rescaleAnswer.getAnswer()) {
+										final boolean success = AddOrEditGradeItemPanel.this.businessService.updateAssignment(assignment);
+										if (success) {
+											if("yes" == rescaleAnswer.getAnswer()) {
+												final boolean scaleSuccess = AddOrEditGradeItemPanel.this.businessService.rescaleGrades(assignment.getId(), oldPointValue, newPointValue);
+											}
+											getSession().success(MessageFormat.format(getString("message.edititem.success"), assignment.getName()));
+											setResponsePage(getPage().getPageClass());
+										} else {
+											error(new ResourceModel("message.edititem.error").getObject());
+											target.addChildren(form, FeedbackPanel.class);
+										}
+									}
+								} 
+							});
+							window.setContent(new RescalePointsPanel(window.getContentId(), window, rescaleAnswer));
+							window.showUnloadConfirmation(false);
+							window.show(target);
+						}
+						else {
+							final boolean success = AddOrEditGradeItemPanel.this.businessService.updateAssignment(assignment);
 
-						final boolean success = AddOrEditGradeItemPanel.this.businessService.updateAssignment(assignment);
-
-						if (success) {
-							getSession().success(MessageFormat.format(getString("message.edititem.success"), assignment.getName()));
-							setResponsePage(getPage().getPageClass());
-						} else {
-							error(new ResourceModel("message.edititem.error").getObject());
-							target.addChildren(form, FeedbackPanel.class);
+							if (success) {
+								getSession().success(MessageFormat.format(getString("message.edititem.success"), assignment.getName()));
+								setResponsePage(getPage().getPageClass());
+							} else {
+								error(new ResourceModel("message.edititem.error").getObject());
+								target.addChildren(form, FeedbackPanel.class);
+							}
 						}
 
 					} else {
@@ -220,4 +261,5 @@ public class AddOrEditGradeItemPanel extends Panel {
 			return new ResourceModel("button.create");
 		}
 	}
+
 }

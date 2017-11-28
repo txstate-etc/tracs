@@ -86,6 +86,7 @@ public class GradebookPage extends BasePage {
 	public static final String UNCATEGORISED = "gradebookpage.uncategorised";
 
 	GbModalWindow addOrEditGradeItemWindow;
+	GbModalWindow rescalePointsWindow;
 	GbModalWindow studentGradeSummaryWindow;
 	GbModalWindow updateUngradedItemsWindow;
 	GbModalWindow gradeLogWindow;
@@ -145,6 +146,10 @@ public class GradebookPage extends BasePage {
 		this.addOrEditGradeItemWindow = new GbModalWindow("addOrEditGradeItemWindow");
 		this.addOrEditGradeItemWindow.showUnloadConfirmation(false);
 		this.form.add(this.addOrEditGradeItemWindow);
+
+		this.rescalePointsWindow = new GbModalWindow("rescalePointsWindow");
+		this.rescalePointsWindow.showUnloadConfirmation(false);
+		this.form.add(this.rescalePointsWindow);
 
 		this.addScalePointsWindow = new GbModalWindow("addScalePointsWindow");
 		this.addScalePointsWindow.showUnloadConfirmation(false);
@@ -705,6 +710,10 @@ public class GradebookPage extends BasePage {
 	 */
 	public GbModalWindow getAddOrEditGradeItemWindow() {
 		return this.addOrEditGradeItemWindow;
+	}
+
+	public GbModalWindow getRescalePointsWindow() {
+		return this.rescalePointsWindow;
 	}
 
 	public GbModalWindow getStudentGradeSummaryWindow() {

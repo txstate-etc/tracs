@@ -56,6 +56,10 @@ public class ProcessedGradeItemDetail implements Serializable {
 		return previousComment == null ? comment != null : !previousComment.equals(comment);
 	}
 
+	public boolean hasAnyChange() {
+		return hasCommentChange() || hasGradeChange();
+	}
+
 	public String PrintDetail() {
 		String returnVal = "";
 		String scoreString = previousGrade == null ? "-" : previousGrade;

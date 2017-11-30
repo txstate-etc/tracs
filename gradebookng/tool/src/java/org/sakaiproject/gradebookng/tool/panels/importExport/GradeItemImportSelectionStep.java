@@ -22,7 +22,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
@@ -44,6 +44,7 @@ public class GradeItemImportSelectionStep extends Panel {
 
 	private final String panelId;
 	private final IModel<ImportWizardModel> model;
+	private ListView<ProcessedGradeItemDetail> changeDetails;
 
 	// a count of the items that can be selected
 	private int selectableItems = 0;
@@ -69,13 +70,8 @@ public class GradeItemImportSelectionStep extends Panel {
 			}
 		}
 
-		//if (gradeChanges != 0) {
-			returnString += String.format("%d %s", gradeChanges, gradeChanges == 1 ? "grade " : "grades ");
-		//}
-
-		//if (commentChanges != 0) {
-			returnString += String.format("%d %s", commentChanges, commentChanges == 1 ? "comment " : "comments ");
-		//}
+		returnString += String.format("%d %s", gradeChanges, gradeChanges == 1 ? "grade " : "grades ");
+		returnString += String.format("%d %s", commentChanges, commentChanges == 1 ? "comment " : "comments ");
 
 		return returnString;
 	}
@@ -134,11 +130,32 @@ public class GradeItemImportSelectionStep extends Panel {
 		};
 		add(hideNoChanges);
 
-		TextArea textArea = new TextArea<String>("detailsArea", Model.of(""));
-		textArea.setOutputMarkupId(true);
-		textArea.setOutputMarkupPlaceholderTag(true);
-		textArea.setVisible(false);
-		add(textArea);
+		final WebMarkupContainer detailsTablePanel = new WebMarkupContainer("detailsTable");
+		detailsTablePanel.setOutputMarkupId(true);
+		detailsTablePanel.setOutputMarkupPlaceholderTag(true);
+
+		changeDetails = new ListView<ProcessedGradeItemDetail>("gradeChangeDetail") {
+			@Override
+			protected void populateItem(final ListItem<ProcessedGradeItemDetail> itemDetail) {
+				ProcessedGradeItemDetail itemModel = itemDetail.getModelObject();
+				itemDetail.add(new Label("studentDetail", itemModel.getStudentEid()));
+
+				String gradeChangeString = String.format("%s => %s", 
+					itemModel.getPreviousGrade() == null ? "-" : itemModel.getPreviousGrade(), 
+					itemModel.getGrade() == null ? "-" : itemModel.getGrade());
+				itemDetail.add(new Label("gradeDetail", itemModel.hasGradeChange() ? gradeChangeString : "-"));
+
+				String commentChangeString = String.format("%s => %s", 
+					itemModel.getPreviousComment() == null ? "-" : itemModel.getPreviousComment(), 
+					itemModel.getComment() == null ? "-" : itemModel.getComment());
+				itemDetail.add(new Label("commentDetail", itemModel.hasCommentChange() ? commentChangeString : "-"));
+			}
+		};
+		changeDetails.setOutputMarkupId(true);
+		changeDetails.setOutputMarkupPlaceholderTag(true);
+		detailsTablePanel.add(changeDetails);
+		detailsTablePanel.setVisible(false);
+		add(detailsTablePanel);
 
 		final CheckGroup<ProcessedGradeItem> group = new CheckGroup<ProcessedGradeItem>("group", new ArrayList<ProcessedGradeItem>());
 
@@ -241,6 +258,7 @@ public class GradeItemImportSelectionStep extends Panel {
 		group.add(new Button("nextbutton"));
 
 		group.add(new CheckGroupSelector("groupselector"));
+
 		final ListView<ProcessedGradeItem> gradeList = new ListView<ProcessedGradeItem>("grades", importWizardModel.getProcessedGradeItems()) {
 			private static final long serialVersionUID = 1L;
 
@@ -259,16 +277,17 @@ public class GradeItemImportSelectionStep extends Panel {
         			@Override
         			protected void onEvent(final AjaxRequestTarget target) {
             			ListItem<ProcessedGradeItem> listItem = (ListItem<ProcessedGradeItem>)getComponent().getParent();
-            			ProcessedGradeItem processedItem = listItem.getModelObject();
-						String changeString = "";
-						for (ProcessedGradeItemDetail detail : processedItem.getProcessedGradeItemDetails()) {
-							if (detail.hasGradeChange() || detail.hasCommentChange()) {
-								changeString += detail.PrintDetail() + "\n";
-							}
-						}
-						textArea.setModelObject(changeString);
-						textArea.setVisible(true);
-						target.add(textArea);
+            			List<ProcessedGradeItemDetail> changedList = new ArrayList<ProcessedGradeItemDetail>();
+            			for (ProcessedGradeItemDetail detail : listItem.getModelObject().getProcessedGradeItemDetails()) {
+            				if (detail.hasAnyChange()) {
+            					changedList.add(detail);
+            				}
+            			}
+            			changeDetails.setList(changedList);
+
+            			WebMarkupContainer parentContainer = (WebMarkupContainer)changeDetails.getParent();
+            			parentContainer.setVisible(true);
+            			target.add(parentContainer);
         			}
     			});
 				detailButton.setOutputMarkupId(true);

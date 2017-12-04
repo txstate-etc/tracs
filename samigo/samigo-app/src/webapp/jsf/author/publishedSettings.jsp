@@ -66,7 +66,8 @@
               parseFormat: 'YYYY-MM-DD HH:mm:ss',
               allowEmptyDate: true,
               val: '<h:outputText value="#{publishedSettings.startDate}"><f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/></h:outputText>',
-              ashidden: { iso8601: 'startDateISO8601' }
+              ashidden: { iso8601: 'startDateISO8601' },
+              stepMinute: 1
           });
           localDatePicker({
               input: '#assessmentSettingsAction\\:endDate',
@@ -74,7 +75,8 @@
               parseFormat: 'YYYY-MM-DD HH:mm:ss',
               allowEmptyDate: true,
               val: '<h:outputText value="#{publishedSettings.dueDate}"><f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/></h:outputText>',
-              ashidden: { iso8601: 'endDateISO8601' }
+              ashidden: { iso8601: 'endDateISO8601' },
+              stepMinute: 1
           });
           localDatePicker({
               input: '#assessmentSettingsAction\\:retractDate',
@@ -82,7 +84,8 @@
               parseFormat: 'YYYY-MM-DD HH:mm:ss',
               allowEmptyDate: true,
               val: '<h:outputText value="#{publishedSettings.retractDate}"><f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/></h:outputText>',
-              ashidden: { iso8601: 'retractDateISO8601' }
+              ashidden: { iso8601: 'retractDateISO8601' },
+              stepMinute: 1
           });
           localDatePicker({
               input: '#assessmentSettingsAction\\:feedbackDate',
@@ -90,7 +93,8 @@
               parseFormat: 'YYYY-MM-DD HH:mm:ss',
               allowEmptyDate: true,
               val: '<h:outputText value="#{publishedSettings.feedbackDate}"><f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/></h:outputText>',
-              ashidden: { iso8601: 'feedbackDateISO8601' }
+              ashidden: { iso8601: 'feedbackDateISO8601' },
+              stepMinute: 1
           });
 
           // SAM-2121: Lockdown the question layout and mark for review if necessary

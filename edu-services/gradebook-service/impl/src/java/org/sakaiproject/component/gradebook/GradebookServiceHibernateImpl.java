@@ -1916,6 +1916,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		gradeDef.setDateRecorded(gradeRecord.getDateRecorded());
 		int gradeEntryType = gradebook.getGrade_type();
 		gradeDef.setGradeEntryType(gradeEntryType);
+		gradeDef.setExcludedFromGrade(gradeRecord.isExcludedFromGrade());
+		
 		String grade = null;
 		if (gradeEntryType == GradebookService.GRADE_TYPE_LETTER)
 		{

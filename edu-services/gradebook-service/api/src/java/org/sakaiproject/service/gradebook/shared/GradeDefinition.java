@@ -35,6 +35,7 @@ public class GradeDefinition {
 	private String gradeComment;
 	private int gradeEntryType;
 	private boolean gradeReleased;
+	private boolean excludedFromGrade;
 	
 	public String getStudentUid() {
 		return studentUid;
@@ -55,6 +56,14 @@ public class GradeDefinition {
 	}
 	public void setDateRecorded(Date dateRecorded) {
 		this.dateRecorded = dateRecorded;
+	}
+
+	public boolean getExcludedFromGrade() {
+		return excludedFromGrade;
+	}
+
+	public boolean setExcludedFromGrade(boolean excluded) {
+		this.excludedFromGrade = excluded;
 	}
 	
 	/**

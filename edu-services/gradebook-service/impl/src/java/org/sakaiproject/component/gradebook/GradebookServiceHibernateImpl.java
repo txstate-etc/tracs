@@ -2051,6 +2051,37 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
   }
 
   @Override
+  public void updateIsExcludedFromGradeForStudent(final String gradebookUid, final String studentUuid, final Long assignmentId, final boolean excludeFromGrade) {
+		//must be instructor type person
+		if (!currentUserHasEditPerm(gradebookUid)) {
+			log.error("AUTHORIZATION FAILURE: User " + getUserUid() + " in gradebook " + gradebookUid + " attempted to update course grade for student: " + studentUuid);
+			throw new SecurityException("You do not have permission to update course grades in " + gradebookUid);
+		}
+
+		final Gradebook gradebook = getGradebook(gradebookUid);
+		if(gradebook==null) {
+			throw new IllegalArgumentException("There is no gradebook associated with this id: " + gradebookUid);
+		}
+
+		//get assignment grade record
+		AssignmentGradeRecord assignmentGradeRecord = (AssignmentGradeRecord)getHibernateTemplate().execute(new HibernateCallback() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				Assignment assignment = getAssignmentWithoutStats(gradebookUid, assignmentId, session);
+				return getAssignmentGradeRecord(assignment, studentUuid, session);
+			}
+		});
+
+		if (null == assignmentGradeRecord) {
+			//Should not happen...
+		}
+		else {
+			assignmentGradeRecord.setExcludedFromGrade(excludeFromGrade);
+			getHibernateTemplate().saveOrUpdate(assignmentGradeRecord);
+		}
+  }
+
+  @Override
   public void saveGradeAndCommentForStudent(String gradebookUid, Long gradableObjectId, String studentUid, String grade, String comment) {
 	  if (gradebookUid == null || gradableObjectId == null || studentUid == null) {
 		  throw new IllegalArgumentException("Null gradebookUid or gradableObjectId or studentUid passed to saveGradeAndCommentForStudent");

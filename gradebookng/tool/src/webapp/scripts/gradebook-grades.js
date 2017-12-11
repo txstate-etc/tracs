@@ -1665,6 +1665,11 @@ GradebookEditableCell.prototype.setupMenu = function() {
     self.$cell.find(".dropdown-toggle").dropdown('toggle');
     return false;
   });
+  self.$cell.on("click", ".gb-excuse-grade", function() {
+    self.$input.trigger("excusegrade.sakai");
+    self.$cell.find(".dropdown-toggle").dropdown('toggle');
+    return false;
+  });
 };
 
 

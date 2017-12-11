@@ -26,7 +26,9 @@ public class GbGradeInfo implements Serializable, Comparable<GbGradeInfo> {
 	private final String gradeComment;
 
 	@Getter
+	@Setter
 	private final boolean excludedFromGrade;
+	// 
 
 	/**
 	 * Whether or not a user is able to grade this instance of the grade

@@ -62,7 +62,7 @@ public class GradeDefinition {
 		return excludedFromGrade;
 	}
 
-	public boolean setExcludedFromGrade(boolean excluded) {
+	public void setExcludedFromGrade(boolean excluded) {
 		this.excludedFromGrade = excluded;
 	}
 	

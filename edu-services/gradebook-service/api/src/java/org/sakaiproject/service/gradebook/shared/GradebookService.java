@@ -629,7 +629,10 @@ public interface GradebookService {
 	 * @throws SecurityException if current user is not authorized to grade student
 	 */
 	public void saveGradeAndCommentForStudent(String gradebookUid, Long assignmentId, String studentId, String grade, String comment)
-			throws InvalidGradeException, GradebookNotFoundException, AssessmentNotFoundException;
+		throws InvalidGradeException, GradebookNotFoundException, AssessmentNotFoundException;
+
+	public void updateIsExcludedFromGradeForStudent(final String gradebookUid, final String studentUuid, final Long assignmentId, final boolean excludeFromGrade)
+		throws InvalidGradeException, GradebookNotFoundException, AssessmentNotFoundException;
 	
 	/**
 	 * Given a list of GradeDefinitions for students for a given gradebook and gradable object,

@@ -1399,6 +1399,20 @@ public class GradebookNgBusinessService {
 		return false;
 	}
 
+	public boolean saveExcusedGrade(final Long assignmentId, final String studentUuid, final boolean excludeFromGrade) {
+		final String siteId = getCurrentSiteId();
+		final Gradebook gradebook = getGradebook(siteId);
+
+		try {
+			this.gradebookService.updateIsExcludedFromGradeForStudent(gradebook.getUid(), studentUuid, assignmentId, excludeFromGrade );
+			return true;
+		} catch (final Exception e) {
+			log.error("An error occurred updating isExcludedFromGrade flag", e);
+		}
+
+		return false;
+	}
+
 	/**
 	* Scale grades by adding a fixed pointValue to all students' grades for an assignment
 	*

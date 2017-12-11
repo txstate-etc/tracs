@@ -62,6 +62,7 @@ public class GradeItemCellPanel extends Panel {
 	String comment;
 	boolean gradeable;
 	boolean showMenu;
+	boolean excludedFromGrade;
 
 	GradeCellStyle baseGradeStyle = GradeCellStyle.NORMAL;
 	GradeCellSaveStyle gradeSaveStyle;
@@ -105,15 +106,14 @@ public class GradeItemCellPanel extends Panel {
 		// unpack model
 		this.modelData = this.model.getObject();
 		final Long assignmentId = (Long) this.modelData.get("assignmentId");
-		// final String assignmentName = (String) this.modelData.get("assignmentName");
 		final Double assignmentPoints = (Double) this.modelData.get("assignmentPoints");
 		final String studentUuid = (String) this.modelData.get("studentUuid");
-		// final String studentName = (String) this.modelData.get("studentName");
 		final Long categoryId = (Long) this.modelData.get("categoryId");
 		final boolean isExternal = (boolean) this.modelData.get("isExternal");
 		final GbGradeInfo gradeInfo = (GbGradeInfo) this.modelData.get("gradeInfo");
 		final GbRole role = (GbRole) this.modelData.get("role");
 		this.gradingType = (GbGradingType) this.modelData.get("gradingType");
+
 
 		if (this.gradingType == GbGradingType.PERCENTAGE) {
 			this.pointsLimit = 100;
@@ -124,13 +124,13 @@ public class GradeItemCellPanel extends Panel {
 		// Note: gradeInfo may be null
 		this.rawGrade = (gradeInfo != null) ? gradeInfo.getGrade() : "";
 		this.comment = (gradeInfo != null) ? gradeInfo.getGradeComment() : "";
-		this.gradeable = (gradeInfo != null) ? gradeInfo.isGradeable() : false; // ensure this is ALWAYS false if gradeInfo is null.
+		this.gradeable = (gradeInfo != null) ? gradeInfo.isGradeable() : false; 
+		this.excludedFromGrade = (gradeInfo != null) ? gradeInfo.isExcludedFromGrade() : false;
 
 		if (role == GbRole.INSTRUCTOR) {
 			this.gradeable = true;
 		}
 
-		// get grade
 		this.formattedGrade = FormatHelper.formatGrade(this.rawGrade);
 		
 		//TODO move this to the format helper?
@@ -422,6 +422,29 @@ public class GradeItemCellPanel extends Panel {
 					window.show(target);
 				}
 			});
+			this.gradeCell.add(new AjaxEventBehavior("excusegrade.sakai") {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				protected void onEvent(final AjaxRequestTarget target) {
+					boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, !excludedFromGrade);
+					if (success) {
+						excludedFromGrade = !excludedFromGrade;
+					}
+					// final GradebookPage gradebookPage = (GradebookPage) getPage();
+					// final GbModalWindow window = gradebookPage.getExcuseGradeWindow();
+
+					// final ExcuseGradePanel panel = new ExcuseGradePanel(window.getContentId(), GradeItemCellPanel.this.model, window);
+					// final GbUser user = businessService.getUser(studentUuid);
+					// window.setTitle((new StringResourceModel("heading.excusegrade", null,
+					// 	new Object[] { user.getDisplayName(), user.getDisplayId() })).getString());
+					// window.setContent(panel);
+					// window.showUnloadConfirmation(false);
+					// window.clearWindowClosedCallbacks();
+					// window.setComponentToReturnFocusTo(getParentCellFor(GradeItemCellPanel.this.gradeCell));
+					// window.show(target);
+				}
+			});
 
 			this.gradeCell.setOutputMarkupId(true);
 			add(this.gradeCell);
@@ -528,6 +551,7 @@ public class GradeItemCellPanel extends Panel {
 		NORMAL("gb-grade-item-cell"),
 		READONLY("gb-readonly-item-cell"),
 		EXTERNAL("gb-external-item-cell");
+		//EXCUSED("");
 
 		private String css;
 

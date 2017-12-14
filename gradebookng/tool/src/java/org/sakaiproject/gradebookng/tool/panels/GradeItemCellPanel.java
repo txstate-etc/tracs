@@ -157,6 +157,8 @@ public class GradeItemCellPanel extends Panel {
 			} else if (!this.gradeable) {
 				baseGradeStyle = GradeCellStyle.READONLY;
 				this.notifications.add(GradeCellNotification.READONLY);
+			} else if (this.excludedFromGrade) {
+				baseGradeStyle = GradeCellStyle.EXCLUDED;
 			}
 
 		} else {
@@ -426,23 +428,17 @@ public class GradeItemCellPanel extends Panel {
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				protected void onEvent(final AjaxRequestTarget target) {
+				//protected 
+				public void onEvent(final AjaxRequestTarget target) {
 					boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, !excludedFromGrade);
-					if (success) {
-						excludedFromGrade = !excludedFromGrade;
-					}
-					// final GradebookPage gradebookPage = (GradebookPage) getPage();
-					// final GbModalWindow window = gradebookPage.getExcuseGradeWindow();
-
-					// final ExcuseGradePanel panel = new ExcuseGradePanel(window.getContentId(), GradeItemCellPanel.this.model, window);
-					// final GbUser user = businessService.getUser(studentUuid);
-					// window.setTitle((new StringResourceModel("heading.excusegrade", null,
-					// 	new Object[] { user.getDisplayName(), user.getDisplayId() })).getString());
-					// window.setContent(panel);
-					// window.showUnloadConfirmation(false);
-					// window.clearWindowClosedCallbacks();
-					// window.setComponentToReturnFocusTo(getParentCellFor(GradeItemCellPanel.this.gradeCell));
-					// window.show(target);
+					// if (success) {
+					// 	//excludedFromGrade = !excludedFromGrade;
+					// 	target.add(getParentCellFor(GradeItemCellPanel.this.gradeCell));
+					// 	target.appendJavaScript("sakai.gradebookng.spreadsheet.setupCell('"
+					// 			+ getParentCellFor(GradeItemCellPanel.this.gradeCell).getMarkupId() + "','" + assignmentId + "', '"
+					// 			+ studentUuid + "');");
+					// 	refreshNotifications();
+					// }
 				}
 			});
 
@@ -550,8 +546,8 @@ public class GradeItemCellPanel extends Panel {
 
 		NORMAL("gb-grade-item-cell"),
 		READONLY("gb-readonly-item-cell"),
-		EXTERNAL("gb-external-item-cell");
-		//EXCUSED("");
+		EXTERNAL("gb-external-item-cell"),
+		EXCLUDED("gb-excluded-item-cell");
 
 		private String css;
 

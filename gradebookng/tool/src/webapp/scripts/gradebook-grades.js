@@ -1659,7 +1659,7 @@ GradebookEditableCell.prototype.setupMenu = function() {
     self.$input.trigger("viewlog.sakai");
     self.$cell.find(".dropdown-toggle").dropdown('toggle');
     return false;
-  })
+  });
   self.$cell.on("click", ".gb-edit-comments", function() {
     self.$input.trigger("editcomment.sakai");
     self.$cell.find(".dropdown-toggle").dropdown('toggle');

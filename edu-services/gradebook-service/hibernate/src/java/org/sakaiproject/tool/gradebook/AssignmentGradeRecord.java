@@ -215,6 +215,7 @@ public class AssignmentGradeRecord extends AbstractGradeRecord implements Clonea
     	agr.setPointsEarned(pointsEarned);
     	agr.setPercentEarned(percentEarned);
     	agr.setStudentId(studentId);
+        agr.setExcludedFromGrade(excludedFromGrade);
     	return agr;
     }
 

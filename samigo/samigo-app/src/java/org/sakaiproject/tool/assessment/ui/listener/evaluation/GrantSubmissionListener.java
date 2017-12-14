@@ -37,7 +37,9 @@ import javax.faces.event.ActionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.tool.assessment.data.dao.grading.AssessmentGradingData;
+import org.sakaiproject.tool.assessment.facade.AgentFacade;
 import org.sakaiproject.tool.assessment.services.GradingService;
 import org.sakaiproject.tool.assessment.services.shared.MediaService;
 import org.sakaiproject.tool.assessment.ui.bean.delivery.DeliveryBean;
@@ -48,6 +50,7 @@ import org.sakaiproject.tool.assessment.ui.listener.evaluation.util.EvaluationLi
 import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 import org.sakaiproject.tool.assessment.util.BeanSort;
 import org.sakaiproject.tool.assessment.data.dao.grading.MediaData;
+import org.sakaiproject.tool.assessment.shared.AppConstants;
 
 
 /**
@@ -110,7 +113,10 @@ public class GrantSubmissionListener
     Collection collectionOfOne = new ArrayList();
     collectionOfOne.add(ag);
     gradingService.deleteAll(collectionOfOne);
-
+    /* Add Event for deleting student attempt 12/14/17 #7470 */
+    EventTrackingService.post(EventTrackingService.newEvent("sam.submission.delete",
+      AppConstants.SAMIGO_SITE_ID_STRING + AgentFacade.getCurrentSiteId() + ", " + AppConstants.SAMIGO_PUBASSES_ID_STRING + publishedAssessmentId + ", submissionId=" + gradingIdParam,
+      true));
     Collection agentList = totalScores.getAgents();
     for(Iterator i = agentList.iterator(); i.hasNext();) {
     	AgentResults a = (AgentResults)i.next();

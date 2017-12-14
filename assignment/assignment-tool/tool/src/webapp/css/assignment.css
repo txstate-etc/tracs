@@ -330,3 +330,8 @@ fieldset .alertMessageInline,fieldset .alertMessage {
     font-style: italic !important;
     cursor: pointer !important;
 }
+
+/* Added for #7391 */
+.addinst {
+    font-size: 16px;
+}

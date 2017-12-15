@@ -71,14 +71,33 @@ $samigo-active-tab-border: #003eff !default;
   }
 }
 
-.tracs-tool-reset.Mrphs-toolTitleNav__link--reset {
+.Mrphs-toolTitleNav .Mrphs-toolTitleNav__title {
   display: block;
-  font-size: inherit;
   @media (max-width: $break-small-end){
     display: none;
   }
+  a {
+    text-decoration: none;
+    padding-bottom: 0.3rem;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-color: transparent;
+    .tracs-title-icon {
+      width: 30px;
+      text-align: right;
+      line-height: 1.05;
+      vertical-align: 0%;
+    }
+    &:hover {
+      border-color: $link-color;
+      .tracs-title-icon {
+        &::before {
+          content: $fa-var-share;
+        }
+      }
+    }
+  }
 }
-
 
 //Change default color of Tools and Sites bar on mobile
 .Mrphs-skipNav__menu .Mrphs-skipNav__menuitem .Mrphs-skipNav__link{

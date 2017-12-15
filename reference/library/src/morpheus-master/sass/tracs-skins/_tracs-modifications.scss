@@ -71,6 +71,14 @@ $samigo-active-tab-border: #003eff !default;
   }
 }
 
+.tracs-tool-reset.Mrphs-toolTitleNav__link--reset {
+  display: block;
+  font-size: inherit;
+  @media (max-width: $break-small-end){
+    display: none;
+  }
+}
+
 
 //Change default color of Tools and Sites bar on mobile
 .Mrphs-skipNav__menu .Mrphs-skipNav__menuitem .Mrphs-skipNav__link{

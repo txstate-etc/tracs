@@ -95,6 +95,11 @@
 
 				                <span class="Mrphs-toolTitleNav__addRight"></span>
                                 #if ( $toolDirectUrlEnabled && ${tool.showDirectToolUrl} )
+                                    <!-- show reset button when showing link button -->
+                                    <a class="Mrphs-toolTitleNav__link Mrphs-toolTitleNav__link--reset tracs-tool-reset" href="${tool.toolResetActionUrl}" rel="${tool.toolResetActionUrl}" title="${rloader.tool_reset}">
+                                        <span class="Mrphs-itemTitle">${rloader.tool_reset}</span>
+                                    </a>
+
 
                                     <a class="Mrphs-toolTitleNav__link Mrphs-toolTitleNav__link--directurl" href="#${tool.toolPlacementIDJS}_directurl" rel="#${tool.toolPlacementIDJS}_directurl" title="${rloader.tool_direct_link}">
                                         <span class="Mrphs-itemTitle">${rloader.tool_direct_button_link}</span>
@@ -247,6 +252,10 @@
                                 #end ## END of IF (${tool.toolJSR168Edit})
                                  
                                 #if ( $toolDirectUrlEnabled && ${tool.showDirectToolUrl} )
+                                    <!-- show reset button when showing link button -->
+                                    <a class="Mrphs-toolTitleNav__link Mrphs-toolTitleNav__link--reset tracs-tool-reset" href="${tool.toolResetActionUrl}" rel="${tool.toolResetActionUrl}" title="${rloader.tool_reset}">
+                                        <span class="Mrphs-itemTitle">${rloader.tool_reset}</span>
+                                    </a>
                                     <a class="Mrphs-toolTitleNav__link Mrphs-toolTitleNav__link--directurl" href="#${tool.toolPlacementIDJS}_directurl" rel="#${tool.toolPlacementIDJS}_directurl" title="${rloader.tool_direct_link}">
                                         <span class="Mrphs-itemTitle">${rloader.tool_direct_button_link}</span>
                                     </a>

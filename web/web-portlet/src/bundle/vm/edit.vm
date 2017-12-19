@@ -54,7 +54,7 @@ $(document).ready(function() {
 
                      <div class="form-group">
                     <label for="height" class="control-label form-control-label"> $tlang.getString("gen.height")</label>
-                    <select id="height" name="height" size="1" onchange="this.value=='$tlang.getString('gen.heisomelse')'?document.getElementById('customNumber').style.display = 'block':document.getElementById('customNumber').style.display = 'none'">
+                    <select id="height" name="height" size="1" onchange="this.value=='$tlang.getString('gen.heisomelse')'?document.getElementById('customNumberField').parentNode.style.display = 'block':document.getElementById('customNumberField').parentNode.style.display = 'none'">
                         <option value = "300px" #if ($!height == "300px") selected="selected" #end>$tlang.getString('gen.hei1')</option>
                         <option value = "450px" #if ($!height == "450px") selected="selected" #end>$tlang.getString('gen.hei2')</option>
                         <option value = "600px" #if ($!height == "600px") selected="selected" #end>$tlang.getString('gen.hei3')</option>
@@ -68,7 +68,7 @@ $(document).ready(function() {
                     </div>
                     <br />
 
-                    <div class="form-group">
+                    <div class="form-group" #if ($height != "$tlang.getString('gen.heisomelse')") style="display:none" #end>
                     <label for="customNumberField" class="control-label form-control-label">
                         $tlang.getString('gen.custheight')
                     </label>

@@ -185,6 +185,7 @@
                 });
 
                 roster.setupPrintButton();
+                roster.addExportHandler();
 
                 if (roster.currentUserPermissions.viewOfficialPhoto) {
 
@@ -659,6 +660,59 @@
         return d.getDate() + " " + roster.i18n.months[d.getMonth()] + " " + d.getFullYear() + " @ " + hours + ":" + minutes;
     };
 
+    roster.addExportHandler = function () {
+        var button = $('#roster-export-button');
+
+        if (!roster.currentUserPermissions.rosterExport) {
+            button.hide();
+        } else {
+            button.show();
+
+            $('#roster-export-button').click(function (e) {
+                e.preventDefault();
+
+                var baseUrl = "/direct/roster-export/" + roster.siteId +
+                    "/export-to-excel?viewType=" + roster.currentState;
+
+                var facetParams = "&facetName=" + roster.i18n.facet_name +
+                    "&facetUserId=" + roster.i18n.facet_userId +
+                    "&facetEmail=" + roster.i18n.facet_email +
+                    "&facetRole=" + roster.i18n.facet_role +
+                    "&facetGroups=" + roster.i18n.facet_groups +
+                    "&facetStatus=" + roster.i18n.facet_status +
+                    "&facetCredits=" + roster.i18n.facet_credits;
+
+                if (roster.STATE_OVERVIEW === roster.currentState) {
+                    var groupId = null;
+                    if (null != roster.groupToView) {
+                        groupId = roster.groupToView;
+                    } else {
+                        groupId = roster.DEFAULT_GROUP_ID;
+                    }
+
+                    if (null != roster.roleToView) {
+                        baseUrl += "&roleId=" + roster.roleToView;
+                    }
+
+                    window.location.href = baseUrl + "&groupId=" + groupId + facetParams;
+                } else if (roster.STATE_ENROLLMENT_STATUS === roster.currentState) {
+
+                    var enrollmentStatus = null;
+                    if (roster.enrollmentStatusToViewText == roster_enrollment_status_all) {
+                        enrollmentStatus = roster.DEFAULT_ENROLLMENT_STATUS;
+                    } else {
+                        enrollmentStatus = roster.enrollmentStatusToViewText;
+                    }
+
+                    window.location.href = baseUrl +
+                        "&enrollmentSetId=" + roster.enrollmentSetToView +
+                        "&enrollmentStatus=" + enrollmentStatus +
+                        facetParams;
+                }
+            });
+        }
+    };
+
     // Functions and attributes added. All the code from hereon is executed
     // after load.
 
@@ -766,49 +820,49 @@
             return roster.switchState(roster.STATE_PRINT);
         });
 
-        $('#navbar_export_link > span > a').click(function (e) {
+        //$('#navbar_export_link > span > a').click(function (e) {
 
-            e.preventDefault();
+            // e.preventDefault();
             
-            var baseUrl = "/direct/roster-export/" + roster.siteId +
-                "/export-to-excel?viewType=" + roster.currentState;
+            // var baseUrl = "/direct/roster-export/" + roster.siteId +
+            //     "/export-to-excel?viewType=" + roster.currentState;
             
-            var facetParams = "&facetName=" + roster.i18n.facet_name +
-                "&facetUserId=" + roster.i18n.facet_userId +
-                "&facetEmail=" + roster.i18n.facet_email +
-                "&facetRole=" + roster.i18n.facet_role +
-                "&facetGroups=" + roster.i18n.facet_groups +
-                "&facetStatus=" + roster.i18n.facet_status +
-                "&facetCredits=" + roster.i18n.facet_credits;
+            // var facetParams = "&facetName=" + roster.i18n.facet_name +
+            //     "&facetUserId=" + roster.i18n.facet_userId +
+            //     "&facetEmail=" + roster.i18n.facet_email +
+            //     "&facetRole=" + roster.i18n.facet_role +
+            //     "&facetGroups=" + roster.i18n.facet_groups +
+            //     "&facetStatus=" + roster.i18n.facet_status +
+            //     "&facetCredits=" + roster.i18n.facet_credits;
             
-            if (roster.STATE_OVERVIEW === roster.currentState) {
-                var groupId = null;
-                if (null != roster.groupToView) {
-                    groupId = roster.groupToView;
-                } else {
-                    groupId = roster.DEFAULT_GROUP_ID;
-                }
+            // if (roster.STATE_OVERVIEW === roster.currentState) {
+            //     var groupId = null;
+            //     if (null != roster.groupToView) {
+            //         groupId = roster.groupToView;
+            //     } else {
+            //         groupId = roster.DEFAULT_GROUP_ID;
+            //     }
             
-                if (null != roster.roleToView) {
-                    baseUrl += "&roleId=" + roster.roleToView;
-                }
+            //     if (null != roster.roleToView) {
+            //         baseUrl += "&roleId=" + roster.roleToView;
+            //     }
         
-                window.location.href = baseUrl + "&groupId=" + groupId + facetParams;
-            } else if (roster.STATE_ENROLLMENT_STATUS === roster.currentState) {
+            //     window.location.href = baseUrl + "&groupId=" + groupId + facetParams;
+            // } else if (roster.STATE_ENROLLMENT_STATUS === roster.currentState) {
             
-                var enrollmentStatus = null;
-                if (roster.enrollmentStatusToViewText == roster_enrollment_status_all) {
-                    enrollmentStatus = roster.DEFAULT_ENROLLMENT_STATUS;
-                } else {
-                    enrollmentStatus = roster.enrollmentStatusToViewText;
-                }
+            //     var enrollmentStatus = null;
+            //     if (roster.enrollmentStatusToViewText == roster_enrollment_status_all) {
+            //         enrollmentStatus = roster.DEFAULT_ENROLLMENT_STATUS;
+            //     } else {
+            //         enrollmentStatus = roster.enrollmentStatusToViewText;
+            //     }
                 
-                window.location.href = baseUrl + 
-                    "&enrollmentSetId=" + roster.enrollmentSetToView +
-                    "&enrollmentStatus=" + enrollmentStatus +
-                    facetParams;
-            }
-        });
+            //     window.location.href = baseUrl +
+            //         "&enrollmentSetId=" + roster.enrollmentSetToView +
+            //         "&enrollmentStatus=" + enrollmentStatus +
+            //         facetParams;
+            // }
+        //});
         
         $('#navbar_permissions_link > span > a').click(function (e) {
             return roster.switchState(roster.STATE_PERMISSIONS);

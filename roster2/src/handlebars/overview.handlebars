@@ -4,7 +4,7 @@
 
 <div id="roster-filters" class="row">
     {{#if viewGroup}}
-    <div class="form-group col-sm-6">
+    <div class="form-group col-sm-5">
         <label for="roster-groups-selector-top" class="form-control-label col-sm-3">{{translate 'groups'}}</label>
         <div class="col-sm-4">
             <select id="roster-groups-selector-top">
@@ -16,7 +16,7 @@
         </div>
     </div>
     {{/if}}
-    <div class="form-group col-sm-6">        
+    <div class="form-group col-sm-5">        
         <label for="roster-roles-selector" class="form-control-label col-sm-2">{{translate 'roles_label'}}</label>
         <div class="col-sm-4">
             <select id="roster-roles-selector">
@@ -27,6 +27,7 @@
             </select>
         </div>
     </div>
+    <button id="roster-export-button">{{translate 'navbar_export'}}</button>
 </div>
 
 <div id="roster-search-group" class="row">

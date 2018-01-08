@@ -307,6 +307,19 @@
   color: #777;
   font-style: italic;
 }
+
+/*ALAN*/
+#gradebookGrades .gb-excluded-item-cell:before {
+  font-family: 'gradebook-icons';
+  content: '\f006';
+  vertical-align: bottom;
+  margin-right: 4px;
+  color: #999;
+}
+
+#gradebookGrades .gb-excluded-item-cell {
+  background-color: #FD0;
+}
 #gradebookGrades .gb-readonly-grade {
   line-height: 1em;
   display: block;

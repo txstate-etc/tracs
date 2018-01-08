@@ -462,7 +462,7 @@ public class GradebookNgBusinessService {
 	 */
 	public GradeSaveResponse saveGrade(final Long assignmentId, final String studentUuid, final String oldGrade,
 			final String newGrade, final String comment) {
-		
+
 		final Gradebook gradebook = this.getGradebook();
 		if (gradebook == null) {
 			return GradeSaveResponse.ERROR;
@@ -1400,7 +1400,6 @@ public class GradebookNgBusinessService {
 	}
 
 	public boolean saveExcusedGrade(final Long assignmentId, final String studentUuid, final boolean excludeFromGrade) {
-		log.warn("We are inside SaveExcusedGrade in GBNG Business Service");
 		final String siteId = getCurrentSiteId();
 		final Gradebook gradebook = getGradebook(siteId);
 

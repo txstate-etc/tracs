@@ -35,6 +35,7 @@ import org.sakaiproject.gradebookng.business.util.FormatHelper;
 import org.sakaiproject.gradebookng.tool.model.GbModalWindow;
 import org.sakaiproject.gradebookng.tool.model.ScoreChangedEvent;
 import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
+import org.apache.wicket.behavior.AttributeAppender;
 
 /**
  * The panel for the cell of a grade item
@@ -114,7 +115,6 @@ public class GradeItemCellPanel extends Panel {
 		final GbRole role = (GbRole) this.modelData.get("role");
 		this.gradingType = (GbGradingType) this.modelData.get("gradingType");
 
-
 		if (this.gradingType == GbGradingType.PERCENTAGE) {
 			this.pointsLimit = 100;
 		} else {
@@ -126,6 +126,10 @@ public class GradeItemCellPanel extends Panel {
 		this.comment = (gradeInfo != null) ? gradeInfo.getGradeComment() : "";
 		this.gradeable = (gradeInfo != null) ? gradeInfo.isGradeable() : false; 
 		this.excludedFromGrade = (gradeInfo != null) ? gradeInfo.isExcludedFromGrade() : false;
+
+		// if (this.excludedFromGrade) {
+		// 	this.add(new AttributeAppender("class", new Model("gb-excluded-item-cell"), " "));
+		// }
 
 		if (role == GbRole.INSTRUCTOR) {
 			this.gradeable = true;
@@ -157,8 +161,6 @@ public class GradeItemCellPanel extends Panel {
 			} else if (!this.gradeable) {
 				baseGradeStyle = GradeCellStyle.READONLY;
 				this.notifications.add(GradeCellNotification.READONLY);
-			} else if (this.excludedFromGrade) {
-				baseGradeStyle = GradeCellStyle.EXCLUDED;
 			}
 
 		} else {
@@ -232,6 +234,9 @@ public class GradeItemCellPanel extends Panel {
 								GradeItemCellPanel.this.originalGrade = newGrade;
 								refreshCourseGradeAndCategoryAverages(target);
 								target.add(page.updateLiveGradingMessage(getString("feedback.saved")));
+								// if (excludedFromGrade) {
+								// 	markExcluded(GradeItemCellPanel.this.gradeCell);								
+								// }
 								break;
 							case ERROR:
 								markError(getComponent());
@@ -431,14 +436,14 @@ public class GradeItemCellPanel extends Panel {
 				//protected 
 				public void onEvent(final AjaxRequestTarget target) {
 					boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, !excludedFromGrade);
-					// if (success) {
-					// 	//excludedFromGrade = !excludedFromGrade;
-					// 	target.add(getParentCellFor(GradeItemCellPanel.this.gradeCell));
-					// 	target.appendJavaScript("sakai.gradebookng.spreadsheet.setupCell('"
-					// 			+ getParentCellFor(GradeItemCellPanel.this.gradeCell).getMarkupId() + "','" + assignmentId + "', '"
-					// 			+ studentUuid + "');");
-					// 	refreshNotifications();
-					// }
+					if (success) {
+						//excludedFromGrade = !excludedFromGrade;
+						target.add(getParentCellFor(GradeItemCellPanel.this.gradeCell));
+						target.appendJavaScript("sakai.gradebookng.spreadsheet.setupCell('"
+								+ getParentCellFor(GradeItemCellPanel.this.gradeCell).getMarkupId() + "','" + assignmentId + "', '"
+								+ studentUuid + "');");
+						refreshNotifications();
+					}
 				}
 			});
 
@@ -448,7 +453,7 @@ public class GradeItemCellPanel extends Panel {
 
 		// always add these
 		getParent().add(new AttributeModifier("role", "gridcell"));
-		getParent().add(new AttributeModifier("aria-readonly", Boolean.toString(isExternal || !this.gradeable)));
+		getParent().add(new AttributeModifier("aria-readonly", Boolean.toString(isExternal || !this.gradeable || this.excludedFromGrade)));
 
 		refreshExtraCreditFlag();
 		refreshCommentFlag();
@@ -515,6 +520,12 @@ public class GradeItemCellPanel extends Panel {
 	private void styleGradeCell(final Component gradeCell) {
 
 		final ArrayList<String> cssClasses = new ArrayList<>();
+
+		//ALAN
+		if (this.excludedFromGrade) {
+			cssClasses.add(GradeCellStyle.EXCLUDED.getCss());
+		}
+
 		cssClasses.add(baseGradeStyle.getCss()); // always
 		if (this.gradeSaveStyle != null) {
 			cssClasses.add(this.gradeSaveStyle.getCss()); // the particular style for this cell that has been computed previously
@@ -571,6 +582,7 @@ public class GradeItemCellPanel extends Panel {
 		WARNING("grade-save-warning"),
 		OVER_LIMIT("grade-save-over-limit"),
 		OVER_LIMIT_AND_SUCCESS("grade-save-over-limit grade-save-success");
+		
 
 		private String css;
 

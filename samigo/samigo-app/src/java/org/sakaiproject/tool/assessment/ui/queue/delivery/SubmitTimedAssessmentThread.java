@@ -105,21 +105,50 @@ public class SubmitTimedAssessmentThread extends TimerTask
     	    if (ag.getTotalAutoScore() == null) ag.setTotalAutoScore(Double.valueOf("0"));
     	    service.completeItemGradingData(ag);
             service.saveOrUpdateAssessmentGrading(ag);
+
+          PublishedAssessmentService publishedAssessmentService = new PublishedAssessmentService();
+          String siteId = publishedAssessmentService.getPublishedAssessmentOwner(ag.getPublishedAssessmentId());
+
           EventLogService eventService = new EventLogService();
           EventLogFacade eventLogFacade = new EventLogFacade();
+          EventLogData eventLogData = new EventLogData();
 
           List eventLogDataList = eventService.getEventLogData(ag.getAssessmentGradingId());
-          EventLogData eventLogData= (EventLogData) eventLogDataList.get(0);
-          eventLogData.setErrorMsg(eventLogMessages.getString("timer_submit"));
-          eventLogData.setEndDate(submitDate);
-          if(eventLogData.getStartDate() != null) {
-        	  double minute= 1000*60;
-        	  int eclipseTime = (int)Math.ceil(((submitDate.getTime() - eventLogData.getStartDate().getTime())/minute));
-        	  eventLogData.setEclipseTime(eclipseTime); 
-          } else {
-        	  eventLogData.setEclipseTime(null); 
-        	  eventLogData.setErrorMsg(eventLogMessages.getString("error_take"));
-          }
+            if(!eventLogDataList.isEmpty()) {
+                eventLogData= (EventLogData) eventLogDataList.get(0);
+                eventLogData.setErrorMsg(eventLogMessages.getString("timer_submit"));
+                eventLogData.setEndDate(submitDate);
+                if(submitDate != null && eventLogData.getStartDate() != null) {
+                  double minute= 1000*60;
+                  int eclipseTime = (int)Math.ceil(((submitDate.getTime() - eventLogData.getStartDate().getTime())/minute));
+                  eventLogData.setEclipseTime(Integer.valueOf(eclipseTime));
+                } else {
+                  eventLogData.setEclipseTime(null);
+                  eventLogData.setErrorMsg(eventLogMessages.getString("error_take"));
+                }
+            }
+            else {
+              log.info("Couldn't find the grade event for assessmentId=" + ag.getPublishedAssessmentId() + " for userId=" + ag.getAgentId() + " siteId=" + siteId + ", submissionId=" + ag.getAssessmentGradingId());
+              log.info("Creating event log for assessmentId=" + ag.getPublishedAssessmentId() + " for userId=" + ag.getAgentId() + " siteId=" + siteId + ", submissionId=" + ag.getAssessmentGradingId());
+              //adding the event log entry (not sure why it wouldn't have an entry already here, but it did happen in our server log that it didn't find one)
+              //create one; set event log data
+              eventLogData.setAssessmentId(ag.getPublishedAssessmentId());
+              eventLogData.setProcessId(ag.getAssessmentGradingId());
+              eventLogData.setStartDate(ag.getAttemptDate());
+              eventLogData.setTitle(timedAG.getPublishedAssessment().getTitle());
+              eventLogData.setUserEid(AgentFacade.getEid());
+              eventLogData.setSiteId(siteId);
+              eventLogData.setErrorMsg(eventLogMessages.getString("timer_submit"));
+              eventLogData.setEndDate(submitDate);
+              if(submitDate != null && eventLogData.getStartDate() != null) {
+                double minute= 1000*60;
+                int eclipseTime = (int)Math.ceil(((submitDate.getTime() - eventLogData.getStartDate().getTime())/minute));
+                eventLogData.setEclipseTime(Integer.valueOf(eclipseTime));
+              } else {
+                eventLogData.setEclipseTime(null);
+                eventLogData.setErrorMsg(eventLogMessages.getString("error_take"));
+              }
+            }
             eventLogFacade.setData(eventLogData);
             eventService.saveOrUpdateEventLog(eventLogFacade);
 

@@ -51,32 +51,12 @@
 
 			$.blockUI({ message: '<h3>' + please_wait + ' <img src="/library/image/sakai/spinner.gif" /></h3>', overlayCSS: { backgroundColor: '#ccc', opacity: 0.25} });
 		}); 
+		//Disable the back button
+		disableBackButton("<h:outputText value="#{deliveryMessages.use_form_navigation}"/>");
 
-		// Modal dialog that pops up to warn user that time is running out		
-		$('#timer-warning').dialog({
-			autoOpen: false,
-			width: 400,
-			modal: true,
-			resizable: false,
-			draggable: false,
-			buttons: [ { text: button_ok, click: function() { $( this ).dialog( "close" ); } } ],
-			open: function (event,ui) {
-				$(".ui-dialog-title").append("<span class='sr-only'>" + five_minutes_left + "</span>");
-			}
-		});
-		
-		$('#timer-expired-warning').dialog({
-			autoOpen: false,
-			width: 400,
-			modal: true,
-			resizable: false,
-			draggable: false,
-			closeOnEscape: false,
-			open: function (event,ui) { 
-				$(".ui-dialog-titlebar", $(this).parent()).hide(); 
-				$(this).css("background", "#EEEEEE");
-			}
-		});	
+		if($('#submittedForm\\:renderTimeoutMessage').length > 0){
+			showTimerExpiredWarning(function() { ($('#timer-expired-warning').parent()).css('display', 'none');});
+		}
 	});
 
 	function checkIfHonorPledgeIsChecked() {
@@ -89,12 +69,30 @@
 	}
 
 	function showTimerWarning() {
-		$('#timer-warning').dialog('open');
+		$('#timer-warning').dialog({
+			width: 400,
+			modal: true,
+			resizable: false,
+			draggable: false,
+			buttons: [ { text: button_ok, click: function() { $( this ).dialog( "close" ); } } ],
+			open: function (event,ui) {
+				$(".ui-dialog-title").append("<span class='sr-only'>" + five_minutes_left + "</span>");
+			}
+		});
+		
 		return false;
 	}		
 	
 	function showTimerExpiredWarning(submitfunction) {
-		$('#timer-expired-warning').dialog('open');
+		$('#timer-expired-warning').dialog({
+			width: 400,
+			resizable: false,
+			draggable: false,
+			closeOnEscape: false,
+			open: function (event,ui) { 
+				$(".ui-dialog-titlebar", $(this).parent()).hide(); 
+			}
+		});	
 		setTimeout(submitfunction,5000);
 		return false;
 	}

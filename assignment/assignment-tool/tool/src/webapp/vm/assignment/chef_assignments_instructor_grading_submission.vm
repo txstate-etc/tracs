@@ -13,7 +13,7 @@
 			var $pan = $('#peerReviewInfo')
 			if ($pan.is(':visible') && ev.target.id !== 'peerReviewInfo' && ev.target.id !== 'infoImg' && ev.target.id !== 'grade') $pan.hide();
 		});
-		disableBackButton();
+		disableBackButton("$!tlang.getString("use_form_navigation")");
 	});
 </script>
 <div class="portletBody">

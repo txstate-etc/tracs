@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.tool.assessment.data.dao.grading.AssessmentGradingData;
 import org.sakaiproject.tool.assessment.facade.AgentFacade;
+import org.sakaiproject.tool.assessment.services.GradebookServiceException;
 import org.sakaiproject.tool.assessment.services.GradingService;
 import org.sakaiproject.tool.assessment.services.shared.MediaService;
 import org.sakaiproject.tool.assessment.ui.bean.delivery.DeliveryBean;
@@ -152,7 +153,11 @@ public class GrantSubmissionListener
     totalScores.setAssessmentGradingList(gradingList);
     totalScores.setAgents(agentList);
 
-    gradingService.notifyDeleteToGradebook(gradingList, totalScores.getPublishedAssessment(), deletedStudentId);
+    try{
+      gradingService.notifyDeleteToGradebook(gradingList, totalScores.getPublishedAssessment(), deletedStudentId);
+    } catch (GradebookServiceException e) {
+      e.printStackTrace();
+    }
 
   }
 }

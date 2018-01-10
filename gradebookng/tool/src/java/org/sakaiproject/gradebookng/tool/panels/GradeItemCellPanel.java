@@ -25,9 +25,11 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GbRole;
+import org.sakaiproject.gradebookng.business.model.GbUser;
 import org.sakaiproject.gradebookng.business.GradeSaveResponse;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.business.model.GbGradeInfo;
@@ -187,6 +189,11 @@ public class GradeItemCellPanel extends Panel {
 					parentCell.add(new AttributeModifier("class", GradeCellStyle.NORMAL.getCss()));
 					parentCell.setOutputMarkupId(true);
 
+					//Hide the text box if the grade is excused
+					//this.setVisible(!excludedFromGrade);
+					//this.setEnabled(!excludedFromGrade);
+					if (excludedFromGrade) this.add(new AttributeModifier("readonly", new Model("readonly")));
+
 					GradeItemCellPanel.this.showMenu = true;
 				}
 			};
@@ -203,6 +210,9 @@ public class GradeItemCellPanel extends Panel {
 
 				@Override
 				protected void onUpdate(final AjaxRequestTarget target) {
+					if (excludedFromGrade) {
+						return;
+					}
 					final String rawGrade = GradeItemCellPanel.this.gradeCell.getValue();
 					
 					final GradebookPage page = (GradebookPage) getPage();
@@ -234,9 +244,6 @@ public class GradeItemCellPanel extends Panel {
 								GradeItemCellPanel.this.originalGrade = newGrade;
 								refreshCourseGradeAndCategoryAverages(target);
 								target.add(page.updateLiveGradingMessage(getString("feedback.saved")));
-								// if (excludedFromGrade) {
-								// 	markExcluded(GradeItemCellPanel.this.gradeCell);								
-								// }
 								break;
 							case ERROR:
 								markError(getComponent());
@@ -435,19 +442,35 @@ public class GradeItemCellPanel extends Panel {
 				@Override
 				//protected 
 				public void onEvent(final AjaxRequestTarget target) {
-					boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, !excludedFromGrade);
-					if (success) {
-						//excludedFromGrade = !excludedFromGrade;
-						target.add(getParentCellFor(GradeItemCellPanel.this.gradeCell));
-						target.appendJavaScript("sakai.gradebookng.spreadsheet.setupCell('"
-								+ getParentCellFor(GradeItemCellPanel.this.gradeCell).getMarkupId() + "','" + assignmentId + "', '"
-								+ studentUuid + "');");
-						refreshNotifications();
-					}
+					final GradebookPage gradebookPage = (GradebookPage) getPage();
+					final GbModalWindow window = gradebookPage.getExcuseGradeWindow();
+
+					final ExcuseGradePanel panel = new ExcuseGradePanel(window.getContentId(), GradeItemCellPanel.this.model, window);
+					final GbUser user = businessService.getUser(studentUuid);
+					window.setTitle((new StringResourceModel("heading.excusegrade", null,
+						new Object[] { user.getDisplayName(), user.getDisplayId() })).getString());
+					window.setContent(panel);
+					window.showUnloadConfirmation(false);
+					window.clearWindowClosedCallbacks();
+					window.setComponentToReturnFocusTo(getParentCellFor(GradeItemCellPanel.this.gradeCell));
+					window.show(target);
+
+
+
+					// boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, !excludedFromGrade);
+					// if (success) {
+					// 	//excludedFromGrade = !excludedFromGrade;
+					// 	target.add(getParentCellFor(GradeItemCellPanel.this.gradeCell));
+					// 	target.appendJavaScript("sakai.gradebookng.spreadsheet.setupCell('"
+					// 			+ getParentCellFor(GradeItemCellPanel.this.gradeCell).getMarkupId() + "','" + assignmentId + "', '"
+					// 			+ studentUuid + "');");
+					// 	refreshNotifications();
+					//	}
 				}
 			});
 
 			this.gradeCell.setOutputMarkupId(true);
+			this.gradeCell.setOutputMarkupPlaceholderTag(true);
 			add(this.gradeCell);
 		}
 

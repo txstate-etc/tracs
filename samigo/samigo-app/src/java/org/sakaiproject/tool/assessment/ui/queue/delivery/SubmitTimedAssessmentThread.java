@@ -153,9 +153,6 @@ public class SubmitTimedAssessmentThread extends TimerTask
             eventLogFacade.setData(eventLogData);
             eventService.saveOrUpdateEventLog(eventLogFacade);
 
-            PublishedAssessmentService publishedAssessmentService = new PublishedAssessmentService();
-            String siteId = publishedAssessmentService.getPublishedAssessmentOwner(ag.getPublishedAssessmentId());
-            
             EventTrackingService.post(EventTrackingService.newEvent("sam.assessment.thread_submit", AppConstants.SAMIGO_SITE_ID_STRING + siteId + ", submissionId=" + ag.getAssessmentGradingId(), siteId, true, NotificationService.NOTI_REQUIRED));
             Map<String, Object> notiValues = new HashMap<>();
 

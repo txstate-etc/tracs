@@ -131,8 +131,6 @@ public class SubmitTimedAssessmentThread extends TimerTask
             else {
               log.info("Couldn't find the grade event for assessmentId=" + ag.getPublishedAssessmentId() + " for userId=" + ag.getAgentId() + " siteId=" + siteId + ", submissionId=" + ag.getAssessmentGradingId());
               log.info("Creating event log for assessmentId=" + ag.getPublishedAssessmentId() + " for userId=" + ag.getAgentId() + " siteId=" + siteId + ", submissionId=" + ag.getAssessmentGradingId());
-              //adding the event log entry (not sure why it wouldn't have an entry already here, but it did happen in our server log that it didn't find one)
-              //create one; set event log data
               eventLogData.setAssessmentId(ag.getPublishedAssessmentId());
               eventLogData.setProcessId(ag.getAssessmentGradingId());
               eventLogData.setStartDate(ag.getAttemptDate());
@@ -141,7 +139,7 @@ public class SubmitTimedAssessmentThread extends TimerTask
               eventLogData.setSiteId(siteId);
               eventLogData.setErrorMsg(eventLogMessages.getString("timer_submit"));
               eventLogData.setEndDate(submitDate);
-              if(submitDate != null && eventLogData.getStartDate() != null) {
+              if(eventLogData.getStartDate() != null) {
                 double minute= 1000*60;
                 int eclipseTime = (int)Math.ceil(((submitDate.getTime() - eventLogData.getStartDate().getTime())/minute));
                 eventLogData.setEclipseTime(Integer.valueOf(eclipseTime));

@@ -1444,6 +1444,11 @@ public class GradebookNgBusinessService {
 					continue;
 				}
 
+				if (def.getExcludedFromGrade()) {
+					log.warn("Ignored one Grade Definition because grade has been excused");
+					continue;
+				}
+
 				if(def.getGradeEntryType() == GradebookService.GRADE_TYPE_POINTS) {			
 					double newGrade = Double.parseDouble(grade) + pointValue;
 					newGrade = Math.max(newGrade, 0.0);
@@ -1572,9 +1577,10 @@ public class GradebookNgBusinessService {
 
 			// don't remove those where the grades are blank, they need to be
 			// updated too
-			if (StringUtils.isNotBlank(def.getGrade())) {
+			if (StringUtils.isNotBlank(def.getGrade()) || def.getExcludedFromGrade()) {
 				studentUuids.remove(def.getStudentUid());
 			}
+
 		}
 
 		if (studentUuids.isEmpty()) {

@@ -25,9 +25,11 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GbRole;
+import org.sakaiproject.gradebookng.business.model.GbUser;
 import org.sakaiproject.gradebookng.business.GradeSaveResponse;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.business.model.GbGradeInfo;
@@ -35,6 +37,7 @@ import org.sakaiproject.gradebookng.business.util.FormatHelper;
 import org.sakaiproject.gradebookng.tool.model.GbModalWindow;
 import org.sakaiproject.gradebookng.tool.model.ScoreChangedEvent;
 import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
+import org.apache.wicket.behavior.AttributeAppender;
 
 /**
  * The panel for the cell of a grade item
@@ -62,6 +65,7 @@ public class GradeItemCellPanel extends Panel {
 	String comment;
 	boolean gradeable;
 	boolean showMenu;
+	boolean excludedFromGrade;
 
 	GradeCellStyle baseGradeStyle = GradeCellStyle.NORMAL;
 	GradeCellSaveStyle gradeSaveStyle;
@@ -105,10 +109,8 @@ public class GradeItemCellPanel extends Panel {
 		// unpack model
 		this.modelData = this.model.getObject();
 		final Long assignmentId = (Long) this.modelData.get("assignmentId");
-		// final String assignmentName = (String) this.modelData.get("assignmentName");
 		final Double assignmentPoints = (Double) this.modelData.get("assignmentPoints");
 		final String studentUuid = (String) this.modelData.get("studentUuid");
-		// final String studentName = (String) this.modelData.get("studentName");
 		final Long categoryId = (Long) this.modelData.get("categoryId");
 		final boolean isExternal = (boolean) this.modelData.get("isExternal");
 		final GbGradeInfo gradeInfo = (GbGradeInfo) this.modelData.get("gradeInfo");
@@ -124,13 +126,17 @@ public class GradeItemCellPanel extends Panel {
 		// Note: gradeInfo may be null
 		this.rawGrade = (gradeInfo != null) ? gradeInfo.getGrade() : "";
 		this.comment = (gradeInfo != null) ? gradeInfo.getGradeComment() : "";
-		this.gradeable = (gradeInfo != null) ? gradeInfo.isGradeable() : false; // ensure this is ALWAYS false if gradeInfo is null.
+		this.gradeable = (gradeInfo != null) ? gradeInfo.isGradeable() : false; 
+		this.excludedFromGrade = (gradeInfo != null) ? gradeInfo.isExcludedFromGrade() : false;
+
+		// if (this.excludedFromGrade) {
+		// 	this.add(new AttributeAppender("class", new Model("gb-excluded-item-cell"), " "));
+		// }
 
 		if (role == GbRole.INSTRUCTOR) {
 			this.gradeable = true;
 		}
 
-		// get grade
 		this.formattedGrade = FormatHelper.formatGrade(this.rawGrade);
 		
 		//TODO move this to the format helper?
@@ -183,6 +189,11 @@ public class GradeItemCellPanel extends Panel {
 					parentCell.add(new AttributeModifier("class", GradeCellStyle.NORMAL.getCss()));
 					parentCell.setOutputMarkupId(true);
 
+					//Hide the text box if the grade is excused
+					//this.setVisible(!excludedFromGrade);
+					//this.setEnabled(!excludedFromGrade);
+					if (excludedFromGrade) this.add(new AttributeModifier("readonly", new Model("readonly")));
+
 					GradeItemCellPanel.this.showMenu = true;
 				}
 			};
@@ -199,6 +210,9 @@ public class GradeItemCellPanel extends Panel {
 
 				@Override
 				protected void onUpdate(final AjaxRequestTarget target) {
+					if (excludedFromGrade) {
+						return;
+					}
 					final String rawGrade = GradeItemCellPanel.this.gradeCell.getValue();
 					
 					final GradebookPage page = (GradebookPage) getPage();
@@ -422,14 +436,47 @@ public class GradeItemCellPanel extends Panel {
 					window.show(target);
 				}
 			});
+			this.gradeCell.add(new AjaxEventBehavior("excusegrade.sakai") {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				//protected 
+				public void onEvent(final AjaxRequestTarget target) {
+					final GradebookPage gradebookPage = (GradebookPage) getPage();
+					final GbModalWindow window = gradebookPage.getExcuseGradeWindow();
+
+					final ExcuseGradePanel panel = new ExcuseGradePanel(window.getContentId(), GradeItemCellPanel.this.model, window);
+					final GbUser user = businessService.getUser(studentUuid);
+					window.setTitle((new StringResourceModel("heading.excusegrade", null,
+						new Object[] { user.getDisplayName(), user.getDisplayId() })).getString());
+					window.setContent(panel);
+					window.showUnloadConfirmation(false);
+					window.clearWindowClosedCallbacks();
+					window.setComponentToReturnFocusTo(getParentCellFor(GradeItemCellPanel.this.gradeCell));
+					window.show(target);
+
+
+
+					// boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, !excludedFromGrade);
+					// if (success) {
+					// 	//excludedFromGrade = !excludedFromGrade;
+					// 	target.add(getParentCellFor(GradeItemCellPanel.this.gradeCell));
+					// 	target.appendJavaScript("sakai.gradebookng.spreadsheet.setupCell('"
+					// 			+ getParentCellFor(GradeItemCellPanel.this.gradeCell).getMarkupId() + "','" + assignmentId + "', '"
+					// 			+ studentUuid + "');");
+					// 	refreshNotifications();
+					//	}
+				}
+			});
 
 			this.gradeCell.setOutputMarkupId(true);
+			this.gradeCell.setOutputMarkupPlaceholderTag(true);
 			add(this.gradeCell);
 		}
 
 		// always add these
 		getParent().add(new AttributeModifier("role", "gridcell"));
-		getParent().add(new AttributeModifier("aria-readonly", Boolean.toString(isExternal || !this.gradeable)));
+		getParent().add(new AttributeModifier("aria-readonly", Boolean.toString(isExternal || !this.gradeable || this.excludedFromGrade)));
 
 		refreshExtraCreditFlag();
 		refreshCommentFlag();
@@ -496,6 +543,12 @@ public class GradeItemCellPanel extends Panel {
 	private void styleGradeCell(final Component gradeCell) {
 
 		final ArrayList<String> cssClasses = new ArrayList<>();
+
+		//ALAN
+		if (this.excludedFromGrade) {
+			cssClasses.add(GradeCellStyle.EXCLUDED.getCss());
+		}
+
 		cssClasses.add(baseGradeStyle.getCss()); // always
 		if (this.gradeSaveStyle != null) {
 			cssClasses.add(this.gradeSaveStyle.getCss()); // the particular style for this cell that has been computed previously
@@ -527,7 +580,8 @@ public class GradeItemCellPanel extends Panel {
 
 		NORMAL("gb-grade-item-cell"),
 		READONLY("gb-readonly-item-cell"),
-		EXTERNAL("gb-external-item-cell");
+		EXTERNAL("gb-external-item-cell"),
+		EXCLUDED("gb-excluded-item-cell");
 
 		private String css;
 
@@ -551,6 +605,7 @@ public class GradeItemCellPanel extends Panel {
 		WARNING("grade-save-warning"),
 		OVER_LIMIT("grade-save-over-limit"),
 		OVER_LIMIT_AND_SUCCESS("grade-save-over-limit grade-save-success");
+		
 
 		private String css;
 

@@ -1399,6 +1399,20 @@ public class GradebookNgBusinessService {
 		return false;
 	}
 
+	public boolean saveExcusedGrade(final Long assignmentId, final String studentUuid, final boolean excludeFromGrade) {
+		final String siteId = getCurrentSiteId();
+		final Gradebook gradebook = getGradebook(siteId);
+
+		try {
+			this.gradebookService.updateIsExcludedFromGradeForStudent(gradebook.getUid(), studentUuid, assignmentId, excludeFromGrade );
+			return true;
+		} catch (final Exception e) {
+			log.error("An error occurred updating isExcludedFromGrade flag", e);
+		}
+
+		return false;
+	}
+
 	/**
 	* Scale grades by adding a fixed pointValue to all students' grades for an assignment
 	*
@@ -1427,6 +1441,11 @@ public class GradebookNgBusinessService {
 				String grade = def.getGrade();
 				if(grade == null || grade.isEmpty()) {
 					log.warn("Ignored one Grade Definition due to empty Grade");
+					continue;
+				}
+
+				if (def.getExcludedFromGrade()) {
+					log.warn("Ignored one Grade Definition because grade has been excused");
 					continue;
 				}
 
@@ -1558,9 +1577,10 @@ public class GradebookNgBusinessService {
 
 			// don't remove those where the grades are blank, they need to be
 			// updated too
-			if (StringUtils.isNotBlank(def.getGrade())) {
+			if (StringUtils.isNotBlank(def.getGrade()) || def.getExcludedFromGrade()) {
 				studentUuids.remove(def.getStudentUid());
 			}
+
 		}
 
 		if (studentUuids.isEmpty()) {

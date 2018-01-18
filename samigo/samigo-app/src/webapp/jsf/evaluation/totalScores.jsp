@@ -205,22 +205,6 @@ $(document).ready(function(){
       <h:outputText value=" #{evaluationMessages.applyGradesDesc}"/>
     </h:panelGroup>
 
-<script>
-	$(document).ready(function(){
-		// $("a.sam-scoretable-deleteattempt").each(function(){
-		// 	this.existingOnclick = this.onclick;
-		// 	this.onclick = null;
-		// 	$(this).click(function(){
-		// 		if ( confirm("Are you sure you want to delete this attempt?") ) {
-		// 			this.existingOnclick();
-		// 		} else {
-		// 			return false;
-		// 		}
-		// 	});
-		// });
-		$("tr.inactivePar").css("display","none");
-	});
-</script>
 
     <h:panelGroup styleClass="all-submissions form-group row" layout="block">
       <h:outputLabel styleClass="col-md-2" value="#{evaluationMessages.view}"/>

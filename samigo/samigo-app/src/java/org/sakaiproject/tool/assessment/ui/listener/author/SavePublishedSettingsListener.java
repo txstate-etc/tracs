@@ -37,6 +37,7 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sakaiproject.component.cover.ServerConfigurationService;
@@ -475,7 +476,10 @@ implements ActionListener
 
 		if (retractNow)
 		{
-			control.setRetractDate(new Date());
+			//If retracting now, set both dates to prevent instability caused by RetractDate < DueDate
+			final Date now = new Date();
+			control.setDueDate(DateUtils.addSeconds(now, -1));
+			control.setRetractDate(now);	
 		}
 		else if (assessmentSettings.getRetractDate() == null
 				 || "".equals(assessmentSettings.getRetractDateString()))

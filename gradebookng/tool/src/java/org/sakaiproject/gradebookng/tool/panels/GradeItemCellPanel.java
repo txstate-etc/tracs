@@ -544,7 +544,6 @@ public class GradeItemCellPanel extends Panel {
 
 		final ArrayList<String> cssClasses = new ArrayList<>();
 
-		//ALAN
 		if (this.excludedFromGrade) {
 			cssClasses.add(GradeCellStyle.EXCLUDED.getCss());
 		}

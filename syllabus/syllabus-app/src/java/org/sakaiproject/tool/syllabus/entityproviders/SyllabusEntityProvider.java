@@ -399,6 +399,8 @@ public class SyllabusEntityProvider extends AbstractEntityProvider implements En
 						if(title != null && !"".equals(title.trim())){
 							data.setTitle(title.trim());
 							syllabusManager.saveSyllabus(data);
+							//Anne added for #7471 (1/22/18)
+							syllabusService.sendEditEvent(data, item.getContextId());
 						}
 					}else if("body".equals(params.get("name"))){
 						String body = (String) params.get("value");
@@ -411,6 +413,8 @@ public class SyllabusEntityProvider extends AbstractEntityProvider implements En
 						}else{
 							data.setAsset(cleanedText);
 							syllabusManager.saveSyllabus(data);
+							//Anne added for #7471 (1/22/18)
+							syllabusService.sendEditEvent(data, item.getContextId());
 						}
 					}else if("startDate".equals(params.get("name"))){
 						String startDate = (String) params.get("value");
@@ -430,6 +434,8 @@ public class SyllabusEntityProvider extends AbstractEntityProvider implements En
 							}
 						}
 						syllabusManager.saveSyllabus(data);
+						//Anne added for #7471 (1/22/18)
+						syllabusService.sendEditEvent(data, item.getContextId());
 					}else if("endDate".equals(params.get("name"))){
 						String endDate = (String) params.get("value");
 						if(endDate == null || "".equals(endDate)){
@@ -448,6 +454,8 @@ public class SyllabusEntityProvider extends AbstractEntityProvider implements En
 							}
 						}
 						syllabusManager.saveSyllabus(data);
+						//Anne added for #7471 (1/22/18)
+						syllabusService.sendEditEvent(data, item.getContextId());
 					}
 				}else if(params.containsKey("toggle") && params.containsKey("status")){
 					String statusStr = (String) params.get("status");

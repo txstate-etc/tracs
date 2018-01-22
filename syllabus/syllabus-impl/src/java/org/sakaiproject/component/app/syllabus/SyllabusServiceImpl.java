@@ -1402,7 +1402,7 @@ public class SyllabusServiceImpl implements SyllabusService, EntityTransferrer, 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void updateEntityReferences(String toContext, Map<String, String> transversalMap){		  
+	public void updateEntityReferences(String toContext, Map<String, String> transversalMap){
 		if(transversalMap != null){
 			Set<Entry<String, String>> entrySet = (Set<Entry<String, String>>) transversalMap.entrySet();	  	
 
@@ -1488,5 +1488,12 @@ public class SyllabusServiceImpl implements SyllabusService, EntityTransferrer, 
 			}
 		}		  		  		
 	}
+
+    //Anne added for #7471 (1/22/18)
+    public void sendEditEvent(SyllabusData data, String siteId) {
+        BaseResourceEdit bre = new BaseResourceEdit(data.getSyllabusId().toString(), data, siteId);
+        bre.setEvent(EVENT_SYLLABUS_EDIT);
+        EventTrackingService.post(EventTrackingService.newEvent(bre.getEvent(), bre.getReference(), false ));
+    }
 	
 }

@@ -41,6 +41,8 @@ public interface SyllabusService extends EntityProducer
 	
 	public static final String EVENT_SYLLABUS_READ = "syllabus.read";
 
+	public static final String EVENT_SYLLABUS_EDIT = "syllabus.edit";
+
 	public static final String EVENT_SYLLABUS_DRAFT_NEW = "syllabus.draft.new";
 	
 	public static final String EVENT_SYLLABUS_DRAFT_CHANGE = "syllabus.draft.change";
@@ -90,4 +92,6 @@ public interface SyllabusService extends EntityProducer
 	public boolean checkAddOrEdit (String reference);
 	//Checks if a user can add or edit the current site
 	public boolean checkAddOrEdit ();
+
+	public void sendEditEvent(SyllabusData data, String siteId);
 }

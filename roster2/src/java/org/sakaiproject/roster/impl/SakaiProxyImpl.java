@@ -854,10 +854,13 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
                    }
                }
 
+                Map<String, String> statusCodes = courseManagementService
+                 .getEnrollmentStatusDescriptions(new ResourceLoader().getLocale());
+
                 member.setCredits(enrollment.getCredits());
                 String enrollmentStatusId = enrollment.getEnrollmentStatus();
                 member.setEnrollmentStatusId(enrollmentStatusId);
-                //member.setEnrollmentStatus(statusCodes.get(enrollmentStatusId));
+                member.setEnrollmentStatusText(statusCodes.get(enrollmentStatusId));
                 if(enrollment.getDropDate() != null) {
                     member.setDropDate(enrollment.getDropDate().toString());
                     member.setActive(false);

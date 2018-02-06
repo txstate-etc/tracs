@@ -99,7 +99,7 @@
 
     };
 
-    roster.switchState = function (state, arg) {
+    roster.switchState = function (state, args) {
 
         roster.currentState = state;
 
@@ -129,14 +129,11 @@
             }
         }
 
-        if (!roster.currentUserPermissions.rosterExport) {
-            $('#navbar_export_link').hide();
-        }
-            
         if (roster.STATE_OVERVIEW === state) {
 
             roster.enrollmentSetToView = null;
-            roster.groupToView = null;
+            roster.enrollmentStatus = 'all';
+            roster.groupToView = (args && args.group) ? args.group : null;
             roster.nextPage = 0;
 
             $('#navbar_overview_link > span').addClass('current');
@@ -147,7 +144,7 @@
 
             var showOfficialPictures = false;
 
-            if ((arg && arg.forceOfficialPicture) || roster.officialPictureMode) {
+            if ((args && args.forceOfficialPicture) || roster.officialPictureMode) {
                 showOfficialPictures = true;
             }
 
@@ -162,6 +159,12 @@
                 'roster_content');
 
             $(document).ready(function () {
+
+                if (args && args.group) {
+                    $('#roster-group-option-' + args.group).prop('selected', true);
+                }
+
+                roster.addExportHandler();
 
                 $('#roster-groups-selector-top').change(function (e) {
 
@@ -185,7 +188,6 @@
                 });
 
                 roster.setupPrintButton();
-                roster.addExportHandler();
 
                 if (roster.currentUserPermissions.viewOfficialPhoto) {
 
@@ -238,7 +240,7 @@
 
             var showOfficialPictures = false;
 
-            if ((arg && arg.forceOfficialPicture) || roster.officialPictureMode) {
+            if ((args && args.forceOfficialPicture) || roster.officialPictureMode) {
                 showOfficialPictures = true;
             }
 
@@ -251,6 +253,8 @@
 
             $(document).ready(function () {
 
+                roster.addExportHandler();
+
                 $('#roster-enrollmentset-selector').change(function (e) {
 
                     var option = this.options[this.selectedIndex];
@@ -261,6 +265,8 @@
 
                 $('#roster-status-selector').change(function (e) {
 
+                    roster.enrollmentStatus = this.value;
+                    if (roster.enrollmentStatus == '') roster.enrollmentStatus = 'all';
                     roster.renderMembership({ forceOfficialPicture: showOfficialPictures, replace: true, enrollmentStatus: this.value });
                 });
 
@@ -312,7 +318,7 @@
                     $('#roster_permissions_save_button').click(function () {
 
                        roster.sakai.savePermissions(roster.siteId, 'roster_permission_checkbox',
-                               function () { roster.switchState(roster.rosterLastStateNotPermissions); } );
+                               function () { window.location.reload(); } );
                     });
                     
                     $('#roster_cancel_button').click(function () { roster.switchState(roster.rosterLastStateNotPermissions); } );
@@ -437,8 +443,6 @@
                     var groups = groupIds.map(function (id) { return {id: id, title: m.groups[id]} });
                     m.groups = groups;
 
-                    m.enrollmentStatusText = roster.site.enrollmentStatusCodes[m.enrollmentStatusId];
-
                     if (roster.showVisits) {
                         if (m.totalSiteVisits > 0) {
                             m.formattedLastVisitTime = roster.formatDate(m.lastVisitTime);
@@ -458,9 +462,12 @@
 
                         var value = $(this).attr('data-groupid');
 
-                        roster.renderGroupMembership(value, options.forceOfficialPicture);
-
-                        $('#roster-group-option-' + value).prop('selected', true);
+                        if (roster.currentState === roster.STATE_ENROLLMENT_STATUS) {
+                            roster.switchState(roster.STATE_OVERVIEW, {group: value});
+                        } else {
+                            $('#roster-group-option-' + value).prop('selected', true);
+                            roster.renderGroupMembership(value);
+                        }
                     });
 
                     $('.roster-groups-selector').off('change').on('change', function (e) {

@@ -114,7 +114,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 	public final static String DEFAULT_FACET_CREDITS	= "Credits";
 	public final static String DEFAULT_FACET_DROPDATE	= "Drop Date";
 	public final static String DEFAULT_GROUP_ID			= "all";
-	public final static String DEFAULT_ENROLLMENT_STATUS= "All";
+	public final static String DEFAULT_ENROLLMENT_STATUS= "all";
 	public final static String DEFAULT_VIEW_TYPE		= VIEW_OVERVIEW;
 	public final static boolean DEFAULT_BY_GROUP		= false;
 	
@@ -489,7 +489,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 	private String getEnrollmentStatusValue(Map<String, Object> parameters) {
 		String enrollmentStatus = null;
 		if (null != parameters.get(KEY_ENROLLMENT_STATUS)) {
-			enrollmentStatus = parameters.get(KEY_ENROLLMENT_STATUS).toString();
+			enrollmentStatus = parameters.get(KEY_ENROLLMENT_STATUS).toString().toLowerCase();
 		}
 		return enrollmentStatus;
 	}

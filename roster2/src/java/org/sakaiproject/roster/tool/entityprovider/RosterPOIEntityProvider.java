@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -55,6 +56,7 @@ import org.sakaiproject.roster.api.RosterGroup;
 import org.sakaiproject.roster.api.RosterMember;
 import org.sakaiproject.roster.api.RosterSite;
 import org.sakaiproject.roster.api.SakaiProxy;
+import org.sakaiproject.util.ResourceLoader;
 
 import lombok.Setter;
 
@@ -169,7 +171,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			throw new EntityException(MSG_NO_FILE_CREATED, reference.getReference());
 		}
 	}
-		
+
 	private void addResponseHeader(HttpServletResponse response, String filename) {
 		
 		response.addHeader("Content-Encoding", "base64");
@@ -241,12 +243,12 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 		addResponseHeader(response, createFilename(site, groupId, viewType,
 				byGroup, enrollmentSetTitle, enrollmentStatus));
 
-		List<List<String>> dataInRows = new ArrayList<List<String>>();
+		List<List<String>> dataInRows = new ArrayList<>();
 
 		createSpreadsheetTitle(dataInRows, site, groupId, viewType,
 				enrollmentSetTitle);
 
-		List<String> header = createColumnHeader(parameters, viewType, site.getId());
+		List<String> header = createColumnHeader(viewType, site.getId());
 
 		if (VIEW_OVERVIEW.equals(viewType)) {
 
@@ -305,7 +307,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 		if (DEFAULT_ENROLLMENT_STATUS.equals(enrollmentStatusId)) {
 			membersByStatus = rosterMembers;
 		} else {
-			membersByStatus = new ArrayList<RosterMember>();
+			membersByStatus = new ArrayList<>();
 			for (RosterMember rosterMember : rosterMembers) {
 				if (enrollmentStatusId.equals(rosterMember.getEnrollmentStatusId())) {
 					membersByStatus.add(rosterMember);
@@ -318,7 +320,9 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 
 	private void addOverviewRows(List<List<String>> dataInRows,
 			List<RosterMember> rosterMembers, List<String> header, String siteId) {
-		
+
+		final String userId = this.developerHelperService.getCurrentUserId();
+
 		dataInRows.add(header);
 		// blank line
 		dataInRows.add(new ArrayList<String>());
@@ -345,6 +349,11 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			}
 
 			row.add(member.getRole());
+
+			if (this.sakaiProxy.hasUserSitePermission(userId, RosterFunctions.ROSTER_FUNCTION_VIEWGROUP, siteId)) {
+				row.add(member.getGroups().values().stream().collect(Collectors.joining(", ")));
+			}
+
 			dataInRows.add(row);
 		}
 	}
@@ -430,6 +439,8 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			List<String> header, String enrollmentSetTitle,
 			String enrollmentStatus, String siteId) {
 
+		final String userId = this.developerHelperService.getCurrentUserId();
+
 		List<String> enrollmentSetTitleRow = new ArrayList<String>();
 		enrollmentSetTitleRow.add(enrollmentSetTitle);
 		dataInRows.add(enrollmentSetTitleRow);
@@ -474,6 +485,10 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			row.add(member.getCredits());
 			row.add(member.getDropDate());
 			
+			if (this.sakaiProxy.hasUserSitePermission(userId, RosterFunctions.ROSTER_FUNCTION_VIEWGROUP, siteId)) {
+				row.add(member.getGroups().values().stream().collect(Collectors.joining(", ")));
+			}
+
 			dataInRows.add(row);
 		}
 	}
@@ -527,6 +542,39 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			return parameters.get(KEY_ROLE_ID).toString();
 		}
 		return null;
+	}
+
+	private List<String> createColumnHeader(final String viewType, final String siteId) {
+
+		final String userId = this.developerHelperService.getCurrentUserId();
+
+		final ResourceLoader rl = new ResourceLoader("org.sakaiproject.roster.i18n.ui");
+
+		final List<String> header = new ArrayList<>();
+		header.add(rl.getString("facet_name"));
+		header.add(rl.getString("facet_conf"));
+
+		if (this.sakaiProxy.getViewUserDisplayId()) {
+			header.add(rl.getString("facet_userId"));
+			header.add(rl.getString("facet_userPlid"));
+		}
+
+		if (this.sakaiProxy.getViewEmail(siteId)) {
+			header.add(rl.getString("facet_email"));
+		}
+
+		if (VIEW_OVERVIEW.equals(viewType)) {
+			header.add(rl.getString("facet_role"));
+		} else if (VIEW_ENROLLMENT_STATUS.equals(viewType)) {
+			header.add(rl.getString("facet_status"));
+			header.add(rl.getString("facet_credits"));
+			header.add(rl.getString("facet_dropDate"));
+		}
+		if (this.sakaiProxy.hasUserSitePermission(userId, RosterFunctions.ROSTER_FUNCTION_VIEWGROUP, siteId)) {
+			header.add(rl.getString("facet_groups"));
+		}
+
+		return header;
 	}
 
 	private List<String> createColumnHeader(Map<String, Object> parameters,

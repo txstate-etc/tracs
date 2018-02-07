@@ -82,7 +82,8 @@ body.is-logged-out{
   width: 100%;
   max-width: $tool-menu-width;
   height: auto;
-  margin: 0 auto; 
+  margin: 0 auto;
+  display: none;
 }
 
 #toolMenuWrap{

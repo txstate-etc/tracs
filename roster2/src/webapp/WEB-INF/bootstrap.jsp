@@ -24,7 +24,6 @@
       lang="${language}">
     <head>
         <link rel="stylesheet" media="screen, tty, tv, handheld, projection" type="text/css" href="/profile2-tool/css/profile2-profile-entity.css" media="all" />
-        <link rel="stylesheet" media="screen, tty, tv, handheld, projection" type="text/css" href="/sakai-roster2-tool/css/roster.css" media="all" />
         <link rel="stylesheet" media="print" type="text/css" href="/sakai-roster2-tool/css/print.css" />
         <link rel="stylesheet" media="screen, tty, tv, handheld, projection" type="text/css" href="/library/js/jquery/cluetip/1.2.10/css/jquery.cluetip.css" />
 

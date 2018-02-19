@@ -112,7 +112,8 @@ public class DbAuthzGroupSqlMySql extends DbAuthzGroupSqlDefault
 		sqlBuf.append("from SAKAI_REALM_RL_GR SRRG ");
 		sqlBuf.append("inner join SAKAI_REALM SR force index (AK_SAKAI_REALM_ID) ON SRRG.REALM_KEY = SR.REALM_KEY ");
 		sqlBuf.append("where " + inClause1 + " ");
-		sqlBuf.append("and SRRG.ACTIVE = '1' ");
+		//We need to show the inactive enrolled students; comment out next line. Ticket -Qu
+		// sqlBuf.append("and SRRG.ACTIVE = '1' ");
 		sqlBuf.append("and SRRG.ROLE_KEY in ");
 		sqlBuf.append("(select SRRF.ROLE_KEY ");
 		sqlBuf.append("from SAKAI_REALM_RL_FN SRRF ");

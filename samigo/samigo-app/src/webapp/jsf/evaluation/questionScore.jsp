@@ -4,8 +4,6 @@
 <%@ taglib uri="http://www.sakaiproject.org/samigo" prefix="samigo" %>
 <%@ taglib uri="http://sakaiproject.org/jsf/sakai" prefix="sakai" %>
 <%@ taglib uri="http://myfaces.apache.org/tomahawk" prefix="t"%>
-<script src="/library/js/jquery.js" type="text/javascript"></script>
-<script src="/library/js/expandCollapse.js" type="text/javascript"></script>
 
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -48,6 +46,7 @@ $Id$
       </style>
       <title><h:outputText
         value="#{evaluationMessages.title_question}" /></title>
+      <script src="/library/js/expandCollapse.js" type="text/javascript"></script>
       </head>
       <body onload="<%= request.getAttribute("html.body.onload") %>">
 
@@ -523,6 +522,8 @@ $(document).ready(function(){
 
 </div>
 
+ <div class="hideUnhide" style="padding-left: 5px;"><a id="collapseAll" href="#">Hide</a> | <a id="expandAll" href="#">Show</a>  Inactive Participants </div>
+
   <!-- STUDENT RESPONSES AND GRADING -->
   <!-- note that we will have to hook up with the back end to get N at a time -->
 <div class="table-responsive">
@@ -549,7 +550,7 @@ $(document).ready(function(){
          <h:outputText value="#{description.lastName}" />
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
          <h:outputText value="#{description.firstName}" />
-         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#990006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  escape="false" rendered="#{!description.isActive}"/>
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.StudentScoreListener" />
@@ -589,7 +590,7 @@ $(document).ready(function(){
          <h:outputText value="#{description.lastName}" />
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
          <h:outputText value="#{description.firstName}" />
-         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#990006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  escape="false" rendered="#{!description.isActive}"/>
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.StudentScoreListener" />
@@ -631,7 +632,7 @@ $(document).ready(function(){
          <h:outputText value="#{description.lastName}" />
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
          <h:outputText value="#{description.firstName}" />
-         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#9900006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  title="Includes inactive participants" rendered="#{!description.isActive}"/>
+         <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#990006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>"  escape="false" rendered="#{!description.isActive}"/>
          <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
          <f:actionListener
             type="org.sakaiproject.tool.assessment.ui.listener.evaluation.QuestionScoreUpdateListener" />
@@ -735,8 +736,6 @@ $(document).ready(function(){
        </h:commandLink>
      </h:panelGroup>
     </h:column>  
-
-<div class="hideUnhide" style="padding-left: 5px;"><a id="collapseAll" href="#">Hide</a> | <a id="expandAll" href="#">Show</a>  Inactive Participants </div>
 
    <!-- STUDENT ID -->
     <h:column rendered="#{questionScores.anonymous eq 'false' && questionScores.sortType!='agentDisplayId'}" >

@@ -38,6 +38,8 @@ import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemDetail;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemStatus;
 import org.sakaiproject.gradebookng.tool.model.AssignmentStudentGradeInfo;
 import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.user.api.UserDirectoryService;
+import org.sakaiproject.user.api.UserNotDefinedException;
 
 import au.com.bytecode.opencsv.CSVReader;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +69,9 @@ public class ImportGradesHelper {
 
 	public static List<String> WarningsList;
 	public static String[] HeadersFromInputFile;
+
+	protected static UserDirectoryService userDirectoryService;
+	private static final String PLID_PREFIX = "A0";
 
 	/**
 	 * Helper to parse the imported file into an {@link ImportedSpreadsheetWrapper} depending on its type
@@ -352,6 +357,7 @@ public class ImportGradesHelper {
 	 *
 	 * @param line
 	 * @param mapping
+	 * @param userMap (Maps EID to UserID)
 	 * @return
 	 * @throws GbImportExportUnknownStudentException if a row for a student is found that does not exist in the userMap
 	 */
@@ -386,14 +392,23 @@ public class ImportGradesHelper {
 				}
 
 				// check user is in the map (ie in the site)
+				String studentEid = lineVal;
+				if (studentEid.startsWith(PLID_PREFIX)) {
+					try {
+						studentEid = userDirectoryService.getEidByPlid(lineVal);
+					} catch (UserNotDefinedException ex) {
+						WarningsList.add("UserNotDefinedException in user directory service:" + ex.getMessage());
+						return null;
+					}
+				}
 
-				final String studentUuid = userMap.get(lineVal);
+				final String studentUuid = userMap.get(studentEid);
 				if(StringUtils.isBlank(studentUuid)){
-					WarningsList.add(lineVal + ": Ignored. Student from CSV file not found in Gradebook");
+					WarningsList.add(studentEid + ": Ignored. Student from CSV file not found in Gradebook");
 					return null;
 				}
 
-				row.setStudentEid(lineVal);
+				row.setStudentEid(studentEid);
 				row.setStudentUuid(studentUuid);
 
 			} else if (column.getType() == ImportedColumn.Type.USER_NAME) {

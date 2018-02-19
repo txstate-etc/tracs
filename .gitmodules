@@ -1,6 +1,6 @@
 [submodule "tracs-docker"]
 	path = tracs-docker
-	url = git@git.txstate.edu:its/tracs-docker.git
+	url = https://git.txstate.edu/its/tracs-docker.git
 [submodule "irubric"]
 	path = irubric
 	url = https://github.com/txstate-etc/irubric.git

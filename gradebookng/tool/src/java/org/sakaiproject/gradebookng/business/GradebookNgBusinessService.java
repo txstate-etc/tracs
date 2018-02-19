@@ -1628,6 +1628,30 @@ public class GradebookNgBusinessService {
 	}
 
 	/**
+	 * Get the grade log for this entire gradebook.
+	 *
+	 * @param gradebookUid the gradebook that we are interested in
+	 * @param since the time to check for changes from
+	 * @return
+	 */
+	public List<GbGradeLog> getEntireGradeLog(final String gradebookUid, final Date since) {
+
+		final List<GbGradeLog> rval = new ArrayList<>();
+
+		final List<Assignment> assignments = this.gradebookService.getViewableAssignmentsForCurrentUser(gradebookUid,
+				SortType.SORT_BY_SORTING);
+		final List<Long> assignmentIds = assignments.stream().map(a -> a.getId()).collect(Collectors.toList());
+		final List<GradingEvent> events = this.gradebookService.getGradingEvents(assignmentIds, since);
+
+		// filter out any events made by the current user
+		for (final GradingEvent event : events) {
+			rval.add(new GbGradeLog(event));
+		}
+
+		return rval;
+	}
+
+	/**
 	 * Get the user given a uuid
 	 *
 	 * @param userUuid

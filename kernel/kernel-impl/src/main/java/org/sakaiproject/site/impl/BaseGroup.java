@@ -527,6 +527,11 @@ public class BaseGroup implements Group, Identifiable
 		return getAzg().getUsersIsAllowed(function);
 	}
 
+	public Set getAllUsersIsAllowed(String function)
+	{
+		return getAzg().getAllUsersIsAllowed(function);
+	}
+
 	public boolean hasRole(String userId, String role)
 	{
 		return getAzg().hasRole(userId, role);

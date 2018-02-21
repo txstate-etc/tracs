@@ -144,7 +144,7 @@ public class GradebookNgBusinessService {
 			// note that this list MUST exclude TAs as it is checked in the
 			// GradebookService and will throw a SecurityException if invalid
 			// users are provided
-			final Set<String> userUuids = this.siteService.getSite(siteId).getUsersIsAllowed(GbRole.STUDENT.getValue());
+			final Set<String> userUuids = this.siteService.getSite(siteId).getAllUsersIsAllowed(GbRole.STUDENT.getValue());
 
 			// filter the allowed list based on membership
 			if (groupFilter != null && groupFilter.getType() != GbGroup.Type.ALL) {

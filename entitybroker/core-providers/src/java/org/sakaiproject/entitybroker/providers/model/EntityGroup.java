@@ -459,6 +459,13 @@ public class EntityGroup implements Group {
         throw new UnsupportedOperationException();
     }
 
+    public Set getAllUsersIsAllowed(String arg0) {
+        if (group != null) {
+            return group.getAllUsersIsAllowed(arg0);
+        }
+        throw new UnsupportedOperationException();
+    }
+
     public boolean hasRole(String arg0, String arg1) {
         if (group != null) {
             return group.hasRole(arg0, arg1);

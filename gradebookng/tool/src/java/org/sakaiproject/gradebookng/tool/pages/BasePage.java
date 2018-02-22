@@ -43,6 +43,7 @@ public class BasePage extends WebPage {
 	Link<Void> settingsPageLink;
 	Link<Void> importExportPageLink;
 	Link<Void> permissionsPageLink;
+	Link<Void> historyPageLink;
 
 	public final GbFeedbackPanel feedbackPanel;
 
@@ -146,6 +147,23 @@ public class BasePage extends WebPage {
 		};
 		this.settingsPageLink.add(new Label("screenreaderlabel", getString("link.screenreader.tabnotselected")));
 		nav.add(this.settingsPageLink);
+
+		// History Log
+		this.historyPageLink = new Link<Void>("historyPageLink") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onClick() {
+				setResponsePage(HistoryPage.class);
+			}
+
+			@Override
+			public boolean isVisible() {
+				return (BasePage.this.role == GbRole.INSTRUCTOR);
+			}
+		};
+		this.historyPageLink.add(new Label("screenreaderlabel", getString("link.screenreader.tabnotselected")));
+		nav.add(this.historyPageLink);
 
 		add(nav);
 

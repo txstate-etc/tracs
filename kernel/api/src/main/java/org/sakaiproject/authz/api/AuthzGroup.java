@@ -216,6 +216,16 @@ public interface AuthzGroup extends Edit, Comparable, Serializable
 	public Set<String> getUsersIsAllowed(String function);
 
 	/**
+	 * Access all users who have a role that is allowed this function (including inactive membership).
+	 *
+	 * @param function
+	 *        The function to check.
+	 * @return The Set of user ids (String) who have a role that is allowed this function.
+	 */
+	public Set<String> getAllUsersIsAllowed(String function);
+
+
+	/**
 	 * Test if this user has a membership in this AuthzGroup that has this role and is active.
 	 * 
 	 * @param userId

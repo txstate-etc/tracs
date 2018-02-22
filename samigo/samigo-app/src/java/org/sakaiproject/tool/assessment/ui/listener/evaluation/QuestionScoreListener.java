@@ -1019,8 +1019,8 @@ public class QuestionScoreListener implements ActionListener,
 				  EnrollmentRecord enr = (EnrollmentRecord)useridMap.get(results.getAgentId());
 				  results.setIsActive(enr.getStatus().equalsIgnoreCase("true"));
 			  }catch(Exception e){
-				  log.info("Error occured in TotalScoreListener.popAgentMemberStatus: " + e);
-}
+				  log.info("Error occured in QuestionScoreListener.popAgentMemberStatus: " + e);
+			  }
 
 		  }
 	  }

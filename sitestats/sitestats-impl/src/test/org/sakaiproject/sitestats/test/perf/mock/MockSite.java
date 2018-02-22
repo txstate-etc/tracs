@@ -186,6 +186,12 @@ public class MockSite implements Site {
 	}
 
 	@Override
+	public Set<String> getAllUsersIsAllowed(String function) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public boolean hasRole(String userId, String role) {
 		// TODO Auto-generated method stub
 		return false;

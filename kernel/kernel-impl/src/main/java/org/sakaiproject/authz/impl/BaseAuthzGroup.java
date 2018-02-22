@@ -858,6 +858,25 @@ public class BaseAuthzGroup implements AuthzGroup
 		return rv;
 	}
 
+	public Set getAllUsersIsAllowed(String lock)
+	{
+		if (m_lazy) baseAuthzGroupService.m_storage.completeGet(this);
+
+		Set rv = new HashSet();
+		for (Iterator it = m_userGrants.entrySet().iterator(); it.hasNext();)
+		{
+			Map.Entry entry = (Map.Entry) it.next();
+			String user = (String) entry.getKey();
+			BaseMember grant = (BaseMember) entry.getValue();
+			if (grant.role.isAllowed(lock))
+			{
+				rv.add(user);
+			}
+		}
+
+		return rv;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * This really should be called getActiveUserHasRole, sakai use this method all over

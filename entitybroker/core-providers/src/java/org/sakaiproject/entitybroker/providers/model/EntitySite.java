@@ -820,6 +820,13 @@ public class EntitySite implements Site {
         throw new UnsupportedOperationException();
     }
 
+    public Set getAllUsersIsAllowed(String arg0) {
+        if (site != null) {
+            return site.getUsersIsAllowed(arg0);
+        }
+        throw new UnsupportedOperationException();
+    }
+
     public boolean hasRole(String arg0, String arg1) {
         if (site != null) {
             return site.hasRole(arg0, arg1);

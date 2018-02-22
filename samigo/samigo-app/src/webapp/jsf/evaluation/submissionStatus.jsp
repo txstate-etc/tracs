@@ -3,8 +3,6 @@
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://www.sakaiproject.org/samigo" prefix="samigo" %>
 <%@ taglib uri="http://sakaiproject.org/jsf/sakai" prefix="sakai" %>
-<script src="/library/js/jquery.js" type="text/javascript"></script>
-<script src="/library/js/expandCollapse.js" type="text/javascript"></script>
   
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -39,13 +37,10 @@ $Id$
       <head><%= request.getAttribute("html.head") %>
       <title><h:outputText
         value="#{evaluationMessages.sub_status}" /></title>
+      <script src="/library/js/expandCollapse.js" type="text/javascript"></script>
       </head>
       <body onload="<%= request.getAttribute("html.body.onload") %>">
 <!-- content... -->
-
-<!-- JAVASCRIPT -->
-<%@ include file="/js/delivery.js" %>
-<%@ include file="/library/js/expandCollapse.js" %>
 
 <div class="portletBody container-fluid">
 <h:form id="editTotalResults">
@@ -191,6 +186,7 @@ $Id$
        <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
        <h:outputText value="#{description.firstName}" />
        <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
+       <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#990006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>" escape="false" rendered="#{!description.isActive}" />
        <f:verbatim><br/></f:verbatim>
 	   <h:panelGroup styleClass="itemAction" rendered="#{totalScores.anonymous eq 'false' && description.email != null && description.email != '' && email.fromEmailAddress != null && email.fromEmailAddress != ''}">
 		 <h:outputText value="<a href=\"mailto:" escape="false" />
@@ -235,7 +231,7 @@ $Id$
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
        <h:outputText value="#{description.firstName}" />
        <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
-       <h:graphicImage value="/../library/image/inactive.gif" alt="Includes inactive participants" title="Includes inactive participants" rendered="#{!description.isActive}"/>
+       <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#990006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>" escape="false" rendered="#{!description.isActive}" />
        <f:verbatim><br/></f:verbatim>
 	   <span class="itemAction">
 	   <h:panelGroup rendered="#{totalScores.anonymous eq 'false' && description.email != null && description.email != '' && email.fromEmailAddress != null && email.fromEmailAddress != ''}">
@@ -283,8 +279,7 @@ $Id$
          <h:outputText value=", " rendered="#{description.lastInitial ne 'Anonymous'}"/>
        <h:outputText value="#{description.firstName}" />
        <h:outputText value="#{evaluationMessages.na}" rendered="#{description.lastInitial eq 'Anonymous'}" />
-       <h:graphicImage value="/../library/image/inactive.gif" alt="Includes inactive participants" title="Includes inactive participants" rendered="#{!description.isActive}"/>
-       <h:graphicImage value="/../library/image/inactive.gif" alt="Includes inactive participants" title="Includes inactive participants" rendered="#{!description.isActive}"/>
+       <h:outputText value="<i class=\"fa fa-ban\" style=\"color:#990006\" aria-hidden=\"true\" aria-label=\"Includes inactive participants\" title=\"Includes inactive participants\"></i>" escape="false" rendered="#{!description.isActive}" />
        <f:verbatim><br/></f:verbatim>
 	   <span class="itemAction">
 	   <h:panelGroup rendered="#{totalScores.anonymous eq 'false' && description.email != null && description.email != '' && email.fromEmailAddress != null && email.fromEmailAddress != ''}">

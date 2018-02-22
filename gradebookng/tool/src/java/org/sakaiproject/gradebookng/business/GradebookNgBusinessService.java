@@ -41,6 +41,7 @@ import org.sakaiproject.gradebookng.business.model.GbGroup;
 import org.sakaiproject.gradebookng.business.model.GbStudentGradeInfo;
 import org.sakaiproject.gradebookng.business.model.GbStudentNameSortOrder;
 import org.sakaiproject.gradebookng.business.model.GbUser;
+import org.sakaiproject.gradebookng.business.model.GbHistoryLog;
 import org.sakaiproject.gradebookng.business.util.CourseGradeFormatter;
 import org.sakaiproject.gradebookng.business.util.FormatHelper;
 import org.sakaiproject.gradebookng.business.util.GbStopWatch;
@@ -1266,7 +1267,6 @@ public class GradebookNgBusinessService {
 			if (!event.getGraderId().equals(currentUser.getId())) {
 				// update cache (if required)
 				users.putIfAbsent(event.getGraderId(), getUser(event.getGraderId()));
-
 				// pull user from the cache
 				final GbUser updatedBy = users.get(event.getGraderId());
 				rval.add(
@@ -1634,18 +1634,34 @@ public class GradebookNgBusinessService {
 	 * @param since the time to check for changes from
 	 * @return
 	 */
-	public List<GbGradeLog> getEntireGradeLog(final String gradebookUid, final Date since) {
+	public List<GbHistoryLog> getHistoryLog(final Date since) {
 
-		final List<GbGradeLog> rval = new ArrayList<>();
+		final List<GbHistoryLog> rval = new ArrayList<>();
 
-		final List<Assignment> assignments = this.gradebookService.getViewableAssignmentsForCurrentUser(gradebookUid,
-				SortType.SORT_BY_SORTING);
+		final List<Assignment> assignments = this.gradebookService
+			.getViewableAssignmentsForCurrentUser(getCurrentSiteId(), SortType.SORT_BY_SORTING);
 		final List<Long> assignmentIds = assignments.stream().map(a -> a.getId()).collect(Collectors.toList());
 		final List<GradingEvent> events = this.gradebookService.getGradingEvents(assignmentIds, since);
 
-		// filter out any events made by the current user
+		final Map<String, GbUser> users = new HashMap<>();
+
 		for (final GradingEvent event : events) {
-			rval.add(new GbGradeLog(event));
+			if (!users.containsKey(event.getGraderId())) {
+				users.putIfAbsent(event.getGraderId(), this.getUser(event.getGraderId()));
+			}
+			final GbUser grader = users.get(event.getGraderId());
+
+			if (!users.containsKey(event.getStudentId())) {
+				users.putIfAbsent(event.getStudentId(), this.getUser(event.getStudentId()));
+			}
+			final GbUser student = users.get(event.getStudentId());
+
+			final Assignment eventAssignment = assignments.stream()
+				.filter((a) -> a.getId() == event.getGradableObject().getId())
+				.findFirst()
+				.orElse(null);
+
+			rval.add(new GbHistoryLog(event, student, grader, eventAssignment));
 		}
 
 		return rval;

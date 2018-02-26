@@ -282,6 +282,7 @@ public class GradebookPage extends BasePage {
 				modelData.put("lastName", studentGradeInfo.getStudentLastName());
 				modelData.put("displayName", studentGradeInfo.getStudentDisplayName());
 				modelData.put("nameSortOrder", settings.getNameSortOrder());
+				modelData.put("status", studentGradeInfo.isActive());
 
 				cellItem.add(new StudentNameCellPanel(componentId, Model.ofMap(modelData)));
 				cellItem.add(new AttributeModifier("data-studentUuid", studentGradeInfo.getStudentUuid()));
@@ -509,6 +510,9 @@ public class GradebookPage extends BasePage {
 						super.onComponentTag(tag);
 
 						tag.getAttributes().put("role", "row");
+						if (!((GbStudentGradeInfo)model.getObject()).isActive()) {
+							tag.getAttributes().put("class","inactivePar inactive inactiveBack");
+						}
 					}
 				};
 			}
@@ -816,6 +820,9 @@ public class GradebookPage extends BasePage {
 				.forUrl(String.format("/gradebookng-tool/scripts/gradebook-grade-summary.js?version=%s", version)));
 		response.render(JavaScriptHeaderItem
 				.forUrl(String.format("/gradebookng-tool/scripts/gradebook-update-ungraded.js?version=%s", version)));
+
+		response.render(JavaScriptHeaderItem
+			.forUrl(String.format("/library/js/expandCollapse.js?version=%s", version)));
 	}
 
 	/**

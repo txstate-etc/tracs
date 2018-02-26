@@ -43,6 +43,10 @@ public class GbStudentGradeInfo implements Serializable {
 	@Getter
 	private Map<Long, Double> categoryAverages;
 
+	@Getter
+	@Setter
+	private boolean isActive;
+
 	public GbStudentGradeInfo() {
 	}
 

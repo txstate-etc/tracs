@@ -44,6 +44,7 @@ public class StudentNameCellPanel extends Panel {
 		final String firstName = (String) modelData.get("firstName");
 		final String lastName = (String) modelData.get("lastName");
 		final String displayName = (String) modelData.get("displayName");
+		final boolean status = (boolean) modelData.get("status");
 		final GbStudentNameSortOrder nameSortOrder = (GbStudentNameSortOrder) modelData.get("nameSortOrder");
 
 		// link
@@ -95,6 +96,16 @@ public class StudentNameCellPanel extends Panel {
 				return true; // TODO use config, will need to be passed in the model map
 			}
 
+		});
+
+		link.add(new Label("status", status){
+			@Override
+			public boolean isVisible() {
+				if(status)
+					return false;
+				else
+					return true;
+			}
 		});
 
 		add(link);

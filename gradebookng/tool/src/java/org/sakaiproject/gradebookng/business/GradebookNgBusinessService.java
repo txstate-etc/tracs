@@ -99,6 +99,9 @@ public class GradebookNgBusinessService {
 	private UserDirectoryService userDirectoryService;
 
 	@Setter
+	private AuthzGroupService authzGroupService;
+
+	@Setter
 	private ToolManager toolManager;
 
 	@Setter
@@ -649,6 +652,15 @@ public class GradebookNgBusinessService {
 		// get current user
 		final String currentUserUuid = getCurrentUser().getId();
 
+		String realmId = null;
+		GbGroup groupFilter = uiSettings.getGroupFilter();
+		if (groupFilter != null && groupFilter.getType() != GbGroup.Type.ALL)
+			realmId = groupFilter.getReference();
+		else
+			realmId = "/site/" + getCurrentSiteId();
+
+		boolean active = true;
+
 		// get role for current user
 		final GbRole role = this.getUserRole();
 
@@ -701,6 +713,15 @@ public class GradebookNgBusinessService {
 			final GbCourseGrade gbCourseGrade = new GbCourseGrade(courseGrades.get(student.getId()));
 			gbCourseGrade.setDisplayString(courseGradeFormatter.format(courseGrade));
 			sg.setCourseGrade(gbCourseGrade);
+			try {
+				Member member = authzGroupService.getAuthzGroup(realmId).getMember(student.getId());
+				if(member != null) {
+					active = member.isActive();
+				}
+			} catch (GroupNotDefinedException e) {
+				log.info("Group " + realmId + "does not exist.");
+			}
+			sg.setActive(active);
 
 			// add to map so we can build on it later
 			matrix.put(student.getId(), sg);

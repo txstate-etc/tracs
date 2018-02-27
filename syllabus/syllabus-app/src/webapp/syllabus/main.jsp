@@ -177,7 +177,6 @@
 				<li>
 					<span>
 							<a href="javascript:void(0)" id="expandLink" onclick="expandAccordion('<%= org.sakaiproject.util.Web.escapeJavascript(thisId)%>')">
-								<img src="/library/image/silk/arrow_out.png" alt=""/>&nbsp;&nbsp;
 								</f:verbatim>
 									<h:outputText value="#{msgs.expandAll}"/>
 								<f:verbatim>

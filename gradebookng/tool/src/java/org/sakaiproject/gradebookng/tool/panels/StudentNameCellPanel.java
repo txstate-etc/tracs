@@ -74,8 +74,17 @@ public class StudentNameCellPanel extends Panel {
 				}
 
 				content.setOutputMarkupId(true);
-				final String modalTitle = (new StringResourceModel("heading.studentsummary",
+				String modalTitle = (new StringResourceModel("heading.studentsummary",
 						null, new Object[] { displayName, eid })).getString();
+
+				//Adding inactive icon for tracs
+				if(!status) {
+					modalTitle = modalTitle + "<i class=" + "\\" + "\"fa fa-ban inactivePar" + "\\" + "\""
+							+ "style=" + "\\" + "\"color:#990006" + "\\" + "\"" + "aria-hidden=" + "\\"+ "\"" + "true" + "\\" + "\""
+							+ "aria-label=" + "\\" + "\"Includes inactive participants" + "\\" +"\""
+							+ "title=" + "\\" + "\"" + "Includes inactive participants" + "\\" +"\"" + "></i>";
+				}
+
 				target.appendJavaScript(String.format(
 						"new GradebookGradeSummary($(\"#%s\"), false, \"%s\");",
 						content.getMarkupId(), modalTitle));

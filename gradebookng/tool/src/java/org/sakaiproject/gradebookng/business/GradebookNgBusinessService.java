@@ -655,7 +655,7 @@ public class GradebookNgBusinessService {
 		final String currentUserUuid = getCurrentUser().getId();
 
 		String realmId = null;
-		GbGroup groupFilter = uiSettings.getGroupFilter();
+		GbGroup groupFilter = settings.getGroupFilter();
 		if (groupFilter != null && groupFilter.getType() != GbGroup.Type.ALL)
 			realmId = groupFilter.getReference();
 		else

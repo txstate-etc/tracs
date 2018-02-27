@@ -22,6 +22,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.gradebookng.business.exception.GbImportCommentMissingItemException;
 import org.sakaiproject.gradebookng.business.exception.GbImportExportDuplicateColumnException;
 import org.sakaiproject.gradebookng.business.exception.GbImportExportInvalidColumnException;
@@ -38,7 +39,7 @@ import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemDetail;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemStatus;
 import org.sakaiproject.gradebookng.tool.model.AssignmentStudentGradeInfo;
 import org.sakaiproject.service.gradebook.shared.Assignment;
-import org.sakaiproject.user.api.UserDirectoryService;
+import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -70,7 +71,6 @@ public class ImportGradesHelper {
 	public static List<String> WarningsList;
 	public static String[] HeadersFromInputFile;
 
-	protected static UserDirectoryService userDirectoryService;
 	private static final String PLID_PREFIX = "A0";
 
 	/**
@@ -395,7 +395,7 @@ public class ImportGradesHelper {
 				String studentEid = lineVal;
 				if (studentEid.startsWith(PLID_PREFIX)) {
 					try {
-						studentEid = userDirectoryService.getEidByPlid(lineVal);
+						studentEid = UserDirectoryService.getEidByPlid(lineVal);
 					} catch (UserNotDefinedException ex) {
 						WarningsList.add("UserNotDefinedException in user directory service:" + ex.getMessage());
 						return null;

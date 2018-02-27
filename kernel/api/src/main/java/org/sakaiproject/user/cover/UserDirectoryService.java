@@ -331,6 +331,14 @@ public class UserDirectoryService
 		return service.getUserEid(param0);
 	}
 
+	public static java.lang.String getEidByPlid(java.lang.String param0) throws org.sakaiproject.user.api.UserNotDefinedException
+	{
+		org.sakaiproject.user.api.UserDirectoryService service = getInstance();
+		if (service == null) return null;
+
+		return service.getEidByPlid(param0);
+	}
+
 	public static java.lang.String getUserId(java.lang.String param0) throws org.sakaiproject.user.api.UserNotDefinedException
 	{
 		org.sakaiproject.user.api.UserDirectoryService service = getInstance();

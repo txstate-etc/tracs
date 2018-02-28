@@ -86,8 +86,8 @@ export TZ="US/Central"
 (
 	JAVA=$(which $JAVA_HOME/bin/java java|head -n1)
 	JAVA_VERSION=$(perl -e '($jV) = `'$JAVA' -version 2>&1`=~m/^java version "([\d._]+)"/m; print join("",map({sprintf("%03d",$_)} split(m/[._]/,$jV)));')
-	if [[ $JAVA_VERSION < 1008000092 || $JAVA_VERSION >= 1009000000 ]]; then
-		echo "Please use Java 8, update 92 or newer. (java=$JAVA version=$JAVA_VERSION)"
+	if [[ $JAVA_VERSION < 1008000151 || $JAVA_VERSION > 1008000999 ]]; then
+		echo "Please use Java 8, update 151 or newer. (java=$JAVA version=$JAVA_VERSION)"
 		exit 1
 	fi
 )

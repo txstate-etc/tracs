@@ -5,7 +5,7 @@ rm -r $REPO_ROOT/tracs-docker/components $REPO_ROOT/tracs-docker/lib $REPO_ROOT/
 mkdir $REPO_ROOT/tracs-docker/lib
 mkdir -p /tmp/tracs-apache
 echo "Copying core tomcat libraries..."
-wget -qO- http://archive.apache.org/dist/tomcat/tomcat-8/v8.0.36/bin/apache-tomcat-8.0.36.tar.gz | tar -xz --strip-component 1 -C /tmp/tracs-apache
+wget -qO- http://archive.apache.org/dist/tomcat/tomcat-8/v8.0.46/bin/apache-tomcat-8.0.46.tar.gz | tar -xz --strip-component 1 -C /tmp/tracs-apache
 cp -r /tmp/tracs-apache/lib/* $REPO_ROOT/tracs-docker/lib/
 rm -r /tmp/tracs-apache
 

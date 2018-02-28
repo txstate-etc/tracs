@@ -84,7 +84,7 @@
                 <module>msgcntr</module>
                 <module>oauth</module>
                 <module>pasystem</module>
-                <module>podcasts</module>
+            <!--    <module>podcasts</module>  -->
                 <module>polls</module>
                 <module>portal</module>
                 <module>postem</module>
@@ -132,7 +132,7 @@
                 <!-- Contrib Tools -->
                 <module>melete</module>
                 <module>blogwow</module>
-                <module>bbb</module>
+          <!--      <module>bbb</module>  -->
           <!--      <module>turningpoint</module> -->
                 <module>irubric/irubric-core</module>
                 <module>irubric/irubric-tool</module>

@@ -25,10 +25,7 @@ public class GbHistoryLog implements Serializable {
 	private final Date dateGraded;
 
 	@Getter
-	private final String graderId;
-
-	@Getter
-	private final String graderName;
+	private final String graderDisplayId;
 
 	@Getter
 	private final String assignmentName;
@@ -44,11 +41,10 @@ public class GbHistoryLog implements Serializable {
 
 	public GbHistoryLog(GradingEvent ge, GbUser student, GbUser grader, Assignment assignment) {
 		this.dateGraded = ge.getDateGraded();
-		this.graderId = ge.getGraderId();
 		this.grade = ge.getGrade();
 		this.studentId = ge.getStudentId();
 
-		this.graderName = grader.getDisplayId();
+		this.graderDisplayId = grader.getDisplayId();
 		this.studentName = student.getDisplayName();
 
 		this.assignmentName = assignment.getName();

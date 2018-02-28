@@ -1670,14 +1670,16 @@ public class GradebookNgBusinessService {
 
 		for (final GradingEvent event : events) {
 			if (!users.containsKey(event.getGraderId())) {
+				log.info("Calling getUser with: " + event.getGraderId());
 				users.putIfAbsent(event.getGraderId(), this.getUser(event.getGraderId()));
 			}
-			final GbUser grader = users.get(event.getGraderId());
+			GbUser grader = users.get(event.getGraderId());
+			log.info("Grader name and id are:" + grader.getDisplayName() + ", " + grader.getDisplayId());
 
 			if (!users.containsKey(event.getStudentId())) {
 				users.putIfAbsent(event.getStudentId(), this.getUser(event.getStudentId()));
 			}
-			final GbUser student = users.get(event.getStudentId());
+			GbUser student = users.get(event.getStudentId());
 
 			final Assignment eventAssignment = assignments.stream()
 				.filter((a) -> a.getId() == event.getGradableObject().getId())

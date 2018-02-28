@@ -83,7 +83,7 @@ public class CourseGradeStatisticsPanel extends Panel {
         counts.put(String.format("%d-%d", 0, 50), 0);
 
         final int range = 10;
-        for (int start = 50; start < 100; start = start + range) {
+        for (int start = 50; start < 150; start = start + range) {
             final String key = String.format("%d-%d", start, start + range);
             counts.put(key, 0);
         }
@@ -93,7 +93,7 @@ public class CourseGradeStatisticsPanel extends Panel {
 
             int start = total * range;
 
-            if (start == 100) {
+            if (start == 150) {
                 start = start - range;
             }
 

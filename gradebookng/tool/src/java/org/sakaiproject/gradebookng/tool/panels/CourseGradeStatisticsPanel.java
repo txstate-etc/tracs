@@ -83,17 +83,20 @@ public class CourseGradeStatisticsPanel extends Panel {
         counts.put(String.format("%d-%d", 0, 50), 0);
 
         final int range = 10;
-        for (int start = 50; start < 150; start = start + range) {
+        for (int start = 50; start < 100; start = start + range) {
             final String key = String.format("%d-%d", start, start + range);
             counts.put(key, 0);
         }
-
+        int extraCredits = 0;
         for (final Double grade : grades) {
+            if (grade > 100) {
+              extraCredits = extraCredits + 1;
+              continue;
+            }
             final int total = Double.valueOf(grade / range).intValue();
-
             int start = total * range;
 
-            if (start == 150) {
+            if (start == 100) {
                 start = start - range;
             }
 
@@ -108,6 +111,11 @@ public class CourseGradeStatisticsPanel extends Panel {
 
         for (final String label : counts.keySet()) {
             data.addValue(counts.get(label), "count", label);
+        }
+
+        if (extraCredits > 0) {
+          data.addValue(extraCredits, "count",
+          getString("label.statistics.chart.extracredit"));
         }
 
         //make bar graph

@@ -12,9 +12,9 @@ var dhtml_view_sites = function(){
   dhtml_view_sites = function(){
 
     var modal = $PBJQ('#selectSiteModal');
-    
+
     modal.show();
-    
+
     if (modal.hasClass('outscreen') ) {
 
       $PBJQ('body').toggleClass('active-more-sites');
@@ -26,19 +26,17 @@ var dhtml_view_sites = function(){
 
       if (allSitesButton.length > 0) {
         // Raise the button to keep it visible over the modal overlay
-        // allSitesButton.css('z-index', 1005);
+        allSitesButton.css('z-index', 1005);
 
-        // var topPosition = allSitesButton.offset().top + allSitesButton.outerHeight() + topPadding;
-        // var rightPosition = $PBJQ('body').outerWidth() - (allSitesButton.offset().left + allSitesButton.outerWidth());
-        // var leftPosition = allSitesButton.offset().left + "px";
-        // if( $PBJQ('html').attr('dir') !== "rtl" ){
-        //   // modal.css('top', topPosition).css('right', rightPosition);
-        //   modal.css('top', topPosition).css('left', leftPosition);
-        // }else{
-        //   modal.css('top', topPosition).css('left', $PBJQ('body').outerWidth() - rightPosition );
-        // }
+        var topPosition = allSitesButton.offset().top + allSitesButton.outerHeight() + topPadding;
+        var rightPosition = $PBJQ('body').outerWidth() - (allSitesButton.offset().left + allSitesButton.outerWidth());
+        if( $PBJQ('html').attr('dir') !== "rtl" ){
+          modal.css('top', topPosition).css('right', rightPosition);
+        }else{
+          modal.css('top', topPosition).css('left', $PBJQ('body').outerWidth() - rightPosition );
+        }
       }
-      
+
       modal.toggleClass('outscreen');
 
       var paneHeight = $PBJQ(window).height();

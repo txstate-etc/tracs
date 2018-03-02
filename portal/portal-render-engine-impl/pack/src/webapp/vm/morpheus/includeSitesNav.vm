@@ -13,7 +13,7 @@
                             <span class="Mrphs-sitesNav__menuitem--myworkspace-label">${rloader.sit_mywor}</span>
                             <span class="Mrphs-sitesNav__drop" tabindex="-1" data-site-id="${site.siteId}"></span>
                         </a>
-                    </li>           
+                    </li>
                 #end ## END of IF (${site.isMyWorkspace})
 
                 ## Only show other sites if they're the current site, a favorite of the current user, or if there *is* no current user and we're showing Gateway sites.
@@ -27,12 +27,6 @@
 
                 #end ## END of IF (${site.isMyWorkspace})
             #end ## END of FOREACH ( $site in $tabsSites.tabsSites )
-            <li class="Mrphs-sitesNav__menuitem">
-                <a class="link-container view-all-sites-btn" href="#" title="${rloader.sit_worksites}" role="menuitem" aria-haspopup="true">
-                    <i class="fa fa-th"></i>
-                    <span>${rloader.sit_worksites}</span>
-                </a>
-            </li>
         </ul>
     </div>
 

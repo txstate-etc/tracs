@@ -2,7 +2,7 @@
 
 
 //variables used in this file should have default values because they
-//might not be defined in the custom variables file 
+//might not be defined in the custom variables file
 
 $top-header-text-color: #ffffff !default;
 $selected-tool-border: none !default;
@@ -56,19 +56,7 @@ $samigo-active-tab-border: #003eff !default;
 
 // This is the separator between the Sites and Sakai menus in the top right corner
 .is-maximized #loginLinks {
-  border-color: transparent;
-}
-
-#selectSiteModal {
-  left: 50%;
-  top: 20%;
-  transform: translate(-50%, -20%);
-  @media (max-width: $break-small-end){
-      transform: none;
-    }
-  &::after {
-    display: none;
-  }
+  border-color: $top-header-text-color;;
 }
 
 .Mrphs-toolTitleNav .Mrphs-toolTitleNav__title {
@@ -204,13 +192,6 @@ $samigo-active-tab-border: #003eff !default;
     padding: .2em;
     position: relative;
     font-weight: 500;
-    .view-all-sites-btn {
-      display: inline;
-      z-index: auto !important;
-      i {
-        margin-right: 0.35em;
-      }
-    }
   }
   .Mrphs-sitesNav__submenuitem {
     a {
@@ -341,4 +322,3 @@ body.Mrphs-portalBody{
     }
   }
 }
-

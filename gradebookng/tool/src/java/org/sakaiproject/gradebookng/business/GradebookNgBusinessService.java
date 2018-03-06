@@ -1663,8 +1663,16 @@ public class GradebookNgBusinessService {
 
 		final List<Assignment> assignments = this.gradebookService
 			.getViewableAssignmentsForCurrentUser(getCurrentSiteId(), SortType.SORT_BY_SORTING);
+		if (assignments == null || assignments.isEmpty()) {
+			return rval;
+		}
+
 		final List<Long> assignmentIds = assignments.stream().map(a -> a.getId()).collect(Collectors.toList());
+
 		final List<GradingEvent> events = this.gradebookService.getGradingEvents(assignmentIds, since);
+		if (events == null || events.isEmpty()) {
+			return rval;
+		}
 
 		final Map<String, GbUser> users = new HashMap<>();
 

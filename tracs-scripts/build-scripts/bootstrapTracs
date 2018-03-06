@@ -7,7 +7,7 @@ use File::Temp qw/tempdir/;
 
 
 our $sakaiVersion = '11.4';
-our $tomcatVersion = '8.0.36';
+our $tomcatVersion = '8.5.28';
 
 my $tempDir = tempdir( CLEANUP => 1 );
 my $currentDirectory = abs_path();

@@ -58,7 +58,7 @@ public class ExcuseGradePanel extends Panel {
             public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
                 boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, !excludedFromGrade);
                 if (success) {
-                    if (!excludedFromGrade) {
+                    if (!excludedFromGrade && (gradeInfo.getGrade() != null && !gradeInfo.getGrade().isEmpty())) {
                         //If we just switched the excluded flag from FALSE to TRUE, we must blank out the grade
                         businessService.saveGrade(assignmentId, studentUuid, gradeInfo.getGrade(), "", gradeInfo.getGradeComment());
                     }

@@ -397,7 +397,7 @@ public class ImportGradesHelper {
 					try {
 						studentEid = UserDirectoryService.getEidByPlid(lineVal);
 					} catch (UserNotDefinedException ex) {
-						WarningsList.add("UserNotDefinedException in user directory service:" + ex.getMessage());
+						log.error("UserNotDefinedException in user directory service:" + ex.getMessage());
 						return null;
 					}
 				}

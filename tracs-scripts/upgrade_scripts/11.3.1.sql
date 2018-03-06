@@ -1138,3 +1138,6 @@ UPDATE CONTENTREVIEW_ITEM SET urlAccessed = 1 WHERE dateSubmitted < SYSDATE();
 
 -- Add new column for Lesson Builder
 alter table lesson_builder_pages add folder varchar(250);
+
+-- Convert TRACS 10 skins to TRACS 11 new default skin
+UPDATE SAKAI_SITE SET skin='tracs-default' WHERE SKIN IN ('tracs-nature','tracs-bluestars','tracs-oldmain','tracs-midnightblue','tracs-skyline');

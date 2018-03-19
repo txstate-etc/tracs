@@ -257,6 +257,9 @@
 				  	 #foreach ($s in $skins)
 						  #set($url="")
 						  #set($url=$!s.Url)
+						  #if($s.Name == "Corn")
+						  	$s.Name = "Light Amber"
+						  #end
 						  <option value="$url" #if ($url == $selectedIcon)selected="selected"#end>$s.Name</option>
 					  #end
 				  </select>

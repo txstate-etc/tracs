@@ -1461,19 +1461,25 @@ public class GradebookNgBusinessService {
 		{
 			for (final GradeDefinition def : defs)
 			{
-				String grade = def.getGrade();
-				if(grade == null || grade.isEmpty()) {
-					log.warn("Ignored one Grade Definition due to empty Grade");
+				if (def.getExcludedFromGrade()) {
+					log.info("Ignored one Grade Definition because grade has been excused");
 					continue;
 				}
 
-				if (def.getExcludedFromGrade()) {
-					log.warn("Ignored one Grade Definition because grade has been excused");
+				String grade = def.getGrade();
+				if(grade == null || grade.isEmpty()) {
+					log.info("Ignored one Grade Definition due to empty Grade");
+					continue;
+				}
+
+				Double dblGrade = Double.parseDouble(grade);
+				if (Double.compare(dblGrade, 0.0) == 0) {
+					log.info("Ignored one Grade Definition due to a Grade of zero");
 					continue;
 				}
 
 				if(def.getGradeEntryType() == GradebookService.GRADE_TYPE_POINTS) {			
-					double newGrade = Double.parseDouble(grade) + pointValue;
+					double newGrade = dblGrade + pointValue;
 					newGrade = Math.max(newGrade, 0.0);
 					if (newGrade > maxGradePoints) {
 						returnVal++;
@@ -1483,7 +1489,7 @@ public class GradebookNgBusinessService {
 					saveList.add(def);
 				}
 				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_PERCENTAGE) {
-					double newGrade = Double.parseDouble(grade) + ((pointValue / 100.0) * assignmentMaxPoints);
+					double newGrade = dblGrade + ((pointValue / 100.0) * assignmentMaxPoints);
 					newGrade = Math.max(newGrade, 0.0);
 					if (newGrade > maxPercentage) {
 						returnVal++;

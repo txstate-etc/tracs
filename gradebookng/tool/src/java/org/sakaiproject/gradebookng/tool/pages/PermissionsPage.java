@@ -81,6 +81,10 @@ public class PermissionsPage extends BasePage {
 			}
 		}
 
+		if (taSelected == null && !teachingAssistants.isEmpty()) {
+			taSelected = teachingAssistants.get(0);
+		}
+
 		// get list of categories
 		final List<CategoryDefinition> categories = this.businessService.getGradebookCategories();
 

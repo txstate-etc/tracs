@@ -47,7 +47,7 @@ public class GbHistoryLog implements Serializable {
 		this.graderDisplayId = grader.getDisplayId();
 		this.studentName = student.getDisplayName();
 
-		this.assignmentName = assignment.getName();
+		this.assignmentName = assignment == null ? "NULL" : assignment.getName();
 	}
 
 	@Override

@@ -1667,8 +1667,7 @@ public class GradebookNgBusinessService {
 
 		final List<GbHistoryLog> rval = new ArrayList<>();
 
-		final List<Assignment> assignments = this.gradebookService
-			.getViewableAssignmentsForCurrentUser(getCurrentSiteId(), SortType.SORT_BY_SORTING);
+		final List<Assignment> assignments = this.getGradebookAssignments();
 		if (assignments == null || assignments.isEmpty()) {
 			return rval;
 		}

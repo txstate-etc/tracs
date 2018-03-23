@@ -20,15 +20,7 @@
 
 package org.sakaiproject.entitybroker.providers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -626,10 +618,27 @@ RESTful, ActionsExecutable, Redirectable, RequestStorable, DepthLimitable {
               String siteId = site.getId();
     
               if (securityService.unlock(userId, permission, siteService.siteReference(siteId))) {
+                  List<ToolConfiguration> tools = null;
+                  List<SitePage> pages = site.getPages();
+
+                  for (SitePage page : pages) {
+                      if (page == null) continue;
+                      if (tools == null) {
+                          tools = page.getTools();
+                      } else {
+                          tools.addAll(page.getTools());
+                      }
+                  }
+
+                  if (tools != null) {
+                      for (ToolConfiguration tool : tools) {
+                          if (tool == null) continue;
+                          site.setProperty(tool.getToolId(), tool.getPageId());
+                      }
+                  }
                   sites.add(site);
               }
           }
-    
            return sites;
         }
 

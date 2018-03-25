@@ -330,9 +330,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 		for (RosterMember member : rosterMembers) {
 
 			List<String> row = new ArrayList<String>();
-			
-			row.add(member.isConfidential() ? "yes" : "no");
-			
+
 			if (sakaiProxy.getFirstNameLastName()) {
 				row.add(member.getDisplayName());
 			} else {
@@ -343,6 +341,8 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 				row.add(member.getDisplayId());
 				row.add(member.getPlid());
 			}
+
+			row.add(member.isConfidential() ? "yes" : "no");
 
 			if (sakaiProxy.getViewEmail(siteId)) {
 				row.add(member.getEmail());
@@ -369,8 +369,6 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 
 			List<String> row = new ArrayList<String>();
 
-			row.add(member.isConfidential() ? "yes" : "no");
-
 			if (sakaiProxy.getFirstNameLastName()) {
 				row.add(member.getDisplayName());
 			} else {
@@ -381,6 +379,8 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 				row.add(member.getDisplayId());
 				row.add(member.getPlid());
 			}
+
+			row.add(member.isConfidential() ? "yes" : "no");
 			
 			row.add(member.getRole());
 			row.add(member.getGroupsToString());
@@ -410,8 +410,6 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 
 					List<String> row = new ArrayList<String>();
 
-					row.add(member.isConfidential() ? "yes" : "no");
-
 					if (sakaiProxy.getFirstNameLastName()) {
 						row.add(member.getDisplayName());
 					} else {
@@ -422,7 +420,9 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 						row.add(member.getDisplayId());
 						row.add(member.getPlid());
 					}
-					
+
+					row.add(member.isConfidential() ? "yes" : "no");
+
 					row.add(member.getRole());
 					row.add(member.getGroupsToString());
 					dataInRows.add(row);
@@ -464,18 +464,18 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 
 			List<String> row = new ArrayList<String>();
 
-			row.add(member.isConfidential() ? "yes" : "no");
-
 			if (sakaiProxy.getFirstNameLastName()) {
 				row.add(member.getDisplayName());
 			} else {
 				row.add(member.getSortName());
 			}
-			
+
 			if (sakaiProxy.getViewUserDisplayId()) {
 				row.add(member.getDisplayId());
 				row.add(member.getPlid());
 			}
+
+			row.add(member.isConfidential() ? "yes" : "no");
 
 			if (sakaiProxy.getViewEmail(siteId)) {
 				row.add(member.getEmail());
@@ -552,12 +552,13 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 
 		final List<String> header = new ArrayList<>();
 		header.add(rl.getString("facet_name"));
-		header.add(rl.getString("facet_conf"));
 
 		if (this.sakaiProxy.getViewUserDisplayId()) {
 			header.add(rl.getString("facet_userId"));
 			header.add(rl.getString("facet_userPlid"));
 		}
+
+		header.add(rl.getString("facet_conf"));
 
 		if (this.sakaiProxy.getViewEmail(siteId)) {
 			header.add(rl.getString("facet_email"));
@@ -581,10 +582,7 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			String viewType, String siteId) {
 		
 		List<String> header = new ArrayList<String>();
-		
-		header.add(parameters.get(KEY_FACET_CONF) != null ? parameters.get(
-				KEY_FACET_CONF).toString() : DEFAULT_FACET_CONF);
-		
+
 		header.add(parameters.get(KEY_FACET_NAME) != null ? parameters.get(
 				KEY_FACET_NAME).toString() : DEFAULT_FACET_NAME);
 		
@@ -594,6 +592,9 @@ public class RosterPOIEntityProvider extends AbstractEntityProvider implements
 			header.add(parameters.get(KEY_FACET_PLID) != null ? parameters.get(
 					KEY_FACET_PLID).toString() : DEFAULT_FACET_PLID);
 		}
+
+		header.add(parameters.get(KEY_FACET_CONF) != null ? parameters.get(
+				KEY_FACET_CONF).toString() : DEFAULT_FACET_CONF);
 
 		if (VIEW_OVERVIEW.equals(viewType)) {
 

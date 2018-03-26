@@ -1659,7 +1659,6 @@ public class GradebookNgBusinessService {
 	/**
 	 * Get the grade log for this entire gradebook.
 	 *
-	 * @param gradebookUid the gradebook that we are interested in
 	 * @param since the time to check for changes from
 	 * @return
 	 */
@@ -1667,7 +1666,7 @@ public class GradebookNgBusinessService {
 
 		final List<GbHistoryLog> rval = new ArrayList<>();
 
-		final List<Assignment> assignments = this.getGradebookAssignments();
+		List<Assignment> assignments = this.getGradebookAssignments();
 		if (assignments == null || assignments.isEmpty()) {
 			return rval;
 		}
@@ -1692,10 +1691,17 @@ public class GradebookNgBusinessService {
 			}
 			GbUser student = users.get(event.getStudentId());
 
-			final Assignment eventAssignment = assignments.stream()
+			Assignment eventAssignment = assignments.stream()
 				.filter((a) -> a.getId() == event.getGradableObject().getId())
 				.findFirst()
 				.orElse(null);
+
+
+			// Shouldn't be happening, but is on Staging...
+			if (eventAssignment == null) {
+				eventAssignment = this.getAssignment(event.getGradableObject().getId());
+				assignments.add(eventAssignment);
+			}
 
 			rval.add(new GbHistoryLog(event, student, grader, eventAssignment));
 		}

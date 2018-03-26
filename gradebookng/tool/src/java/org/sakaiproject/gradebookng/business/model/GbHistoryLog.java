@@ -42,10 +42,10 @@ public class GbHistoryLog implements Serializable {
 	public GbHistoryLog(GradingEvent ge, GbUser student, GbUser grader, Assignment assignment) {
 		this.dateGraded = ge.getDateGraded();
 		this.grade = ge.getGrade();
-		this.studentId = ge.getStudentId();
 
 		this.graderDisplayId = grader.getDisplayId();
 		this.studentName = student.getDisplayName();
+		this.studentId = student.getDisplayId();
 
 		this.assignmentName = assignment == null ? "NULL" : assignment.getName();
 	}

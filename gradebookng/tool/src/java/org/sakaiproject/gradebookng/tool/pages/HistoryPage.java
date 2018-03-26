@@ -44,7 +44,8 @@ public class HistoryPage extends BasePage {
 				GbHistoryLog itemModel = item.getModelObject();
 
 				item.add(new Label("dateGraded", FormatHelper.formatDateTime(itemModel.getDateGraded())));
-				item.add(new Label("student", itemModel.getStudentName()));
+				item.add(new Label("studentName", itemModel.getStudentName()));
+				item.add(new Label("studentId", itemModel.getStudentId()));
 				item.add(new Label("assignment", itemModel.getAssignmentName()));
 				item.add(new Label("updatedBy", itemModel.getGraderDisplayId()));
 				item.add(new Label("event", "Score set to " + FormatHelper.formatGrade(itemModel.getGrade())));

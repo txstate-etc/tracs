@@ -43,10 +43,11 @@ public class ExcuseGradePanel extends Panel {
         final Map<String, Object> modelData = (Map<String, Object>) getDefaultModelObject();
         final Long assignmentId = (Long) modelData.get("assignmentId");
         final String studentUuid = (String) modelData.get("studentUuid");
-        final GbGradeInfo gradeInfo = (GbGradeInfo) modelData.get("gradeInfo");
         final Assignment assignment = businessService.getAssignment(assignmentId);
         final String assignmentName = assignment.getName();
-        final boolean excludedFromGrade = (gradeInfo != null) ? gradeInfo.isExcludedFromGrade() : false;
+        final boolean excludedFromGrade = (boolean) modelData.get("isExcusedGrade");
+        final String oldGrade = (String) modelData.get("grade");
+        final String oldComment = (String) modelData.get("gradeComment");
         final Form form = new Form("form");
 
         CheckBox excusedCheckBox = new CheckBox("cbExcused", Model.of(excludedFromGrade));
@@ -83,7 +84,7 @@ public class ExcuseGradePanel extends Panel {
 
                 boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, checkBoxValue);
                 if (success) {
-                    businessService.saveGrade(assignmentId, studentUuid, gradeInfo.getGrade(), newGrade, gradeInfo.getGradeComment());
+                    businessService.saveGrade(assignmentId, studentUuid, oldGrade, newGrade, oldComment);
                     ExcuseGradePanel.this.window.close(target);
                     setResponsePage(GradebookPage.class);
                 }

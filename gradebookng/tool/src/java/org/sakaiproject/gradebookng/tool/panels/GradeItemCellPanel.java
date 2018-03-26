@@ -1,9 +1,6 @@
 package org.sakaiproject.gradebookng.tool.panels;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -445,7 +442,14 @@ public class GradeItemCellPanel extends Panel {
 					final GradebookPage gradebookPage = (GradebookPage) getPage();
 					final GbModalWindow window = gradebookPage.getExcuseGradeWindow();
 
-					final ExcuseGradePanel panel = new ExcuseGradePanel(window.getContentId(), GradeItemCellPanel.this.model, window);
+					Map<String, Object> excusedGradeModel =  new HashMap<String, Object>();
+					excusedGradeModel.put("assignmentId", assignmentId);
+					excusedGradeModel.put("studentUuid", studentUuid);
+					excusedGradeModel.put("isExcusedGrade", excludedFromGrade);
+					excusedGradeModel.put("grade", GradeItemCellPanel.this.gradeCell.getValue());
+					excusedGradeModel.put("gradeComment", gradeInfo.getGradeComment());
+
+					final ExcuseGradePanel panel = new ExcuseGradePanel(window.getContentId(), Model.ofMap(excusedGradeModel), window);
 					final GbUser user = businessService.getUser(studentUuid);
 					window.setTitle((new StringResourceModel("heading.excusegrade", null,
 						new Object[] { user.getDisplayName(), user.getDisplayId() })).getString());

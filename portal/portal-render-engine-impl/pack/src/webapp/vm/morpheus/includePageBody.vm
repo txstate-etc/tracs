@@ -70,6 +70,7 @@
 
                                         <h2 class="Mrphs-toolTitleNav__title">
                                             <a class="Mrphs-toolTitleNav__link--inline" href="${tool.toolResetActionUrl}" target="${tool.toolPlacementIDJS}" title="${rloader.sit_reset}: ${tool.toolRenderResult.getTitle()}">
+                                                <span class="icon-sakai--${toolTitleClass} tracs-title-icon"></span>
                                                 <span class="Mrphs-toolTitleNav__link Mrphs-toolTitleNav__link--reset"></span>
                                                 <span class="Mrphs-toolTitleNav__text">${tool.toolRenderResult.getTitle()}</span>
                                             </a>

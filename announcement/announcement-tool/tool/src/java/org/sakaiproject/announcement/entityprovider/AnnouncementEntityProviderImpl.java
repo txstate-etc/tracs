@@ -522,9 +522,24 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 		}
 
 		List<?> l = getAnnouncements(siteId, params, false);
+
+		for (Object announcement : l) {
+			try {
+				if (siteService == null) continue;
+
+				DecoratedAnnouncement announce = (DecoratedAnnouncement) announcement;
+				if (announce == null) continue;
+
+				Site announcementSite = siteService.getSite(announce.siteId);
+				if (announcementSite == null) continue;
+
+				announce.siteTitle = siteService.getSite(announce.siteId).getTitle();
+			} catch (IdUnusedException ignored) {}
+		}
+
 		return l;
     }
-	
+
 	/**
 	 * motd
 	 */

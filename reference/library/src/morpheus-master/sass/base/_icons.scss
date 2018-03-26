@@ -85,6 +85,11 @@
   .icon-sakai--sakai-blogwow{                               @extend .fa-commenting-o;}
   .icon-sakai--sakai-irubric{                               @extend .fa-list;}
   .icon-sakai--sakai-attendance {                           @extend .fa-check-square; }
+  .icon-sakai--sakai-readinglist {                          @extend .fa-tasks; }
+  .icon-sakai--sakai-examity-lti {                          @extend .fa-user-circle; }
+  .icon-sakai--sakai-pearson-mylabsplus {                   @extend .fa-product-hunt; }
+  .icon-sakai--sakai-mhcampuse {                            @extend .fa-graduation-cap; }
+  .icon-sakai--sakai-turningtool-lti {                      @extend .fa-cog; }
 
   // other icons
   .icon-sakai--check {                                      @extend .fa-check; }

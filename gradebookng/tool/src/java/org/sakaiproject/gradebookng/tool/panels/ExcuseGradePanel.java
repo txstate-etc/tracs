@@ -1,5 +1,6 @@
 package org.sakaiproject.gradebookng.tool.panels;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -14,6 +15,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
+import org.sakaiproject.gradebookng.business.model.GbGradeLog;
 import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
 import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
 import org.sakaiproject.gradebookng.business.model.GbGradeInfo;
@@ -47,7 +49,9 @@ public class ExcuseGradePanel extends Panel {
         final boolean excludedFromGrade = (gradeInfo != null) ? gradeInfo.isExcludedFromGrade() : false;
         final Form form = new Form("form");
 
-        form.add(new CheckBox("cbExcused", Model.of(excludedFromGrade)));
+        CheckBox excusedCheckBox = new CheckBox("cbExcused", Model.of(excludedFromGrade));
+
+        form.add(excusedCheckBox);
 
         form.add(new Label("assignment_name", assignmentName));
 
@@ -56,12 +60,30 @@ public class ExcuseGradePanel extends Panel {
 
             @Override
             public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-                boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, !excludedFromGrade);
-                if (success) {
-                    if (!excludedFromGrade && (gradeInfo.getGrade() != null && !gradeInfo.getGrade().isEmpty())) {
-                        //If we just switched the excluded flag from FALSE to TRUE, we must blank out the grade
-                        businessService.saveGrade(assignmentId, studentUuid, gradeInfo.getGrade(), "", gradeInfo.getGradeComment());
+                boolean checkBoxValue = excusedCheckBox.getModelObject();
+                if (checkBoxValue == excludedFromGrade) {
+                    // If no change was made, simply do nothing and return
+                    ExcuseGradePanel.this.window.close(target);
+                    setResponsePage(GradebookPage.class);
+                    return;
+                }
+
+                // The new grade will be blank unless checkBoxValue is FALSE
+                String newGrade = "";
+                if (!checkBoxValue) {
+                    // The flag was changed from TRUE to FALSE, so we set the grade to the last non-empty value from grade log
+                    List<GbGradeLog> gradeLog = businessService.getGradeLog(studentUuid, assignmentId);
+                    for (GbGradeLog logItem : gradeLog) {
+                        newGrade = logItem.getGrade().equals(null) ? "" : logItem.getGrade().trim();
+                        if (!newGrade.equals("")) {
+                            break;
+                        }
                     }
+                }
+
+                boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, checkBoxValue);
+                if (success) {
+                    businessService.saveGrade(assignmentId, studentUuid, gradeInfo.getGrade(), newGrade, gradeInfo.getGradeComment());
                     ExcuseGradePanel.this.window.close(target);
                     setResponsePage(GradebookPage.class);
                 }

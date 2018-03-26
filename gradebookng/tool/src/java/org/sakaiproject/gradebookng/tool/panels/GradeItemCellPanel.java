@@ -454,18 +454,6 @@ public class GradeItemCellPanel extends Panel {
 					window.clearWindowClosedCallbacks();
 					window.setComponentToReturnFocusTo(getParentCellFor(GradeItemCellPanel.this.gradeCell));
 					window.show(target);
-
-
-
-					// boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, !excludedFromGrade);
-					// if (success) {
-					// 	//excludedFromGrade = !excludedFromGrade;
-					// 	target.add(getParentCellFor(GradeItemCellPanel.this.gradeCell));
-					// 	target.appendJavaScript("sakai.gradebookng.spreadsheet.setupCell('"
-					// 			+ getParentCellFor(GradeItemCellPanel.this.gradeCell).getMarkupId() + "','" + assignmentId + "', '"
-					// 			+ studentUuid + "');");
-					// 	refreshNotifications();
-					//	}
 				}
 			});
 

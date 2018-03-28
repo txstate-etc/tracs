@@ -3,6 +3,7 @@ package org.sakaiproject.gradebookng.business.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Setter;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.sakaiproject.tool.gradebook.GradingEvent;
 
@@ -38,6 +39,11 @@ public class GbHistoryLog implements Serializable {
 
 	@Getter
 	private final String grade;
+
+	// This variable is manipulated by the GB History Page to simplify display logic
+	@Getter
+	@Setter
+	private String eventText;
 
 	public GbHistoryLog(GradingEvent ge, GbUser student, GbUser grader, Assignment assignment) {
 		this.dateGraded = ge.getDateGraded();

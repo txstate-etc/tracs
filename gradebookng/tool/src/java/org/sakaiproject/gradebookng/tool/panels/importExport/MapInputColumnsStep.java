@@ -288,7 +288,7 @@ public class MapInputColumnsStep extends Panel {
                 				break;
 
                 			case "Ignore":
-                				spreadSheetWrapper.setRawDataValue(0, i, "# " + columnName);
+                				spreadSheetWrapper.setRawDataValue(0, i, "## " + columnName);
                 				break;
                 		}
                 	}

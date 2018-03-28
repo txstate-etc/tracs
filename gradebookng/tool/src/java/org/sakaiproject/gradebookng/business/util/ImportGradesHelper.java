@@ -365,6 +365,19 @@ public class ImportGradesHelper {
 
 		final ImportedRow row = new ImportedRow();
 
+		// Return a null for this row if every item in the line array is blank
+		boolean allBlank = true;
+		for (String lineItem : line) {
+			if (!lineItem.trim().equals("")) {
+				allBlank = false;
+				break;
+			}
+		}
+		if (allBlank) {
+			log.debug("Skipping a blank line of import row data");
+			return null;
+		}
+
 		for (final Map.Entry<Integer, ImportedColumn> entry : mapping.entrySet()) {
 
 			final int i = entry.getKey();
@@ -398,6 +411,7 @@ public class ImportGradesHelper {
 						studentEid = UserDirectoryService.getEidByPlid(lineVal);
 					} catch (UserNotDefinedException ex) {
 						log.error("UserNotDefinedException in user directory service:" + ex.getMessage());
+						WarningsList.add(lineVal + " Ignored. No student found with this PLID");
 						return null;
 					}
 				}

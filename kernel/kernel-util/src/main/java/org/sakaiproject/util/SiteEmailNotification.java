@@ -213,7 +213,7 @@ public class SiteEmailNotification extends EmailNotification
 		{
 		}
 
-		return "\"" + title + "\" <"+ ServerConfigurationService.getString("setup.request","no-reply@" + ServerConfigurationService.getServerName()) + ">";
+		return "\"" + title + "\" <"+ ServerConfigurationService.getString("setup.request", ServerConfigurationService.getString("email.noreply_address", "no-reply@" + ServerConfigurationService.getServerName())) + ">";
 	}
 
 	/**
@@ -251,9 +251,13 @@ public class SiteEmailNotification extends EmailNotification
 		}
 
 		// if for any reason we did not find an email, setup for the no-reply for email
-		if (email == null) email = "no-reply";
+		if (email == null) {
+			email = ServerConfigurationService.getString("email.noreply_address", "no-reply@" + ServerConfigurationService.getServerName());
+		} else {
+			email = email + "@" + ServerConfigurationService.getServerName();
+		}
 
-		String rv = "\"" + title + "\" <" + email + "@" + ServerConfigurationService.getServerName() + ">";
+		String rv = "\"" + title + "\" <" + email + ">";
 
 		return rv;
 	}

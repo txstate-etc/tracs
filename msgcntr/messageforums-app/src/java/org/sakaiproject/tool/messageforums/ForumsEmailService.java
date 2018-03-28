@@ -101,8 +101,7 @@ public class ForumsEmailService {
 
 			String fromName = ServerConfigurationService.getString("ui.service", "LocalSakaiName");
 
-			String fromEmailAddress = DiscussionForumTool.getResourceBundleString("email.fromAddress", 
-					new Object[]{ServerConfigurationService.getString("serverName", "localhost")});
+			String fromEmailAddress = ServerConfigurationService.getString("email.noreply_address", "no-reply@" + ServerConfigurationService.getServerName());
 			log.info(fromEmailAddress);
 			
 			String anonAwareAuthor = getAnonAwareAuthor(reply);

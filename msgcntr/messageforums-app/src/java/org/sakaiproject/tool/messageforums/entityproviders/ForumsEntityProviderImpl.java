@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.Setter;
 
-import org.sakaiproject.component.app.messageforums.dao.hibernate.DiscussionTopicImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sakaiproject.api.app.messageforums.Attachment;
@@ -94,7 +93,7 @@ public class ForumsEntityProviderImpl extends AbstractEntityProvider implements 
 
 		List<Site> userSites = siteService.getSites(SiteService.SelectionType.ACCESS, null, null, null,
 				null, null);
-
+		SiteMessages siteMessages = new SiteMessages();
 		for (Site site : userSites) {
 			if (site == null) continue;
 			String siteId = site.getId();
@@ -124,13 +123,12 @@ public class ForumsEntityProviderImpl extends AbstractEntityProvider implements 
 						msg.put("forumId", discussionForum.getId().toString());
 						msg.put("topicId", discussionTopic.getId().toString());
 						msg.put("messageId", message.getId().toString());
-						SiteMessages.addMessage(siteId, msg);
+						siteMessages.addMessage(siteId, msg);
 					}
 				}
 			}
 		}
-		System.out.println("Messages Runtime: " + (System.nanoTime() - startTime) / 1000000 + "ms");
-		return SiteMessages.sites;
+		return siteMessages.getSiteMessages();
 	}
 
 	private boolean userCannotAccessSiteAndTool(String siteId) {
@@ -152,16 +150,20 @@ public class ForumsEntityProviderImpl extends AbstractEntityProvider implements 
 		return !userHasAccess;
 	}
 
-	private static class SiteMessages {
-		static HashMap<String, ArrayList<HashMap<String, String>>> sites;
+	private class SiteMessages {
+		private HashMap<String, ArrayList<HashMap<String, String>>> siteMessages;
 
-		static {
-			sites = new HashMap<String, ArrayList<HashMap<String, String>>>();
+		public SiteMessages() {
+			this.siteMessages = new HashMap<String, ArrayList<HashMap<String, String>>>();
 		}
 
-		static void addMessage(String siteId, HashMap<String, String> message) {
-			sites.putIfAbsent(siteId, new ArrayList<HashMap<String, String>>());
-			sites.get(siteId).add(message);
+		void addMessage(String siteId, HashMap<String, String> message) {
+			this.siteMessages.putIfAbsent(siteId, new ArrayList<HashMap<String, String>>());
+			this.siteMessages.get(siteId).add(message);
+		}
+
+		public HashMap getSiteMessages() {
+			return siteMessages;
 		}
 	}
 

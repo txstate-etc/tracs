@@ -318,6 +318,19 @@ public class GradebookNgBusinessService {
 		return assignments;
 	}
 
+	public String getGradebookExportName() {
+		String siteId = getCurrentSiteId();
+		String siteName;
+		try {
+			Site currentSite = this.siteService.getSite(siteId);
+			siteName = currentSite.getTitle();
+		} catch(Exception ex) {
+			siteName = getGradebook().getName();
+		}
+
+		return siteName;
+	}
+
 	/**
 	 * Get a list of assignments in the gradebook in the specified site that the current user is allowed to access, sorted by sort order
 	 *

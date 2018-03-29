@@ -208,7 +208,7 @@ public class MapInputColumnsStep extends Panel {
 					item.add(ddcAssignment);
 
 
-					List<Integer> assignmentIndexes = IntStream.rangeClosed(1,9).boxed().collect(Collectors.toList());
+					List<Integer> assignmentIndexes = IntStream.rangeClosed(1,importedColumns.size()).boxed().collect(Collectors.toList());
 					DropDownChoice ddcNewAssignmentIndex = new DropDownChoice("columnNewAssignmentIndex", Model.of(1), assignmentIndexes);
 					ddcNewAssignmentIndex.setOutputMarkupId(true);
 					ddcNewAssignmentIndex.setOutputMarkupPlaceholderTag(true);

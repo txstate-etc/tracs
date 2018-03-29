@@ -301,7 +301,7 @@ public class ExportPanel extends Panel {
 	private String buildFileName() {
 		final String prefix = "gradebook_export";
 		final String extension = this.exportFormat.toString().toLowerCase();
-		String gradebookName = this.businessService.getGradebook().getName();
+		String gradebookName = this.businessService.getGradebookExportName();
 
 		if (StringUtils.trimToNull(gradebookName) == null) {
 			return String.format("%s.%s", gradebookName, extension);

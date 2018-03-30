@@ -54,8 +54,22 @@ public class CreateGradeItemStep extends Panel {
         final ProcessedGradeItem processedGradeItem = importWizardModel.getItemsToCreate().get(step - 1);
 
         // setup new assignment for populating
-        final Assignment assignment = new Assignment();
-        assignment.setName(StringUtils.trim(processedGradeItem.getItemTitle()));
+        // first make sure it doesn't already exist (user could have hit the back button)
+        Assignment assignment = null;
+        String assignmentTitle = StringUtils.trim(processedGradeItem.getItemTitle());
+        for (Assignment assignmentItem : importWizardModel.getAssignmentsToCreate()) {
+            if (assignmentItem.getName().equals(assignmentTitle)) {
+                assignment = assignmentItem;
+                break;
+            }
+        }
+        if (assignment == null) {
+            assignment = new Assignment();
+            importWizardModel.getAssignmentsToCreate().add(assignment);
+        }
+
+
+        assignment.setName(assignmentTitle);
         if(StringUtils.isNotBlank(processedGradeItem.getItemPointValue())) {
         	assignment.setPoints(Double.parseDouble(processedGradeItem.getItemPointValue()));
         }
@@ -76,7 +90,6 @@ public class CreateGradeItemStep extends Panel {
 
                 // validate name is unique
                 final List<Assignment> existingAssignments = CreateGradeItemStep.this.businessService.getGradebookAssignments();
-                existingAssignments.addAll(importWizardModel.getAssignmentsToCreate());
 
                 if(!assignmentNameIsUnique(existingAssignments, newAssignment.getName())) {
                 	validated = false;
@@ -84,12 +97,10 @@ public class CreateGradeItemStep extends Panel {
                 }
 
                 if (validated) {
-	                //add to model
-	                importWizardModel.getAssignmentsToCreate().add(newAssignment);
-
 	                // sync up the assignment data so we can present it for confirmation
 	                processedGradeItem.setAssignmentTitle(newAssignment.getName());
 	                processedGradeItem.setAssignmentPoints(newAssignment.getPoints());
+	                processedGradeItem.setItemTitle(newAssignment.getName());
 
 	                //Figure out if there are more steps
 	                //If so, go to the next step (ie do it all over again)

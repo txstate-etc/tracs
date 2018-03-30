@@ -354,7 +354,7 @@ public class SiteEmailNotificationAnnc extends SiteEmailNotification
 		catch(Exception ignore)
 		{}
 		
-		String userEmail = ServerConfigurationService.getString("setup.request","no-reply@" + ServerConfigurationService.getServerName());
+		String userEmail = ServerConfigurationService.getString("setup.request", ServerConfigurationService.getString("email.noreply_address", "no-reply@" + ServerConfigurationService.getServerName()));
 		String userDisplay = ServerConfigurationService.getString("ui.service", "Sakai");
 		//String no_reply = "From: \"" + userDisplay + "\" <" + userEmail + ">";
 		//String no_reply_withTitle = "From: \"" + title + "\" <" + userEmail + ">";	
@@ -387,11 +387,11 @@ public class SiteEmailNotificationAnnc extends SiteEmailNotification
 					if ((userEmail != null) && (userEmail.trim().length()) == 0) userEmail = null;
 					
 				} catch (UserNotDefinedException e) {
-					M_log.warn("Failed to load user from announcement header: " + userId + ". Will send from no-reply@" + ServerConfigurationService.getServerName()  + " instead.");
+					M_log.warn("Failed to load user from announcement header: " + userId + ". Will send from " + ServerConfigurationService.getString("email.noreply_address", "no-reply@" + ServerConfigurationService.getServerName())  + " instead.");
 				}
 				
 				// some fallback positions
-				if (userEmail == null) userEmail = ServerConfigurationService.getString("setup.request","no-reply@" + ServerConfigurationService.getServerName());
+				if (userEmail == null) userEmail = ServerConfigurationService.getString("setup.request", ServerConfigurationService.getString("email.noreply_address", "no-reply@" + ServerConfigurationService.getServerName()));
 				if (userDisplay == null) userDisplay = ServerConfigurationService.getString("ui.service", "Sakai");
 				from="From: \"" + userDisplay + "\" <" + userEmail + ">";
 		}

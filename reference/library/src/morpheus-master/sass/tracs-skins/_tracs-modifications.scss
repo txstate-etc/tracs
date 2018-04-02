@@ -120,20 +120,21 @@ $samigo-active-tab-border: #003eff !default;
       display: block;
       width: auto;
       height: auto;
-      padding: 0px;
+      padding: 0;
+      margin: 0 0 0 0;
     }
 }
 
 #toolMenu ul li a .Mrphs-toolsNav__menuitem--title, #subSites ul li a .Mrphs-toolsNav__menuitem--title{
   display: inline-block;
   width: 75%;
-  white-space: pre;
+  white-space: normal;
   overflow: hidden;
   vertical-align: middle;
   @media (max-width: $break-small-end){
     display: inline;
     width: 100%;
-    white-space: pre-wrap;
+    white-space: pre;
     vertical-align: baseline;
   }
 }

@@ -4,6 +4,7 @@
 //variables used in this file should have default values because they
 //might not be defined in the custom variables file
 
+$top-header-background: #ffffff;
 $top-header-text-color: #ffffff !default;
 $selected-tool-border: none !default;
 $selected-tool-background: #ffffff !default;
@@ -52,6 +53,7 @@ $samigo-active-tab-border: #003eff !default;
       width: 100%;
     }
   }
+  background: $top-header-background;
 }
 
 // This is the separator between the Sites and Sakai menus in the top right corner

@@ -29,7 +29,11 @@
         #parse("/vm/morpheus/snippets/siteStatus-snippet.vm")
 
         <div id="$pageColumnLayout" class="${columnClasses}">
-
+            #if ($pageColumn0Tools.size() == 0)
+                <H1>Gradebook 2 is now deprecated. Try GradebookNG!</H1>
+                <br>
+                <p>Other text from your friends Matt and Jimmy will be displayed here soon!</p>
+            #end
             #foreach ( $tool in $pageColumn0Tools )
 
                 #set( $i = $i + 1 )

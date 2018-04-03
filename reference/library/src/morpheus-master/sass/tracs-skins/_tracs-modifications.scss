@@ -4,6 +4,7 @@
 //variables used in this file should have default values because they
 //might not be defined in the custom variables file
 
+$top-header-background: #ffffff;
 $top-header-text-color: #ffffff !default;
 $selected-tool-border: none !default;
 $selected-tool-background: #ffffff !default;
@@ -52,6 +53,7 @@ $samigo-active-tab-border: #003eff !default;
       width: 100%;
     }
   }
+  background: $top-header-background;
 }
 
 // This is the separator between the Sites and Sakai menus in the top right corner
@@ -118,20 +120,21 @@ $samigo-active-tab-border: #003eff !default;
       display: block;
       width: auto;
       height: auto;
-      padding: 0px;
+      padding: 0;
+      margin: 0 0 0 0;
     }
 }
 
 #toolMenu ul li a .Mrphs-toolsNav__menuitem--title, #subSites ul li a .Mrphs-toolsNav__menuitem--title{
   display: inline-block;
   width: 75%;
-  white-space: pre;
+  white-space: normal;
   overflow: hidden;
   vertical-align: middle;
   @media (max-width: $break-small-end){
     display: inline;
     width: 100%;
-    white-space: pre-wrap;
+    white-space: pre;
     vertical-align: baseline;
   }
 }

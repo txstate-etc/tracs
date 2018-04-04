@@ -123,9 +123,6 @@
 					</label>
 					<div class="col-sm-8">
 						#foreach ($s in $skins)
-							#if($s.Name == "Corn")
-						  		$s.Name = "Light Amber"
-						  	#end
 							#set($url="")
 							#set($url=$!s.Url)
 							#set($newSkin="")

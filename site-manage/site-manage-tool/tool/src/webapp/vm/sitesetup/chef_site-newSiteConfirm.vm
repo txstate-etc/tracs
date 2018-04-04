@@ -233,9 +233,6 @@
 						#set($selectedUrl="")
 						#set($selectedUrl=$!selectedIcon)
 						#foreach($skin in $!skins)
-							#if($skin.Name == "Corn")
-						  		$skin.Name = "Light Amber"
-						  	#end
 							#set($skinUrl="")
 							#set($skinUrl=$!skin.Url)
 							#if($selectedUrl == $skinUrl)

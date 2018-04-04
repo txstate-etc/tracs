@@ -459,12 +459,49 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 			return announcementService.channelReference(siteId, SiteService.MAIN_CONTAINER);
 		}
 	}
-	
-	
-	
-	/**
-	 * site/siteId
-	 */
+
+	@EntityCustomAction(action="all",viewKey=EntityView.VIEW_LIST)
+	public List<?> getAllUserAnnouncements(EntityView view, Map<String, Object> params) {
+		List<Site> sites = siteService.getUserSites();
+		List<DecoratedAnnouncement> announcements = new ArrayList<>();
+
+		if (sites == null) return announcements;
+
+		sites.forEach(site -> {
+			String siteId = site.getId();
+			List<String> channels = getChannels(siteId);
+
+			if (channels == null || channels.size() == 0) return;
+
+			channels.forEach(channel -> {
+				List<Message> rawAnnouncements = null;
+				try {
+					rawAnnouncements = announcementService.getAnnouncementChannel(channel).getMessages(null, true);
+					if (rawAnnouncements == null || rawAnnouncements.size() == 0) return;
+
+					rawAnnouncements.forEach(announcementMessage -> {
+						try {
+							DecoratedAnnouncement announcement = createDecoratedAnnouncement((AnnouncementMessage) announcementMessage, siteService.getSite(siteId).getTitle());
+							if (announcement != null) {
+								announcements.add(announcement);
+							}
+						} catch (IdUnusedException e) {
+							log.debug(e.getMessage());
+						}
+					});
+				} catch (IdUnusedException | PermissionException e) {
+					log.debug(e.getMessage());
+				}
+
+			});
+		});
+
+		return announcements;
+	}
+
+		/**
+         * site/siteId
+         */
 	@EntityCustomAction(action="site",viewKey=EntityView.VIEW_LIST)
 	public List<?> getAnnouncementsForSite(EntityView view, Map<String, Object> params) {
 		
@@ -496,7 +533,7 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 		List<?> l = getAnnouncements(siteId, params, onlyPublic);
 		return l;
     }
-	
+
 	/**
 	 * user
 	 */

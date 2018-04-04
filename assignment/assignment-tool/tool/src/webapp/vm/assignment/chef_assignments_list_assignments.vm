@@ -259,7 +259,7 @@
 												#end
 
 											#if ($assignmentContent.getAllowReviewService())
-												<i alt="$reviewIndicator" title="$reviewIndicator" class="fa fa-certificate reviewStyle"></i>
+												<img alt="$reviewIndicator" title="$reviewIndicator" src="/library/image/silk/rosette.png" />
 											#end
 											</a>
 											&nbsp

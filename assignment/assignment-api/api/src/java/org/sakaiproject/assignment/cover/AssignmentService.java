@@ -425,15 +425,6 @@ public class AssignmentService {
 
 		service.commitEdit(param0);
 	}
-	
-	public static void commitEditFromCallback(
-			org.sakaiproject.assignment.api.AssignmentSubmissionEdit param0) {
-		org.sakaiproject.assignment.api.AssignmentService service = getInstance();
-		if (service == null)
-			return;
-
-		service.commitEditFromCallback(param0);
-	}
 
 	public static void cancelEdit(
 			org.sakaiproject.assignment.api.AssignmentSubmissionEdit param0) {

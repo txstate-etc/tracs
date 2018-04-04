@@ -1,6 +1,6 @@
-# Sakai CLE (+ Turnitin)
+# Sakai CLE
 
-This is the source code for the Sakai CLE with some changes for LTI Turnitin.
+This is the source code for the Sakai CLE.
 
 ## Building
 

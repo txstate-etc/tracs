@@ -189,15 +189,7 @@ public interface AssignmentContent extends Entity, AttachmentContainer
 	 */
 	
 	public boolean getAllowStudentViewReport();
-
-	/**
-	 * Access whether this AssignmentContent allows students to view review service grades.
-	 * 
-	 * @return true if the AssignmentContent allows students to view review service grades, false otherwise.
-	 */
 	
-	public boolean getAllowStudentViewExternalGrade();
-
 	/**
 	 * Access the list of authors.
 	 * 
@@ -245,10 +237,6 @@ public interface AssignmentContent extends Entity, AttachmentContainer
 	public boolean isExcludeQuoted();
 
 	public void setExcludeQuoted(boolean m_excludeQuoted);
-	
-	public boolean isAllowAnyFile();
-
-	public void setAllowAnyFile(boolean m_allowAnyFile);
 	
 	/**
 	 * Exclude type options:

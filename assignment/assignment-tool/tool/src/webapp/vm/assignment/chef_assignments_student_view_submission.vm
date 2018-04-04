@@ -326,10 +326,10 @@ $(document).ready(function(){
 									#set ($props = $reviewResult.getContentResource().Properties)
 									<span class="reportIcon">
 										#if ($reviewResult.getReviewReport().equals("Error"))
-											<i alt="$reviewResult.getReviewError()" title="$reviewResult.getReviewError()" class="fa fa-exclamation-triangle errorStyle"></i>
+											<img src="/library/skin/images/error.png" alt="$reviewResult.getReviewError()" title="$reviewResult.getReviewError()">
 										#else
 											<a href="$reviewResult.getReviewReport()" target="_blank">
-												<i alt="$tlang.getString("review.originality.alt") = $reviewResult.getReviewScore() %" title="$tlang.getString("review.originality.alt") = $reviewResult.getReviewScore() %" class="fa fa-flag reviewStyle" style="color:$reviewResult.getReviewIconColor()"></i>
+												<img src="$reviewResult.getReviewIconURL()" alt="$reviewResult.getReviewScore()" title="$reviewResult.getReviewScore()">
 											</a>
 										#end
 									</span>
@@ -337,11 +337,6 @@ $(document).ready(function(){
 										$tlang.getString("submission.inline")
 									#else
 										$validator.escapeHtml($props.getPropertyFormatted($props.NamePropDisplayName))
-									#end
-									#if($reviewResult.getExternalGrade() && $assignment.getContent().AllowStudentViewExternalGrade)
-										<span style="font-style:italic !important">
-											($tlang.getString("gen.gra.ext") $reviewResult.getExternalGrade() / $maxPointsInt)
-										</span>
 									#end
 								</div>
 							#end
@@ -668,9 +663,12 @@ $(document).ready(function(){
 							#end
 							#if ($plagiarismNote)
 								<p>
-									<i alt="$plagiarismNote" title="$plagiarismNote" class="fa fa-certificate reviewStyle"></i>
+									<img alt="$reviewIndicator" title="$reviewIndicator" src="/library/image/silk/rosette.png" class="assignmentRosette"/>
 									<em>
 										$plagiarismNote
+										#if ($plagiarismFileTypes)
+											$plagiarismFileTypes
+										#end
 									</em>
 								</p>
 							#end
@@ -736,7 +734,18 @@ $(document).ready(function(){
 						#end
 					</p>
 				#end	
-				#if (($submissionType == 2) || ($submissionType == 5)) 
+				#if (($submissionType == 2) || ($submissionType == 5))
+					#if ($plagiarismNote)
+						<p>
+							<img alt="$reviewIndicator" title="$reviewIndicator" src="/library/image/silk/rosette.png" class="assignmentRosette"/>
+							<em>
+								$plagiarismNote
+								#if ($plagiarismFileTypes)
+									$plagiarismFileTypes
+								#end
+							</em>
+						</p>
+					#end
 					#if ($unsubmittableInline && ""!="$!value_submission_text")
 						<div class="assignmentUnsubmittable">
 							<h3>$tlang.getString("gen.orisub")</h3>
@@ -756,21 +765,7 @@ $(document).ready(function(){
 						#else
 							$tlang.getString("gen.att")
 						#end
-					</h3>
-					#if ($assignment.getContent().getAllowReviewService())
-						<p class="instruction">
-							<i alt="$reviewIndicator" title="$reviewIndicator" class="fa fa-certificate reviewStyle"></i>
-							<em>$reviewIndicator</em>
-						</p>
-						#if (!$assignment.getContent().isAllowAnyFile())
-							<ul>
-								$tlang.getString("content_review.studentNote")
-								#if ($plagiarismFileTypes)
-									<li>$plagiarismFileTypes</li>
-								#end
-							</ul>
-						#end
-					#end
+					</h3>	
 					#if ($size == 0)
 						<p class="instruction">
                                                     #if ($submissionType == 5)

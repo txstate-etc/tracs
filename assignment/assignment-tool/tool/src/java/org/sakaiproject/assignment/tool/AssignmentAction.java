@@ -18161,15 +18161,11 @@ public class AssignmentAction extends PagedResourceActionII
 		String assignmentRef = StringUtils.trimToNull(params.getString("assignmentRef"));
 
 		if (AssignmentService.allowAddAssignment((String) state.getAttribute(STATE_CONTEXT_STRING))) {
-			//Assignment reference is <context>/<id>
+			// sakai has assignmentRef in sakai is "/assignment/a/<context>/<id>"
+			//eportfolio has Assignment reference is <context>/<id>
 			String[] split = assignmentRef.split("/");
-
-			String assignmentId = assignmentRef;
-
-			if (split.length == 2)
-			{
-				assignmentId = split[1];
-			}
+			assignmentRef = split[3]+"/"+split[4];
+			String assignmentId = split[4];
 
 			state.setAttribute(EDIT_ASSIGNMENT_ID, assignmentId);
 			state.setAttribute(EDIT_ASSIGNMENT_REF, assignmentRef);
@@ -18179,10 +18175,9 @@ public class AssignmentAction extends PagedResourceActionII
 			state.setAttribute("the_assignment", a);
 
 			state.setAttribute(NEW_ASSIGNMENT_TITLE, a.getTitle());
-			state.setAttribute(NEW_ASSIGNMENT_GRADE_POINTS, a.getContent().getMaxGradePointDisplay());
+//			state.setAttribute(NEW_ASSIGNMENT_GRADE_POINTS, a.getContent().getMaxGradePointDisplay());
 
 			ResourceProperties properties = a.getProperties();
-
 			state.setAttribute("gbExternalId", properties.getProperty("gbExternalId"));
 
 			state.setAttribute(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK, properties.getProperty(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK));

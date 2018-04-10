@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 
@@ -149,6 +150,11 @@ public class BaseJdbcDao extends NamedParameterJdbcDaoSupport
     {
       LOG.error("Can't find query " + queryName);
       ex.printStackTrace();
+      return null;
+    }
+    catch (EmptyResultDataAccessException ex)
+    {
+      LOG.info("There was no record found for query "+ queryName + " with args " + args.toString());
       return null;
     }
     catch (DataAccessException ex)

@@ -3448,8 +3448,8 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			for (int x = 0; x < allAssignments.size(); x++)
 			{
 				tempAssignment = (Assignment) allAssignments.get(x);
-				
-				if (tempAssignment.getStatus().equals("eportfolio"))
+				String status = tempAssignment.getStatus();
+				if (null != status && status.equals("eportfolio"))
 				{
 					retVal.add(tempAssignment);
 				}
@@ -7479,6 +7479,8 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 
 		protected String m_peerAssessmentInstructions;
 
+		protected String m_url;
+
 		/**
 		 * constructor
 		 */
@@ -7924,7 +7926,10 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		 */
 		public String getUrl()
 		{
-			return getAccessPoint(false) + Entity.SEPARATOR + "a" + Entity.SEPARATOR + m_context + Entity.SEPARATOR + m_id;
+			if (null != m_url && !m_url.isEmpty())
+				return m_url;
+			else
+				return getAccessPoint(false) + Entity.SEPARATOR + "a" + Entity.SEPARATOR + m_context + Entity.SEPARATOR + m_id;
 
 		} // getUrl
 
@@ -8426,6 +8431,8 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		/** The event code for this edit. */
 		protected String m_event = null;
 
+		protected String m_status = null;
+
 		/** Active flag. */
 		protected boolean m_active = false;
 
@@ -8487,6 +8494,18 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		public void setTitle(String title)
 		{
 			m_title = title;
+		}
+
+		public void setStatus(String status){
+			m_status = status;
+		}
+
+		public String getStatus(){
+			return m_status;
+		}
+
+		public void setUrl(String url){
+			m_url = url;
 		}
 
 		public void setPeerAssessmentPeriod(Time time)
@@ -10162,6 +10181,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		{
 			m_maxGradePoint = maxPoints;
 		}
+
 		
 		public void setFactor(int factor)
 		{
@@ -10378,6 +10398,37 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 
 	} // BaseAssignmentContentEdit
 
+	public class EportfolioAssignmentContent extends BaseAssignmentContent {
+
+		public EportfolioAssignmentContent(EportfolioAssignment eportfolioAssignment, TracsAssignment tracsAssignment, String context)
+		{
+			m_id = eportfolioAssignment.getId();
+			m_context = context;
+			m_title = eportfolioAssignment.getTitle();
+			m_maxGradePoint = tracsAssignment.getMaxPoints();
+
+			m_properties = new BaseResourcePropertiesEdit();
+		}
+
+		public String getReference(){
+			return m_id;
+		}
+
+	}
+
+	public class EportfolioAssignmentContentEdit extends BaseAssignmentContentEdit {
+		private String m_id;
+
+		public EportfolioAssignmentContentEdit(String id, String context) {
+			super(id, context);
+			// TODO Auto-generated constructor stub
+		}
+
+		public void setReference(String ref){
+			m_id = ref;
+		}
+
+	}
 	/**********************************************************************************************************************************************************************************************************************************************************
 	 * AssignmentSubmission implementation
 	 *********************************************************************************************************************************************************************************************************************************************************/
@@ -14324,21 +14375,25 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 	{
 		M_log.debug(this + " getListEportfolioAssignmentsForContext : CONTEXT : " + context);
 
-		List eportfolioAssignments = new ArrayList<EportfolioAssignment>();
-
+		List<EportfolioAssignment> eportfolioAssignments = new ArrayList<EportfolioAssignment>();
+		List<Assignment> assignments = new ArrayList<Assignment>();
 		try {
 			AuthzGroup realm = authzGroupService.getAuthzGroup(SiteService.siteReference(context));
 			String courseEid = realm.getProviderGroupId();
-			List<EportfolioAssignment> assignments = null;
-			assignments = eportfolioService.getEportfolioAssignments(courseEid, context);
-			if ( assignments != null)
-				eportfolioAssignments.addAll(assignments);
+			eportfolioAssignments = eportfolioService.getEportfolioAssignments(courseEid, context);
+
+			if ( !eportfolioAssignments.isEmpty()) {
+				for(EportfolioAssignment ep : eportfolioAssignments){
+					assignments.add(convertEportfolioAssignmentToAssignment(ep, context));
+				}
+			}
+
 		}
 		catch (GroupNotDefinedException e) {
 			M_log.warn("failed to get site from context: " + context);
 		}
 
-		return (List<Assignment>)eportfolioAssignments;
+		return assignments;
 	}
 
 	public Assignment findEportfolioAssignment(String assignmentReference) {
@@ -14348,12 +14403,65 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		//An eportfolio assignment reference has the form <context>/<id>
 		if (split.length != 2) return null;
 
-		return (Assignment) eportfolioService.getEportfolioAssignment(split[1], split[0]);
+//		return (Assignment) eportfolioService.getEportfolioAssignment(split[1], split[0]);
+		EportfolioAssignment eportfolioAssignment = eportfolioService.getEportfolioAssignment(split[1], split[0]);
+		return convertEportfolioAssignmentToAssignment(eportfolioAssignment, split[0]);
 	}
 
 	public EditStatus editEportfolioAssignment(TracsAssignment assignment, GradebookIntegrationInfo gbIntegrationInfo)
 	{
 		return eportfolioService.editEportfolioAssignment(assignment, gbIntegrationInfo);
+	}
+
+	private Assignment convertEportfolioAssignmentToAssignment(EportfolioAssignment eportfolioAssignment, String context) {
+
+			String assignmentId = eportfolioAssignment.getId();
+			BaseAssignmentEdit assignmentEdit = new BaseAssignmentEdit(assignmentId, context);
+
+			assignmentEdit.setTitle(eportfolioAssignment.getTitle());
+			assignmentEdit.setDueTime(TimeService.newTime(eportfolioAssignment.getDueDate().getTime()));
+			assignmentEdit.setOpenTime(TimeService.newTime(eportfolioAssignment.getOpenDate().getTime()));
+			assignmentEdit.setSection(eportfolioAssignment.getCourseNumber() + "." + eportfolioAssignment.getSection());
+			assignmentEdit.setStatus(eportfolioAssignment.getStatus());
+			assignmentEdit.setDraft(eportfolioAssignment.isDraft());
+			assignmentEdit.setUrl(eportfolioAssignment.getUrl());
+
+			ResourcePropertiesEdit propertiesEdit = assignmentEdit.getPropertiesEdit();
+
+			Double rubricMaxPoints = eportfolioAssignment.getMaxPoints();
+
+			if (rubricMaxPoints != null)
+			{
+				propertiesEdit.addProperty("hasRubric", "true");
+				propertiesEdit.addProperty("rubricMaxPoints", rubricMaxPoints.toString());
+			}
+			else
+			{
+				propertiesEdit.addProperty("hasRubric", "false");
+			}
+
+			TracsAssignment tracsAssignment = eportfolioService.getTracsAssignment(assignmentId);
+			if(tracsAssignment == null) {
+				M_log.info("Eportfolio AssignmentId " + assignmentId + " does not exist in tracs");
+				return assignmentEdit;
+			}
+
+			propertiesEdit.addProperty("gbExternalId", tracsAssignment.getGbExternalId());
+			propertiesEdit.addProperty("gradebookUid", tracsAssignment.getGradebookUid());
+
+			if (tracsAssignment.isIncludedInGb())
+				propertiesEdit.addProperty(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK, AssignmentService.GRADEBOOK_INTEGRATION_ADD);
+			else
+				propertiesEdit.addProperty(AssignmentService.NEW_ASSIGNMENT_ADD_TO_GRADEBOOK, AssignmentService.GRADEBOOK_INTEGRATION_NO);
+
+			propertiesEdit.addProperty("gradeImportField", Integer.toString(tracsAssignment.getImportField()));
+
+			EportfolioAssignmentContent assignmentContent = new EportfolioAssignmentContent(eportfolioAssignment, tracsAssignment, context);
+//			if (null != rubricMaxPoints)
+//				assignmentContentEdit.setMaxGradePoint(eportfolioAssignment.getMaxPoints().intValue());
+			assignmentEdit.setContent(assignmentContent);
+
+			return assignmentEdit;
 	}
 	//TK20 integration stuff ends here
 

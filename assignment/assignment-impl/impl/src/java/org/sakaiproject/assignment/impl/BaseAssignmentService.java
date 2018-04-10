@@ -14428,7 +14428,8 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 
 			ResourcePropertiesEdit propertiesEdit = assignmentEdit.getPropertiesEdit();
 
-			Double rubricMaxPoints = eportfolioAssignment.getMaxPoints();
+//			Double rubricMaxPoints = eportfolioAssignment.getMaxPoints();
+			Double rubricMaxPoints = eportfolioService.getMaxPointsFromRubric(assignmentId);
 
 			if (rubricMaxPoints != null)
 			{

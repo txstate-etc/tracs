@@ -8553,7 +8553,6 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		 */
 		public void setContent(AssignmentContent content)
 		{
-			_assignmentContent = content;
 			if (content != null) m_assignmentContent = content.getReference();
 		}
 

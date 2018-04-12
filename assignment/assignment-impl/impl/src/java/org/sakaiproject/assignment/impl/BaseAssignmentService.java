@@ -8553,6 +8553,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		 */
 		public void setContent(AssignmentContent content)
 		{
+			_assignmentContent = content;
 			if (content != null) m_assignmentContent = content.getReference();
 		}
 
@@ -10398,6 +10399,34 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 
 	} // BaseAssignmentContentEdit
 
+	public class EportfolioBaseAssignment extends BaseAssignmentEdit {
+
+		public EportfolioBaseAssignment(String id, String context) {
+			super(id, context);
+			// TODO Auto-generated constructor stub
+		}
+
+		protected EportfolioAssignmentContent _assignmentContent;
+
+		public AssignmentContent getContent(){
+			return _assignmentContent;
+		}
+
+	}
+
+	public class EportfolioBaseAssignmentEdit extends EportfolioBaseAssignment {
+
+		public EportfolioBaseAssignmentEdit(String id, String context) {
+			super(id, context);
+			// TODO Auto-generated constructor stub
+		}
+
+		public void setContent(AssignmentContent assignmentContent){
+			_assignmentContent = (EportfolioAssignmentContent)assignmentContent;
+		}
+
+	}
+
 	public class EportfolioAssignmentContent extends BaseAssignmentContent {
 
 		public EportfolioAssignmentContent(EportfolioAssignment eportfolioAssignment, TracsAssignment tracsAssignment, String context)
@@ -10406,7 +10435,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			m_context = context;
 			m_title = eportfolioAssignment.getTitle();
 			m_maxGradePoint = tracsAssignment.getMaxPoints();
-
+			m_factor = getScaleFactor();
 			m_properties = new BaseResourcePropertiesEdit();
 		}
 
@@ -10416,19 +10445,6 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 
 	}
 
-	public class EportfolioAssignmentContentEdit extends BaseAssignmentContentEdit {
-		private String m_id;
-
-		public EportfolioAssignmentContentEdit(String id, String context) {
-			super(id, context);
-			// TODO Auto-generated constructor stub
-		}
-
-		public void setReference(String ref){
-			m_id = ref;
-		}
-
-	}
 	/**********************************************************************************************************************************************************************************************************************************************************
 	 * AssignmentSubmission implementation
 	 *********************************************************************************************************************************************************************************************************************************************************/
@@ -14416,7 +14432,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 	private Assignment convertEportfolioAssignmentToAssignment(EportfolioAssignment eportfolioAssignment, String context) {
 
 			String assignmentId = eportfolioAssignment.getId();
-			BaseAssignmentEdit assignmentEdit = new BaseAssignmentEdit(assignmentId, context);
+			EportfolioBaseAssignmentEdit assignmentEdit = new EportfolioBaseAssignmentEdit(assignmentId, context);
 
 			assignmentEdit.setTitle(eportfolioAssignment.getTitle());
 			assignmentEdit.setDueTime(TimeService.newTime(eportfolioAssignment.getDueDate().getTime()));
@@ -14458,8 +14474,6 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			propertiesEdit.addProperty("gradeImportField", Integer.toString(tracsAssignment.getImportField()));
 
 			EportfolioAssignmentContent assignmentContent = new EportfolioAssignmentContent(eportfolioAssignment, tracsAssignment, context);
-//			if (null != rubricMaxPoints)
-//				assignmentContentEdit.setMaxGradePoint(eportfolioAssignment.getMaxPoints().intValue());
 			assignmentEdit.setContent(assignmentContent);
 
 			return assignmentEdit;

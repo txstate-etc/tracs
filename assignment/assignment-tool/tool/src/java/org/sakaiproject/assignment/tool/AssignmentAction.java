@@ -18175,7 +18175,7 @@ public class AssignmentAction extends PagedResourceActionII
 			state.setAttribute("the_assignment", a);
 
 			state.setAttribute(NEW_ASSIGNMENT_TITLE, a.getTitle());
-//			state.setAttribute(NEW_ASSIGNMENT_GRADE_POINTS, a.getContent().getMaxGradePointDisplay());
+			state.setAttribute(NEW_ASSIGNMENT_GRADE_POINTS, a.getContent().getMaxGradePointDisplay());
 
 			ResourceProperties properties = a.getProperties();
 			state.setAttribute("gbExternalId", properties.getProperty("gbExternalId"));

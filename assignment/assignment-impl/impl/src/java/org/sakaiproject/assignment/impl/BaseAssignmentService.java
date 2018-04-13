@@ -10436,6 +10436,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			m_maxGradePoint = tracsAssignment.getMaxPoints();
 			m_factor = getScaleFactor();
 			m_properties = new BaseResourcePropertiesEdit();
+			m_typeOfGrade = Assignment.SCORE_GRADE_TYPE;
 		}
 
 		public String getReference(){

@@ -119,7 +119,7 @@
                 
                 <!-- TxState Specific -->
                 <module>tracs-jdbc</module>
-                <module>tracs-pearson</module>
+          <!--      <module>tracs-pearson</module> -->
                 <module>tracs-examity</module>
                 <module>tracs-tk20</module>
                 <module>tracs-warehouse</module>

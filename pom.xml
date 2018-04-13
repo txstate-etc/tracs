@@ -138,7 +138,7 @@
                 <module>irubric/irubric-tool</module>
 
                 <!-- Contrib Dependencies -->
-                <module>roster-legacy</module>
+                <!--<module>roster-legacy</module> -->
                 <module>lticontact</module>
                 <module>etudes-util</module>
 

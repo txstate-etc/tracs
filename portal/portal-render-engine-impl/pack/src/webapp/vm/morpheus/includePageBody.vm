@@ -30,9 +30,11 @@
 
         <div id="$pageColumnLayout" class="${columnClasses}">
             #if ($pageColumn0Tools.size() == 0)
-                <H1>Gradebook 2 is now deprecated. Try GradebookNG!</H1>
+                <H1>This version of Gradebook is no longer supported in TRACS</H1>
+                <a href="http://www.its.txstate.edu/Support.html">Contact the TRACS Support Team</a>
+                <p style="display:inline"> if you need to retrieve data from a previous Gradebook</p>
                 <br>
-                <p>Other text from your friends Matt and Jimmy will be displayed here soon!</p>
+                <p style="display:inline"> or if you have any questions.</p>
             #end
             #foreach ( $tool in $pageColumn0Tools )
 

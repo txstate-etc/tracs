@@ -488,6 +488,7 @@ public class ImportGradesHelper {
 			}
 
 			final String columnTitle = StringUtils.trim(column.getColumnTitle());
+			final String rawColumnTitle = StringUtils.trim(column.getUnparsedTitle());
 
 			//setup a new one unless it already exists (ie there were duplicate columns)
 			ProcessedGradeItem processedGradeItem = assignmentProcessedGradeItemMap.get(columnTitle);
@@ -509,6 +510,7 @@ public class ImportGradesHelper {
 				processedGradeItem.setItemTitle(columnTitle);
 				processedGradeItem.setItemPointValue(column.getPoints());
 				processedGradeItem.setStatus(status);
+				processedGradeItem.setRawColumnTitle(rawColumnTitle);
 			} else if (column.getType() == ImportedColumn.Type.COMMENTS) {
 				log.info("Comments: " + columnTitle + ", status: " + status.getStatusCode());
 				processedGradeItem.setType(ProcessedGradeItem.Type.COMMENT);
@@ -518,6 +520,7 @@ public class ImportGradesHelper {
 				log.info("Regular: " + columnTitle + ", status: " + status.getStatusCode());
 				processedGradeItem.setItemTitle(columnTitle);
 				processedGradeItem.setStatus(status);
+				processedGradeItem.setRawColumnTitle(rawColumnTitle);
 			} else {
 				// skip
 				//TODO could return this but as a skip status?

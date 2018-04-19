@@ -57,18 +57,23 @@ public class CreateGradeItemStep extends Panel {
         // first make sure it doesn't already exist (user could have hit the back button)
         Assignment assignment = null;
         String assignmentTitle = StringUtils.trim(processedGradeItem.getItemTitle());
+
+        // If the assignment is already present, delete it and start over
+        // This ensures no dupes are created via using the back button
         for (Assignment assignmentItem : importWizardModel.getAssignmentsToCreate()) {
             if (assignmentItem.getName().equals(assignmentTitle)) {
-                assignment = assignmentItem;
+                importWizardModel.getAssignmentsToCreate().remove(assignmentItem);
                 break;
             }
         }
         if (assignment == null) {
             assignment = new Assignment();
-            importWizardModel.getAssignmentsToCreate().add(assignment);
         }
 
-
+        String rawTitle = StringUtils.trim(processedGradeItem.getRawColumnTitle());
+        if (StringUtils.isNotEmpty(rawTitle) && !assignmentTitle.contains(rawTitle)) {
+            assignmentTitle += " (" + rawTitle + ")";
+        }
         assignment.setName(assignmentTitle);
         if(StringUtils.isNotBlank(processedGradeItem.getItemPointValue())) {
         	assignment.setPoints(Double.parseDouble(processedGradeItem.getItemPointValue()));
@@ -98,6 +103,7 @@ public class CreateGradeItemStep extends Panel {
 
                 if (validated) {
 	                // sync up the assignment data so we can present it for confirmation
+                    importWizardModel.getAssignmentsToCreate().add(newAssignment);
 	                processedGradeItem.setAssignmentTitle(newAssignment.getName());
 	                processedGradeItem.setAssignmentPoints(newAssignment.getPoints());
 	                processedGradeItem.setItemTitle(newAssignment.getName());

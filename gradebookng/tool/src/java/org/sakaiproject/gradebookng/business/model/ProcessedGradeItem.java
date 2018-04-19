@@ -36,6 +36,10 @@ public class ProcessedGradeItem implements Serializable {
 
 	@Getter
 	@Setter
+	private String rawColumnTitle;
+
+	@Getter
+	@Setter
 	private Long itemId;
 
 	@Getter

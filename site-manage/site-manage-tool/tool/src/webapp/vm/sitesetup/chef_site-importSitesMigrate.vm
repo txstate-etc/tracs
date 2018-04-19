@@ -29,9 +29,9 @@
 				#set ($toolCount=0)
 				#set ($meleteFound=false)
 				#foreach($toolId in $selectedTools)
-					##Attempt to trick import into treating GB2 like GB Classic
+					##Attempt to trick import into treating GB2 like GBNG
 					#if ($toolId == "sakai.gradebook.gwt.rpc")
-						#set($toolId = "sakai.gradebook.tool")
+						#set($toolId = "sakai.gradebookng")
 					#end
 				#set($selectedSites = $!importSitesTools.get($toolId))
 				#set ($toolCount=$toolCount + 1)
@@ -80,6 +80,7 @@
 									#foreach ($page in $allPages)
 										#set($pageTools = $page.getTools())
 										#foreach ($pageTool in $pageTools)
+											<p>$pageTool.getTool().getId()</p>
 											#if ($pageTool.getTool().getId() == $toolId)
 												#set($toolFound = true)
 											#end

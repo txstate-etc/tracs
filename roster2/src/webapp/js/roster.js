@@ -295,6 +295,7 @@
                 $('#navbar_enrollment_status_link').off('click');
 
                 roster.renderMembership({ forceOfficialPicture: showOfficialPictures, replace: true });
+                roster.readyHideUnhide();
             });
         } else if (roster.STATE_PERMISSIONS === state) {
 

@@ -340,9 +340,9 @@ public class AssignmentColumnHeaderPanel extends Panel {
 
 			@Override
 			public boolean isVisible() {
-				if (assignment.isExternallyMaintained()) {
-					return false;
-				}
+//				if (assignment.isExternallyMaintained()) {
+//					return false;
+//				}
 				return canEditAssignment;
 			}
 

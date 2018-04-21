@@ -604,6 +604,8 @@ GradebookSpreadsheet.prototype.setupFixedColumnsTable = function(reset) {
   var $tbody = $("<tbody>");
   self.$table.find("> tbody > tr:visible").each(function(i, origRow) {
     var $tr = $("<tr>");
+    if ($(origRow).hasClass('inactivePar'))
+      $tr.addClass($("tr[class*='inactivePar']").attr('class'));
     self._cloneCells($(origRow).find(" > :lt(3)")).appendTo($tr);
     $tbody.append($tr);
   });

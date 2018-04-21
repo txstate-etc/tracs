@@ -522,7 +522,7 @@ GradebookSpreadsheet.prototype.setupFixedColumns = function() {
 
   // populate the dummy column table
   var $tbody = $("<tbody>");
-  self.$table.find("> tbody > tr").each(function(i, origRow) {
+  self.$table.find("> tbody > tr:visible").each(function(i, origRow) {
     var $tr = $("<tr>");
     self._cloneCells($(origRow).find(" > :lt(3)")).appendTo($tr);
     $tbody.append($tr);
@@ -565,7 +565,86 @@ GradebookSpreadsheet.prototype.setupFixedColumns = function() {
     self.$spreadsheet.scrollLeft(0);
     var cellIndex = $(this).index();
     var rowIndex = $(this).closest("tr").index();
-    $targetCell = $($(self.$table.find("> tbody > tr").get(rowIndex)).find("> *").get(cellIndex));
+    $targetCell = $($(self.$table.find("> tbody > tr:visible").get(rowIndex)).find("> *").get(cellIndex));
+
+    self.$spreadsheet.data("activeCell", $targetCell);
+
+    // attempt to proxy to elements in the original cell
+    if (!self.proxyEventToElementsInOriginalCell(event, $targetCell)) {
+      // otherwise just focus the original cell
+      $targetCell.focus();
+    }
+  });
+
+  self._fixedThingsAreReady += 1;
+};
+
+GradebookSpreadsheet.prototype.refreshFixedColumnsTable = function() {
+  this.setupFixedColumnsTable(true);
+};
+
+GradebookSpreadsheet.prototype.setupFixedColumnsTable = function(reset) {
+  var self = this;
+
+  if (reset) {
+    // delete the existing table and initialize a new one
+    self.find(".gb-fixed-columns-table").remove();
+  };
+
+  self.$fixedColumns = $("<table>").attr("class", self.$table.attr("class")).
+                                    addClass("gb-fixed-columns-table").
+                                    attr("role", "presentation").
+                                    attr("aria-hidden", "true").
+                                    hide();
+
+
+  self.$fixedColumns.append($("<tbody>"));
+
+  // populate the dummy column table
+  var $tbody = $("<tbody>");
+  self.$table.find("> tbody > tr:visible").each(function(i, origRow) {
+    var $tr = $("<tr>");
+    self._cloneCells($(origRow).find(" > :lt(3)")).appendTo($tr);
+    $tbody.append($tr);
+  });
+  self.$fixedColumns.append($tbody);
+
+  self.$spreadsheet.prepend(self.$fixedColumns);
+
+  self.$fixedColumns.data("width", self.$fixedColumns.width());
+
+  self.$table.find("> tbody > tr").hover(
+    function() {
+      $(self.$fixedColumns.find("tr")[$(this).index()]).addClass("hovered");
+    },
+    function() {
+      $(self.$fixedColumns.find("tr")[$(this).index()]).removeClass("hovered");
+    }
+  );
+
+  // Clicks on the fixed header return you to the real header cell
+  self.$fixedColumnsHeader.find("> thead > tr > *").on("mousedown", function(event) {
+    event.preventDefault();
+    $(window).scrollTop(self.$table.offset().top - 10);
+    self.$spreadsheet.scrollLeft(0);
+    var $targetCell = $(self.$table.find("> thead > tr.gb-headers > *").get($(this).index()));
+
+    self.$spreadsheet.data("activeCell", $targetCell);
+
+    // attempt to proxy to elements in the original cell
+    if (!self.proxyEventToElementsInOriginalCell(event, $targetCell)) {
+      // otherwise just focus the original cell
+      $targetCell.focus();
+    }
+  });
+
+  // Clicks on the fixed column return you to the real column cell
+  self.$fixedColumns.find("td").on("mousedown", function(event) {
+    event.preventDefault();
+    self.$spreadsheet.scrollLeft(0);
+    var cellIndex = $(this).index();
+    var rowIndex = $(this).closest("tr").index();
+    $targetCell = $($(self.$table.find("> tbody > tr:visible").get(rowIndex)).find("> *").get(cellIndex));
 
     self.$spreadsheet.data("activeCell", $targetCell);
 
@@ -596,6 +675,9 @@ GradebookSpreadsheet.prototype.handleScrollEvent = function() {
 
   function positionFixedColumn() {
     if (self.$horizontalOverflow[0].scrollLeft > 0) {
+      //update fixedColumns rows to sync with show/hide of inactivePar status
+      self.refreshFixedTableHeader(true);
+      self.refreshFixedColumnsTable(true);
       self.$fixedColumns.
           show().
           css("left", self.$horizontalOverflow.offset().left).
@@ -1987,7 +2069,7 @@ GradebookHeaderCell.prototype.moveColumnTo = function(newIndex) {
     $(self.getRow().children().get(newIndex)).after(self.$cell);
 
     // reorder the tbody cells
-    self.gradebookSpreadsheet.$table.find("tbody > tr").each(function() {
+    self.gradebookSpreadsheet.$table.find("tbody > tr:visible").each(function() {
         var $tr = $(this);
         // match either th or td (as row contains either
         $tr.find(" > *:eq(" + newIndex + ")").after($tr.find("> *:eq("+currentIndex+")"));
@@ -1997,7 +2079,7 @@ GradebookHeaderCell.prototype.moveColumnTo = function(newIndex) {
     $(self.getRow().children().get(newIndex)).before(self.$cell);
 
     // reorder the tbody cells
-    self.gradebookSpreadsheet.$table.find("> tbody > tr").each(function() {
+    self.gradebookSpreadsheet.$table.find("> tbody > tr:visible").each(function() {
         var $tr = $(this);
         $tr.find("> *:eq(" + newIndex + ")").before($tr.find("> *:eq("+currentIndex+")"));
     });

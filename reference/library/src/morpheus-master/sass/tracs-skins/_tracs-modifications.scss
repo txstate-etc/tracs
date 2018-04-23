@@ -195,6 +195,9 @@ $samigo-active-tab-border: #003eff !default;
     padding: .2em;
     position: relative;
     font-weight: 500;
+    &.is-selected a.Mrphs-sitesNav__dropdown {
+      border: 0px;
+    }
   }
   .Mrphs-sitesNav__submenuitem {
     a {

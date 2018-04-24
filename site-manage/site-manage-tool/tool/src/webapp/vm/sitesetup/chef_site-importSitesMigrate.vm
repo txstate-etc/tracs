@@ -80,7 +80,6 @@
 									#foreach ($page in $allPages)
 										#set($pageTools = $page.getTools())
 										#foreach ($pageTool in $pageTools)
-											<p>$pageTool.getTool().getId()</p>
 											#if ($pageTool.getTool().getId() == $toolId)
 												#set($toolFound = true)
 											#end

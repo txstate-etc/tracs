@@ -127,7 +127,6 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
 
         extraPlugins: (sakai.editor.enableResourceSearch ? 'resourcesearch,' : '')+'',
 
-
         // These two settings enable the browser's native spell checking and context menus.
         // Control-Right-Click (Windows/Linux) or Command-Right-Click (Mac) on highlighted words
         // will cause the CKEditor menu to be suppressed and display the browser's standard context
@@ -178,9 +177,9 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
         //wordcount Plugin see https://github.com/w8tcha/CKEditor-WordCount-Plugin for more config options
         //This value should match the one in antisamy (kernel/kernel-impl/src/main/resources/antisamy/low-security-policy.xml)
         wordcount : {
-            "maxCharCount" : 1000000,
+            "maxCharCount" : 65000,
             //Previous behavior
-            "countSpacesAsCharsHTML" : true,
+            "countSpacesAsCharsHTML" : false,
             "countHTML" : true,
             "showParagraphs" : false,
             "showWordCount" : true,
@@ -248,7 +247,12 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
         }
     })();
 
-      ckconfig.autoParagraph = false
+      ckconfig.autoParagraph = false;
+      ckconfig.fillEmptyBlocks = false;
+      ckconfig.enterMode = CKEDITOR.ENTER_BR;
+      ckconfig.forceEnterMode = true;
+      ckconfig.basicEntities = false;
+
 	  CKEDITOR.replace(targetId, ckconfig);
       //SAK-22505
       CKEDITOR.on('dialogDefinition', function(e) {

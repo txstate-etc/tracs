@@ -172,7 +172,8 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
         //Delay for autosave
         autosave_delay: 300,
         //autosave_messageType can be "no" or "notification"
-        autosave_messageType : "statusbar", 
+        autosave_messageType : "statusbar",
+        autosave_diffType : "sideBySide",
 
         //wordcount Plugin see https://github.com/w8tcha/CKEditor-WordCount-Plugin for more config options
         //This value should match the one in antisamy (kernel/kernel-impl/src/main/resources/antisamy/low-security-policy.xml)
@@ -249,8 +250,8 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
 
       ckconfig.autoParagraph = false;
       ckconfig.fillEmptyBlocks = false;
-      ckconfig.enterMode = CKEDITOR.ENTER_BR;
-      ckconfig.forceEnterMode = true;
+      // ckconfig.enterMode = CKEDITOR.ENTER_BR;
+      // ckconfig.forceEnterMode = true;
       ckconfig.basicEntities = false;
 
 	  CKEDITOR.replace(targetId, ckconfig);

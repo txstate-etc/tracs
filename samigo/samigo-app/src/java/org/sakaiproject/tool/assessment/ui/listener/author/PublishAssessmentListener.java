@@ -334,7 +334,7 @@ public class PublishAssessmentListener
 	  }
 
 
-	  String noReplyEmaillAddress =  ServerConfigurationService.getString("setup.request", ServerConfigurationService.getString("email.noreply_address", "no-reply@" + ServerConfigurationService.getServerName()));
+	  String noReplyEmaillAddress =  ServerConfigurationService.getString("setup.request", ServerConfigurationService.getString("email.noreply_address", "noreply@" + ServerConfigurationService.getServerName()));
       InternetAddress[] noReply = new InternetAddress[1];
       try {
     	  noReply[0] = new InternetAddress(noReplyEmaillAddress);
@@ -344,6 +344,7 @@ public class PublishAssessmentListener
 	  
 	  List<String> headers = new  ArrayList<String>();
 	  headers.add("Content-Type: text/html");
+
 	  EmailService.sendMail(fromIA, toIA, subject.toString(), message, noReply, noReply, headers);
   }
   

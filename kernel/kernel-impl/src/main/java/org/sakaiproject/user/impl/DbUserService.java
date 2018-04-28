@@ -698,7 +698,12 @@ public abstract class DbUserService extends BaseUserDirectoryService
 			List<UserEdit> usersToQueryProvider = userWithEidReader.getUsersToQueryProvider();
 			if ((m_provider != null) && !usersToQueryProvider.isEmpty())
 			{
-				m_provider.getUsers(usersToQueryProvider);
+				try {
+					m_provider.getUsers(usersToQueryProvider);
+				}
+				catch (Exception e) {
+					M_log.error("Couldn't get users from the provider ");
+				}
 
 				// Make sure that returned users are mapped and cached correctly.
 				for (UserEdit user : usersToQueryProvider)
@@ -756,7 +761,12 @@ public abstract class DbUserService extends BaseUserDirectoryService
 			// Finally, fill in the provided user records.
 			if ((m_provider != null) && !usersToQueryProvider.isEmpty())
 			{
-				m_provider.getUsers(usersToQueryProvider);
+				try {
+					m_provider.getUsers(usersToQueryProvider);
+				}
+				catch (Exception e) {
+					M_log.error("Couldn't get users from the provider ");
+				}
 
 				// Make sure that returned users are mapped and cached correctly.
 				for (UserEdit user : usersToQueryProvider)

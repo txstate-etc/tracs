@@ -63,7 +63,7 @@
                                      ## SAK-29132 - Don't do anything if this is an instance of a multi-tool, it's handled down below
                                      #elseif ($multipleToolIdTitleMap.containsKey($toolId))
                                        <!-- Multi tool $toolId is handled below -->
-                                     #else 
+                                     #elseif (!$toolId.equals("sakai.search"))
                                      	<li id="row-$rowCount">
                                             <div class="toolListControl" id="$toolId.replace(".","_")_wrap">
                                                 <input type="checkbox" name="selectedTools" value="$toolId" id="$toolId"

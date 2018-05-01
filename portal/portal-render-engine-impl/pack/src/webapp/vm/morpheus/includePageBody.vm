@@ -29,7 +29,7 @@
         #parse("/vm/morpheus/snippets/siteStatus-snippet.vm")
 
         <div id="$pageColumnLayout" class="${columnClasses}">
-            #if ($pageColumn0Tools.size() == 0)
+            #if ($pageColumn0Tools.size() == 0 && $breadToolName.toUpperCase().contains("GRADEBOOK"))
                 <H1>This version of Gradebook is no longer supported in TRACS</H1>
                 <a href="http://www.its.txstate.edu/Support.html">Contact the TRACS Support Team</a>
                 <p style="display:inline"> if you need to retrieve data from a previous Gradebook</p>

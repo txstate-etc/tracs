@@ -455,6 +455,9 @@
 
                 roster.renderMembers(members, $('#roster-members'), enrollmentsMode);
 
+                //showing inactive by default for enrollmentstatus page
+                if(enrollmentsMode) $('.inactivePar').show();
+
                 $(document).ready(function () {
 
                     roster.alignMobileLabels();

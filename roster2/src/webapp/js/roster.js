@@ -239,6 +239,7 @@
             }
 
             var showOfficialPictures = false;
+            roster.officialPictureMode = roster.officialPicturesByDefault;
 
             if ((args && args.forceOfficialPicture) || roster.officialPictureMode) {
                 showOfficialPictures = true;
@@ -248,6 +249,7 @@
                 { enrollmentSets: roster.site.siteEnrollmentSets,
                     onlyOne: roster.site.siteEnrollmentSets.length == 1,
                     enrollmentStatusCodes: roster.site.enrollmentStatusCodes,
+                    checkOfficialPicturesButton: showOfficialPictures,
                     viewOfficialPhoto: roster.currentUserPermissions.viewOfficialPhoto },
                 'roster_content');
 

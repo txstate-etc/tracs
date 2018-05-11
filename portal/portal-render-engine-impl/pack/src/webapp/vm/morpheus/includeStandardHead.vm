@@ -35,6 +35,7 @@
                 "portalPath": "$!{portalPath}",
                 "loggedOutUrl": "$!{loggedOutUrl}",
                 "siteId": "$!{siteId}",
+                "toolId": "$!{toolId}",
                 "siteTitle": "$!{siteTitle}",
                 "shortDescription" : "$!{shortDescription}",
                 "locale": "$!{locale}",

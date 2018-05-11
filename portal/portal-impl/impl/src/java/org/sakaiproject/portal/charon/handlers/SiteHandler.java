@@ -523,6 +523,8 @@ public class SiteHandler extends WorksiteHandler
 		}
 
 		rcontext.put("siteId", siteId);
+		rcontext.put("toolId", commonToolId);
+
 		boolean showShortDescription = Boolean.valueOf(ServerConfigurationService.getBoolean("portal.title.shortdescription.show", false));
 
 		if (showShortDescription) {

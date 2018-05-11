@@ -81,7 +81,7 @@
   </h3>
 
   <p class="instruction">
-    This is an eportfolio assignment. These settings control how the assignment appears in TRACS. If you want to modify the assignment content, it must be done from the eportfolio site.
+    This is an ePortfolio assignment. These settings control how the assignment appears in TRACS. If you want to modify the assignment content, it must be done from the ePortfolio site.
   </p>
 
   #if ($alertMessage)

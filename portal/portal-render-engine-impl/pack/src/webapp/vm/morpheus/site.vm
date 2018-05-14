@@ -173,13 +173,13 @@
         function portal_check_pnotify() {
             ${d}PBJQ.getJSON( "/direct/portal/notify.json", function( data ) {
                 for(i=0; i<data.error.length; i++ ) {
-                     ${d}PBJQ(function(){
-                        new PNotify({
-                            title: '${rloader.getString("pnotify_notice")}',
-                            text: data.error[i],
-                            type: 'notice'
-                        });
-                    });
+##                     ${d}PBJQ(function(){
+##                        new PNotify({
+##                            title: '${rloader.getString("pnotify_notice")}',
+##                            text: data.error[i],
+##                            type: 'notice'
+##                        });
+##                    });
                 }
             });
         }

@@ -36,11 +36,9 @@ function GradebookSpreadsheet($spreadsheet) {
   // critical path of the page load
   this.onReady(function() {
     self.setupKeyboadNavigation();
-    setTimeout(function(){ self.setupFixedColumns(); });
     // only setup the fixed header if categies are not enabled
     // otherwise they'll be setup post group-by-category
     if (!$("#toggleCategoriesToolbarItem").hasClass("on")) {
-      self.setupFixedTableHeader();
     }
     setTimeout(function() { self.setupColumnDragAndDrop(); });
     self.setupRowSelector();
@@ -664,10 +662,10 @@ GradebookSpreadsheet.prototype.setupFixedColumnsTable = function(reset) {
 GradebookSpreadsheet.prototype.setupScrollHandling = function() {
   var self = this;
 
-  $(document).on("scroll", $.proxy(self.handleScrollEvent, self));
-  self.$horizontalOverflow.on("scroll", $.proxy(self.handleScrollEvent, self));
+  $(document).on("scroll", $.proxy(self.handleScrollEventForTracs, self));
+  self.$horizontalOverflow.on("scroll", $.proxy(self.handleScrollEventForTracs, self));
 
-  self.handleScrollEvent();
+  self.handleScrollEventForTracs();
 };
 
 
@@ -753,6 +751,11 @@ GradebookSpreadsheet.prototype.handleScrollEvent = function() {
   });
 }
 
+GradebookSpreadsheet.prototype.handleScrollEventForTracs = function() {
+   //TRACS own scroll handler; to be implemented
+   //not use sakai's fixedColumns table as it causes alignment issue
+
+};
 
 GradebookSpreadsheet.prototype.proxyEventToElementsInOriginalCell = function(event, $originalCell) {
   var $target = $(event.target);
@@ -1051,7 +1054,7 @@ GradebookSpreadsheet.prototype.updateCategoryLabelPositions = function(animate) 
 
     if ($table.is(":visible")) {
       var viewport = self.getWidth();
-      var overlay = self.$fixedColumns.data("width");
+      var overlay = 0;
       var available = viewport - overlay;
       var scroll = self.$horizontalOverflow[0].scrollLeft;
 
@@ -1280,9 +1283,6 @@ GradebookSpreadsheet.prototype.refreshSummary = function() {
 GradebookSpreadsheet.prototype.highlightRow = function($row) {
   this.$spreadsheet.find(".gb-highlighted-row").removeClass("gb-highlighted-row");
   $row.addClass("gb-highlighted-row");
-  if ($row.closest("tbody").length > 0){
-    $(this.$fixedColumns.find("tr").get($row.index())).addClass("gb-highlighted-row");
-  }
 };
 
 

@@ -1,0 +1,373 @@
+package org.sakaiproject.gradebookng.tool.panels;
+
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.sakaiproject.gradebookng.business.GbGradingType;
+import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
+import org.sakaiproject.gradebookng.business.model.GradeSubmissionResult;
+import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
+import org.sakaiproject.gradebookng.tool.component.GbFeedbackPanel;
+import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
+import org.sakaiproject.service.gradebook.shared.Assignment;
+import org.sakaiproject.service.gradebook.shared.AssignmentHasIllegalPointsException;
+import org.sakaiproject.service.gradebook.shared.CategoryDefinition;
+import org.sakaiproject.service.gradebook.shared.ConflictingAssignmentNameException;
+import org.sakaiproject.service.gradebook.shared.ConflictingExternalIdException;
+import org.sakaiproject.service.gradebook.shared.GradebookService;
+import org.sakaiproject.tool.gradebook.Gradebook;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.sakaiproject.gradebookng.tool.model.GbModalWindow;
+import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
+import org.sakaiproject.gradebookng.tool.model.RescaleAnswer;
+
+/**
+ * The panel for submit final and midTerm (Initial Academic Feedback) grades window
+ *
+ * @author Yuanhua Qu (Txstate University)
+ *
+ */
+public class GradeSubmissionPanel extends Panel {
+
+	private static final long serialVersionUID = 1L;
+
+	@SpringBean(name = "org.sakaiproject.gradebookng.business.GradebookNgBusinessService")
+	protected GradebookNgBusinessService businessService;
+
+
+	/**
+	 * How this panel is rendered
+	 */
+	enum Mode {
+		FINAL,
+		MIDTERM;
+	}
+
+	Mode mode;
+	ModalWindow window;
+
+	public GradeSubmissionPanel(final String id, final ModalWindow window, final String gradeSubmitType) {
+		super(id);
+		this.window = window;
+		// determine mode
+		if (gradeSubmitType.equalsIgnoreCase(getString("finalGrade"))) {
+			this.mode = Mode.FINAL;
+		} else if (gradeSubmitType.equalsIgnoreCase(getString("midTerm"))){
+			this.mode = Mode.MIDTERM;
+		}
+
+		String url = "https://yahoo.com";
+
+		final GbGradingType gradeType = GbGradingType.valueOf(this.businessService.getGradebook().getGrade_type());
+
+
+			final Gradebook gradebook = this.businessService.getGradebook();
+
+//			add(new Label("gradeSubmissionWarning1", MessageFormat.format(getString("label.gradesubmit.warning1"), gradeSubmitType.toLowerCase())));
+		// form
+		final Form form = new Form ("gradeSubmissionForm");
+
+		form.add(new Label("gradeSubmissionWarning1", MessageFormat.format(getString("label.gradesubmit.warning1"), gradeSubmitType.toLowerCase())));
+		form.add(new Label("gradeSubmissionWarning2", MessageFormat.format(getString("label.gradesubmit.warning2"), gradeSubmitType)));
+//		form.add(new Label("gradeSubmissionWarning3", MessageFormat.format(getString("label.gradesubmit.warning3"), gradeSubmitType)));
+		final Label gradeSubmissionWarning3 = new Label("gradeSubmissionWarning3", new StringResourceModel("label.gradesubmit.warning3", null, new Object[] { gradeSubmitType }).getString());
+//		form.add(new Label("gradeSubmissionWarning3", new StringResourceModel("label.gradesubmit.warning3", null, new Object[] { gradeSubmitType }).getString()));
+		gradeSubmissionWarning3.setEscapeModelStrings(false);
+		form.add(gradeSubmissionWarning3);
+		
+		
+//		GradeSubmissionResult gradeSubmissionResult = GradeSubmissionPanel.this.businessService.submitGrade(gradeSubmitType);
+//
+//		final boolean isSuccess = true;
+//		
+//		String gradeSubmission;
+//		if(mode.equals(Mode.FINAL)) {
+//			gradeSubmission = getString("finalGrade");
+//		} else if (mode.equals(Mode.MIDTERM)) {
+//			gradeSubmission = getString("midTerm");
+//		} else {
+//			gradeSubmission = getString("notDefinedGradeSubmissionType");
+//		}
+//
+//		if (Integer.valueOf(500).compareTo(gradeSubmissionResult.getStatus()) == 0) {
+//			error(new StringResourceModel("message.gradesubmit.error", null, new Object[] {gradeSubmission}).getObject());
+////			target.addChildren(form, FeedbackPanel.class);
+//		} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 &&!isSuccess) {
+//			error(new StringResourceModel("message.gradesubmit.error", null, new Object[] {gradeSubmission}).getObject());			
+//			error("error in server");
+//		} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && isSuccess) {
+//			getSession().success(MessageFormat.format(getString("message.gradesubmit.success"), gradeSubmission));
+////			setResponsePage(getPage().getPageClass());
+//			error(new StringResourceModel("message.gradesubmit.error", null, new Object[] {gradeSubmission}).getObject());		
+//		}
+//		else {
+////			error(new ResourceModel("message.gradesubmit.error").getObject());
+//			error(new StringResourceModel("message.gradesubmit.error", null, new Object[] {gradeSubmission}).getObject());
+////			target.addChildren(form, FeedbackPanel.class);
+//		}
+
+		
+		final GbAjaxButton submit = new GbAjaxButton("submit") {
+			private static final long serialVersionUID = 1L;
+			String strWindowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes"; 
+			public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+				
+				target.appendJavaScript("Window.open(url, '_blank', strWindowFeatures)");
+				window.close(target);
+				
+			}
+
+/*			@Override
+			public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+				
+				String strWindowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes"; 
+////			window.open(url, "_blank", strWindowFeatures);
+//target.appendJavaScript("alert('hi')");
+				
+//target.appendJavaScript("open(url, '_blank', strWindowFeature)");
+//window.close(target);
+
+				GradeSubmissionResult gradeSubmissionResult = GradeSubmissionPanel.this.businessService.submitGrade(gradeSubmitType);
+
+				boolean isSuccess = false;
+String data = gradeSubmissionResult.getData();
+				isSuccess = Boolean.parseBoolean((String)getJsonMap(gradeSubmissionResult.getData()).get("success"));
+
+				String gradeSubmission;
+				if(mode.equals(Mode.FINAL)) {
+					gradeSubmission = getString("finalGrade");
+				} else if (mode.equals(Mode.MIDTERM)) {
+					gradeSubmission = getString("midTerm");
+				} else {
+					gradeSubmission = getString("notDefinedGradeSubmissionType");
+				}
+
+				if (Integer.valueOf(500).compareTo(gradeSubmissionResult.getStatus()) == 0) {
+					error(new StringResourceModel("message.gradesubmit.error1", null, new Object[] {gradeSubmission}).getObject());
+					target.addChildren(form, FeedbackPanel.class);
+				} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && !isSuccess) {
+					error(new StringResourceModel("message.gradesubmit.error2", null, new Object[] {gradeSubmission}).getObject());
+					target.addChildren(form, FeedbackPanel.class);
+				} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && isSuccess) {
+					target.appendJavaScript("Window.open(url, '_blank', strWindowFeature)");
+//					getSession().success(MessageFormat.format(getString("message.gradesubmit.success"), gradeSubmission + " HIII  " + data));
+//					setResponsePage(getPage().getPageClass());
+				}
+				else {
+//					error(new ResourceModel("message.gradesubmit.error").getObject());
+					error(new StringResourceModel("message.gradesubmit.error", null, new Object[] {gradeSubmission}).getObject());
+					target.addChildren(form, FeedbackPanel.class);
+				}
+				
+
+//
+//				boolean validated = true;
+//
+//				// PRE VALIDATION
+//				// 1. if category selected and drop/keep highest/lowest selected for that category,
+//				// ensure points match the already established maximum for the category.
+//				if (assignment.getCategoryId() != null) {
+//					final List<CategoryDefinition> categories = GradeSubmissionPanel.this.businessService.getGradebookCategories();
+//					final CategoryDefinition category = categories
+//							.stream()
+//							.filter(c -> (c.getId() == assignment.getCategoryId())
+//									&& (c.getDropHighest() > 0 || c.getKeepHighest() > 0 || c.getDrop_lowest() > 0))
+//							.filter(c -> (c.getDropHighest() > 0 || c.getKeepHighest() > 0 || c.getDrop_lowest() > 0))
+//							.findFirst()
+//							.orElse(null);
+//
+//					if (category != null) {
+//						final Assignment mismatched = category.getAssignmentList()
+//								.stream()
+//								.filter(a -> Double.compare(a.getPoints().doubleValue(), assignment.getPoints().doubleValue()) != 0)
+//								.findFirst()
+//								.orElse(null);
+//						if (mismatched != null) {
+//							validated = false;
+//							error(MessageFormat.format(getString("error.addeditgradeitem.categorypoints"), mismatched.getPoints()));
+//							target.addChildren(form, FeedbackPanel.class);
+//						}
+//					}
+//				}
+//
+//				// 2. names cannot start with * or #
+//				if(validated && StringUtils.startsWithAny(assignment.getName(), new String[]{"*", "#"})) {
+//					validated = false;
+//					error(getString("error.addeditgradeitem.titlecharacters"));
+//					target.addChildren(form, FeedbackPanel.class);
+//				}
+//
+//				// OK
+//				if (validated) {
+//					if (GradeSubmissionPanel.this.mode == Mode.EDIT) {
+//						Assignment currentAssignment = GradeSubmissionPanel.this.businessService.getAssignment(assignment.getId());
+//						double oldPointValue = currentAssignment.getPoints();
+//						double newPointValue = assignment.getPoints();
+//						if(gradeType == GbGradingType.POINTS && newPointValue != oldPointValue){
+//							final GradebookPage gradebookPage = (GradebookPage) getPage();
+//							final GbModalWindow window = gradebookPage.getRescalePointsWindow();
+//							window.setTitle(new ResourceModel("label.editgradeitem.doRecalculatePointsTitle"));
+//							window.setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
+//								public void onClose(AjaxRequestTarget target) {
+//									if ("cancel" == rescaleAnswer.getAnswer()) {
+//										window.close(target);
+//									}
+//									else if ("no" == rescaleAnswer.getAnswer() || "yes" == rescaleAnswer.getAnswer()) {
+//										final boolean success = GradeSubmissionPanel.this.businessService.updateAssignment(assignment);
+//										if (success) {
+//											if("yes" == rescaleAnswer.getAnswer()) {
+//												final boolean scaleSuccess = GradeSubmissionPanel.this.businessService.rescaleGrades(assignment.getId(), oldPointValue, newPointValue);
+//											}
+//											getSession().success(MessageFormat.format(getString("message.edititem.success"), assignment.getName()));
+//											setResponsePage(getPage().getPageClass());
+//										} else {
+//											error(new ResourceModel("message.edititem.error").getObject());
+//											target.addChildren(form, FeedbackPanel.class);
+//										}
+//									}
+//								} 
+//							});
+//							window.setContent(new RescalePointsPanel(window.getContentId(), window, rescaleAnswer));
+//							window.showUnloadConfirmation(false);
+//							window.show(target);
+//						}
+//						else {
+//							final boolean success = GradeSubmissionPanel.this.businessService.updateAssignment(assignment);
+//
+//							if (success) {
+//								getSession().success(MessageFormat.format(getString("message.edititem.success"), assignment.getName()));
+//								setResponsePage(getPage().getPageClass());
+//							} else {
+//								error(new ResourceModel("message.edititem.error").getObject());
+//								target.addChildren(form, FeedbackPanel.class);
+//							}
+//						}
+//
+//					} else {
+//
+//						Long assignmentId = null;
+//
+//						boolean success = true;
+//						try {
+//							assignmentId = GradeSubmissionPanel.this.businessService.addAssignment(assignment);
+//						} catch (final AssignmentHasIllegalPointsException e) {
+//							error(new ResourceModel("error.addgradeitem.points").getObject());
+//							success = false;
+//						} catch (final ConflictingAssignmentNameException e) {
+//							error(new ResourceModel("error.addgradeitem.title").getObject());
+//							success = false;
+//						} catch (final ConflictingExternalIdException e) {
+//							error(new ResourceModel("error.addgradeitem.exception").getObject());
+//							success = false;
+//						} catch (final Exception e) {
+//							error(new ResourceModel("error.addgradeitem.exception").getObject());
+//							success = false;
+//						}
+//						if (success) {
+//							getSession()
+//									.success(MessageFormat.format(getString("notification.addgradeitem.success"), assignment.getName()));
+//							setResponsePage(getPage().getPageClass(),
+//									new PageParameters().add(GradebookPage.CREATED_ASSIGNMENT_ID_PARAM, assignmentId));
+//						} else {
+//							target.addChildren(form, FeedbackPanel.class);
+//						}
+//					}
+//				}
+//			}
+
+//			@Override
+//			protected void onError(final AjaxRequestTarget target, final Form<?> form) {
+//				target.addChildren(form, FeedbackPanel.class);
+//			}
+			
+//			@Override
+//			public void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
+//				error(new StringResourceModel("message.gradesubmit.error", null, new Object[] {"FinalGrade"}).getObject());
+//				target.addChildren(form, FeedbackPanel.class);
+
+//				String strWindowFeatures = "menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes"; 
+////				window.open(url, "_blank", strWindowFeatures);
+//target.appendJavaScript("alert('hi')");
+//target.appendJavaScript("Window.open(url, '_blank', strWindowFeature)");
+			}
+*/		};
+
+		// submit button label
+		submit.add(new Label("submitLabel", getSubmitButtonLabel()));
+		submit.setDefaultFormProcessing(false);
+		form.add(submit);
+		
+		form.add(new GbFeedbackPanel("addGradeSubmitFeedback"));
+
+		// cancel button
+		final GbAjaxButton cancel = new GbAjaxButton("cancel") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
+				window.close(target);
+			}
+		};
+		cancel.setDefaultFormProcessing(false);
+		form.add(cancel);
+
+		add(form);
+		
+		
+	}
+
+	/**
+	 * Helper to get the model for the button
+	 *
+	 * @return
+	 */
+	private ResourceModel getSubmitButtonLabel() {
+		if (this.mode == Mode.FINAL) {
+			return new ResourceModel("button.yes");
+		} else {
+			return new ResourceModel("button.create");
+		}
+	}
+
+	//convert json string to Map
+	private Map<String, Object> getJsonMap (String jsonDataString) {
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			map = mapper.readValue(jsonDataString, new TypeReference<Map<String,String>>(){});
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return map;
+	}
+
+}

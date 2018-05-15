@@ -43,6 +43,7 @@ import org.sakaiproject.gradebookng.business.model.GbGroup;
 import org.sakaiproject.gradebookng.business.model.GbStudentGradeInfo;
 import org.sakaiproject.gradebookng.business.model.GbStudentNameSortOrder;
 import org.sakaiproject.gradebookng.business.model.GbUser;
+import org.sakaiproject.gradebookng.business.model.GradeSubmissionResult;
 import org.sakaiproject.gradebookng.business.model.GbHistoryLog;
 import org.sakaiproject.gradebookng.business.util.CourseGradeFormatter;
 import org.sakaiproject.gradebookng.business.util.FormatHelper;
@@ -123,6 +124,9 @@ public class GradebookNgBusinessService {
 
 	@Setter
 	private SecurityService securityService;
+	
+	@Setter
+	private TxstateInstitutionalAdvisor advisor;
 
 	public static final String ASSIGNMENT_ORDER_PROP = "gbng_assignment_order";
 
@@ -598,13 +602,65 @@ public class GradebookNgBusinessService {
 		return rval;
 	}
 
+	public GradeSubmissionResult submitGrade(String gradeSubmitType){
+		//get gradebook data
+		Map<String, String> studentsGrades = new HashMap<>();
+		String gradebookUid = "4ee10e6e-c41a-41f8-976c-208c4e6ea77d";
+		//filter
+		//Need to filter out non-grade override inactive participants for grade submission bugid:4759 -Qu 4/10/2012
+//		studentDataList = gradeSubmissionStudentFilter(gradebookUid,studentDataList);
+		GradeSubmissionResult gradeSubmissionResult = null;
+		try {
+			gradeSubmissionResult= advisor.submitGrade(studentsGrades, gradebookUid, gradeSubmitType);
+		} catch (Exception e) {
+			log.error("General Exception submitting grades for UID (" + gradebookUid + "): " + e.getMessage(), e);
+			gradeSubmissionResult.setStatus(500);
+		}
+		return gradeSubmissionResult;
+	}
+	
+/*	public FinalGradeSubmissionResult submitGrade(List<Map<Column, String>> studentDataList, String gradebookUid, String gradeSubmitType) {
+
+		//Need to filter out non-grade override inactive participants for grade submission bugid:4759 -Qu 4/10/2012
+		studentDataList = gradeSubmissionStudentFilter(gradebookUid,studentDataList);
+
+		List<ActionRecord> logs = getRecordlogs(studentDataList, gradebookUid);
+		FinalGradeSubmissionResult finalGradeSubmissionResult = null; 
+
+		try {
+			finalGradeSubmissionResult = advisor.submitGrade(studentDataList, gradebookUid, gradeSubmitType);
+			for (ActionRecord log : logs) {
+				gbService.storeActionRecord(log);
+			}
+		} catch (Exception e) {
+			log.error("General Exception submitting grades for UID (" + gradebookUid + "): " + e.getMessage(), e);
+		}
+
+
+		Gradebook gradebook = gbService.getGradebook(gradebookUid);
+		gradebook.setLocked(true);
+		gbService.updateGradebook(gradebook);
+
+		// GRBK-971
+		if (gradeSubmitType.equalsIgnoreCase(AppConstants.FINAL_GRADE)){
+			postEvent("gradebook2.submitFinalGrades", gradebookUid, "count", String.valueOf(studentDataList.size()));
+		}
+		else if (gradeSubmitType.equalsIgnoreCase(AppConstants.MID_TERM)) {
+			postEvent("gradebook2.submitMidTermGrades", gradebookUid, "count", String.valueOf(studentDataList.size()));
+		}
+
+		return finalGradeSubmissionResult;
+
+	}
+*/
+
 	/**
 	 * Build the matrix of assignments, students and grades for all students
 	 *
 	 * @param assignments list of assignments
 	 * @return
 	 */
-	public List<GbStudentGradeInfo> buildGradeMatrix(final List<Assignment> assignments) throws GbException {
+ 	public List<GbStudentGradeInfo> buildGradeMatrix(final List<Assignment> assignments) throws GbException {
 		return this.buildGradeMatrix(assignments, this.getGradeableUsers());
 	}
 

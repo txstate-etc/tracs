@@ -319,7 +319,7 @@ INSERT INTO SAKAI_REALM_RL_FN VALUES((select REALM_KEY from SAKAI_REALM where RE
 
 -- SAK-29432 Add dropDate field to Enrollment
 -- TRACS has it already
---ALTER TABLE CM_ENROLLMENT_T ADD COLUMN DROP_DATE DATE;
+-- ALTER TABLE CM_ENROLLMENT_T ADD COLUMN DROP_DATE DATE;
 
 
 -- SAK-29422 Incorporate NYU's "public announcement system"

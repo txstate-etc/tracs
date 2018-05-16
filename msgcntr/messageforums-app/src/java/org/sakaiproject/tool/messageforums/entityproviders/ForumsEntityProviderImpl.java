@@ -142,7 +142,7 @@ public class ForumsEntityProviderImpl extends AbstractEntityProvider implements 
 
 		if (userHasAccess) {
 			ToolConfiguration toolConfig = site.getToolForCommonId("sakai.forums");
-			if (!toolManager.isVisible(site, toolConfig)) {
+			if (toolConfig == null || !toolManager.isVisible(site, toolConfig)) {
 				userHasAccess = false;
 			}
 		}

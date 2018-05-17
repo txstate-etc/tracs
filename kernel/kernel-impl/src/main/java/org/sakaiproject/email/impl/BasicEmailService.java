@@ -433,14 +433,10 @@ public class BasicEmailService implements EmailService
 		}
 
 		if (replyTo != null) {
-			boolean isRequestAuthorizerEmail = subject.toLowerCase().contains("site request") &&
-					content.toLowerCase().contains("please respond");
-
-			if (replyTo[0].getAddress().toLowerCase().equals("tracs@txstate.edu") && !isRequestAuthorizerEmail) {
+			if (replyTo[0].getAddress().equals("tracs@txstate.edu")) {
 				replyTo[0].setAddress("noreply@txstate.edu");
 			}
 		}
-
 		sendMail(from, to, subject, content, recipients, replyTo, additionalHeaders, null);
 	}
 
@@ -559,6 +555,9 @@ public class BasicEmailService implements EmailService
 		if ((replyTo != null))
 			msg.setReplyTo(replyTo);
 
+		// update to be Postmaster if necessary
+		checkFrom(msg);
+
 		// figure out what charset encoding to use
 		//
 		// first try to use the charset from the forwarded
@@ -604,10 +603,6 @@ public class BasicEmailService implements EmailService
 
 		if ((subject != null) && (msg.getHeader(EmailHeaders.SUBJECT) == null))
 			msg.setSubject(subject, charset);
-
-		// update to be Postmaster if necessary
-		// Moving this line here so it occurs after Subject is set, avoiding null ref error
-		checkFrom(msg);
 
 		// extract just the content type value from the header
 		String contentType = null;
@@ -695,7 +690,6 @@ public class BasicEmailService implements EmailService
 			    replyTo[0] = from;
 			    msg.setReplyTo(replyTo);
 			}
-
 			// for some reason setReplyTo doesn't work, though setFrom does. Have to create the
 			// actual header line
 			if (msg.getHeader(EmailHeaders.REPLY_TO) == null)
@@ -722,14 +716,6 @@ public class BasicEmailService implements EmailService
 			msg.setFrom(from);
 		    }
 		}
-
-		String msgSubject = msg.getSubject();
-		boolean isCourseRequestEmail = msgSubject != null && msgSubject.toLowerCase().contains("site request");
-		if (!isCourseRequestEmail) {
-			from.setAddress("noreply@tracs.txstate.edu");
-			msg.setFrom(from);
-		}
-
 	    } catch (javax.mail.internet.AddressException e) {
 		M_log.info("checkfrom address exception " + e);
 	    } catch (javax.mail.MessagingException e) {

@@ -752,9 +752,12 @@ GradebookSpreadsheet.prototype.handleScrollEvent = function() {
 }
 
 GradebookSpreadsheet.prototype.handleScrollEventForTracs = function() {
+  var self = this;
    //TRACS own scroll handler; to be implemented
    //not use sakai's fixedColumns table as it causes alignment issue
-
+  //  $("#gradebookGradesTable").parent().css("height","500px");
+  // if (self.$horizontalOverflow[0].scrollLeft > 0)
+  //     $("#gradebookGradesTable").tableHeadFixer({"left" : 3});
 };
 
 GradebookSpreadsheet.prototype.proxyEventToElementsInOriginalCell = function(event, $originalCell) {

@@ -1206,3 +1206,7 @@ and (max-device-width : 736px) {
   font-family: "gradebook-icons";
   content: "\f071";
 }
+
+#gradebookVerticalOverflowWrapper {
+  height: 800px;
+}

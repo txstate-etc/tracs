@@ -213,7 +213,7 @@ public class SiteEmailNotification extends EmailNotification
 		{
 		}
 
-		return "\"" + title + "\" <"+ ServerConfigurationService.getString("setup.request", ServerConfigurationService.getString("email.noreply_address", "no-reply@" + ServerConfigurationService.getServerName())) + ">";
+		return "\"" + title + "\" <"+  ServerConfigurationService.getString("email.noreply_address", "no-reply@" + ServerConfigurationService.getServerName()) + ">";
 	}
 
 	/**

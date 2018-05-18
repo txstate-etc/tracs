@@ -461,7 +461,7 @@ public class ExternalLogicImpl implements ExternalLogic {
 		Map<String, String> replacementValues = new HashMap<String, String>();
 
 		String from = (fromEmailAddress == null || fromEmailAddress.equals("")) ?
-					serverConfigurationService.getString("setup.request", "no-reply@" + serverConfigurationService.getServerName()) : fromEmailAddress;
+					serverConfigurationService.getString("email.noreply_address", "no-reply@" + serverConfigurationService.getServerName()) : fromEmailAddress;
 					
 		for (String userEid : userEids) {
 			User user = null;

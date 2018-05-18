@@ -303,7 +303,7 @@ public class SyllabusEntityProvider extends AbstractEntityProvider implements En
 							if (StringUtils.isNotBlank(content)) {
 								StringBuilder alertMsg = new StringBuilder();
 								String cleanedText = FormattedText.processFormattedText(content, alertMsg);
-								if (alertMsg.length() > 0) {
+								if (alertMsg.length() > 0  && cleanedText.length() < 1) {
 									throw new IllegalArgumentException("Error formatting body text: " + alertMsg);
 								} else {
 									if (StringUtils.isNotEmpty(cleanedText)) {

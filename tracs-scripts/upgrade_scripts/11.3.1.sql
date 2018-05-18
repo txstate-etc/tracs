@@ -319,7 +319,7 @@ INSERT INTO SAKAI_REALM_RL_FN VALUES((select REALM_KEY from SAKAI_REALM where RE
 
 -- SAK-29432 Add dropDate field to Enrollment
 -- TRACS has it already
---ALTER TABLE CM_ENROLLMENT_T ADD COLUMN DROP_DATE DATE;
+-- ALTER TABLE CM_ENROLLMENT_T ADD COLUMN DROP_DATE DATE;
 
 
 -- SAK-29422 Incorporate NYU's "public announcement system"
@@ -440,8 +440,8 @@ INSERT INTO SAKAI_SITE_TOOL VALUES('!contact-us', '!contact-us', '!contact-us', 
 
 -- SAK-29733 Change Schedule to Calendar for existing sites
 -- TRACS uses Calendar all the time
---UPDATE SAKAI_SITE_TOOL SET TITLE="Calendar" WHERE REGISTRATION = "sakai.schedule" AND TITLE = "Schedule";
---UPDATE SAKAI_SITE_PAGE SET TITLE="Calendar" WHERE TITLE = "Schedule";
+-- UPDATE SAKAI_SITE_TOOL SET TITLE="Calendar" WHERE REGISTRATION = "sakai.schedule" AND TITLE = "Schedule";
+-- UPDATE SAKAI_SITE_PAGE SET TITLE="Calendar" WHERE TITLE = "Schedule";
 
 -- SAK-29974 Nested citation lists
 ALTER TABLE CITATION_COLLECTION_ORDER ADD SECTION_TYPE ENUM('HEADING1','HEADING2', 'HEADING3', 'DESCRIPTION', 'CITATION') DEFAULT NULL;

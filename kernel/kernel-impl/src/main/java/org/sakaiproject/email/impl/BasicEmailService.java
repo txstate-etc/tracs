@@ -431,12 +431,6 @@ public class BasicEmailService implements EmailService
 			recipients = new HashMap<RecipientType, InternetAddress[]>();
 			recipients.put(RecipientType.TO, headerTo);
 		}
-
-		if (replyTo != null) {
-			if (replyTo[0].getAddress().equals("tracs@txstate.edu")) {
-				replyTo[0].setAddress("noreply@txstate.edu");
-			}
-		}
 		sendMail(from, to, subject, content, recipients, replyTo, additionalHeaders, null);
 	}
 
@@ -552,7 +546,7 @@ public class BasicEmailService implements EmailService
 		setRecipients(headerTo, msg);
 
 		// set the reply to
-		if ((replyTo != null))
+		if ((replyTo != null) && (msg.getHeader(EmailHeaders.REPLY_TO) == null))
 			msg.setReplyTo(replyTo);
 
 		// update to be Postmaster if necessary
@@ -693,7 +687,7 @@ public class BasicEmailService implements EmailService
 			// for some reason setReplyTo doesn't work, though setFrom does. Have to create the
 			// actual header line
 			if (msg.getHeader(EmailHeaders.REPLY_TO) == null)
-			    msg.addHeader(EmailHeaders.REPLY_TO, replyTo[0].getAddress());
+			    msg.addHeader(EmailHeaders.REPLY_TO, from.getAddress());
 			
 			// and use the new from address
 			// biggest issue is the "personal address", i.e. the comment text

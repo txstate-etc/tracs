@@ -21,9 +21,8 @@
 			multiple values are grouped and separated by a comma (,).
 		-->
 		<configuration name="subjectprefix" value="" />
-
-		<configuration name="replyto" value="noreply@txstate.edu" />
 		<!--
+		<configuration name="replyto" value="(yes,sender)|(no,no_reply_to)" />
 		<configuration name="sendmecopy" value="(true,yes)|(false,no)" />
 		<configuration name="appendrecipientlist" value="(true,yes)|(false,no)" />
 		<configuration name="emailarchive" value="(true,yes)|(false,no)" />

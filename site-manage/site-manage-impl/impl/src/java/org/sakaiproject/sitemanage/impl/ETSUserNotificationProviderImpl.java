@@ -356,7 +356,7 @@ public class ETSUserNotificationProviderImpl implements UserNotificationProvider
 		from = requestEmail;
 		to = currentUserEmail;
 		headerTo = currentUserEmail;
-		replyTo = serverConfigurationService.getString("setup.request", serverConfigurationService.getString("email.noreply_address", "no-reply@" + serverConfigurationService.getServerName()));
+		replyTo = serverConfigurationService.getString("email.noreply_address", "no-reply@" + serverConfigurationService.getServerName());
 		emailTemplateServiceSend(NOTIFY_SITE_CREATION_CONFIRMATION, (new ResourceLoader()).getLocale(), currentUser, from, to, headerTo, replyTo, replacementValues);
 		
 	}

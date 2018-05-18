@@ -78,7 +78,7 @@ public class SamigoETSProviderImpl implements SamigoETSProvider {
         String samigoFromAddress                    = serverConfigurationService.getString("samigo.fromAddress");
 
         if( samigoFromAddress == null || StringUtils.isBlank(samigoFromAddress)){
-            fromAddress                             = serverConfigurationService.getString("setup.request", "no-reply@" + serverConfigurationService.getServerName());
+            fromAddress                             = serverConfigurationService.getString("email.noreply_address", "no-reply@" + serverConfigurationService.getServerName());
         } else {
             fromAddress                             = samigoFromAddress;
         }

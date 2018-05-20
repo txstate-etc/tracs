@@ -51,90 +51,56 @@ import org.sakaiproject.gradebookng.tool.model.RescaleAnswer;
  * @author Yuanhua Qu (Txstate University)
  *
  */
-public class GradeSubmissionPanel extends Panel {
+public class ViewGradeSubmissionReceiptPanel extends Panel {
 
 	private static final long serialVersionUID = 1L;
 
 	@SpringBean(name = "org.sakaiproject.gradebookng.business.GradebookNgBusinessService")
 	protected GradebookNgBusinessService businessService;
 
-	/**
-	 * How this panel is rendered
-	 */
-	enum Mode {
-		FINAL,
-		MIDTERM;
-	}
-
-	Mode mode;
 	ModalWindow window;
-	String gradeSubmitType;
 	String url = null;
 
-	public GradeSubmissionPanel(final String id, final ModalWindow window, final String gradeSubmitType) {
+	public ViewGradeSubmissionReceiptPanel(final String id, final ModalWindow window) {
 		super(id);
 		this.window = window;
-		// determine mode
-		if (gradeSubmitType.equalsIgnoreCase(getString("finalGrade"))) {
-			this.mode = Mode.FINAL;
-		} else if (gradeSubmitType.equalsIgnoreCase(getString("midTerm"))){
-			this.mode = Mode.MIDTERM;
-		}
-		this.gradeSubmitType = gradeSubmitType;
 	};
 
 	@Override
 	protected void onInitialize() {
 		super.onInitialize();
+		
+		final Gradebook gradebook = this.businessService.getGradebook();
+		GradeSubmissionResult gradeSubmissionResult = ViewGradeSubmissionReceiptPanel.this.businessService.viewSubmissionReceipt(gradebook.getId().toString());
+System.out.print("gradebookid is: " + gradebook.getId() + " gradebook uid is:" + gradebook.getUid());
 
-		GradeSubmissionResult gradeSubmissionResult = GradeSubmissionPanel.this.businessService.submitGrade(gradeSubmitType);
-
-		final Form form = new Form ("gradeSubmissionForm");
-
-		form.add(new Label("gradeSubmissionWarning1", MessageFormat.format(getString("label.gradesubmit.warning1"), gradeSubmitType.toLowerCase())));
-		form.add(new Label("gradeSubmissionWarning2", MessageFormat.format(getString("label.gradesubmit.warning2"), gradeSubmitType)));
-
-		final Label gradeSubmissionWarning3 = new Label("gradeSubmissionWarning3", new StringResourceModel("label.gradesubmit.warning3", null, new Object[] { gradeSubmitType }).getString());
-		gradeSubmissionWarning3.setEscapeModelStrings(false);
-		form.add(gradeSubmissionWarning3);
-
-//		boolean isSuccess = false;
 		final String data = gradeSubmissionResult.getData();
 		final boolean isSuccess = Boolean.parseBoolean((String)getJsonMap(gradeSubmissionResult.getData()).get("success"));
 		url = (String)getJsonMap(gradeSubmissionResult.getData()).get("url");
 
-		String gradeSubmission;
-		if(mode.equals(Mode.FINAL)) {
-			gradeSubmission = getString("finalGrade");
-		} else if (mode.equals(Mode.MIDTERM)) {
-			gradeSubmission = getString("midTerm");
-		} else {
-			gradeSubmission = getString("notDefinedGradeSubmissionType");
-		}
-
 		if (Integer.valueOf(500).compareTo(gradeSubmissionResult.getStatus()) == 0) {
-			error(new StringResourceModel("message.gradesubmit.error1", null, new Object[] {gradeSubmission}).getObject());
-			form.add(new GbFeedbackPanel("addGradeSubmitFeedback"));
+			error(new StringResourceModel("message.viewreceipt.error1", null, null));
+			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
 		} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && !isSuccess) {
-			error(new StringResourceModel("message.gradesubmit.error2", null, new Object[] {gradeSubmission}).getObject());
-			form.add(new GbFeedbackPanel("addGradeSubmitFeedback"));
+			error(getString("message.viewreceipt.error2"));
+			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
 		} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && isSuccess) {
-			getSession().success(MessageFormat.format(getString("message.gradesubmit.success"), gradeSubmission + " HIII  " + data));
+			getSession().success(getString("message.viewreceipt.success"));
 //			setResponsePage(getPage().getPageClass());
-			form.add(new GbFeedbackPanel("addGradeSubmitFeedback"));
+			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
 		}
 		else {
-			error(new StringResourceModel("message.gradesubmit.error", null, new Object[] {gradeSubmission}).getObject());
-			form.add(new GbFeedbackPanel("addGradeSubmitFeedback"));
+			error(getString("message.gradesubmit.error"));
+			add(new GbFeedbackPanel("addGradeSubmitFeedback"));
 		}
 
-		final ExternalLink link = new ExternalLink("gradeSubmitLink", url) {
+		final ExternalLink link = new ExternalLink("viewSubRcptLink", url) {
 
 			@Override
 			protected void onComponentTag(final ComponentTag tag) {
 				super.onComponentTag(tag);
 				tag.put("target","_blank");
-				tag.put("title", "Submit" + gradeSubmitType);
+				tag.put("title", "Submit View Receipt");
 				tag.getAttributes().put("menubar", "yes");
 				tag.getAttributes().put("location", "yes");
 				tag.getAttributes().put("resizable", "yes");
@@ -143,9 +109,7 @@ public class GradeSubmissionPanel extends Panel {
 			}
 
 		};
-		// submit button label
-		link.add(new Label("submitLabel", getSubmitButtonLabel()));
-		form.add(link);
+		add(link);
 
 		// cancel button
 		final GbAjaxButton cancel = new GbAjaxButton("cancel") {
@@ -157,23 +121,9 @@ public class GradeSubmissionPanel extends Panel {
 			}
 		};
 		cancel.setDefaultFormProcessing(false);
-		form.add(cancel);
+		add(cancel);
 
-		add(form);
 	};
-
-	/**
-	 * Helper to get the model for the button
-	 *
-	 * @return
-	 */
-	private ResourceModel getSubmitButtonLabel() {
-		if (this.mode == Mode.FINAL) {
-			return new ResourceModel("button.submit");
-		} else {
-			return new ResourceModel("button.create");
-		}
-	}
 
 	//convert json string to Map
 	private Map<String, Object> getJsonMap (String jsonDataString) {

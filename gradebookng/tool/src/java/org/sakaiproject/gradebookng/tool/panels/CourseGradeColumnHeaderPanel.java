@@ -220,10 +220,10 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 			@Override
 			public void onClick(final AjaxRequestTarget target) {
 				final GradebookPage gradebookPage = (GradebookPage) getPage();
-				final GbModalWindow window = gradebookPage.getCourseGradeStatisticsWindow();
+				final GbModalWindow window = gradebookPage.getViewGradeSubmissionReceiptWindow();
 				window.setTitle(getString("heading.viewreceipt"));
 				window.setComponentToReturnFocusTo(getParentCellFor(this));
-				window.setContent(new CourseGradeStatisticsPanel(window.getContentId(), window));
+				window.setContent(new ViewGradeSubmissionReceiptPanel(window.getContentId(), window));
 				window.show(target);
 			}
 		});

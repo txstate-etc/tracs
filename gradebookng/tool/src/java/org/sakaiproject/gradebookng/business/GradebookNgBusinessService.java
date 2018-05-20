@@ -618,7 +618,11 @@ public class GradebookNgBusinessService {
 		}
 		return gradeSubmissionResult;
 	}
-	
+
+	public GradeSubmissionResult viewSubmissionReceipt(String gradebookUid) {
+		return advisor.viewSubmissionReceipt(gradebookUid);
+	}
+
 /*	public FinalGradeSubmissionResult submitGrade(List<Map<Column, String>> studentDataList, String gradebookUid, String gradeSubmitType) {
 
 		//Need to filter out non-grade override inactive participants for grade submission bugid:4759 -Qu 4/10/2012

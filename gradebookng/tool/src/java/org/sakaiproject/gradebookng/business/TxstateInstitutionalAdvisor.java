@@ -362,8 +362,8 @@ public class TxstateInstitutionalAdvisor {
 		wrapper.put(SUBMIT_SECTIONS, sections);
 		wrapper.put(SUBMIT_APP, appKey);
 		wrapper.put(SUBMIT_SITE, siteId);
-		wrapper.put(GRADE_TYPE, gradeSubmitType.toLowerCase());
 		if (action.equals(GRADES_SUBMISSION)){
+			wrapper.put(GRADE_TYPE, gradeSubmitType.toLowerCase());
 			wrapper.put(SUBMIT_GRADES, studentsGrades);
 			wrapper.put(SUBMIT_ACTION, GRADES_SUBMISSION);
 		}

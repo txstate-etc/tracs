@@ -98,6 +98,7 @@ public class GradebookPage extends BasePage {
 	GbModalWindow addScalePointsWindow;
 	GbModalWindow excuseGradeWindow;
 	GbModalWindow gradeSubmissionWindow;
+	GbModalWindow viewGradeSubmissionReceiptWindow;
 
 	Label liveGradingFeedback;
 	boolean hasAssignmentsAndGrades;
@@ -192,6 +193,10 @@ public class GradebookPage extends BasePage {
 //		this.gradeSubmissionWindow.setPositionAtTop(true);
 		this.form.add(this.gradeSubmissionWindow);
 
+		this.viewGradeSubmissionReceiptWindow = new GbModalWindow("viewGradeSubmissionReceiptWindow");
+//		this.gradeSubmissionWindow.setPositionAtTop(true);
+		this.form.add(this.viewGradeSubmissionReceiptWindow); 
+		
 		final GbAjaxButton addGradeItem = new GbAjaxButton("addGradeItem") {
 			@Override
 			public void onSubmit(final AjaxRequestTarget target, final Form form) {
@@ -771,6 +776,10 @@ public class GradebookPage extends BasePage {
 
 	public GbModalWindow getGradeSubmissionWindow() {
 		return this.gradeSubmissionWindow;
+	}
+	
+	public GbModalWindow getViewGradeSubmissionReceiptWindow() {
+		return this.viewGradeSubmissionReceiptWindow;
 	}
 	/**
 	 * Getter for the GradebookUiSettings. Used to store a few UI related settings for the current session only.

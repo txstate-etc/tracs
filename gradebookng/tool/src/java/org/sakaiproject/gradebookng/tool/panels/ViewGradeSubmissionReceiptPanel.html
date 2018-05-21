@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+
+<body>
+	<wicket:panel>
+
+				<div wicket:id="addViewSubRcptFeedback" />
+				<div class="help-block">
+					<p><wicket:message key="label.viewreceipt.instruction" /></p>
+				</div>
+				<div class="col-xs-offset-3 col-xs-5">
+					<a wicket:id="viewSubRcptLink" target="_blank" >
+						<button type="button"><wicket:message key="button.submit" />
+						</button>
+					</a>
+					            <!-- <input type="button" class="button_color" wicket:id="done" wicket:message="value:button.done" /> -->
+					<button wicket:id="cancel" type="button"><wicket:message key="button.cancel" /></button>
+				</div>
+
+	</wicket:panel>
+</body>
+</html>

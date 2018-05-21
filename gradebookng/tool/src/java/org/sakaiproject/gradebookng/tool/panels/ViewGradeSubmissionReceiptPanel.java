@@ -24,6 +24,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
+import org.sakaiproject.gradebookng.business.SubmitResultKey;
 import org.sakaiproject.gradebookng.business.model.GradeSubmissionResult;
 import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
 import org.sakaiproject.gradebookng.tool.component.GbFeedbackPanel;
@@ -69,25 +70,25 @@ public class ViewGradeSubmissionReceiptPanel extends Panel {
 	@Override
 	protected void onInitialize() {
 		super.onInitialize();
-		
+
 		final Gradebook gradebook = this.businessService.getGradebook();
 		GradeSubmissionResult gradeSubmissionResult = ViewGradeSubmissionReceiptPanel.this.businessService.viewSubmissionReceipt(gradebook.getId().toString());
-System.out.print("gradebookid is: " + gradebook.getId() + " gradebook uid is:" + gradebook.getUid());
 
 		final String data = gradeSubmissionResult.getData();
-		final boolean isSuccess = Boolean.parseBoolean((String)getJsonMap(gradeSubmissionResult.getData()).get("success"));
-		url = (String)getJsonMap(gradeSubmissionResult.getData()).get("url");
+		final boolean isSuccess = Boolean.parseBoolean((String)getJsonMap(gradeSubmissionResult.getData()).get(SubmitResultKey.SUBMIT_SUCCESS.getProperty()));
+		url = (String)getJsonMap(gradeSubmissionResult.getData()).get(SubmitResultKey.SUBMIT_PAGE_URL.getProperty());
+
 
 		if (Integer.valueOf(500).compareTo(gradeSubmissionResult.getStatus()) == 0) {
-			error(new StringResourceModel("message.viewreceipt.error1", null, null));
+			error(getString("message.viewreceipt.error1"));
 			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
 		} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && !isSuccess) {
 			error(getString("message.viewreceipt.error2"));
 			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
 		} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && isSuccess) {
-			getSession().success(getString("message.viewreceipt.success"));
+//			getSession().success(getString("message.viewreceipt.success"));
 //			setResponsePage(getPage().getPageClass());
-			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
+//			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
 		}
 		else {
 			error(getString("message.gradesubmit.error"));

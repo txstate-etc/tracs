@@ -24,6 +24,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
+import org.sakaiproject.gradebookng.business.SubmitResultKey;
 import org.sakaiproject.gradebookng.business.model.GradeSubmissionResult;
 import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
 import org.sakaiproject.gradebookng.tool.component.GbFeedbackPanel;
@@ -87,7 +88,8 @@ public class GradeSubmissionPanel extends Panel {
 	protected void onInitialize() {
 		super.onInitialize();
 
-		GradeSubmissionResult gradeSubmissionResult = GradeSubmissionPanel.this.businessService.submitGrade(gradeSubmitType);
+		final Gradebook gradebook = this.businessService.getGradebook();
+		GradeSubmissionResult gradeSubmissionResult = GradeSubmissionPanel.this.businessService.submitGrade(gradebook.getUid(), gradeSubmitType);
 
 		final Form form = new Form ("gradeSubmissionForm");
 
@@ -98,10 +100,9 @@ public class GradeSubmissionPanel extends Panel {
 		gradeSubmissionWarning3.setEscapeModelStrings(false);
 		form.add(gradeSubmissionWarning3);
 
-//		boolean isSuccess = false;
 		final String data = gradeSubmissionResult.getData();
-		final boolean isSuccess = Boolean.parseBoolean((String)getJsonMap(gradeSubmissionResult.getData()).get("success"));
-		url = (String)getJsonMap(gradeSubmissionResult.getData()).get("url");
+		final boolean isSuccess = Boolean.parseBoolean((String)getJsonMap(gradeSubmissionResult.getData()).get(SubmitResultKey.SUBMIT_SUCCESS.getProperty()));
+		url = (String)getJsonMap(gradeSubmissionResult.getData()).get(SubmitResultKey.SUBMIT_PAGE_URL.getProperty());
 
 		String gradeSubmission;
 		if(mode.equals(Mode.FINAL)) {
@@ -119,9 +120,9 @@ public class GradeSubmissionPanel extends Panel {
 			error(new StringResourceModel("message.gradesubmit.error2", null, new Object[] {gradeSubmission}).getObject());
 			form.add(new GbFeedbackPanel("addGradeSubmitFeedback"));
 		} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && isSuccess) {
-			getSession().success(MessageFormat.format(getString("message.gradesubmit.success"), gradeSubmission + " HIII  " + data));
+//			getSession().success(MessageFormat.format(getString("message.gradesubmit.success"), gradeSubmission));
 //			setResponsePage(getPage().getPageClass());
-			form.add(new GbFeedbackPanel("addGradeSubmitFeedback"));
+//			form.add(new GbFeedbackPanel("addGradeSubmitFeedback"));
 		}
 		else {
 			error(new StringResourceModel("message.gradesubmit.error", null, new Object[] {gradeSubmission}).getObject());
@@ -134,7 +135,7 @@ public class GradeSubmissionPanel extends Panel {
 			protected void onComponentTag(final ComponentTag tag) {
 				super.onComponentTag(tag);
 				tag.put("target","_blank");
-				tag.put("title", "Submit" + gradeSubmitType);
+				tag.put("title", "Submit " + gradeSubmitType);
 				tag.getAttributes().put("menubar", "yes");
 				tag.getAttributes().put("location", "yes");
 				tag.getAttributes().put("resizable", "yes");
@@ -144,7 +145,9 @@ public class GradeSubmissionPanel extends Panel {
 
 		};
 		// submit button label
-		link.add(new Label("submitLabel", getSubmitButtonLabel()));
+//		keep following in case in future we may present customized button for diff submit
+//		link.add(new Label("submitLabel", getSubmitButtonLabel()));
+		link.add(new Label("submitLabel", getString("button.submit")));
 		form.add(link);
 
 		// cancel button
@@ -182,13 +185,10 @@ public class GradeSubmissionPanel extends Panel {
 		try {
 			map = mapper.readValue(jsonDataString, new TypeReference<Map<String,String>>(){});
 		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
-			// TODO Auto- generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return map;

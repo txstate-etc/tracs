@@ -2,8 +2,6 @@ package org.sakaiproject.gradebookng.business.model;
 
 import java.io.Serializable;
 
-import org.sakaiproject.gradebookng.business.GradeSubmissionResultKey;
-
 import lombok.Getter;
 import lombok.Setter;
 

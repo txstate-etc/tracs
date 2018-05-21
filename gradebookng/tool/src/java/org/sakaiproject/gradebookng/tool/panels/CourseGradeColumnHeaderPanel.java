@@ -184,11 +184,11 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 				window.show(target);
 			}
 		});
-		
+
 		//final grade submission
 		menu.add(new GbAjaxLink("finalGradeSubmission") {
 			private static final long serialVersionUID = 1L;
-			
+
 			@Override
 			public void onClick(final AjaxRequestTarget target) {
 				final GradebookPage gradebookPage = (GradebookPage) getPage();
@@ -202,7 +202,7 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 
 		menu.add(new GbAjaxLink("midTermGradeSubmission") {
 			private static final long serialVersionUID = 1L;
-			
+
 			@Override
 			public void onClick(final AjaxRequestTarget target) {
 				final GradebookPage gradebookPage = (GradebookPage) getPage();
@@ -216,7 +216,7 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 
 		menu.add(new GbAjaxLink("viewGradeSubmissionReceipt") {
 			private static final long serialVersionUID = 1L;
-			
+
 			@Override
 			public void onClick(final AjaxRequestTarget target) {
 				final GradebookPage gradebookPage = (GradebookPage) getPage();

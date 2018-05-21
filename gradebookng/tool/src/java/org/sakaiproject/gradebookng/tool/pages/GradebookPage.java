@@ -70,7 +70,8 @@ import org.sakaiproject.service.gradebook.shared.SortType;
 import org.sakaiproject.tool.gradebook.Gradebook;
 
 /**
- * Grades page. Instructors and TAs see this one. Students see the {@link StudentPage}.
+ * Grades page. Instructors and TAs see this one. Students see the
+ * {@link StudentPage}.
  *
  * @author Steve Swinsburg (steve.swinsburg@gmail.com)
  *
@@ -117,11 +118,11 @@ public class GradebookPage extends BasePage {
 			throw new RestartResponseException(StudentPage.class);
 		}
 
-		//TAs with no permissions or in a roleswap situation
-		if(this.role == GbRole.TA){
+		// TAs with no permissions or in a roleswap situation
+		if (this.role == GbRole.TA) {
 
-			//roleswapped?
-			if(this.businessService.isUserRoleSwapped()) {
+			// roleswapped?
+			if (this.businessService.isUserRoleSwapped()) {
 				final PageParameters params = new PageParameters();
 				params.add("message", getString("ta.roleswapped"));
 				throw new RestartResponseException(AccessDeniedPage.class, params);
@@ -129,7 +130,7 @@ public class GradebookPage extends BasePage {
 
 			// no perms
 			this.permissions = this.businessService.getPermissionsForUser(this.currentUserUuid);
-			if(this.permissions.isEmpty()) {
+			if (this.permissions.isEmpty()) {
 				final PageParameters params = new PageParameters();
 				params.add("message", getString("ta.nopermission"));
 				throw new RestartResponseException(AccessDeniedPage.class, params);
@@ -144,7 +145,8 @@ public class GradebookPage extends BasePage {
 		add(this.form);
 
 		/**
-		 * Note that SEMI_TRANSPARENT has a 100% black background and TRANSPARENT is overridden to 10% opacity
+		 * Note that SEMI_TRANSPARENT has a 100% black background and
+		 * TRANSPARENT is overridden to 10% opacity
 		 */
 		this.addOrEditGradeItemWindow = new GbModalWindow("addOrEditGradeItemWindow");
 		this.addOrEditGradeItemWindow.showUnloadConfirmation(false);
@@ -188,15 +190,13 @@ public class GradebookPage extends BasePage {
 
 		this.excuseGradeWindow = new GbModalWindow("excuseGradeWindow");
 		this.form.add(this.excuseGradeWindow);
-		
+
 		this.gradeSubmissionWindow = new GbModalWindow("gradeSubmissionWindow");
-//		this.gradeSubmissionWindow.setPositionAtTop(true);
 		this.form.add(this.gradeSubmissionWindow);
 
 		this.viewGradeSubmissionReceiptWindow = new GbModalWindow("viewGradeSubmissionReceiptWindow");
-//		this.gradeSubmissionWindow.setPositionAtTop(true);
-		this.form.add(this.viewGradeSubmissionReceiptWindow); 
-		
+		this.form.add(this.viewGradeSubmissionReceiptWindow);
+
 		final GbAjaxButton addGradeItem = new GbAjaxButton("addGradeItem") {
 			@Override
 			public void onSubmit(final AjaxRequestTarget target, final Form form) {
@@ -243,7 +243,8 @@ public class GradebookPage extends BasePage {
 
 		this.hasAssignmentsAndGrades = !assignments.isEmpty() && !grades.isEmpty();
 
-		// mark the current timestamp so we can use this date to check for any changes since now
+		// mark the current timestamp so we can use this date to check for any
+		// changes since now
 		final Date gradesTimestamp = new Date();
 
 		stopwatch.time("buildGradeMatrix", stopwatch.getTime());
@@ -255,7 +256,8 @@ public class GradebookPage extends BasePage {
 		final GbGradingType gradingType = GbGradingType.valueOf(gradebook.getGrade_type());
 
 		// this could potentially be a sortable data provider
-		final ListDataProvider<GbStudentGradeInfo> studentGradeMatrix = new ListDataProvider<GbStudentGradeInfo>(grades);
+		final ListDataProvider<GbStudentGradeInfo> studentGradeMatrix = new ListDataProvider<GbStudentGradeInfo>(
+				grades);
 		final List<IColumn> cols = new ArrayList<IColumn>();
 
 		// add an empty column that we can use as a handle for selecting the row
@@ -336,12 +338,15 @@ public class GradebookPage extends BasePage {
 				cellItem.add(new AttributeModifier("tabindex", 0));
 
 				// setup model
-				// TODO we may not need to pass everything into this panel since we now use a display string
-				// however we do requre that the label can receive events and update itself, although this could be recalculated for each
+				// TODO we may not need to pass everything into this panel since
+				// we now use a display string
+				// however we do requre that the label can receive events and
+				// update itself, although this could be recalculated for each
 				// event
 				final Map<String, Object> modelData = new HashMap<>();
 				modelData.put("courseGradeDisplay", studentGradeInfo.getCourseGrade().getDisplayString());
-				modelData.put("hasCourseGradeOverride", studentGradeInfo.getCourseGrade().getCourseGrade().getEnteredGrade() != null);
+				modelData.put("hasCourseGradeOverride",
+						studentGradeInfo.getCourseGrade().getCourseGrade().getEnteredGrade() != null);
 				modelData.put("studentUuid", studentGradeInfo.getStudentUuid());
 				modelData.put("currentUserUuid", GradebookPage.this.currentUserUuid);
 				modelData.put("currentUserRole", GradebookPage.this.role);
@@ -520,8 +525,8 @@ public class GradebookPage extends BasePage {
 						super.onComponentTag(tag);
 
 						tag.getAttributes().put("role", "row");
-						if (!((GbStudentGradeInfo)model.getObject()).isActive()) {
-							tag.getAttributes().put("class","inactivePar inactive inactiveBack");
+						if (!((GbStudentGradeInfo) model.getObject()).isActive()) {
+							tag.getAttributes().put("class", "inactivePar inactive inactiveBack");
 						}
 					}
 				};
@@ -609,23 +614,26 @@ public class GradebookPage extends BasePage {
 
 		// if only one group, just show the title
 		// otherwise add the 'all groups' option
-		// cater for the case where there is only one group visible to TA but they can see everyone.
+		// cater for the case where there is only one group visible to TA but
+		// they can see everyone.
 		if (this.role == GbRole.TA) {
 
-			//if only one group, hide the filter
+			// if only one group, hide the filter
 			if (groups.size() == 1) {
 				this.showGroupFilter = false;
 
-				// but need to double check permissions to see if we have any permissions with no group reference
+				// but need to double check permissions to see if we have any
+				// permissions with no group reference
 				this.permissions.forEach(p -> {
-					if (!StringUtils.equalsIgnoreCase(p.getFunction(),GraderPermission.VIEW_COURSE_GRADE.toString()) && StringUtils.isBlank(p.getGroupReference())) {
+					if (!StringUtils.equalsIgnoreCase(p.getFunction(), GraderPermission.VIEW_COURSE_GRADE.toString())
+							&& StringUtils.isBlank(p.getGroupReference())) {
 						this.showGroupFilter = true;
 					}
 				});
 			}
 		}
 
-		if(!this.showGroupFilter) {
+		if (!this.showGroupFilter) {
 			toolbar.add(new Label("groupFilterOnlyOne", Model.of(groups.get(0).getTitle())));
 		} else {
 			toolbar.add(new EmptyPanel("groupFilterOnlyOne").setVisible(false));
@@ -635,7 +643,8 @@ public class GradebookPage extends BasePage {
 			if (this.role == GbRole.TA) {
 
 				// does the TA have any permissions set?
-				// we can assume that if they have any then there is probably some sort of group restriction so we can change the label
+				// we can assume that if they have any then there is probably
+				// some sort of group restriction so we can change the label
 				if (!this.permissions.isEmpty()) {
 					allGroupsTitle = getString("groups.available");
 				}
@@ -686,7 +695,6 @@ public class GradebookPage extends BasePage {
 			groupFilter.setVisible(false);
 		}
 
-
 		final ToggleGradeItemsToolbarPanel gradeItemsTogglePanel = new ToggleGradeItemsToolbarPanel(
 				"gradeItemsTogglePanel", Model.ofList(assignments));
 		add(gradeItemsTogglePanel);
@@ -710,7 +718,8 @@ public class GradebookPage extends BasePage {
 
 		toolbar.setVisible(this.hasAssignmentsAndGrades);
 
-		//#3755 if group selected but it is empty, bring the groupfilter back into view so they can choose something else
+		// #3755 if group selected but it is empty, bring the groupfilter back
+		// into view so they can choose something else
 		if (settings.getGroupFilter() != null && grades.size() == 0) {
 			toolbar.setVisible(true);
 			groupFilter.setVisible(true);
@@ -777,12 +786,14 @@ public class GradebookPage extends BasePage {
 	public GbModalWindow getGradeSubmissionWindow() {
 		return this.gradeSubmissionWindow;
 	}
-	
+
 	public GbModalWindow getViewGradeSubmissionReceiptWindow() {
 		return this.viewGradeSubmissionReceiptWindow;
 	}
+
 	/**
-	 * Getter for the GradebookUiSettings. Used to store a few UI related settings for the current session only.
+	 * Getter for the GradebookUiSettings. Used to store a few UI related
+	 * settings for the current session only.
 	 *
 	 * TODO move this to a helper
 	 */
@@ -819,12 +830,12 @@ public class GradebookPage extends BasePage {
 				.forUrl(String.format("/library/js/lang-datepicker/lang-datepicker.js?version=%s", version)));
 
 		// tablesorted used by student grade summary
-		response.render(CssHeaderItem
-			.forUrl(String.format("/library/js/jquery/tablesorter/2.27.7/css/theme.bootstrap.min.css?version=%s", version)));
-		response.render(JavaScriptHeaderItem
-			.forUrl(String.format("/library/js/jquery/tablesorter/2.27.7/js/jquery.tablesorter.min.js?version=%s", version)));
-		response.render(JavaScriptHeaderItem
-			.forUrl(String.format("/library/js/jquery/tablesorter/2.27.7/js/jquery.tablesorter.widgets.min.js?version=%s", version)));
+		response.render(CssHeaderItem.forUrl(String
+				.format("/library/js/jquery/tablesorter/2.27.7/css/theme.bootstrap.min.css?version=%s", version)));
+		response.render(JavaScriptHeaderItem.forUrl(String
+				.format("/library/js/jquery/tablesorter/2.27.7/js/jquery.tablesorter.min.js?version=%s", version)));
+		response.render(JavaScriptHeaderItem.forUrl(String.format(
+				"/library/js/jquery/tablesorter/2.27.7/js/jquery.tablesorter.widgets.min.js?version=%s", version)));
 
 		// GradebookNG Grade specific styles and behaviour
 		response.render(CssHeaderItem
@@ -838,12 +849,13 @@ public class GradebookPage extends BasePage {
 		response.render(JavaScriptHeaderItem
 				.forUrl(String.format("/gradebookng-tool/scripts/gradebook-update-ungraded.js?version=%s", version)));
 
-		response.render(JavaScriptHeaderItem
-			.forUrl(String.format("/library/js/expandCollapse.js?version=%s", version)));
+		response.render(
+				JavaScriptHeaderItem.forUrl(String.format("/library/js/expandCollapse.js?version=%s", version)));
 	}
 
 	/**
-	 * Helper to generate a RGB CSS color string with values between 180-250 to ensure a lighter color e.g. rgb(181,222,199)
+	 * Helper to generate a RGB CSS color string with values between 180-250 to
+	 * ensure a lighter color e.g. rgb(181,222,199)
 	 */
 	public String generateRandomRGBColorString() {
 		final Random rand = new Random();
@@ -872,7 +884,8 @@ public class GradebookPage extends BasePage {
 	}
 
 	/**
-	 * Build a table summary for the table along the lines of if verbose: "Showing 1{from} to 100{to} of 153{of} students" else:
+	 * Build a table summary for the table along the lines of if verbose:
+	 * "Showing 1{from} to 100{to} of 153{of} students" else:
 	 * "Showing 100{to} students"
 	 */
 	private Label constructTableLabel(final String componentId, final DataTable table, final boolean verbose) {

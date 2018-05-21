@@ -1,24 +1,9 @@
 /**********************************************************************************
- *
- * $Id:$
- *
- ***********************************************************************************
- *
- * Copyright (c) 2008, 2009 The Regents of the University of California
- *
- * Licensed under the
- * Educational Community License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may
- * obtain a copy of the License at
- * 
- * http://www.osedu.org/licenses/ECL-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an "AS IS"
- * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- *
+ * Implementation of Texas Satet University
+ * This is used to connect to grade submission server in order to submit grades
+ * from Gradebookng to Texas State Banner system.
+ * It packs the student grades in json format and send the payload to the grade
+ * submission server.
  **********************************************************************************/
 
 package org.sakaiproject.gradebookng.business;
@@ -75,11 +60,10 @@ import org.sakaiproject.user.api.UserDirectoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-
 public class TxstateInstitutionalAdvisor {
-	
+
 	private static final Log log = LogFactory.getLog(TxstateInstitutionalAdvisor.class);
-	
+
 	//Banner uses gradetype to indicate final grade or mid term; in gradebook, it is more of a gradeSubmitType
 	//Params used to communicate with grade submission server; all are lowercase
 	public static final String GRADE_TYPE = "gradetype";
@@ -105,17 +89,16 @@ public class TxstateInstitutionalAdvisor {
 	// Final Grade Submission Status (FGSS)
 	private final String FGSS_BANNER_MESSAGE = "The final grade process has begun";
 	private final String FGSS_DIALOG_MESSAGE = "The final grade process has begun.  Please contact all course graders before making any Gradebook changes.";
-	
-	
+
 	String finalGradeSubmissionPath = null;
-	
+
 	private SiteService siteService = null;
 	private ToolManager toolManager = null;
 	private AuthzGroupService authzGroupService = null;
 	private UserDirectoryService userDirectoryService;
 	private EventTrackingService eventTrackingService;
 	private ServerConfigurationService configService;
-	
+
 	public List<String> getExportCourseManagementSetEids(Group group) {
 		if(null == group) {
 			log.error("ERROR : Group is null");
@@ -127,108 +110,60 @@ public class TxstateInstitutionalAdvisor {
 		}
 		return Arrays.asList(group.getProviderGroupId().split("\\+"));
 	}
-	
+
 	public String getExportCourseManagementId(String userEid, Group group, List<String> enrollmentSetEids) {
-		
+
 		if (null == group) {
 			log.error("ERROR : Group is null");
 			return null;
 		}
-		
+
 		if (null == group.getContainingSite()) {
 			log.warn("Containing site is null");
 			return null;
 		}
-		
+
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(group.getContainingSite().getTitle());
 		stringBuilder.append(" : ");
 		stringBuilder.append(group.getTitle());
-		
+
 		return stringBuilder.toString();
 	}
-	
-//	public String getExportUserId(UserDereference dereference) {
-//		
-//		return dereference.getDisplayId();
-//	}
-//	
-//	public String getFinalGradeUserId(UserDereference dereference) {
-//		
-//		return dereference.getEid();
-//	}
-//	
-//	public String[] getLearnerRoleNames() {
-//		String[] roleKeys = { "Student", "Open Campus", "access" };
-//		return roleKeys;
-//	}
-	
-	
+
 	public boolean isLearner(Member member) {
 		String role = member.getRole() == null ? "" : member.getRole().getId();
-		
-		return (role.equalsIgnoreCase("Student") 
+
+		return (role.equalsIgnoreCase("Student")
 				|| role.equalsIgnoreCase("Open Campus")
 				|| role.equalsIgnoreCase("Access"))
 		&& member.isActive();
 	}
-	
+
 	public boolean isExportCourseManagementIdByGroup() {
 		return false;
 	}
-	
+
 	public boolean isValidOverrideGrade(String grade, String learnerEid, String learnerDisplayId, Gradebook gradebook, Set<String> scaledGrades) {
-		
+
 		if (scaledGrades.contains(grade))
 			return true;
 		//allow override if they meet registra's final grade types
 		else if (new HashSet<String>(Arrays.asList(validFinalGrades )).contains(grade))
 			return true;
-		
+
 		return false;
 	}
 
 	public GradeSubmissionResult submitGrade(Map<String, String> studentsGrades, String gradebookUid, String gradeSubmitType){
 		return submitToExtGradesSubmissionServer(studentsGrades, gradebookUid, GRADES_SUBMISSION, gradeSubmitType);
 	}
-	
+
 	//The submission server will show the previous submission's receipt;
 	public GradeSubmissionResult viewSubmissionReceipt(String gradebookUid){
 		return submitToExtGradesSubmissionServer(null, gradebookUid, VIEW_RECEIPTS, null);
 	}
 
-	// API Impl
-//	public FinalGradeSubmissionStatus hasFinalGradeSubmission(String gradebookUid, boolean hasFinalGradeSubmission) {
-//		
-//		/*
-//		 * By default, when the user clicks on the final grade submission menu item,
-//		 * GB2 marks the gradebook as "locked". So we check for locked status, and
-//		 * set the messages in the FinalGradeSubmissionStatus object accordingly.
-//		 * 
-//		 * In addition, an institution could check its final grade submission system,
-//		 * and show appropriate messages to the user in case final grades 
-//		 * have been submitted.
-//		 * 
-//		 */
-//		
-//		FinalGradeSubmissionStatus finalGradeSubmissionStatus = new FinalGradeSubmissionStatusImpl();
-//
-//		if(hasFinalGradeSubmission) {
-//
-//			finalGradeSubmissionStatus.setBannerNotificationMessage(FGSS_BANNER_MESSAGE);
-//			finalGradeSubmissionStatus.setDialogNotificationMessage(FGSS_DIALOG_MESSAGE);
-//		}
-//		else {
-//			
-//			/*
-//			 * We don't set the banner and dialog messages so that the client doesn't show the messages
-//			 */
-//		}
-//
-//		return finalGradeSubmissionStatus;
-//	}
-
-	
 	public GradeSubmissionResult submitToExtGradesSubmissionServer(Map<String, String> studentsGrades, String gradebookUid, String action, String gradeSubmitType){
 		//get keys
 		SUBMIT_APPKEY = configService.getString("grade.submit.app.key");
@@ -236,29 +171,29 @@ public class TxstateInstitutionalAdvisor {
 
 		//get data
 		String submitGradesJsonData = getSubmissionJsonData(studentsGrades,SUBMIT_APPKEY, action, gradeSubmitType);
-		
+
 		byte[] signature = getDataSigned(submitGradesJsonData,SUBMIT_SIGKEY);
-		
+
 		log.debug("\n\nsubmitGradesJsonData:" + submitGradesJsonData +"\n\n" + "singature is: " + signature+ "\n\n");
-		
+
 		GradeSubmissionResult gradeSubmissionResult = new GradeSubmissionResult();
-		
+
 		Map<String, String>  resultMap = new HashMap<String, String>();
-		
+
 		HttpsURLConnection connection = getSSLConnection();
-		
+
 		boolean submitResult = false;
 		String sessionId = null;
 		try {
-			
+
 			//payload=<url encoded json object>&sig=<hex encoded hmac-sha1 of payload and key>
-			
-			String query = "payload=" + URLEncoder.encode(submitGradesJsonData); 
-			query += "&"; 
-			query += "sig=" + Hex.encodeHexString(signature); 
-			
+
+			String query = "payload=" + URLEncoder.encode(submitGradesJsonData);
+			query += "&";
+			query += "sig=" + Hex.encodeHexString(signature);
+
 			log.debug("\n\n"+query+"\n");
-			
+
 			//DEFINE CONNECTION.
 			if (connection == null)
 				gradeSubmissionResult.setStatus(500);
@@ -266,40 +201,40 @@ public class TxstateInstitutionalAdvisor {
 			connection.setDoOutput     (true);
 			connection.setDoInput      (true);
 			connection.setRequestMethod("POST");
-			
+
 			//CREATE REQUEST
-			OutputStream   outPut  = connection.getOutputStream();
+			OutputStream outPut = connection.getOutputStream();
 			OutputStreamWriter wout = new OutputStreamWriter(outPut);
 			wout.write(query);
 			wout.flush();
 			wout.close();
-			
-			//READ RESPONSE.
+
+			//READ RESPONSE
 			InputStream in = connection.getInputStream();
-			
+
 			int c;
 			String res = "";
 			while ((c = in.read()) != -1) { res += (char) c; }
 			HashMap<String,Object> result = new ObjectMapper().readValue(res, HashMap.class);
-			
+
 			//Can be simplified to be
 			//HashMap<String, Object> result = new ObjectMapper().readValue(in, HashMap.class);
-			
+
 			submitResult = ((Boolean)result.get(SubmitResultKey.SUBMIT_SUCCESS.getProperty())).booleanValue();
-			
+
 			//handling successful response
 			if(submitResult){
 				sessionId = result.get(SubmitResultKey.SESSION_ID.getProperty()).toString();
 				String message = "gradebook2." + action;
-				
+
 				//We only get url when successfully connected
 				String url = result.get(SubmitResultKey.SUBMIT_PAGE_URL.getProperty()).toString();
 				log.debug("\n\nurl="+url+ "\n\n" );
-				
+
 				String ref = "externalConnSessionId="+sessionId;
 				Event event = eventTrackingService.newEvent(message, ref, true);
 				eventTrackingService.post(event);
-				
+
 				resultMap.put(SubmitResultKey.SUBMIT_PAGE_URL.getProperty(), url);
 				resultMap.put(SubmitResultKey.SUBMIT_SUCCESS.getProperty(), submitResult?"true":"false");
 				resultMap.put(SubmitResultKey.SESSION_ID.getProperty(), sessionId);
@@ -310,10 +245,10 @@ public class TxstateInstitutionalAdvisor {
 				gradeSubmissionResult.setStatus(500);
 				log.info("Failed to connect server with this error: " + error);
 			}
-			
+
 			log.debug("\n\nsubmitResult "+submitResult+ "\n\nsessionId "+sessionId+ "\n\n" );
 			log.debug("\n\nfinalGradeSubmissionResultData "+ toJson(resultMap, true) + "\n\n");
-			
+
 			gradeSubmissionResult.setData(toJson(resultMap, true));
 
 			//CLOSE ALL.
@@ -321,7 +256,7 @@ public class TxstateInstitutionalAdvisor {
 			outPut.close();
 			connection.disconnect();
 			return gradeSubmissionResult;
-			
+
 		}
 		catch (IOException e) {
 			gradeSubmissionResult.setStatus(500);
@@ -336,22 +271,21 @@ public class TxstateInstitutionalAdvisor {
 		}
 
 	}
-	
-	
+
 	/*
 	 * Helper Methods
 	 */
-	
+
 	private String getSubmissionJsonData (Map<String, String> studentsGrades, String appKey, String action, String gradeSubmitType){
 		String siteId = null;
-		
+
 		try {
 			Site site = siteService.getSite(toolManager.getCurrentPlacement().getContext());
 			siteId = site.getId();
 		} catch (IdUnusedException e) {
 			log.error("EXCEPTION: Wasn't able to get the siteId");
 		}
-		
+
 		String realmId = siteService.siteReference(siteId);
 		String submitter = userDirectoryService.getCurrentUser().getEid();
 		Set<String> sections = authzGroupService.getProviderIds(realmId);
@@ -370,42 +304,42 @@ public class TxstateInstitutionalAdvisor {
 		else
 			//no need to wrap grades if only see submission receipt
 			wrapper.put(SUBMIT_ACTION, VIEW_RECEIPTS);
-		
+
 		String jsonData = toJson(wrapper, true);
-		
+
 		return jsonData;
 	}
-	
+
 	protected String toJson(Object o, boolean pretty) {
 		ObjectMapper mapper = new ObjectMapper();
-		
+
 		if (pretty)
 		{
-			mapper.configure(SerializationFeature.INDENT_OUTPUT, true); 
+			mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		}
-		
+
 		StringWriter w = new StringWriter();
 		try {
 			mapper.writeValue(w, o);
 		} catch (Exception e) {
 			log.error("Caught an exception serializing to JSON: ", e);
 		}
-		
+
 		return w.toString();
 	}
-	
+
 	private byte[] getDataSigned(String jsonData, String sigKey){
 		byte[] signature = null;
 		try {
 			byte[] keyBytes = sigKey.getBytes();
 			SecretKeySpec signingKey = new SecretKeySpec(keyBytes, "HmacSHA1");
-			
+
 			Mac mac = Mac.getInstance("HmacSHA1");
 			mac.init(signingKey);
 			signature = mac.doFinal(jsonData.getBytes());
 		}
 		catch(NoSuchAlgorithmException e){
-		    log.info("No HmaSHA1 algorithm available");	
+			log.info("No HmaSHA1 algorithm available");
 		}
 		catch(InvalidKeyException e){
 			log.info("The key is not valid");
@@ -431,14 +365,14 @@ public class TxstateInstitutionalAdvisor {
 				}
 			}
 		};
-		
+
 		// Create empty HostnameVerifier
 		HostnameVerifier hv = new HostnameVerifier() {
 			public boolean verify(String arg0, SSLSession arg1) {
 				return true;
 			}
 		};
-		
+
 		// Install the all-trusting trust manager
 		SSLContext sc;
 		try {
@@ -454,7 +388,7 @@ public class TxstateInstitutionalAdvisor {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private HttpsURLConnection getSSLConnection() {
 		trustAllCerts();
 		HttpsURLConnection conn = null;
@@ -468,28 +402,19 @@ public class TxstateInstitutionalAdvisor {
 		}
 		return conn;
 	}
-	
-	/*
-	 * IOC setters:
-	 */
-	
-//	public void setFinalGradeSubmissionPath(String finalGradeSubmissionPath) {
-//		
-//		this.finalGradeSubmissionPath = finalGradeSubmissionPath;
-//	}
-	
+
 	public void setSiteService(SiteService siteService) {
 		this.siteService = siteService;
 	}
-	
+
 	public void setToolManager(ToolManager toolManager) {
 		this.toolManager = toolManager;
 	}
-	
+
 	public String getDisplaySectionId(String enrollmentSetEid) {
 		return "DisplayId for eid: " + enrollmentSetEid;
 	}
-	
+
 	public String getPrimarySectionEid(List<String> eids) {
 		if(null == eids || eids.isEmpty()) {
 			return "";
@@ -498,20 +423,20 @@ public class TxstateInstitutionalAdvisor {
 			return eids.get(0);
 		}
 	}
-	
+
 	public void setAuthzGroupService(AuthzGroupService authzGroupService) {
 		this.authzGroupService = authzGroupService;
 	}
-	
+
 	public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
 		this.userDirectoryService = userDirectoryService;
 	}
-	
-	public void setEventTrackingService(EventTrackingService eventTrackingService){
+
+	public void setEventTrackingService(EventTrackingService eventTrackingService) {
 		this.eventTrackingService = eventTrackingService;
 	}
-	
-	public void setConfigService(ServerConfigurationService configService){
+
+	public void setConfigService(ServerConfigurationService configService) {
 		this.configService = configService;
 	}
 }

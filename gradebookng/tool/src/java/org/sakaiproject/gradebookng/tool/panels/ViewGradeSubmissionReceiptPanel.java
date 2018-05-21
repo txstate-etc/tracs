@@ -2,49 +2,27 @@ package org.sakaiproject.gradebookng.tool.panels;
 
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.model.StringResourceModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.business.SubmitResultKey;
 import org.sakaiproject.gradebookng.business.model.GradeSubmissionResult;
 import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
 import org.sakaiproject.gradebookng.tool.component.GbFeedbackPanel;
-import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
-import org.sakaiproject.service.gradebook.shared.Assignment;
-import org.sakaiproject.service.gradebook.shared.AssignmentHasIllegalPointsException;
-import org.sakaiproject.service.gradebook.shared.CategoryDefinition;
-import org.sakaiproject.service.gradebook.shared.ConflictingAssignmentNameException;
-import org.sakaiproject.service.gradebook.shared.ConflictingExternalIdException;
-import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.tool.gradebook.Gradebook;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.sakaiproject.gradebookng.tool.model.GbModalWindow;
-import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
-import org.sakaiproject.gradebookng.tool.model.RescaleAnswer;
 
 /**
  * The panel for submit final and midTerm (Initial Academic Feedback) grades window
@@ -81,20 +59,18 @@ public class ViewGradeSubmissionReceiptPanel extends Panel {
 
 		if (Integer.valueOf(500).compareTo(gradeSubmissionResult.getStatus()) == 0) {
 			error(getString("message.viewreceipt.error1"));
-			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
 		} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && !isSuccess) {
 			error(getString("message.viewreceipt.error2"));
-			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
 		} else if (Integer.valueOf(200).compareTo(gradeSubmissionResult.getStatus()) == 0 && isSuccess) {
 //			getSession().success(getString("message.viewreceipt.success"));
 //			setResponsePage(getPage().getPageClass());
-//			add(new GbFeedbackPanel("addViewSubRcptFeedback"));
 		}
 		else {
-			error(getString("message.gradesubmit.error"));
-			add(new GbFeedbackPanel("addGradeSubmitFeedback"));
+			error(getString("message.viewreceipt.error2"));
 		}
 
+		add(new GbFeedbackPanel("addViewSubRcptFeedback"));
+		
 		final ExternalLink link = new ExternalLink("viewSubRcptLink", url) {
 
 			@Override
@@ -133,13 +109,10 @@ public class ViewGradeSubmissionReceiptPanel extends Panel {
 		try {
 			map = mapper.readValue(jsonDataString, new TypeReference<Map<String,String>>(){});
 		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
-			// TODO Auto- generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return map;

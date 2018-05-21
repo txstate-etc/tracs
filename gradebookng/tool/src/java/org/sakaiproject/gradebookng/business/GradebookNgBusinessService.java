@@ -670,41 +670,6 @@ public class GradebookNgBusinessService {
 		return false;
 	}
 
-/*	public FinalGradeSubmissionResult submitGrade(List<Map<Column, String>> studentDataList, String gradebookUid, String gradeSubmitType) {
-
-		//Need to filter out non-grade override inactive participants for grade submission bugid:4759 -Qu 4/10/2012
-		studentDataList = gradeSubmissionStudentFilter(gradebookUid,studentDataList);
-
-		List<ActionRecord> logs = getRecordlogs(studentDataList, gradebookUid);
-		FinalGradeSubmissionResult finalGradeSubmissionResult = null; 
-
-		try {
-			finalGradeSubmissionResult = advisor.submitGrade(studentDataList, gradebookUid, gradeSubmitType);
-			for (ActionRecord log : logs) {
-				gbService.storeActionRecord(log);
-			}
-		} catch (Exception e) {
-			log.error("General Exception submitting grades for UID (" + gradebookUid + "): " + e.getMessage(), e);
-		}
-
-
-		Gradebook gradebook = gbService.getGradebook(gradebookUid);
-		gradebook.setLocked(true);
-		gbService.updateGradebook(gradebook);
-
-		// GRBK-971
-		if (gradeSubmitType.equalsIgnoreCase(AppConstants.FINAL_GRADE)){
-			postEvent("gradebook2.submitFinalGrades", gradebookUid, "count", String.valueOf(studentDataList.size()));
-		}
-		else if (gradeSubmitType.equalsIgnoreCase(AppConstants.MID_TERM)) {
-			postEvent("gradebook2.submitMidTermGrades", gradebookUid, "count", String.valueOf(studentDataList.size()));
-		}
-
-		return finalGradeSubmissionResult;
-
-	}
-*/
-
 	/**
 	 * Build the matrix of assignments, students and grades for all students
 	 *

@@ -494,7 +494,7 @@ public class GradebookPage extends BasePage {
 		stopwatch.time("all Columns added", stopwatch.getTime());
 
 		// TODO make this AjaxFallbackDefaultDataTable
-		final DataTable table = new DataTable("table", cols, studentGradeMatrix, 100) {
+		final DataTable table = new DataTable("table", cols, studentGradeMatrix, 50) {
 			@Override
 			protected Item newCellItem(final String id, final int index, final IModel model) {
 				return new Item(id, index, model) {

@@ -64,7 +64,7 @@ public class AnnouncementsNotifier implements Observer {
 
     public void update(Observable o, Object arg) {
       Event event = (Event) arg;
-      System.out.println("received "+event.getEvent()+" event for ticket " + event.getResource());
+      log.debug("received "+event.getEvent()+" event for ticket " + event.getResource());
       try {
         if (updates.contains(event.getEvent())) {
           if(notifyUtils.toolIsHidden(event.getContext(), "sakai.announcements")) return;
@@ -80,10 +80,10 @@ public class AnnouncementsNotifier implements Observer {
           String contenthash = notifyUtils.hashContent(m.getAnnouncementHeader().getSubject(), m.getBody());
 
           List<String> userids = getNotifyList(event.getContext(), event.getUserId(), m);
-          for (String uid : userids) System.out.println("userid: "+uid);
+          for (String uid : userids) log.debug("userid: "+uid);
 
           if (m.getHeader().getDraft()) {
-            System.out.println("message is in draft mode, delete any scheduled notification");
+            log.debug("message is in draft mode, delete any scheduled notification");
             notifyUtils.deleteForObject("announcement", ref.getId());
           } else if (announceService.isMessageViewable(m)) {
             notifyUtils.sendNotification("announcement", "creation", m.getId(), event.getContext(), userids, releaseDate, contenthash, true);

@@ -304,15 +304,32 @@ public class GradebookNgBusinessService {
 		// in any case the role check would just be a confirmation that the user passed in was a student.
 
 		// for each assignment we need to check if it is grouped externally and if the user has access to the group
+		boolean isGrouped;
+		boolean isVisible;
 		final Iterator<Assignment> iter = assignments.iterator();
 		while (iter.hasNext()) {
 			final Assignment a = iter.next();
-			if (a.isExternallyMaintained()) {
-				if (this.gradebookExternalAssessmentService.isExternalAssignmentGrouped(gradebook.getUid(), a.getExternalId()) &&
-						!this.gradebookExternalAssessmentService.isExternalAssignmentVisible(gradebook.getUid(), a.getExternalId(),
-								studentUuid)) {
-					iter.remove();
-				}
+			if (!a.isExternallyMaintained()) {
+				continue;
+			}
+
+			try {
+				isGrouped = this.gradebookExternalAssessmentService.isExternalAssignmentGrouped(gradebook.getUid(), a.getExternalId());
+			} catch (Exception ex) {
+				log.error("Exception isExternalAssignmentGrouped: {0} Trace:{1}", ex.getMessage(), ex.getStackTrace());
+				isGrouped = false;
+			}
+
+			try {
+				isVisible = this.gradebookExternalAssessmentService.isExternalAssignmentVisible(gradebook.getUid(), a.getExternalId(),
+						studentUuid);
+			} catch (Exception ex) {
+				log.error("Exception isExternalAssignmentVisible: {0} Trace: {1}", ex.getMessage(), ex.getStackTrace());
+				isVisible = false;
+			}
+
+			if (isGrouped && !isVisible) {
+				iter.remove();
 			}
 		}
 		return assignments;

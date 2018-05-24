@@ -1544,8 +1544,14 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		default:
 			comp = GradableObject.defaultComparator;	
 	}
-    
-  	Collections.sort(assignments, comp);
+
+	try {
+		Collections.sort(assignments, comp);
+	}catch (Exception e) {
+		log.info("Something needs to be looked for sort ");
+		e.printStackTrace();
+	}
+
   	if(!ascending) {
   		Collections.reverse(assignments);
   	}

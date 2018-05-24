@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -618,10 +619,15 @@ public class GradebookNgBusinessService {
 		for(String studentUid : studentUuids) {
 			try {
 				String eid = userDirectoryService.getUser(studentUid).getEid();
-				studentsGrades.put(eid, studentsCourseGrades.get(studentUid).getMappedGrade());
+				String courseGrade = studentsCourseGrades.get(studentUid).getMappedGrade();
+				if (null != courseGrade)
+					studentsGrades.put(eid, courseGrade);
 			}
 			catch (UserNotDefinedException e) {
 				log.info("User " + studentUid + " could not be found in the system.");
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 
@@ -645,10 +651,11 @@ public class GradebookNgBusinessService {
 	 *         grade is not assigned, but include inactive students with override grades.
 	 */
 	private Map<String, CourseGrade> gradeSubmissionStudentFilter(String gradebookUid, Map<String, CourseGrade> studentsCourseGrades){
-//		Map<String, CourseGrade> filteredMap = new HashMap<String,CourseGrade>();
-		for (Map.Entry<String, CourseGrade> entry : studentsCourseGrades.entrySet()){
+		Iterator<Entry<String, CourseGrade>> it = studentsCourseGrades.entrySet().iterator();
+		while(it.hasNext()) {
+			Map.Entry<String, CourseGrade> entry = it.next();
 			if(!getMemberStatus(entry.getKey()) && null == entry.getValue().getEnteredGrade())
-				studentsCourseGrades.remove(entry.getKey(), entry.getValue());
+				it.remove();
 		}
 		return studentsCourseGrades;
 	}

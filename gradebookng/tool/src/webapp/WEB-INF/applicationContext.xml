@@ -3,7 +3,6 @@
 
 <beans>
 
-
 	<bean
 		id="org.sakaiproject.gradebookng.business.GradebookNgBusinessService"
 		class="org.sakaiproject.gradebookng.business.GradebookNgBusinessService">
@@ -21,7 +20,7 @@
 			ref="org.sakaiproject.coursemanagement.api.CourseManagementService" />
 		<property name="securityService" ref="org.sakaiproject.authz.api.SecurityService" />
 		<property name="gradebookExternalAssessmentService" ref="org.sakaiproject.service.gradebook.GradebookExternalAssessmentService"/>
-		
+		<property name="advisor" ref="org.sakaiproject.gradebookng.business.TxstateInstitutionalAdvisor" />
 	</bean>
 
 	<bean
@@ -32,7 +31,7 @@
 		<property name="securityService" ref="org.sakaiproject.authz.api.SecurityService" />
 		<property name="businessService" ref="org.sakaiproject.gradebookng.business.GradebookNgBusinessService" />
 	</bean>
-	
+
 	<bean
 		id="org.sakaiproject.gradebookng.framework.GradebookNgEntityProducer"
 		class="org.sakaiproject.gradebookng.framework.GradebookNgEntityProducer"
@@ -41,11 +40,23 @@
 		<property name="gradebookService" ref="org.sakaiproject.service.gradebook.GradebookService" />
 		<property name="gradebookFrameworkService" ref="org.sakaiproject.service.gradebook.GradebookFrameworkService" />	
 	</bean>
-	
+
 	<bean
 		id="org.sakaiproject.gradebookng.framework.GradebookNgContextObserver"
 		class="org.sakaiproject.gradebookng.framework.GradebookNgContextObserver"
 		parent="org.sakaiproject.gradebookng.framework.GradebookNgEntityProducer">
 	</bean>	
+
+	<bean
+		id="org.sakaiproject.gradebookng.business.TxstateInstitutionalAdvisor"
+		class="org.sakaiproject.gradebookng.business.TxstateInstitutionalAdvisor">
+		<property name="toolManager" ref="org.sakaiproject.tool.api.ToolManager"/>
+		<property name="siteService" ref="org.sakaiproject.site.api.SiteService"/>
+		<!-- <property name="finalGradeSubmissionPath" value="/abc"/> -->
+		<property name="authzGroupService" ref="org.sakaiproject.authz.api.AuthzGroupService"/>
+		<property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService"/>
+		<property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService" />
+		<property name="configService" ref="org.sakaiproject.component.api.ServerConfigurationService" />
+	</bean>
 
 </beans>

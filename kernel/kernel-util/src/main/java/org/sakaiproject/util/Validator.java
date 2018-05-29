@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.exception.IdInvalidException;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * <p>
  * Validator is utility class that helps to validate stuff.
@@ -109,6 +111,14 @@ public class Validator
 	public static String escapeHtml(String value)
 	{
 		return FormattedText.escapeHtml(value, true);
+	}
+
+	public static String beautifyText(String value)
+	{
+		value = value.replaceAll("\\<\\/p\\>", "\n");
+		value = FormattedText.escapeHtml(value, false);
+		value = StringUtils.replaceEach(value, new String[]{"&quot;", "&amp;", "&lt;", "&gt;", "\n"}, new String[]{"\"","&", "<", ">", "<br />"});
+		return value;
 	}
 
 	/**

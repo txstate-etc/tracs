@@ -142,7 +142,13 @@ public class GradebookEntityProvider extends AbstractEntityProvider implements
 			List<Assignment> gbitems = gradebookService.getAssignments(siteId);
 			for (Assignment assignment : gbitems) {
 				for (String studentId : students) {
-					GradeAssignmentItem item = createGradeItem(assignment, siteId, studentId);
+					GradeAssignmentItem item = new GradeAssignmentItem(
+							assignment);
+					item.setUserId(studentId);
+					item.setUserName(getUserDisplayName(studentId));
+					item.setGrade(gradebookService.getAssignmentScoreString(
+							siteId, assignment.getId(), studentId));
+
 					course.assignments.add(item);
 				}
 			}
@@ -155,27 +161,16 @@ public class GradebookEntityProvider extends AbstractEntityProvider implements
 			List<Assignment> gbitems = gradebookService
 					.getViewableAssignmentsForCurrentUser(siteId);
 			for (Assignment assignment : gbitems) {
-				GradeAssignmentItem item = createGradeItem(assignment, siteId, userId);
+				GradeAssignmentItem item = new GradeAssignmentItem(assignment);
+				item.setUserId(userId);
+				item.setUserName(getUserDisplayName(userId));
+				item.setGrade(gradebookService.getAssignmentScoreString(siteId,
+						assignment.getId(), userId));
+
 				course.assignments.add(item);
 			}
 			return course;
 		}
-	}
-
-	private GradeAssignmentItem createGradeItem(Assignment assignment, String siteId, String userId) {
-		GradeAssignmentItem item = new GradeAssignmentItem(assignment);
-		CommentDefinition cd = gradebookService.getAssignmentScoreComment(siteId, assignment.getId(), userId);
-
-		if (cd != null) {
-			item.setComment(cd.getCommentText());
-			item.setGrader(getUserDisplayName(cd.getGraderUid()));
-		}
-
-		item.setUserId(userId);
-		item.setUserName(getUserDisplayName(userId));
-		item.setGrade(gradebookService.getAssignmentScoreString(siteId,
-				assignment.getId(), userId));
-		return item;
 	}
 
 	private Collection<String> getStudentList(String siteId) {
@@ -245,7 +240,12 @@ public class GradebookEntityProvider extends AbstractEntityProvider implements
 			List<Assignment> gbitems = gradebookService
 					.getViewableAssignmentsForCurrentUser(siteId);
 			for (Assignment assignment : gbitems) {
-				GradeAssignmentItem item = createGradeItem(assignment, siteId, userId);
+				GradeAssignmentItem item = new GradeAssignmentItem(assignment);
+				item.setUserId(userId);
+				item.setUserName(getUserDisplayName(userId));
+				item.setGrade(gradebookService.getAssignmentScoreString(siteId,
+						assignment.getId(), userId));
+
 				course.assignments.add(item);
 			}
 			r.add(course);

@@ -43,7 +43,7 @@
 		$tlang.getString("meta.message")
 	</h4>
 	<div class="message-body">
-        <p class="indnt1">$validator.beautifyText($body)</p>
+		<p class="indnt1">$validator.escapeHtmlFormattedText($body)</p>
 	</div>
 	#set ($size = 0)
 	#if (!$attachments.isEmpty())

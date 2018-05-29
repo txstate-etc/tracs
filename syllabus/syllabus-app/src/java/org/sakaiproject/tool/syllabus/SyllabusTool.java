@@ -74,7 +74,6 @@ import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.util.FormattedText;
 import org.sakaiproject.util.ResourceLoader;
-import org.sakaiproject.util.Validator;
 
 import com.sun.faces.util.MessageFactory;
 
@@ -112,7 +111,6 @@ public class SyllabusTool
     
     public DecoratedSyllabusEntry(SyllabusData en)
     {
-      en.setAsset(Validator.beautifyText(en.getAsset()));
       in_entry = en;
       //b/c of pass by reference, we need to clone the values we want to check
       //against

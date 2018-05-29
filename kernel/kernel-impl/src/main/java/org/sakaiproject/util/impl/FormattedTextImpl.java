@@ -610,7 +610,7 @@ public class FormattedTextImpl implements FormattedText
         if (value != null && !"".equals(value)) {
             val = StringEscapeUtils.escapeHtml(value);
             if (escapeNewlines && val != null) {
-                val = M_patternTagBr.matcher(val).replaceAll("\n");
+                val = val.replace("\n", "<br/>\n");
             }
         }
         return val;

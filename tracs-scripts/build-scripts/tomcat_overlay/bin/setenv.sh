@@ -3,6 +3,7 @@
 STANDARD_OPTS="-XX:+UseConcMarkSweepGC -XX:+UseParNewGC \
 -Dsun.net.client.defaultConnectTimeout=5000 -Dsun.net.client.defaultReadTimeout=20000 \
 -Dsun.lang.ClassLoader.allowArraySyntax=true -Dorg.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING=false -Dcom.sun.management.jmxremote \
+-Dfile.encoding=UTF-8 \
 -server -Djava.awt.headless=true \
 -Dsakai.security=/etc/sakai \
 $GARBAGECOLLECTOR_OPTS $TIMEOUT_OPTS $COMPATABILITY_OPTS $JVM_OPTS $RUN_OPTS"

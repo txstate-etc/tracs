@@ -263,13 +263,15 @@ public class Assignment extends GradableObject {
                 // if in the same category, sort by their categorized sort order
                 if (one.getCategory().equals(two.getCategory())) {
                     // handles null orders by putting them at the end of the list
-                    if (one.getCategorizedSortOrder() == null) {
-                        return 1;
-                    } else if (two.getCategorizedSortOrder() == null) {
-                        return -1;
-                    }
+                   if (one.getCategorizedSortOrder() == null && two.getCategorizedSortOrder() == null) {
+                      return 0;
+                   } else if (one.getCategorizedSortOrder() == null) {
+                      return 1;
+                   } else if (two.getCategorizedSortOrder() == null) {
+                      return -1;
+                   } else {
                     return Integer.compare(one.getCategorizedSortOrder(), two.getCategorizedSortOrder());
-
+                   }
                 // otherwise, sort by their category order
                 } else {
                     // check if category has a order (not required)

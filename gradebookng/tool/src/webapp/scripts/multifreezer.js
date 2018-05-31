@@ -11,7 +11,7 @@ $('.table-freeze-multi').each(function () {
     //prepare
     table.css({
         margin: 0
-    }).addClass('table-freeze-multi-original').find('tfoot').remove();
+    }).addClass('table-freeze-multi-original');
 
     //wrap
     table.wrap('<div class="freeze-multi-scroll-wrapper" />');
@@ -31,21 +31,28 @@ $('.table-freeze-multi').each(function () {
             .append($('<div class="freeze-multi-scroll-left-body" />').append(leftblock))
     );
 
-		//cloning
+    //cloning
     var clone = table.clone(true);
     clone.addClass('table-freeze-multi-clone').removeClass('table-freeze-multi-original');
     var colsNumber = table.data('colsNumber') || table.find('tbody tr:first th').length;
+
     //head
     var cloneHead = clone.clone(true);
     cloneHead.find('tbody').remove();
+    cloneHead.find('tfoot').remove();
     headblock.append(cloneHead);
+
     //top
     var cloneTop = cloneHead.clone(true);
     topblock.append(cloneTop);
-    //left
+
+    //left (contains body and functional footer)
     var cloneLeft = clone.clone(true);
     cloneLeft.find('thead').remove();
     leftblock.append(cloneLeft);
+
+    //remove the duplicate footer from the original table by emptying the divs, adding br's to maintain alignment
+    table.find('tfoot').find('div').empty().append("<br>").next().empty().append("<br>");
 
 		//sizing
     var scrollHeight = table.data('scrollHeight') || wrapper.parent().closest('*').height();

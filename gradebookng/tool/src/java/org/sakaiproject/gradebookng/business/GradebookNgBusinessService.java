@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
@@ -317,7 +316,7 @@ public class GradebookNgBusinessService {
 			try {
 				isGrouped = this.gradebookExternalAssessmentService.isExternalAssignmentGrouped(gradebook.getUid(), a.getExternalId());
 			} catch (Exception ex) {
-				log.error("Exception isExternalAssignmentGrouped: {0} Trace:{1}", ex.getMessage(), ExceptionUtils.getStackTrace(ex.getCause()));
+				log.error("Exception isExternalAssignmentGrouped: {0}", ex.getMessage());
 				isGrouped = false;
 			}
 
@@ -325,7 +324,7 @@ public class GradebookNgBusinessService {
 				isVisible = this.gradebookExternalAssessmentService.isExternalAssignmentVisible(gradebook.getUid(), a.getExternalId(),
 						studentUuid);
 			} catch (Exception ex) {
-				log.error("Exception isExternalAssignmentVisible: {0} Trace: {1}", ex.getMessage(), ExceptionUtils.getStackTrace(ex.getCause()));
+				log.error("Exception isExternalAssignmentVisible: {0}", ex.getMessage());
 				isVisible = false;
 			}
 

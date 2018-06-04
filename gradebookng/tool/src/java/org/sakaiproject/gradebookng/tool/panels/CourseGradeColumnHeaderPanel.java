@@ -185,6 +185,49 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 			}
 		});
 
+		//final grade submission
+		menu.add(new GbAjaxLink("finalGradeSubmission") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onClick(final AjaxRequestTarget target) {
+				final GradebookPage gradebookPage = (GradebookPage) getPage();
+				final GbModalWindow window = gradebookPage.getGradeSubmissionWindow();
+				window.setTitle(getString("heading.finalgrade"));
+				window.setComponentToReturnFocusTo(getParentCellFor(this));
+				window.setContent(new GradeSubmissionPanel(window.getContentId(), window, getString("finalGrade")));
+				window.show(target);
+			}
+		});
+
+		menu.add(new GbAjaxLink("midTermGradeSubmission") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onClick(final AjaxRequestTarget target) {
+				final GradebookPage gradebookPage = (GradebookPage) getPage();
+				final GbModalWindow window = gradebookPage.getGradeSubmissionWindow();
+				window.setTitle(getString("heading.midtermgrade"));
+				window.setComponentToReturnFocusTo(getParentCellFor(this));
+				window.setContent(new GradeSubmissionPanel(window.getContentId(), window, getString("midTerm")));
+				window.show(target);
+			}
+		});
+
+		menu.add(new GbAjaxLink("viewGradeSubmissionReceipt") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onClick(final AjaxRequestTarget target) {
+				final GradebookPage gradebookPage = (GradebookPage) getPage();
+				final GbModalWindow window = gradebookPage.getViewGradeSubmissionReceiptWindow();
+				window.setTitle(getString("heading.viewreceipt"));
+				window.setComponentToReturnFocusTo(getParentCellFor(this));
+				window.setContent(new ViewGradeSubmissionReceiptPanel(window.getContentId(), window));
+				window.show(target);
+			}
+		});
+
 		add(menu);
 	}
 

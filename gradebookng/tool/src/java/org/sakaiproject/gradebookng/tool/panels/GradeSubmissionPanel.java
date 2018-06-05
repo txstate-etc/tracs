@@ -71,6 +71,7 @@ public class GradeSubmissionPanel extends Panel {
 		super.onInitialize();
 
 		final Gradebook gradebook = this.businessService.getGradebook();
+
 		GradeSubmissionResult gradeSubmissionResult = GradeSubmissionPanel.this.businessService.submitGrade(gradebook.getUid(), gradeSubmitType);
 
 		final Form form = new Form ("gradeSubmissionForm");

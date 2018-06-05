@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,6 +35,7 @@ import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.SecurityService;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.coursemanagement.api.CourseManagementService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
@@ -130,6 +132,9 @@ public class GradebookNgBusinessService {
 
 	@Setter
 	private TxstateInstitutionalAdvisor advisor;
+
+	@Setter
+	private ServerConfigurationService configService;
 
 	public static final String ASSIGNMENT_ORDER_PROP = "gbng_assignment_order";
 
@@ -643,6 +648,22 @@ public class GradebookNgBusinessService {
 
 	public GradeSubmissionResult viewSubmissionReceipt(String gradebookUid) {
 		return advisor.viewSubmissionReceipt(gradebookUid);
+	}
+
+	public boolean allowMidTermGradeSubmission() {
+
+		Set <String> providerIds = (Set<String>) authzGroupService.getProviderIds("/site/"+ getCurrentSiteId());
+		if(null != providerIds) {
+			for (String providerId : providerIds ) {
+				 String sectionTitle = courseManagementService.getSection(providerId).getTitle().toLowerCase();
+				 String courseTitle = sectionTitle.split("\\.")[0];
+				 List<String> providerIdPatterns = Arrays.asList(configService.getString("gradebook.allow.mid.term.submission.section.title.patterns", "").toLowerCase().split(","));
+				 if (providerIdPatterns.contains(courseTitle)){
+					 return true;
+				 }
+			}
+		}
+		return false;
 	}
 
 	/* Helper method

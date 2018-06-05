@@ -90,6 +90,9 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 		// get setting
 		final Boolean showPoints = this.model.getObject();
 
+		// visible control for mid-term grade submission menu
+		final boolean allowMidTermSubmit = businessService.allowMidTermGradeSubmission();
+
 		// icons
 		final Map<String, Object> popoverModel = new HashMap<>();
 		popoverModel.put("role", role);
@@ -200,7 +203,7 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 			}
 		});
 
-		menu.add(new GbAjaxLink("midTermGradeSubmission") {
+		GbAjaxLink midTermMenu = new GbAjaxLink("midTermGradeSubmission") {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -212,7 +215,10 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 				window.setContent(new GradeSubmissionPanel(window.getContentId(), window, getString("midTerm")));
 				window.show(target);
 			}
-		});
+		};
+
+		midTermMenu.setVisible(allowMidTermSubmit);
+		menu.add(midTermMenu);
 
 		menu.add(new GbAjaxLink("viewGradeSubmissionReceipt") {
 			private static final long serialVersionUID = 1L;

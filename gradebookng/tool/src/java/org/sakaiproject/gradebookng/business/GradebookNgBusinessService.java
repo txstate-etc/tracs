@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -27,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.math.NumberUtils;
+import org.jfree.util.Log;
+import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Member;
@@ -43,6 +46,7 @@ import org.sakaiproject.gradebookng.business.model.GbGroup;
 import org.sakaiproject.gradebookng.business.model.GbStudentGradeInfo;
 import org.sakaiproject.gradebookng.business.model.GbStudentNameSortOrder;
 import org.sakaiproject.gradebookng.business.model.GbUser;
+import org.sakaiproject.gradebookng.business.model.GradeSubmissionResult;
 import org.sakaiproject.gradebookng.business.model.GbHistoryLog;
 import org.sakaiproject.gradebookng.business.util.CourseGradeFormatter;
 import org.sakaiproject.gradebookng.business.util.FormatHelper;
@@ -123,6 +127,9 @@ public class GradebookNgBusinessService {
 
 	@Setter
 	private SecurityService securityService;
+
+	@Setter
+	private TxstateInstitutionalAdvisor advisor;
 
 	public static final String ASSIGNMENT_ORDER_PROP = "gbng_assignment_order";
 
@@ -613,6 +620,78 @@ public class GradebookNgBusinessService {
 			rval = GradeSaveResponse.ERROR;
 		}
 		return rval;
+	}
+
+	public GradeSubmissionResult submitGrade(String gradebookUid, String gradeSubmitType){
+		//get gradebook data
+		Map<String, String> studentsGrades = new HashMap<>();
+
+		final List<String> studentUuids = this.getGradeableUsers();
+		Map<String, CourseGrade> studentsCourseGrades = getCourseGrades(studentUuids);
+
+		//filter
+		//Need to filter out non-grade override inactive participants for grade submission
+		studentsCourseGrades = gradeSubmissionStudentFilter(gradebookUid, studentsCourseGrades);
+
+		for(String studentUid : studentUuids) {
+			try {
+				String eid = userDirectoryService.getUser(studentUid).getEid();
+				String courseGrade = studentsCourseGrades.get(studentUid).getMappedGrade();
+				if (null != courseGrade)
+					studentsGrades.put(eid, courseGrade);
+			}
+			catch (UserNotDefinedException e) {
+				log.info("User " + studentUid + " could not be found in the system.");
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		GradeSubmissionResult gradeSubmissionResult = null;
+		try {
+			gradeSubmissionResult= advisor.submitGrade(studentsGrades, gradebookUid, gradeSubmitType);
+		} catch (Exception e) {
+			log.error("General Exception submitting grades for UID (" + gradebookUid + "): " + e.getMessage(), e);
+			gradeSubmissionResult.setStatus(500);
+		}
+		return gradeSubmissionResult;
+	}
+
+	public GradeSubmissionResult viewSubmissionReceipt(String gradebookUid) {
+		return advisor.viewSubmissionReceipt(gradebookUid);
+	}
+
+	/* Helper method
+	 * @param: a full list of participants including inactive
+	 * @return: a list of participants without inactive students whose override
+	 *         grade is not assigned, but include inactive students with override grades.
+	 */
+	private Map<String, CourseGrade> gradeSubmissionStudentFilter(String gradebookUid, Map<String, CourseGrade> studentsCourseGrades){
+		Iterator<Entry<String, CourseGrade>> it = studentsCourseGrades.entrySet().iterator();
+		while(it.hasNext()) {
+			Map.Entry<String, CourseGrade> entry = it.next();
+			if(!getMemberStatus(entry.getKey()) && null == entry.getValue().getEnteredGrade())
+				it.remove();
+		}
+		return studentsCourseGrades;
+	}
+
+	//Helper method
+	private boolean getMemberStatus(String memberId){
+		String realmId = "/site/" + getCurrentSiteId();
+
+		AuthzGroup realm;
+		try {
+			realm = authzGroupService.getAuthzGroup(realmId);
+			if(realm !=null && realm.getMember(memberId) != null) {
+				boolean memberStatus = realm.getMember(memberId).isActive();
+				return memberStatus;
+			}
+		} catch (GroupNotDefinedException e) {
+			log.info(realmId + " does not exists.");
+		}
+		return false;
 	}
 
 	/**

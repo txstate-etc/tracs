@@ -74,6 +74,9 @@
 								<li>
 									<a class="Mrphs-toolsNav__menuitem--link #if(${page.hidden})is-invisible#end" href="${page.pageRefUrl}" title="${page.pageTitle} - ${page.description}">
 										<span class="Mrphs-toolsNav__menuitem--icon ${page.menuClass} $!{page.menuClassOverride}"></span>
+                                        #if($page.menuClass.contains("lessonbuildertool") && $page.pageTitle.toLowerCase() != "lessons")
+											<span aria-label="Lessons"></span>
+										#end
 										<span class="Mrphs-toolsNav__menuitem--title">${page.pageTitle}</span>
 									</a>
 								</li>

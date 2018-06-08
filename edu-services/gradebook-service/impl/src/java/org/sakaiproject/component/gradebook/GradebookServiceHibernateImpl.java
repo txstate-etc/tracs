@@ -3719,6 +3719,26 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		rval = (List)getHibernateTemplate().execute(hc);
 		return rval;
 	}
+
+	@Override
+	public List<GradingEvent> getPaginatedGradingEvents(final List<Long> assignmentIds, final int pageNum, final int perPage) {
+		List<GradingEvent> rval = new ArrayList<>();
+
+		HibernateCallback hc = new HibernateCallback() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException, SQLException {
+				Query q = session.createQuery("from GradingEvent as ge where ge.gradableObject.id in (:assignmentIds) order by ge.dateGraded desc");
+				q.setParameterList("assignmentIds", assignmentIds);
+				q.setFirstResult(pageNum * perPage);
+				q.setMaxResults(perPage);
+
+				return q.list();
+			}
+		};
+
+		rval = (List)getHibernateTemplate().execute(hc);
+		return rval;
+	}
 	
 	/**
 	 * Update the persistent grade points for an assignment when the total points is changed.

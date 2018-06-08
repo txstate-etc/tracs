@@ -1766,12 +1766,14 @@ public class GradebookNgBusinessService {
 	}
 
 	/**
-	 * Get the grade log for this entire gradebook.
+	 * Get the grade log for this gradebook.
 	 *
-	 * @param since the time to check for changes from
+	 * @param currentPage denotes which "page" we are on (how many times we've called)
+	 * @param resultsPerPage number of records to pull from the database
+	 * @param previousList the cumulative results from previous pulls to append new results to
 	 * @return
 	 */
-	public List<GbHistoryLog> getHistoryLog(final Date since) {
+	public List<GbHistoryLog> getHistoryLog(final int currentPage, final int resultsPerPage) {
 
 		final List<GbHistoryLog> rval = new ArrayList<>();
 
@@ -1782,7 +1784,7 @@ public class GradebookNgBusinessService {
 
 		final List<Long> assignmentIds = assignments.stream().map(a -> a.getId()).collect(Collectors.toList());
 
-		final List<GradingEvent> events = this.gradebookService.getGradingEvents(assignmentIds, since);
+		final List<GradingEvent> events = this.gradebookService.getPaginatedGradingEvents(assignmentIds, currentPage, resultsPerPage);
 		if (events == null || events.isEmpty()) {
 			return rval;
 		}

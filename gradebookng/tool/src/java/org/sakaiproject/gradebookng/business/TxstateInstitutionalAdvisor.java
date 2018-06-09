@@ -247,7 +247,7 @@ public class TxstateInstitutionalAdvisor {
 			}
 
 			log.debug("\n\nsubmitResult "+submitResult+ "\n\nsessionId "+sessionId+ "\n\n" );
-			log.debug("\n\nfinalGradeSubmissionResultData "+ toJson(resultMap, true) + "\n\n");
+			log.debug("\n\nfinalGradeSubmissionResult "+ toJson(resultMap, true) + "\n\n");
 
 			gradeSubmissionResult.setData(toJson(resultMap, true));
 

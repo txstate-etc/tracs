@@ -67,6 +67,7 @@ public class BasePage extends WebPage {
 
 		// set locale
 		setUserPreferredLocale();
+		boolean isSubmitGradesEnabled = this.businessService.isSubmitGradesEnabled();
 
 		// nav container
 		final WebMarkupContainer nav = new WebMarkupContainer("gradebookPageNav") {
@@ -126,7 +127,7 @@ public class BasePage extends WebPage {
 
 			@Override
 			public boolean isVisible() {
-				return (BasePage.this.role == GbRole.INSTRUCTOR);
+				return (BasePage.this.role == GbRole.INSTRUCTOR) && isSubmitGradesEnabled;
 			}
 		};
 		this.submitGradesPageLink.add(new Label("screenreaderlabel", getString("link.screenreader.tabnotselected")));

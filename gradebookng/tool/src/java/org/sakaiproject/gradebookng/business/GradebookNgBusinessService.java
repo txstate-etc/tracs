@@ -681,6 +681,10 @@ public class GradebookNgBusinessService {
 		return false;
 	}
 
+	public boolean isSubmitGradesEnabled() {
+		return Boolean.parseBoolean(configService.getString("gradebook.submit.grades.enabled", "true"));
+	}
+
 	/* Helper method
 	 * @param: a full list of participants including inactive
 	 * @return: a list of participants without inactive students whose override

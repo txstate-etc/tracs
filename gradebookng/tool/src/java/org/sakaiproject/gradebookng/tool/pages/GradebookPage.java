@@ -97,8 +97,6 @@ public class GradebookPage extends BasePage {
 	GbModalWindow updateCourseGradeDisplayWindow;
 	GbModalWindow addScalePointsWindow;
 	GbModalWindow excuseGradeWindow;
-	GbModalWindow gradeSubmissionWindow;
-	GbModalWindow viewGradeSubmissionReceiptWindow;
 
 	Label liveGradingFeedback;
 	boolean hasAssignmentsAndGrades;
@@ -188,12 +186,6 @@ public class GradebookPage extends BasePage {
 
 		this.excuseGradeWindow = new GbModalWindow("excuseGradeWindow");
 		this.form.add(this.excuseGradeWindow);
-
-		this.gradeSubmissionWindow = new GbModalWindow("gradeSubmissionWindow");
-		this.form.add(this.gradeSubmissionWindow);
-
-		this.viewGradeSubmissionReceiptWindow = new GbModalWindow("viewGradeSubmissionReceiptWindow");
-		this.form.add(this.viewGradeSubmissionReceiptWindow);
 
 		final GbAjaxButton addGradeItem = new GbAjaxButton("addGradeItem") {
 			@Override
@@ -770,14 +762,6 @@ public class GradebookPage extends BasePage {
 
 	public GbModalWindow getExcuseGradeWindow() {
 		return this.excuseGradeWindow;
-	}
-
-	public GbModalWindow getGradeSubmissionWindow() {
-		return this.gradeSubmissionWindow;
-	}
-
-	public GbModalWindow getViewGradeSubmissionReceiptWindow() {
-		return this.viewGradeSubmissionReceiptWindow;
 	}
 
 	/**

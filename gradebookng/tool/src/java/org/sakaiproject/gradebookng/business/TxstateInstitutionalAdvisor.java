@@ -225,7 +225,7 @@ public class TxstateInstitutionalAdvisor {
 			//handling successful response
 			if(submitResult){
 				sessionId = result.get(SubmitResultKey.SESSION_ID.getProperty()).toString();
-				String message = "gradebook2." + action;
+				String message = "gradebookng." + action;
 
 				//We only get url when successfully connected
 				String url = result.get(SubmitResultKey.SUBMIT_PAGE_URL.getProperty()).toString();
@@ -247,7 +247,7 @@ public class TxstateInstitutionalAdvisor {
 			}
 
 			log.debug("\n\nsubmitResult "+submitResult+ "\n\nsessionId "+sessionId+ "\n\n" );
-			log.debug("\n\nfinalGradeSubmissionResultData "+ toJson(resultMap, true) + "\n\n");
+			log.debug("\n\nfinalGradeSubmissionResult "+ toJson(resultMap, true) + "\n\n");
 
 			gradeSubmissionResult.setData(toJson(resultMap, true));
 

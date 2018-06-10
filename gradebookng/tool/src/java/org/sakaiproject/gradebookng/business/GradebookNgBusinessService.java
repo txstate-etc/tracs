@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,7 +35,10 @@ import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.SecurityService;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.coursemanagement.api.CourseManagementService;
+import org.sakaiproject.event.api.Event;
+import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.gradebookng.business.exception.GbException;
@@ -130,6 +134,12 @@ public class GradebookNgBusinessService {
 
 	@Setter
 	private TxstateInstitutionalAdvisor advisor;
+
+	@Setter
+	private ServerConfigurationService configService;
+
+	@Setter
+	private EventTrackingService eventTrackingService;
 
 	public static final String ASSIGNMENT_ORDER_PROP = "gbng_assignment_order";
 
@@ -655,11 +665,41 @@ public class GradebookNgBusinessService {
 			log.error("General Exception submitting grades for UID (" + gradebookUid + "): " + e.getMessage(), e);
 			gradeSubmissionResult.setStatus(500);
 		}
+
+		if (gradeSubmitType.equalsIgnoreCase("finalgrade")){
+			Event event = eventTrackingService.newEvent("gradebookng.submitFinalGrades", "gradebookUid=" + gradebookUid + ", studentGrades count: " + studentsGrades.size(), true);
+			eventTrackingService.post(event);
+		}
+		else if (gradeSubmitType.equalsIgnoreCase("midterm")) {
+			Event event = eventTrackingService.newEvent("gradebookng.submitMidTermGrades", "gradebookUid=" + gradebookUid + ", studentGrades count: " + studentsGrades.size(), true);
+			eventTrackingService.post(event);
+		}
+
 		return gradeSubmissionResult;
 	}
 
 	public GradeSubmissionResult viewSubmissionReceipt(String gradebookUid) {
 		return advisor.viewSubmissionReceipt(gradebookUid);
+	}
+
+	public boolean allowMidTermGradeSubmission() {
+
+		Set <String> providerIds = (Set<String>) authzGroupService.getProviderIds("/site/"+ getCurrentSiteId());
+		if(null != providerIds) {
+			for (String providerId : providerIds ) {
+				 String sectionTitle = courseManagementService.getSection(providerId).getTitle().toLowerCase();
+				 String courseTitle = sectionTitle.split("\\.")[0];
+				 List<String> providerIdPatterns = Arrays.asList(configService.getString("gradebook.allow.mid.term.submission.section.title.patterns", "").toLowerCase().split(","));
+				 if (providerIdPatterns.contains(courseTitle)){
+					 return true;
+				 }
+			}
+		}
+		return false;
+	}
+
+	public boolean isSubmitGradesEnabled() {
+		return Boolean.parseBoolean(configService.getString("gradebook.submit.grades.enabled", "true"));
 	}
 
 	/* Helper method

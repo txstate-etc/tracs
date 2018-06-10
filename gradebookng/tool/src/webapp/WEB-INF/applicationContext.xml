@@ -22,6 +22,7 @@
 		<property name="gradebookExternalAssessmentService" ref="org.sakaiproject.service.gradebook.GradebookExternalAssessmentService"/>
 		<property name="advisor" ref="org.sakaiproject.gradebookng.business.TxstateInstitutionalAdvisor" />
 		<property name="configService" ref="org.sakaiproject.component.api.ServerConfigurationService" />
+		<property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService" />
 	</bean>
 
 	<bean

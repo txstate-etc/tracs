@@ -37,6 +37,8 @@ import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.coursemanagement.api.CourseManagementService;
+import org.sakaiproject.event.api.Event;
+import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.gradebookng.business.exception.GbException;
@@ -135,6 +137,9 @@ public class GradebookNgBusinessService {
 
 	@Setter
 	private ServerConfigurationService configService;
+
+	@Setter
+	private EventTrackingService eventTrackingService;
 
 	public static final String ASSIGNMENT_ORDER_PROP = "gbng_assignment_order";
 
@@ -643,6 +648,16 @@ public class GradebookNgBusinessService {
 			log.error("General Exception submitting grades for UID (" + gradebookUid + "): " + e.getMessage(), e);
 			gradeSubmissionResult.setStatus(500);
 		}
+
+		if (gradeSubmitType.equalsIgnoreCase("finalgrade")){
+			Event event = eventTrackingService.newEvent("gradebookng.submitFinalGrades", "gradebookUid=" + gradebookUid + ", studentGrades count: " + studentsGrades.size(), true);
+			eventTrackingService.post(event);
+		}
+		else if (gradeSubmitType.equalsIgnoreCase("midterm")) {
+			Event event = eventTrackingService.newEvent("gradebookng.submitMidTermGrades", "gradebookUid=" + gradebookUid + ", studentGrades count: " + studentsGrades.size(), true);
+			eventTrackingService.post(event);
+		}
+
 		return gradeSubmissionResult;
 	}
 

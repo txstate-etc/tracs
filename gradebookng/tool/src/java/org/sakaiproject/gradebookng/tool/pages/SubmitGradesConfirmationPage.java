@@ -2,37 +2,12 @@ package org.sakaiproject.gradebookng.tool.pages;
 
 import java.text.MessageFormat;
 
-import org.apache.wicket.Page;
-import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.StringResourceModel;
-import org.sakaiproject.component.cover.ServerConfigurationService;
-import org.sakaiproject.gradebookng.business.SubmitResultKey;
-import org.sakaiproject.gradebookng.business.model.GradeSubmissionResult;
-import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
-import org.sakaiproject.gradebookng.tool.panels.GradeSubmissionPanel;
-import org.sakaiproject.gradebookng.tool.panels.importExport.GradeImportUploadStep;
-import org.sakaiproject.tool.gradebook.Gradebook;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-/**
- * Import Export page
- *
- * @author Steve Swinsburg (steve.swinsburg@gmail.com)
- *
- */
 public class SubmitGradesConfirmationPage extends BasePage {
 
 	private static final long serialVersionUID = 1L;

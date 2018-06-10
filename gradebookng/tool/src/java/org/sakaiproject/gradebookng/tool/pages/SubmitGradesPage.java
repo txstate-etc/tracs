@@ -30,12 +30,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/**
- * Import Export page
- *
- * @author Steve Swinsburg (steve.swinsburg@gmail.com)
- *
- */
 public class SubmitGradesPage extends BasePage {
 
 	private static final long serialVersionUID = 1L;

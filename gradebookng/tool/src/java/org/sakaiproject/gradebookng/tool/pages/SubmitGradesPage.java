@@ -67,7 +67,6 @@ public class SubmitGradesPage extends BasePage {
 	public void onInitialize() {
 		super.onInitialize();
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
 		final Form form = new Form("form");
 
 		//page instruction text
@@ -92,11 +91,22 @@ public class SubmitGradesPage extends BasePage {
 		};
 		form.add(submitFinalGrade);
 
+		// visible control for mid-term grade submission menu
+		final boolean allowMidTermSubmit = businessService.allowMidTermGradeSubmission();
+
 		//Mid Term
 		String midTermWording = getString(GradeSubmitType.MIDTERM.getType());
-		form.add(new Label("midTermTitle", MessageFormat.format(getString("submitgradespage.section.title"), midTermWording)));
-		form.add(new Label("midTermInstruction1", MessageFormat.format(getString("submitgradespage.section.instruction1"), midTermWording)));
-		form.add(new Label("midTermInstruction2", MessageFormat.format(getString("submitgradespage.section.instruction2"), midTermWording.toLowerCase())).setEscapeModelStrings(false));
+		Label label1 = new Label("midTermTitle", MessageFormat.format(getString("submitgradespage.section.title"), midTermWording));
+		Label label2 = new Label("midTermInstruction1", MessageFormat.format(getString("submitgradespage.section.instruction1"), midTermWording));
+		Label label3 = new Label("midTermInstruction2", MessageFormat.format(getString("submitgradespage.section.instruction2"), midTermWording.toLowerCase()));
+
+		label1.setVisible(allowMidTermSubmit);
+		label2.setVisible(allowMidTermSubmit);
+		label3.setVisible(allowMidTermSubmit);
+
+		form.add(label1);
+		form.add(label2);
+		form.add(label3.setEscapeModelStrings(false));
 
 		final GbAjaxButton submitMidTerm = new GbAjaxButton("submitMidTerm") {
 			private static final long serialVersionUID = 1L;
@@ -108,6 +118,7 @@ public class SubmitGradesPage extends BasePage {
 				processSubmitGrades(gradeSubmitType);
 			}
 		};
+		submitMidTerm.setVisible(allowMidTermSubmit);
 		form.add(submitMidTerm);
 
 		form.add(new Label("viewReceiptTitle", instructions).setEscapeModelStrings(false));

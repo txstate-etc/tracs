@@ -21,7 +21,6 @@ import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.gradebookng.business.SubmitResultKey;
 import org.sakaiproject.gradebookng.business.model.GradeSubmissionResult;
 import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
-import org.sakaiproject.gradebookng.tool.panels.GradeSubmissionPanel;
 import org.sakaiproject.gradebookng.tool.panels.importExport.GradeImportUploadStep;
 import org.sakaiproject.tool.gradebook.Gradebook;
 

@@ -195,8 +195,11 @@ public class TxstateInstitutionalAdvisor {
 			log.debug("\n\n"+query+"\n");
 
 			//DEFINE CONNECTION.
-			if (connection == null)
+			if (connection == null) {
 				gradeSubmissionResult.setStatus(500);
+				log.error("Grade submission NULL connection");
+				return gradeSubmissionResult;
+			}
 
 			connection.setDoOutput     (true);
 			connection.setDoInput      (true);
@@ -392,7 +395,7 @@ public class TxstateInstitutionalAdvisor {
 	private HttpsURLConnection getSSLConnection() {
 		trustAllCerts();
 		HttpsURLConnection conn = null;
-		String server = configService.getString("grade.submission.server.url");
+		String server = configService.getString("gradebook.grade.submission.server.url");
 		try {
 			conn = (HttpsURLConnection) ( new URL(server).openConnection() );
 		} catch (MalformedURLException e) {

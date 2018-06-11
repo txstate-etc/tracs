@@ -157,8 +157,13 @@ public class SubmitGradesPage extends BasePage {
 		String gradeSubmission = getString(gradeSubmitType);
 		
 		final String data = gradeSubmissionResult.getData();
-		final boolean isSuccess = Boolean.parseBoolean((String)getJsonMap(gradeSubmissionResult.getData()).get(SubmitResultKey.SUBMIT_SUCCESS.getProperty()));
-		String url = (String)getJsonMap(gradeSubmissionResult.getData()).get(SubmitResultKey.SUBMIT_PAGE_URL.getProperty());
+		boolean isSuccess = false;
+		String url = null;
+
+		if ( null != data) {
+			isSuccess = Boolean.parseBoolean((String)getJsonMap(gradeSubmissionResult.getData()).get(SubmitResultKey.SUBMIT_SUCCESS.getProperty()));
+			url = (String)getJsonMap(gradeSubmissionResult.getData()).get(SubmitResultKey.SUBMIT_PAGE_URL.getProperty());
+		}
 
 		if (Integer.valueOf(500).compareTo(gradeSubmissionResult.getStatus()) == 0) {
 			error(new StringResourceModel("message.gradesubmit.error1", null, new Object[] {gradeSubmission}).getObject());
@@ -186,6 +191,8 @@ public class SubmitGradesPage extends BasePage {
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return map;

@@ -517,10 +517,10 @@ public class GradebookPage extends BasePage {
 				};
 			}
 
-			@Override
-			protected IModel<String> getCaptionModel() {
-				return Model.of(MessageHelper.getString("gradespage.caption"));
-			}
+//			@Override
+//			protected IModel<String> getCaptionModel() {
+//				return Model.of(MessageHelper.getString("gradespage.caption"));
+//			}
 		};
 		table.addBottomToolbar(new NavigationToolbar(table) {
 			@Override
@@ -809,11 +809,18 @@ public class GradebookPage extends BasePage {
 		response.render(JavaScriptHeaderItem
 			.forUrl(String.format("/library/js/jquery/tablesorter/2.27.7/js/jquery.tablesorter.widgets.min.js?version=%s", version)));
 
+		// Column freezing for TRACS
+		response.render(CssHeaderItem
+				.forUrl(String.format("/gradebookng-tool/styles/multifreezer.css?version=%s",	version)));
+		response.render(JavaScriptHeaderItem
+				.forUrl(String.format("/gradebookng-tool/scripts/multifreezer.js?version=%s", version)));
+
 		// GradebookNG Grade specific styles and behaviour
 		response.render(CssHeaderItem
 				.forUrl(String.format("/gradebookng-tool/styles/gradebook-grades.css?version=%s", version)));
 		response.render(CssHeaderItem
 				.forUrl(String.format("/gradebookng-tool/styles/gradebook-print.css?version=%s", version), "print"));
+
 		response.render(JavaScriptHeaderItem
 				.forUrl(String.format("/gradebookng-tool/scripts/gradebook-grades.js?version=%s", version)));
 		response.render(JavaScriptHeaderItem
@@ -824,11 +831,7 @@ public class GradebookPage extends BasePage {
 		response.render(JavaScriptHeaderItem
 			.forUrl(String.format("/library/js/expandCollapse.js?version=%s", version)));
 
-		// Column freezing for TRACS
-		response.render(CssHeaderItem
-				.forUrl(String.format("/gradebookng-tool/styles/multifreezer.css?version=%s",	version)));
-		response.render(JavaScriptHeaderItem
-				.forUrl(String.format("/gradebookng-tool/scripts/multifreezer.js?version=%s", version)));
+
 	}
 
 	/**

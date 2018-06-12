@@ -33,21 +33,25 @@ $('.table-freeze-multi').each(function () {
 
     //cloning
     var clone = table.clone(true);
+    clone.attr('id', 'gbgt_frozenClone');
     clone.addClass('table-freeze-multi-clone').removeClass('table-freeze-multi-original');
     var colsNumber = table.data('colsNumber') || table.find('tbody tr:first th').length;
 
     //head
     var cloneHead = clone.clone(true);
+    cloneHead.attr('id', 'gbgt_frozenHead');
     cloneHead.find('tbody').remove();
     cloneHead.find('tfoot').remove();
     headblock.append(cloneHead);
 
     //top
     var cloneTop = cloneHead.clone(true);
+    cloneTop.attr('id', 'gbgt_frozenTop');
     topblock.append(cloneTop);
 
     //left (contains body and functional footer)
     var cloneLeft = clone.clone(true);
+    cloneLeft.attr('id', 'gbgt_frozenLeft');
     cloneLeft.find('thead').remove();
     leftblock.append(cloneLeft);
 

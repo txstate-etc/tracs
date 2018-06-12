@@ -8,6 +8,9 @@
 function GradebookSpreadsheet($spreadsheet) {
   this.$spreadsheet = $spreadsheet;
   this.$table = $("#gradebookGradesTable");
+  this.$frozenHead = $("#gbgt_frozenHead");
+  this.$frozenTop = $("#gbgt_frozenTop");
+  this.$frozenLeft = $("#gbgt_frozenLeft");
   this.$horizontalOverflow = $("#gradebookHorizontalOverflowWrapper");
 
   // no students or grade items, nothing to do
@@ -1449,7 +1452,7 @@ GradebookSpreadsheet.prototype.setupMenusAndPopovers = function() {
     }, 500));
   });
 
-  self.$spreadsheet.on("click", ".popover", function(event) {
+  self.$table.on("click", ".popover", function(event) {
     self.popoverClicked = true;
   }).on("click", ":not(.popover)", function(event) {
     setTimeout(function() {

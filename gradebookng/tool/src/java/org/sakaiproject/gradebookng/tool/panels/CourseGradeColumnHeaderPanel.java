@@ -1,5 +1,6 @@
 package org.sakaiproject.gradebookng.tool.panels;
 
+import java.beans.Visibility;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,8 +85,18 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 		}
 		add(title);
 
-		final Label totalLabel = new Label("totalLabel");
-		final Label totalPoints = new Label("totalPoints", Model.of(this.totalPoints));
+		final Label totalLabel = new Label("totalLabel") {
+			@Override
+			public boolean isVisible() {
+				return false;
+			}
+		};
+		final Label totalPoints = new Label("totalPoints", Model.of(this.totalPoints)) {
+			@Override
+			public boolean isVisible() {
+				return false;
+			}
+		};
 		totalLabel.setDefaultModel(Model.of("Total Points:"));
 
 		add(totalLabel);

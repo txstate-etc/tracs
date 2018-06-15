@@ -8,9 +8,6 @@
 function GradebookSpreadsheet($spreadsheet) {
   this.$spreadsheet = $spreadsheet;
   this.$table = $("#gradebookGradesTable");
-  this.$frozenHead = $("#gbgt_frozenHead");
-  this.$frozenTop = $("#gbgt_frozenTop");
-  this.$frozenLeft = $("#gbgt_frozenLeft");
   this.$horizontalOverflow = $("#gradebookHorizontalOverflowWrapper");
 
   // no students or grade items, nothing to do

@@ -702,6 +702,12 @@ public class GradebookNgBusinessService {
 		return Boolean.parseBoolean(configService.getString("gradebook.submit.grades.enabled", "true"));
 	}
 
+	public boolean isValidOverrideGrade(Map<String, Double> schema, String grade) {
+		if(schema.containsKey(grade) || advisor.isValidOverrideGrade(grade))
+			return true;
+		return false;
+	}
+
 	/* Helper method
 	 * @param: a full list of participants including inactive
 	 * @return: a list of participants without inactive students whose override

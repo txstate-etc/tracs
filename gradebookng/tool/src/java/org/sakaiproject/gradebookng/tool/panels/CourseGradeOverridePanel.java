@@ -95,7 +95,10 @@ public class CourseGradeOverridePanel extends Panel {
 
 			@Override
 			public void onSubmit(final AjaxRequestTarget target, final Form<?> form) {
-				final String newGrade = (String) form.getModelObject();
+				String newGrade = (String) form.getModelObject();
+
+				if (null != newGrade)
+					newGrade = newGrade.toUpperCase();
 
 				// validate the grade entered is a valid one for the selected grading schema
 				// though we allow blank grades so the override is removed
@@ -103,7 +106,8 @@ public class CourseGradeOverridePanel extends Panel {
 					final GradebookInformation gbInfo = CourseGradeOverridePanel.this.businessService.getGradebookSettings();
 
 					final Map<String, Double> schema = gbInfo.getSelectedGradingScaleBottomPercents();
-					if (!schema.containsKey(newGrade)) {
+					final boolean isValidOverrideGrade = CourseGradeOverridePanel.this.businessService.isValidOverrideGrade(schema, newGrade);
+					if (!isValidOverrideGrade ) {
 						error(new ResourceModel("message.addcoursegradeoverride.invalid").getObject());
 						target.addChildren(form, FeedbackPanel.class);
 						return;

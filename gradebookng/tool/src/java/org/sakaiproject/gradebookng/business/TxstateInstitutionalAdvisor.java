@@ -144,12 +144,10 @@ public class TxstateInstitutionalAdvisor {
 		return false;
 	}
 
-	public boolean isValidOverrideGrade(String grade, String learnerEid, String learnerDisplayId, Gradebook gradebook, Set<String> scaledGrades) {
+	public boolean isValidOverrideGrade(String grade) {
 
-		if (scaledGrades.contains(grade))
-			return true;
-		//allow override if they meet registra's final grade types
-		else if (new HashSet<String>(Arrays.asList(validFinalGrades )).contains(grade))
+		//allow override if they meet registar's final grade types
+		if (new HashSet<String>(Arrays.asList(validFinalGrades )).contains(grade))
 			return true;
 
 		return false;

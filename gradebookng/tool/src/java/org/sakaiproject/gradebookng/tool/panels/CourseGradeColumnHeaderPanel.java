@@ -33,10 +33,12 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 	protected GradebookNgBusinessService businessService;
 
 	IModel<Boolean> model;
+	private Double totalPoints;
 
-	public CourseGradeColumnHeaderPanel(final String id, final IModel<Boolean> model) {
+	public CourseGradeColumnHeaderPanel(final String id, final IModel<Boolean> model, final Double totalPoints) {
 		super(id, model);
 		this.model = model;
+		this.totalPoints = totalPoints;
 	}
 
 	@Override
@@ -81,6 +83,13 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 				new AttributeModifier("class", "gb-sort-" + settings.getCourseGradeSortOrder().toString().toLowerCase()));
 		}
 		add(title);
+
+		final Label totalLabel = new Label("totalLabel");
+		final Label totalPoints = new Label("totalPoints", Model.of(this.totalPoints));
+		totalLabel.setDefaultModel(Model.of("Total Points:"));
+
+		add(totalLabel);
+		add(totalPoints);
 
 		final Gradebook gradebook = this.businessService.getGradebook();
 		final GbRole role = this.businessService.getUserRole();

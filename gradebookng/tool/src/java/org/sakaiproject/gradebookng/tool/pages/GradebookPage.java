@@ -106,6 +106,8 @@ public class GradebookPage extends BasePage {
 	List<PermissionDefinition> permissions = new ArrayList<>();
 	boolean showGroupFilter = true;
 
+	Double totalPoints;
+
 	@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 	public GradebookPage() {
 		disableLink(this.gradebookPageLink);
@@ -228,6 +230,11 @@ public class GradebookPage extends BasePage {
 		final List<Assignment> assignments = this.businessService.getGradebookAssignments(sortBy);
 		stopwatch.time("getGradebookAssignments", stopwatch.getTime());
 
+		totalPoints = 0.0;
+		for(Assignment ass : assignments) {
+			totalPoints += ass.getPoints();
+		}
+
 		// get the grade matrix. It should be sorted if we have that info
 		final List<GbStudentGradeInfo> grades = this.businessService.buildGradeMatrix(assignments, settings);
 
@@ -306,7 +313,7 @@ public class GradebookPage extends BasePage {
 		final AbstractColumn courseGradeColumn = new AbstractColumn(new Model("")) {
 			@Override
 			public Component getHeader(final String componentId) {
-				return new CourseGradeColumnHeaderPanel(componentId, Model.of(settings.getShowPoints()));
+				return new CourseGradeColumnHeaderPanel(componentId, Model.of(settings.getShowPoints()), totalPoints);
 			}
 
 			@Override

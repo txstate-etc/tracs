@@ -1620,14 +1620,14 @@ GradebookSpreadsheet.prototype.setupNewAssignmentFocus = function() {
   }
 };
 
-
 GradebookSpreadsheet.prototype.refreshCourseGradeForStudent = function(studentUuid) {
   // cell has been updated, so need to refresh the course grade in the fixed column
   // on the off chance the grade has changed
   var $studentNameCell = this.$table.find(".gb-student-cell[data-studentuuid='"+studentUuid+"']");
   var $courseGradeCell = $studentNameCell.closest("tr").find(".gb-course-grade");
 
-  var $fixedColumnStudentNameCell = this.$fixedColumns.find(".gb-student-cell[data-studentuuid='"+studentUuid+"']");
+  var $leftFrozenTable = $("#gbgt_frozenLeft");
+  var $fixedColumnStudentNameCell = $leftFrozenTable.find(".gb-student-cell[data-studentuuid='"+studentUuid+"']");
   var $fixedColumnCourseGradeCell = $fixedColumnStudentNameCell.closest("tr").find(".gb-course-grade");
 
   var courseGrade = this._cloneCell($courseGradeCell).html();

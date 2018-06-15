@@ -59,6 +59,7 @@ $('.table-freeze-multi').each(function () {
     //left (contains body and functional footer)
     var cloneLeft = clone.clone(true);
     cloneLeft.find('thead').remove();
+    cloneLeft.attr('id', 'gbgt_frozenLeft');
     leftblock.append(cloneLeft);
 
     //remove the duplicate footer from the original table by emptying the divs, adding br's to maintain alignment

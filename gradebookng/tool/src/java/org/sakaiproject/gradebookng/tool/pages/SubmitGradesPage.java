@@ -85,7 +85,7 @@ public class SubmitGradesPage extends BasePage {
 		form.add(submitFinalGrade);
 
 		// visible control for mid-term grade submission menu
-		final boolean allowMidTermSubmit = businessService.allowMidTermGradeSubmission();
+		final boolean allowMidTermSubmit = this.businessService.allowMidTermGradeSubmission();
 
 		//Mid Term
 		String midTermWording = getString(GradeSubmitType.MIDTERM.getType());
@@ -147,12 +147,12 @@ public class SubmitGradesPage extends BasePage {
 	/* Helper methods */
 	private void processSubmitGrades (String gradeSubmitType) {
 
-		final Gradebook gradebook = businessService.getGradebook();
+		final Gradebook gradebook = this.businessService.getGradebook();
 		GradeSubmissionResult gradeSubmissionResult;
 		if(gradeSubmitType.equalsIgnoreCase(GradeSubmitType.VIEWRECEIPT.getType()))
-			gradeSubmissionResult = businessService.viewSubmissionReceipt(gradebook.getUid());
+			gradeSubmissionResult = this.businessService.viewSubmissionReceipt(gradebook.getUid());
 		else 
-			gradeSubmissionResult = businessService.submitGrade(gradebook.getUid(), gradeSubmitType);
+			gradeSubmissionResult = this.businessService.submitGrade(gradebook.getUid(), gradeSubmitType);
 	
 		String gradeSubmission = getString(gradeSubmitType);
 		

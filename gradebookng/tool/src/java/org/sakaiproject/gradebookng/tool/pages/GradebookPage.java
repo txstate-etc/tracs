@@ -337,8 +337,14 @@ public class GradebookPage extends BasePage {
 				// however we do requre that the label can receive events and update itself, although this could be recalculated for each
 				// event
 				final Map<String, Object> modelData = new HashMap<>();
-				modelData.put("courseGradeDisplay", studentGradeInfo.getCourseGrade().getDisplayString());
-				modelData.put("hasCourseGradeOverride", studentGradeInfo.getCourseGrade().getCourseGrade().getEnteredGrade() != null);
+				String gradeEntered = studentGradeInfo.getCourseGrade().getCourseGrade().getEnteredGrade();
+				boolean hasCourseGradeOverride = gradeEntered != null;
+
+				if(hasCourseGradeOverride)
+					modelData.put("courseGradeDisplay", gradeEntered + " " + getString("coursegrade.override.label"));
+				else
+					modelData.put("courseGradeDisplay", studentGradeInfo.getCourseGrade().getDisplayString());
+				modelData.put("hasCourseGradeOverride", hasCourseGradeOverride);
 				modelData.put("studentUuid", studentGradeInfo.getStudentUuid());
 				modelData.put("currentUserUuid", GradebookPage.this.currentUserUuid);
 				modelData.put("currentUserRole", GradebookPage.this.role);

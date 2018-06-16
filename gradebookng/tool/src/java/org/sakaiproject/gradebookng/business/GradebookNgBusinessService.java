@@ -646,9 +646,13 @@ public class GradebookNgBusinessService {
 		for(String studentUid : studentUuids) {
 			try {
 				String eid = userDirectoryService.getUser(studentUid).getEid();
-				String courseGrade = studentsCourseGrades.get(studentUid).getMappedGrade();
-				if (null != courseGrade)
+				if(studentsCourseGrades.containsKey(studentUid)) {
+					String override = studentsCourseGrades.get(studentUid).getEnteredGrade();
+					String courseGrade = studentsCourseGrades.get(studentUid).getMappedGrade();
+					if(null != override)
+						courseGrade = override;
 					studentsGrades.put(eid, courseGrade);
+				}
 			}
 			catch (UserNotDefinedException e) {
 				log.info("User " + studentUid + " could not be found in the system.");

@@ -8,6 +8,8 @@
 function GradebookSpreadsheet($spreadsheet) {
   this.$spreadsheet = $spreadsheet;
   this.$table = $("#gradebookGradesTable");
+  this.$leftFrozenTable = $("table.table-freeze-left");
+  this.$headerFrozenTable = $("table.table-freeze-head");
   this.$horizontalOverflow = $("#gradebookHorizontalOverflowWrapper");
 
   // no students or grade items, nothing to do
@@ -1626,8 +1628,7 @@ GradebookSpreadsheet.prototype.refreshCourseGradeForStudent = function(studentUu
   var $studentNameCell = this.$table.find(".gb-student-cell[data-studentuuid='"+studentUuid+"']");
   var $courseGradeCell = $studentNameCell.closest("tr").find(".gb-course-grade");
 
-  var $leftFrozenTable = $("#gbgt_frozenLeft");
-  var $fixedColumnStudentNameCell = $leftFrozenTable.find(".gb-student-cell[data-studentuuid='"+studentUuid+"']");
+  var $fixedColumnStudentNameCell = this.$leftFrozenTable.find(".gb-student-cell[data-studentuuid='"+studentUuid+"']");
   var $fixedColumnCourseGradeCell = $fixedColumnStudentNameCell.closest("tr").find(".gb-course-grade");
 
   var courseGrade = this._cloneCell($courseGradeCell).html();

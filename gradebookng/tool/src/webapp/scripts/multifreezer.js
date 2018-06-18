@@ -33,7 +33,6 @@ $('.table-freeze-multi').each(function () {
 
     //cloning
     var clone = table.clone(true);
-    //clone.attr('id', 'gbgt_frozenClone');
     clone.addClass('table-freeze-multi-clone').removeClass('table-freeze-multi-original');
     var colsNumber = table.data('colsNumber') || table.find('tbody tr:first th').length;
 
@@ -56,10 +55,13 @@ $('.table-freeze-multi').each(function () {
     var cloneTop = cloneHead.clone(true);
     topblock.append(cloneTop);
 
+    cloneHead.addClass('table-freeze-head');
+    cloneTop.addClass('table-freeze-topLeft');
+
     //left (contains body and functional footer)
     var cloneLeft = clone.clone(true);
     cloneLeft.find('thead').remove();
-    cloneLeft.attr('id', 'gbgt_frozenLeft');
+    cloneLeft.addClass('table-freeze-left');
     leftblock.append(cloneLeft);
 
     //remove the duplicate footer from the original table by emptying the divs, adding br's to maintain alignment

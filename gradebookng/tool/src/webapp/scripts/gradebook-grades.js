@@ -8,6 +8,7 @@
 function GradebookSpreadsheet($spreadsheet) {
   this.$spreadsheet = $spreadsheet;
   this.$table = $("#gradebookGradesTable");
+  //this.table = $('table.table-freeze-multi-original');
   this.$horizontalOverflow = $("#gradebookHorizontalOverflowWrapper");
 
   // no students or grade items, nothing to do
@@ -46,6 +47,7 @@ function GradebookSpreadsheet($spreadsheet) {
     self.setupStudentFilter();
     self.setupMenusAndPopovers();
     self.setupNewAssignmentFocus();
+    self.setupCloneTables();
   });
 
   this.onReady(function() {
@@ -224,8 +226,8 @@ GradebookSpreadsheet.prototype.navigate = function(event, fromCell, direction, e
       $targetCell = $cell.nextAll(":visible:first");
     } else {
       fromCell.focus();
-      if (fromCell.data("_pendingReplacement")) {
-        fromCell.data("model")._focusAfterSaveComplete = true;
+      if ($cell.data("_pendingReplacement")) {
+        $cell.data("model")._focusAfterSaveComplete = true;
       }
       return true;
     }
@@ -272,8 +274,8 @@ GradebookSpreadsheet.prototype.navigate = function(event, fromCell, direction, e
 
     } else {
       fromCell.focus();
-      if (fromCell.data("_pendingReplacement")) {
-        fromCell.data("model")._focusAfterSaveComplete = true;
+      if ($cell.data("_pendingReplacement")) {
+        $cell.data("model")._focusAfterSaveComplete = true;
       }
     }
   }
@@ -412,7 +414,7 @@ GradebookSpreadsheet.prototype.getHeader = function() {
   return this.$table.find("> thead", "> tr");
 };
 
-
+//ALAN - This being used...?
 GradebookSpreadsheet.prototype.setupFixedTableHeader = function(reset) {
   var self = this;
 
@@ -1618,6 +1620,110 @@ GradebookSpreadsheet.prototype.setupNewAssignmentFocus = function() {
       $justCreated.parent().focus();
     });
   }
+};
+
+GradebookSpreadsheet.prototype.setupCloneTables = function() {
+    var scrollDiv = document.createElement("div");
+    scrollDiv.className = "freezer-scrollbar-measure";
+    document.body.appendChild(scrollDiv);
+
+    // Get the scrollbar width
+    var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+    //console.warn(scrollbarWidth); // Mac: 15, Win: 17
+
+    // Delete the DIV
+    document.body.removeChild(scrollDiv);
+
+    //prepare
+    this.$table.css({
+        margin: 0
+    }).addClass('table-freeze-multi-original');
+
+    //wrap
+    this.$table.wrap('<div class="freeze-multi-scroll-wrapper" />');
+    var wrapper = this.$table.closest('.freeze-multi-scroll-wrapper');
+    this.$table.wrap('<div class="freeze-multi-scroll-table" />');
+    this.$table.wrap('<div class="freeze-multi-scroll-table-body" />');
+    var scroller = wrapper.find('.freeze-multi-scroll-table-body');
+
+    //layout
+    var headblock = $('<div class="freeze-multi-scroll-table-head-inner" />');
+    scroller.before($('<div class="freeze-multi-scroll-table-head" />').append(headblock));
+    var topblock = $('<div class="freeze-multi-scroll-left-head" />');
+    var leftblock = $('<div class="freeze-multi-scroll-left-body-inner" />');
+    wrapper.append(
+        $('<div class="freeze-multi-scroll-left" />')
+            .append(topblock)
+            .append($('<div class="freeze-multi-scroll-left-body" />').append(leftblock))
+    );
+
+    //cloning
+    var clone = this.$table.clone(true);
+    clone.addClass('table-freeze-multi-clone').removeClass('table-freeze-multi-original');
+    var colsNumber = this.$table.data('colsNumber') || this.$table.find('tbody tr:first th').length;
+
+    var originalTable = this.$table;
+    clone.on("click", function(event) {
+        if(event.target.id != "") {
+            originalTable.find('#' + event.target.id).trigger("click");
+        }
+        else if (event.target.parentNode.id != "") {
+            originalTable.find('#' + event.target.parentNode.id).trigger("click");
+        }
+    });
+
+    //head
+    this.$cloneHead = clone.clone(true);
+    this.$cloneHead.find('tbody').remove();
+    this.$cloneHead.find('tfoot').remove();
+    headblock.append(this.$cloneHead);
+
+    //top
+    this.$cloneTop = this.$cloneHead.clone(true);
+    topblock.append(this.$cloneTop);
+
+    this.$cloneHead.addClass('table-freeze-head');
+    this.$cloneTop.addClass('table-freeze-topLeft');
+
+    //left (contains body and functional footer)
+    this.$cloneLeft = clone.clone(true);
+    this.$cloneLeft.find('thead').remove();
+    this.$cloneLeft.addClass('table-freeze-left');
+    leftblock.append(this.$cloneLeft);
+
+    //remove the duplicate footer from the original table by emptying the divs, adding br's to maintain alignment
+    this.$table.find('tfoot').find('div').empty().append("<br>").next().empty().append("<br>");
+
+    //sizing
+
+    var scrollHeight = this.$table.data('scrollHeight') || wrapper.parent().closest('*').height();
+    var headerHeight = this.$table.find('thead').height();
+    var leftWidth = (function () {
+        var w = 0;
+        originalTable.find('tbody tr:first > *').slice(0, colsNumber).each(function () {
+            w = w + $(this).outerWidth();
+        });
+        return w + 1;
+    }());
+    wrapper.css('height', scrollHeight);
+    scroller.css('max-height', scrollHeight - headblock.height());
+    headblock.width(this.$table.width()).css('padding-right', scrollbarWidth);
+    leftblock.add(leftblock.parent()).height(scrollHeight - scrollbarWidth - headerHeight);
+    leftblock.width(leftWidth + scrollbarWidth);
+    wrapper.find('.freeze-multi-scroll-left').width(leftWidth);
+
+    //postprocess
+    wrapper.find('.table-freeze-multi-original thead').hide();
+
+    //scrolling
+    scroller.on('scroll', function () {
+        var s = $(this),
+            left = s.scrollLeft(),
+            top = s.scrollTop();
+        headblock.css('transform', 'translate(' + (-1 * left) + 'px, 0)');
+        leftblock.scrollTop(top);
+    });
+    leftblock.on('mousewheel', false);
 };
 
 GradebookSpreadsheet.prototype.refreshCourseGradeForStudent = function(studentUuid) {

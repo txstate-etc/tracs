@@ -815,8 +815,15 @@ public class GradebookPage extends BasePage {
 		response.render(CssHeaderItem
 				.forUrl(String.format("/gradebookng-tool/styles/gradebook-print.css?version=%s", version), "print"));
 
+		// Column freezing for TRACS
+		response.render(CssHeaderItem
+				.forUrl(String.format("/gradebookng-tool/styles/multifreezer.css?version=%s",	version)));
+//		response.render(JavaScriptHeaderItem
+//				.forUrl(String.format("/gradebookng-tool/scripts/multifreezer.js?version=%s", version)));
+
 		response.render(JavaScriptHeaderItem
 				.forUrl(String.format("/gradebookng-tool/scripts/gradebook-grades.js?version=%s", version)));
+
 		response.render(JavaScriptHeaderItem
 				.forUrl(String.format("/gradebookng-tool/scripts/gradebook-grade-summary.js?version=%s", version)));
 		response.render(JavaScriptHeaderItem
@@ -825,11 +832,8 @@ public class GradebookPage extends BasePage {
 		response.render(JavaScriptHeaderItem
 			.forUrl(String.format("/library/js/expandCollapse.js?version=%s", version)));
 
-		// Column freezing for TRACS
-		response.render(CssHeaderItem
-				.forUrl(String.format("/gradebookng-tool/styles/multifreezer.css?version=%s",	version)));
-		response.render(JavaScriptHeaderItem
-				.forUrl(String.format("/gradebookng-tool/scripts/multifreezer.js?version=%s", version)));
+
+
 
 
 	}

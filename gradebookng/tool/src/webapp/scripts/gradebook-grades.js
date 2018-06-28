@@ -52,6 +52,9 @@ function GradebookSpreadsheet($spreadsheet) {
 
     self.setupGradeItemCellModels(this.$cloneHead);
     self.setupMenusAndPopovers(this.$cloneHead);
+
+      self.setupGradeItemCellModels(this.$cloneTop);
+      self.setupMenusAndPopovers(this.$cloneTop);
   });
 
   this.onReady(function() {
@@ -1687,11 +1690,13 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
     this.$cloneHead = clone.clone(true);
     this.$cloneHead.find('tbody').remove();
     this.$cloneHead.find('tfoot').remove();
+    this.$cloneHead.attr("id", "gradebookGradesTableHead");
     headblock.append(this.$cloneHead);
 
     //top
     this.$cloneTop = this.$cloneHead.clone(true);
     topblock.append(this.$cloneTop);
+    this.$cloneTop.attr("id", "gradebookGradesTableTop");
 
     this.$cloneHead.addClass('table-freeze-head');
     this.$cloneTop.addClass('table-freeze-topLeft');
@@ -1700,6 +1705,7 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
     this.$cloneLeft = clone.clone(true);
     this.$cloneLeft.find('thead').remove();
     this.$cloneLeft.addClass('table-freeze-left');
+    this.$cloneLeft.attr("id", "gradebookGradesTableLeft");
     leftblock.append(this.$cloneLeft);
 
     //remove the duplicate footer from the original table by emptying the divs, adding br's to maintain alignment

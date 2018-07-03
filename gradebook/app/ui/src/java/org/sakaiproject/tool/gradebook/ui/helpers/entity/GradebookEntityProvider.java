@@ -24,9 +24,11 @@ import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.CommentDefinition;
+import org.sakaiproject.service.gradebook.shared.CourseGrade;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
+import org.sakaiproject.tool.gradebook.Gradebook;
 import org.sakaiproject.tool.gradebook.GradingEvent;
 import org.sakaiproject.tool.gradebook.ui.helpers.params.GradebookItemViewParams;
 import org.sakaiproject.tool.gradebook.ui.helpers.producers.AuthorizationFailedProducer;
@@ -227,12 +229,29 @@ public class GradebookEntityProvider extends AbstractEntityProvider implements
 
 			GradeCourse course = new GradeCourse(site);
 
-			List<Assignment> gbitems = gradebookService
-					.getViewableAssignmentsForCurrentUser(siteId);
-			for (Assignment assignment : gbitems) {
-				GradeAssignmentItem item = createGradeItem(assignment, siteId, userId);
-				course.assignments.add(item);
+			//Viewable assignments only retrieved if the Gradebook has released them
+			if ( ((Gradebook)gradebookService.getGradebook(siteId)).isAssignmentsDisplayed() ) {
+				List<Assignment> gbitems = gradebookService
+						.getViewableAssignmentsForCurrentUser(siteId);
+
+				for (Assignment assignment : gbitems) {
+					//Skip adding unreleased assignments
+					if (assignment == null || !assignment.isReleased()) continue;
+
+					GradeAssignmentItem item = createGradeItem(assignment, siteId, userId);
+					course.assignments.add(item);
+				}
 			}
+
+
+			CourseGrade courseGrade = gradebookService.getCourseGradeForStudent(siteId, userId);
+
+			//Gradebooks can opt to not release course grades to students, requires null check
+			String calculatedGrade = courseGrade == null ? null : courseGrade.getCalculatedGrade();
+			String mappedGrade = courseGrade == null ? null : courseGrade.getMappedGrade();
+
+			course.setMappedGrade(mappedGrade);
+			course.setCalculatedGrade(calculatedGrade);
 			r.add(course);
 		}
 

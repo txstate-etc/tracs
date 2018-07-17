@@ -50,11 +50,11 @@ function GradebookSpreadsheet($spreadsheet) {
 
     self.setupCloneTables();
 
-    self.setupGradeItemCellModels(this.$cloneHead);
-    self.setupMenusAndPopovers(this.$cloneHead);
-
-      self.setupGradeItemCellModels(this.$cloneTop);
-      self.setupMenusAndPopovers(this.$cloneTop);
+    // self.setupGradeItemCellModels(this.$cloneHead);
+    // self.setupMenusAndPopovers(this.$cloneHead);
+    //
+    // self.setupGradeItemCellModels(this.$cloneTop);
+    // self.setupMenusAndPopovers(this.$cloneTop);
   });
 
   this.onReady(function() {
@@ -426,7 +426,6 @@ GradebookSpreadsheet.prototype.getHeader = function() {
   return this.$table.find("> thead", "> tr");
 };
 
-//ALAN - This being used...?
 GradebookSpreadsheet.prototype.setupFixedTableHeader = function(reset) {
   var self = this;
 
@@ -1189,9 +1188,7 @@ GradebookSpreadsheet.prototype.getCategoriesMap = function() {
 
 
 GradebookSpreadsheet.prototype.getHeaderModelForAssignment = function(assignmentId) {
-  //ALAN changed this...
     return this.$table.find("thead .gb-headers .gb-grade-item-column-cell [data-assignmentid='" + assignmentId + "']").closest(".gb-grade-item-column-cell").data("model");
-    //return this.$cloneLeft.find("thead .gb-headers .gb-grade-item-column-cell [data-assignmentid='" + assignmentId + "']").closest(".gb-grade-item-column-cell").data("model");
 };
 
 
@@ -1636,6 +1633,11 @@ GradebookSpreadsheet.prototype.setupNewAssignmentFocus = function() {
   }
 };
 
+//NOTE
+// The setupCloneTables function was originally designed to create clones of the original table with the goal of
+// freezing the 2 left columns AND the header row
+// Due to technical difficulties, we are currently only freezing the leftmost 2 columns
+// All of the commented code pertains to freezing the header row (saved for posterity in case we revisit this approach in the future)
 GradebookSpreadsheet.prototype.setupCloneTables = function() {
     var scrollDiv = document.createElement("div");
     scrollDiv.className = "freezer-scrollbar-measure";
@@ -1661,13 +1663,13 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
     var scroller = wrapper.find('.freeze-multi-scroll-table-body');
 
     //layout
-    var headblock = $('<div class="freeze-multi-scroll-table-head-inner" />');
-    scroller.before($('<div class="freeze-multi-scroll-table-head" />').append(headblock));
-    var topblock = $('<div class="freeze-multi-scroll-left-head" />');
+    // var headblock = $('<div class="freeze-multi-scroll-table-head-inner" />');
+    // scroller.before($('<div class="freeze-multi-scroll-table-head" />').append(headblock));
+    // var topblock = $('<div class="freeze-multi-scroll-left-head" />');
     var leftblock = $('<div class="freeze-multi-scroll-left-body-inner" />');
     wrapper.append(
         $('<div class="freeze-multi-scroll-left" />')
-            .append(topblock)
+            //.append(topblock)
             .append($('<div class="freeze-multi-scroll-left-body" />').append(leftblock))
     );
 
@@ -1686,24 +1688,24 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
         }
     });
 
-    //head
-    this.$cloneHead = clone.clone(true);
-    this.$cloneHead.find('tbody').remove();
-    this.$cloneHead.find('tfoot').remove();
-    this.$cloneHead.attr("id", "gradebookGradesTableHead");
-    headblock.append(this.$cloneHead);
-
-    //top
-    this.$cloneTop = this.$cloneHead.clone(true);
-    topblock.append(this.$cloneTop);
-    this.$cloneTop.attr("id", "gradebookGradesTableTop");
-
-    this.$cloneHead.addClass('table-freeze-head');
-    this.$cloneTop.addClass('table-freeze-topLeft');
+    // //head
+    // this.$cloneHead = clone.clone(true);
+    // this.$cloneHead.find('tbody').remove();
+    // this.$cloneHead.find('tfoot').remove();
+    // this.$cloneHead.attr("id", "gradebookGradesTableHead");
+    // headblock.append(this.$cloneHead);
+    //
+    // //top
+    // this.$cloneTop = this.$cloneHead.clone(true);
+    // topblock.append(this.$cloneTop);
+    // this.$cloneTop.attr("id", "gradebookGradesTableTop");
+    //
+    // this.$cloneHead.addClass('table-freeze-head');
+    // this.$cloneTop.addClass('table-freeze-topLeft');
 
     //left (contains body and functional footer)
     this.$cloneLeft = clone.clone(true);
-    this.$cloneLeft.find('thead').remove();
+    //this.$cloneLeft.find('thead').remove();
     this.$cloneLeft.addClass('table-freeze-left');
     this.$cloneLeft.attr("id", "gradebookGradesTableLeft");
     leftblock.append(this.$cloneLeft);
@@ -1723,21 +1725,21 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
         return w + 1;
     }());
     wrapper.css('height', scrollHeight);
-    scroller.css('max-height', scrollHeight - headblock.height());
-    headblock.width(this.$table.width()).css('padding-right', scrollbarWidth);
-    leftblock.add(leftblock.parent()).height(scrollHeight - scrollbarWidth - headerHeight);
+    scroller.css('max-height', scrollHeight);// - headblock.height());
+    //headblock.width(this.$table.width()).css('padding-right', scrollbarWidth);
+    leftblock.add(leftblock.parent()).height(scrollHeight - scrollbarWidth);// - headerHeight);
     leftblock.width(leftWidth + scrollbarWidth);
     wrapper.find('.freeze-multi-scroll-left').width(leftWidth);
 
     //postprocess
-    wrapper.find('.table-freeze-multi-original thead').hide();
+    //wrapper.find('.table-freeze-multi-original thead').hide();
 
     //scrolling
     scroller.on('scroll', function () {
         var s = $(this),
             left = s.scrollLeft(),
             top = s.scrollTop();
-        headblock.css('transform', 'translate(' + (-1 * left) + 'px, 0)');
+        //headblock.css('transform', 'translate(' + (-1 * left) + 'px, 0)');
         leftblock.scrollTop(top);
     });
     leftblock.on('mousewheel', false);

@@ -90,6 +90,9 @@ public class CourseGradeColumnHeaderPanel extends Panel {
 		// get setting
 		final Boolean showPoints = this.model.getObject();
 
+		// visible control for mid-term grade submission menu
+		final boolean allowMidTermSubmit = businessService.allowMidTermGradeSubmission();
+
 		// icons
 		final Map<String, Object> popoverModel = new HashMap<>();
 		popoverModel.put("role", role);

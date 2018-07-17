@@ -44,6 +44,7 @@ public class BasePage extends WebPage {
 	Link<Void> importExportPageLink;
 	Link<Void> permissionsPageLink;
 	Link<Void> historyPageLink;
+	Link<Void> submitGradesPageLink;
 
 	public final GbFeedbackPanel feedbackPanel;
 
@@ -66,6 +67,7 @@ public class BasePage extends WebPage {
 
 		// set locale
 		setUserPreferredLocale();
+		boolean isSubmitGradesEnabled = this.businessService.isSubmitGradesEnabled();
 
 		// nav container
 		final WebMarkupContainer nav = new WebMarkupContainer("gradebookPageNav") {
@@ -113,6 +115,23 @@ public class BasePage extends WebPage {
 		};
 		this.importExportPageLink.add(new Label("screenreaderlabel", getString("link.screenreader.tabnotselected")));
 		nav.add(this.importExportPageLink);
+
+		// submit grades page
+		this.submitGradesPageLink = new Link<Void>("submitGradesPageLink") {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onClick() {
+				setResponsePage(SubmitGradesPage.class);
+			}
+
+			@Override
+			public boolean isVisible() {
+				return (BasePage.this.role == GbRole.INSTRUCTOR) && isSubmitGradesEnabled;
+			}
+		};
+		this.submitGradesPageLink.add(new Label("screenreaderlabel", getString("link.screenreader.tabnotselected")));
+		nav.add(this.submitGradesPageLink);
 
 		// permissions page
 		this.permissionsPageLink = new Link<Void>("permissionsPageLink") {

@@ -277,7 +277,7 @@ public class UserNotificationProviderImpl implements UserNotificationProvider {
 		from = requestEmail;
 		to = currentUserEmail;
 		headerTo = currentUserEmail;
-		replyTo = serverConfigurationService.getString("setup.request", serverConfigurationService.getString("email.noreply_address", "no-reply@" + serverConfigurationService.getServerName()));
+		replyTo = serverConfigurationService.getString("email.noreply_address", "no-reply@" + serverConfigurationService.getServerName());
 		String content = rb.getFormattedMessage("java.siteCreation.confirmation", new Object[]{title, serverConfigurationService.getServerName()});
 		content += "\n\n" + buf.toString();
 		emailService.send(from, to, message_subject, content, headerTo, replyTo, null);

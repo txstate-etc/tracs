@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -27,11 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.math.NumberUtils;
+import org.jfree.util.Log;
+import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.SecurityService;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.coursemanagement.api.CourseManagementService;
+import org.sakaiproject.event.api.Event;
+import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.gradebookng.business.exception.GbException;
@@ -43,6 +50,7 @@ import org.sakaiproject.gradebookng.business.model.GbGroup;
 import org.sakaiproject.gradebookng.business.model.GbStudentGradeInfo;
 import org.sakaiproject.gradebookng.business.model.GbStudentNameSortOrder;
 import org.sakaiproject.gradebookng.business.model.GbUser;
+import org.sakaiproject.gradebookng.business.model.GradeSubmissionResult;
 import org.sakaiproject.gradebookng.business.model.GbHistoryLog;
 import org.sakaiproject.gradebookng.business.util.CourseGradeFormatter;
 import org.sakaiproject.gradebookng.business.util.FormatHelper;
@@ -123,6 +131,15 @@ public class GradebookNgBusinessService {
 
 	@Setter
 	private SecurityService securityService;
+
+	@Setter
+	private TxstateInstitutionalAdvisor advisor;
+
+	@Setter
+	private ServerConfigurationService configService;
+
+	@Setter
+	private EventTrackingService eventTrackingService;
 
 	public static final String ASSIGNMENT_ORDER_PROP = "gbng_assignment_order";
 
@@ -304,15 +321,32 @@ public class GradebookNgBusinessService {
 		// in any case the role check would just be a confirmation that the user passed in was a student.
 
 		// for each assignment we need to check if it is grouped externally and if the user has access to the group
+		boolean isGrouped;
+		boolean isVisible;
 		final Iterator<Assignment> iter = assignments.iterator();
 		while (iter.hasNext()) {
 			final Assignment a = iter.next();
-			if (a.isExternallyMaintained()) {
-				if (this.gradebookExternalAssessmentService.isExternalAssignmentGrouped(gradebook.getUid(), a.getExternalId()) &&
-						!this.gradebookExternalAssessmentService.isExternalAssignmentVisible(gradebook.getUid(), a.getExternalId(),
-								studentUuid)) {
-					iter.remove();
-				}
+			if (!a.isExternallyMaintained()) {
+				continue;
+			}
+
+			try {
+				isGrouped = this.gradebookExternalAssessmentService.isExternalAssignmentGrouped(gradebook.getUid(), a.getExternalId());
+			} catch (Exception ex) {
+				log.error("Exception isExternalAssignmentGrouped: {0}", ex.getMessage());
+				isGrouped = false;
+			}
+
+			try {
+				isVisible = this.gradebookExternalAssessmentService.isExternalAssignmentVisible(gradebook.getUid(), a.getExternalId(),
+						studentUuid);
+			} catch (Exception ex) {
+				log.error("Exception isExternalAssignmentVisible: {0}", ex.getMessage());
+				isVisible = false;
+			}
+
+			if (isGrouped && !isVisible) {
+				iter.remove();
 			}
 		}
 		return assignments;
@@ -596,6 +630,118 @@ public class GradebookNgBusinessService {
 			rval = GradeSaveResponse.ERROR;
 		}
 		return rval;
+	}
+
+	public GradeSubmissionResult submitGrade(String gradebookUid, String gradeSubmitType){
+		//get gradebook data
+		Map<String, String> studentsGrades = new HashMap<>();
+
+		final List<String> studentUuids = this.getGradeableUsers();
+		Map<String, CourseGrade> studentsCourseGrades = getCourseGrades(studentUuids);
+
+		//filter
+		//Need to filter out non-grade override inactive participants for grade submission
+		studentsCourseGrades = gradeSubmissionStudentFilter(gradebookUid, studentsCourseGrades);
+
+		for(String studentUid : studentUuids) {
+			try {
+				String eid = userDirectoryService.getUser(studentUid).getEid();
+				if(studentsCourseGrades.containsKey(studentUid)) {
+					String override = studentsCourseGrades.get(studentUid).getEnteredGrade();
+					String courseGrade = studentsCourseGrades.get(studentUid).getMappedGrade();
+					if(null != override)
+						courseGrade = override;
+					studentsGrades.put(eid, courseGrade);
+				}
+			}
+			catch (UserNotDefinedException e) {
+				log.info("User " + studentUid + " could not be found in the system.");
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		GradeSubmissionResult gradeSubmissionResult = null;
+		try {
+			gradeSubmissionResult= advisor.submitGrade(studentsGrades, gradebookUid, gradeSubmitType);
+		} catch (Exception e) {
+			log.error("General Exception submitting grades for UID (" + gradebookUid + "): " + e.getMessage(), e);
+			gradeSubmissionResult.setStatus(500);
+		}
+
+		if (gradeSubmitType.equalsIgnoreCase("finalgrade")){
+			Event event = eventTrackingService.newEvent("gradebookng.submitFinalGrades", "gradebookUid=" + gradebookUid + ", studentGrades count: " + studentsGrades.size(), true);
+			eventTrackingService.post(event);
+		}
+		else if (gradeSubmitType.equalsIgnoreCase("midterm")) {
+			Event event = eventTrackingService.newEvent("gradebookng.submitMidTermGrades", "gradebookUid=" + gradebookUid + ", studentGrades count: " + studentsGrades.size(), true);
+			eventTrackingService.post(event);
+		}
+
+		return gradeSubmissionResult;
+	}
+
+	public GradeSubmissionResult viewSubmissionReceipt(String gradebookUid) {
+		return advisor.viewSubmissionReceipt(gradebookUid);
+	}
+
+	public boolean allowMidTermGradeSubmission() {
+
+		Set <String> providerIds = (Set<String>) authzGroupService.getProviderIds("/site/"+ getCurrentSiteId());
+		if(null != providerIds) {
+			for (String providerId : providerIds ) {
+				 String sectionTitle = courseManagementService.getSection(providerId).getTitle().toLowerCase();
+				 String courseTitle = sectionTitle.split("\\.")[0];
+				 List<String> providerIdPatterns = Arrays.asList(configService.getString("gradebook.allow.mid.term.submission.section.title.patterns", "").toLowerCase().split(","));
+				 if (providerIdPatterns.contains(courseTitle)){
+					 return true;
+				 }
+			}
+		}
+		return false;
+	}
+
+	public boolean isSubmitGradesEnabled() {
+		return Boolean.parseBoolean(configService.getString("gradebook.submit.grades.enabled", "true"));
+	}
+
+	public boolean isValidOverrideGrade(Map<String, Double> schema, String grade) {
+		if(schema.containsKey(grade) || advisor.isValidOverrideGrade(grade))
+			return true;
+		return false;
+	}
+
+	/* Helper method
+	 * @param: a full list of participants including inactive
+	 * @return: a list of participants without inactive students whose override
+	 *         grade is not assigned, but include inactive students with override grades.
+	 */
+	private Map<String, CourseGrade> gradeSubmissionStudentFilter(String gradebookUid, Map<String, CourseGrade> studentsCourseGrades){
+		Iterator<Entry<String, CourseGrade>> it = studentsCourseGrades.entrySet().iterator();
+		while(it.hasNext()) {
+			Map.Entry<String, CourseGrade> entry = it.next();
+			if(!getMemberStatus(entry.getKey()) && null == entry.getValue().getEnteredGrade())
+				it.remove();
+		}
+		return studentsCourseGrades;
+	}
+
+	//Helper method
+	private boolean getMemberStatus(String memberId){
+		String realmId = "/site/" + getCurrentSiteId();
+
+		AuthzGroup realm;
+		try {
+			realm = authzGroupService.getAuthzGroup(realmId);
+			if(realm !=null && realm.getMember(memberId) != null) {
+				boolean memberStatus = realm.getMember(memberId).isActive();
+				return memberStatus;
+			}
+		} catch (GroupNotDefinedException e) {
+			log.info(realmId + " does not exists.");
+		}
+		return false;
 	}
 
 	/**
@@ -1670,12 +1816,14 @@ public class GradebookNgBusinessService {
 	}
 
 	/**
-	 * Get the grade log for this entire gradebook.
+	 * Get the grade log for this gradebook.
 	 *
-	 * @param since the time to check for changes from
+	 * @param currentPage denotes which "page" we are on (how many times we've called)
+	 * @param resultsPerPage number of records to pull from the database
+	 * @param previousList the cumulative results from previous pulls to append new results to
 	 * @return
 	 */
-	public List<GbHistoryLog> getHistoryLog(final Date since) {
+	public List<GbHistoryLog> getHistoryLog(final int currentPage, final int resultsPerPage) {
 
 		final List<GbHistoryLog> rval = new ArrayList<>();
 
@@ -1686,7 +1834,7 @@ public class GradebookNgBusinessService {
 
 		final List<Long> assignmentIds = assignments.stream().map(a -> a.getId()).collect(Collectors.toList());
 
-		final List<GradingEvent> events = this.gradebookService.getGradingEvents(assignmentIds, since);
+		final List<GradingEvent> events = this.gradebookService.getPaginatedGradingEvents(assignmentIds, currentPage, resultsPerPage);
 		if (events == null || events.isEmpty()) {
 			return rval;
 		}

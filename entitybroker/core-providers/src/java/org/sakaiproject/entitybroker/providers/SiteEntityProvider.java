@@ -633,7 +633,8 @@ RESTful, ActionsExecutable, Redirectable, RequestStorable, DepthLimitable {
                   if (tools != null) {
                       for (ToolConfiguration tool : tools) {
                           if (tool == null) continue;
-                          site.setProperty(tool.getToolId(), tool.getPageId());
+                          String toolIds = "{" + "\"pageId\":\"" + tool.getPageId() + "\",\"id\":\"" + tool.getId() + "\"}";
+                          site.setProperty(tool.getToolId(), toolIds);
                       }
                   }
                   sites.add(site);

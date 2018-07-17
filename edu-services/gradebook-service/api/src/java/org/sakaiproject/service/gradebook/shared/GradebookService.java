@@ -883,4 +883,6 @@ public interface GradebookService {
 	 */
 	List getGradingEvents(final List<Long> assignmentIds, final Date since);
 
+	List getPaginatedGradingEvents(final List<Long> assignmentIds, final int pageNum, final int perPage);
+
 }

@@ -1544,8 +1544,14 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		default:
 			comp = GradableObject.defaultComparator;	
 	}
-    
-  	Collections.sort(assignments, comp);
+
+	try {
+		Collections.sort(assignments, comp);
+	}catch (Exception e) {
+		log.info("Something needs to be looked for sort ");
+		e.printStackTrace();
+	}
+
   	if(!ascending) {
   		Collections.reverse(assignments);
   	}
@@ -3706,6 +3712,26 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 					" and ge.gradableObject.id in (:assignmentIds)");
 				q.setParameter("since", since);
 				q.setParameterList("assignmentIds", assignmentIds);
+				return q.list();
+			}
+		};
+
+		rval = (List)getHibernateTemplate().execute(hc);
+		return rval;
+	}
+
+	@Override
+	public List<GradingEvent> getPaginatedGradingEvents(final List<Long> assignmentIds, final int pageNum, final int perPage) {
+		List<GradingEvent> rval = new ArrayList<>();
+
+		HibernateCallback hc = new HibernateCallback() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException, SQLException {
+				Query q = session.createQuery("from GradingEvent as ge where ge.gradableObject.id in (:assignmentIds) order by ge.dateGraded desc");
+				q.setParameterList("assignmentIds", assignmentIds);
+				q.setFirstResult(pageNum * perPage);
+				q.setMaxResults(perPage);
+
 				return q.list();
 			}
 		};

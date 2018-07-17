@@ -24,9 +24,12 @@ import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.CommentDefinition;
+import org.sakaiproject.service.gradebook.shared.CourseGrade;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
+import org.sakaiproject.tool.gradebook.Gradebook;
+import org.sakaiproject.tool.gradebook.GradingEvent;
 import org.sakaiproject.tool.gradebook.ui.helpers.params.GradebookItemViewParams;
 import org.sakaiproject.tool.gradebook.ui.helpers.producers.AuthorizationFailedProducer;
 import org.sakaiproject.tool.gradebook.ui.helpers.producers.GradebookItemProducer;
@@ -142,13 +145,7 @@ public class GradebookEntityProvider extends AbstractEntityProvider implements
 			List<Assignment> gbitems = gradebookService.getAssignments(siteId);
 			for (Assignment assignment : gbitems) {
 				for (String studentId : students) {
-					GradeAssignmentItem item = new GradeAssignmentItem(
-							assignment);
-					item.setUserId(studentId);
-					item.setUserName(getUserDisplayName(studentId));
-					item.setGrade(gradebookService.getAssignmentScoreString(
-							siteId, assignment.getId(), studentId));
-
+					GradeAssignmentItem item = createGradeItem(assignment, siteId, userId);
 					course.assignments.add(item);
 				}
 			}
@@ -161,12 +158,7 @@ public class GradebookEntityProvider extends AbstractEntityProvider implements
 			List<Assignment> gbitems = gradebookService
 					.getViewableAssignmentsForCurrentUser(siteId);
 			for (Assignment assignment : gbitems) {
-				GradeAssignmentItem item = new GradeAssignmentItem(assignment);
-				item.setUserId(userId);
-				item.setUserName(getUserDisplayName(userId));
-				item.setGrade(gradebookService.getAssignmentScoreString(siteId,
-						assignment.getId(), userId));
-
+				GradeAssignmentItem item = createGradeItem(assignment, siteId, userId);
 				course.assignments.add(item);
 			}
 			return course;
@@ -237,21 +229,55 @@ public class GradebookEntityProvider extends AbstractEntityProvider implements
 
 			GradeCourse course = new GradeCourse(site);
 
-			List<Assignment> gbitems = gradebookService
-					.getViewableAssignmentsForCurrentUser(siteId);
-			for (Assignment assignment : gbitems) {
-				GradeAssignmentItem item = new GradeAssignmentItem(assignment);
-				item.setUserId(userId);
-				item.setUserName(getUserDisplayName(userId));
-				item.setGrade(gradebookService.getAssignmentScoreString(siteId,
-						assignment.getId(), userId));
+			//Viewable assignments only retrieved if the Gradebook has released them
+			if ( ((Gradebook)gradebookService.getGradebook(siteId)).isAssignmentsDisplayed() ) {
+				List<Assignment> gbitems = gradebookService
+						.getViewableAssignmentsForCurrentUser(siteId);
 
-				course.assignments.add(item);
+				for (Assignment assignment : gbitems) {
+					//Skip adding unreleased assignments
+					if (assignment == null || !assignment.isReleased()) continue;
+
+					GradeAssignmentItem item = createGradeItem(assignment, siteId, userId);
+					course.assignments.add(item);
+				}
 			}
+
+
+			CourseGrade courseGrade = gradebookService.getCourseGradeForStudent(siteId, userId);
+
+			//Gradebooks can opt to not release course grades to students, requires null check
+			String calculatedGrade = courseGrade == null ? null : courseGrade.getCalculatedGrade();
+			String mappedGrade = courseGrade == null ? null : courseGrade.getMappedGrade();
+
+			course.setMappedGrade(mappedGrade);
+			course.setCalculatedGrade(calculatedGrade);
 			r.add(course);
 		}
 
 		return r;
+	}
+
+	private GradeAssignmentItem createGradeItem(Assignment assignment, String siteId, String userId) {
+		GradeAssignmentItem item = new GradeAssignmentItem(assignment);
+		CommentDefinition cd = gradebookService.getAssignmentScoreComment(siteId, assignment.getId(), userId);
+
+		List<GradingEvent> gradeEvents = gradebookService.getGradingEvents(userId, assignment.getId());
+
+		if (gradeEvents.size() > 0) {
+			GradingEvent gradeEvent = gradeEvents.get(gradeEvents.size() - 1);
+			item.setPostedDate(gradeEvent.getDateGraded());
+		}
+
+		if (cd != null) {
+			item.setComment(cd.getCommentText());
+		}
+
+		item.setUserId(userId);
+		item.setUserName(getUserDisplayName(userId));
+		item.setGrade(gradebookService.getAssignmentScoreString(siteId, assignment.getId(), userId));
+		item.setDueDate(assignment.getDueDate());
+		return item;
 	}
 
 	@EntityCustomAction(action = "item", viewKey = EntityView.VIEW_LIST)

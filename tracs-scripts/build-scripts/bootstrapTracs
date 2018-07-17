@@ -86,7 +86,7 @@ my($tar);
 		die "Please use Maven 3.2.2 or newer.";
 	}
 
-	$tar = `which gnutar tar |head -n1`;
+	$tar = `which gnutar gtar tar |head -n1`;
 	chomp($tar);
 }#
 

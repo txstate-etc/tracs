@@ -257,7 +257,7 @@ abstract public class SignupEmailBase implements SignupEmailNotification, Meetin
 	}
 	
 	protected String getServerFromAddress() {
-		return  getServiceName() +" <" + getSakaiFacade().getServerConfigurationService().getString("setup.request", "no-reply@"  + getSakaiFacade().getServerConfigurationService().getServerName())+ ">";
+		return  getServiceName() +" <" + getSakaiFacade().getServerConfigurationService().getString("email.noreply_address", "no-reply@"  + getSakaiFacade().getServerConfigurationService().getServerName())+ ">";
 	}
 
 	protected boolean userIsAttendingTimeslot(User user, SignupTimeslot timeslot) {

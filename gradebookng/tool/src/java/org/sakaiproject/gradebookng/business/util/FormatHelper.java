@@ -82,7 +82,7 @@ public class FormatHelper {
 			return null;
 		}
 
-		final BigDecimal decimal = new BigDecimal(string).setScale(2, RoundingMode.HALF_DOWN);
+		final BigDecimal decimal = new BigDecimal(string).setScale(2, RoundingMode.FLOOR);
 
 		return formatDoubleAsPercentage(decimal.doubleValue());
 	}

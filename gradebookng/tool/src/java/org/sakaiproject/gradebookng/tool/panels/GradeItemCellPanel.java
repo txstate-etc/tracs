@@ -447,7 +447,7 @@ public class GradeItemCellPanel extends Panel {
 					excusedGradeModel.put("studentUuid", studentUuid);
 					excusedGradeModel.put("isExcusedGrade", excludedFromGrade);
 					excusedGradeModel.put("grade", GradeItemCellPanel.this.gradeCell.getValue());
-					excusedGradeModel.put("gradeComment", gradeInfo.getGradeComment());
+					excusedGradeModel.put("gradeComment", GradeItemCellPanel.this.comment);
 
 					final ExcuseGradePanel panel = new ExcuseGradePanel(window.getContentId(), Model.ofMap(excusedGradeModel), window);
 					final GbUser user = businessService.getUser(studentUuid);
@@ -459,6 +459,8 @@ public class GradeItemCellPanel extends Panel {
 					window.setComponentToReturnFocusTo(getParentCellFor(GradeItemCellPanel.this.gradeCell));
 					window.show(target);
 				}
+
+
 			});
 
 			this.gradeCell.setOutputMarkupId(true);

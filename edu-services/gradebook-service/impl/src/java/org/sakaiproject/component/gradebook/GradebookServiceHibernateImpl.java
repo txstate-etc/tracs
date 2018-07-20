@@ -2079,7 +2079,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		});
 
 		if (null == assignmentGradeRecord) {
-			//Should not happen...
+			log.error("No AssignmentGradeRecord found for student " + studentUuid + " and assignment " + assignmentId);
+			throw new AssessmentNotFoundException("No AssignmentGradeRecord found for student " + studentUuid + "and assignment " + assignmentId);
 		}
 		else {
 			assignmentGradeRecord.setExcludedFromGrade(excludeFromGrade);
@@ -2236,7 +2237,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				  }
 			  } else {
 				  // if the grade is something other than null, add a new AGR
-				  if (gradeDef.getGrade() != null && !gradeDef.getGrade().trim().equals("")) {
+				  if (gradeDef.getGrade() != null) {
 					  gradeRec =  new AssignmentGradeRecord(assignment, studentId, convertedGrade);
 					  gradeRec.setPointsEarned(convertedGrade);
 					  gradeRec.setGraderId(graderId);

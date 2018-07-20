@@ -518,11 +518,13 @@ public class GradebookNgBusinessService {
 
 		final Gradebook gradebook = this.getGradebook();
 		if (gradebook == null) {
+			log.error("Gradebook not found");
 			return GradeSaveResponse.ERROR;
 		}
 
 		// if newGrade is null, no change
 		if (newGrade == null) {
+			log.info("No grade change occurred. Cancelling saveGrade process");
 			return GradeSaveResponse.NO_CHANGE;
 		}
 
@@ -600,6 +602,7 @@ public class GradebookNgBusinessService {
 		// someone else has edited.
 		// if oldGrade == null, ignore concurrency check
 		if (oldGrade != null && !StringUtils.equals(storedGradeAdjusted, oldGradeAdjusted)) {
+			log.info("Old grade does not equal stored grade");
 			return GradeSaveResponse.CONCURRENT_EDIT;
 		}
 
@@ -759,7 +762,7 @@ public class GradebookNgBusinessService {
 	 * student summary but could be more for paging etc
 	 *
 	 * @param assignments list of assignments
-	 * @param list of uuids
+	 * @param studentUuids list of uuids
 	 * @return
 	 */
 	public List<GbStudentGradeInfo> buildGradeMatrix(final List<Assignment> assignments,
@@ -1465,7 +1468,6 @@ public class GradebookNgBusinessService {
 	/**
 	 * Get an Assignment in the current site given the assignment id
 	 *
-	 * @param siteId
 	 * @param assignmentId
 	 * @return
 	 */
@@ -1581,19 +1583,34 @@ public class GradebookNgBusinessService {
 		return false;
 	}
 
-	public boolean saveExcusedGrade(final Long assignmentId, final String studentUuid, final boolean excludeFromGrade) {
-		final String siteId = getCurrentSiteId();
-		final Gradebook gradebook = getGradebook(siteId);
+	public boolean saveExcusedGrade(final Long assignmentId, final String studentUuid, final boolean excludeFromGrade, String oldComment) {
+        final String siteId = getCurrentSiteId();
+        final Gradebook gradebook = getGradebook(siteId);
 
-		try {
-			this.gradebookService.updateIsExcludedFromGradeForStudent(gradebook.getUid(), studentUuid, assignmentId, excludeFromGrade );
-			return true;
-		} catch (final Exception e) {
-			log.error("An error occurred updating isExcludedFromGrade flag", e);
+        try {
+            this.gradebookService.updateIsExcludedFromGradeForStudent(gradebook.getUid(), studentUuid, assignmentId, excludeFromGrade);
+            return true;
+        } catch (AssessmentNotFoundException a) {
+        	return saveBlankGradeGradeThenExcuseIt(gradebook, assignmentId, studentUuid, excludeFromGrade, oldComment);
+        } catch (final Exception e) {
+			log.error("An unexpected error occurred updating isExcludedFromGrade flag", e);
 		}
 
 		return false;
 	}
+
+	private boolean saveBlankGradeGradeThenExcuseIt(final Gradebook gradebook, final Long assignmentId, final String studentUuid, final boolean excludeFromGrade, String oldComment) {
+		try {
+			this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(), assignmentId, studentUuid, "", oldComment);
+			this.gradebookService.updateIsExcludedFromGradeForStudent(gradebook.getUid(), studentUuid, assignmentId, excludeFromGrade);
+			return true;
+		} catch (final Exception e) {
+			log.error("An error occurred saving a blank and updating isExcludedFromGrade flag", e);
+		}
+
+		return false;
+	}
+
 
 	/**
 	* Scale grades by adding a fixed pointValue to all students' grades for an assignment
@@ -1820,7 +1837,6 @@ public class GradebookNgBusinessService {
 	 *
 	 * @param currentPage denotes which "page" we are on (how many times we've called)
 	 * @param resultsPerPage number of records to pull from the database
-	 * @param previousList the cumulative results from previous pulls to append new results to
 	 * @return
 	 */
 	public List<GbHistoryLog> getHistoryLog(final int currentPage, final int resultsPerPage) {

@@ -231,7 +231,9 @@ public class GradebookPage extends BasePage {
 
 		totalPoints = 0.0;
 		for (Assignment assignment : assignments) {
-			totalPoints += assignment.getPoints();
+			if (assignment.isCounted()) {
+				totalPoints += assignment.getPoints();
+			}
 		}
 
 		// get the grade matrix. It should be sorted if we have that info

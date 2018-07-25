@@ -27,7 +27,7 @@ function GradebookSpreadsheet($spreadsheet) {
 
 
   // set it all up
-  this.setupGradeItemCellModels(this.$table);
+  this.setupGradeItemCellModels();
   this._refreshColumnOrder();
   this.setupToolbar();
   this.setupColoredCategories();
@@ -45,16 +45,10 @@ function GradebookSpreadsheet($spreadsheet) {
     self.setupRowSelector();
     self.setupConcurrencyCheck();
     self.setupStudentFilter();
-    self.setupMenusAndPopovers(this.$table);
+    self.setupMenusAndPopovers();
     self.setupNewAssignmentFocus();
 
     self.setupCloneTables();
-
-    // self.setupGradeItemCellModels(this.$cloneHead);
-    // self.setupMenusAndPopovers(this.$cloneHead);
-    //
-    // self.setupGradeItemCellModels(this.$cloneTop);
-    // self.setupMenusAndPopovers(this.$cloneTop);
   });
 
   this.onReady(function() {
@@ -81,13 +75,13 @@ GradebookSpreadsheet.prototype.getCellModelForWicketParams = function(wicketExtr
 };
 
 
-GradebookSpreadsheet.prototype.setupGradeItemCellModels = function(targetTable) {
+GradebookSpreadsheet.prototype.setupGradeItemCellModels = function() {
   var self = this;
   //var t = Date.now();
 
 //  var tmpHeaderByIndex = [];
 
-    $(targetTable).find("> thead > tr.gb-headers > th").each(function(cellIndex, cell) {
+    self.$table.find("> thead > tr.gb-headers > th").each(function(cellIndex, cell) {
     var $cell = $(cell);
 
     var model = new GradebookHeaderCell($cell, self);
@@ -95,12 +89,12 @@ GradebookSpreadsheet.prototype.setupGradeItemCellModels = function(targetTable) 
     //tmpHeaderByIndex.push(model);
   });
 
-    $(targetTable).on("focus", "td, th", function(event) {
+    self.$table.on("focus", "td, th", function(event) {
     // lazy load model
     self.getCellModel($(this));
   });
 
-    $(targetTable).on("focus", "td.gb-grade-item-cell :text", function(event) {
+    self.$table.on("focus", "td.gb-grade-item-cell :text", function(event) {
     // lazy load model
     self.getCellModel($(event.target).closest("td"));
   });
@@ -122,7 +116,7 @@ GradebookSpreadsheet.prototype.setupGradeItemCellModels = function(targetTable) 
     $cell.data("has-dropdown", true);
   };
 
-    $(targetTable).on("focus", "td.gb-grade-item-cell", function(event) {
+    self.$table.on("focus", "td.gb-grade-item-cell", function(event) {
     var $cell = $(event.target).closest(".gb-grade-item-cell");
     if (!$cell.data("has-dropdown")) {
       setupContextMenu($cell);
@@ -130,7 +124,7 @@ GradebookSpreadsheet.prototype.setupGradeItemCellModels = function(targetTable) 
     return true;
   });
 
-    $(targetTable).find(".gb-grade-item-cell, .gb-grade-item-cell :text").hover(function(event) {
+    self.$table.find(".gb-grade-item-cell, .gb-grade-item-cell :text").hover(function(event) {
     var $cell = $(event.target).closest(".gb-grade-item-cell");
     if (!$cell.data("has-dropdown")) {
       setupContextMenu($cell);
@@ -1432,9 +1426,8 @@ GradebookSpreadsheet.prototype.setupStudentFilter = function() {
 };
 
 
-GradebookSpreadsheet.prototype.setupMenusAndPopovers = function(targetTable) {
+GradebookSpreadsheet.prototype.setupMenusAndPopovers = function() {
   var self = this;
-
   self._popovers = [];
 
   function hideAllPopovers() {
@@ -1446,7 +1439,7 @@ GradebookSpreadsheet.prototype.setupMenusAndPopovers = function(targetTable) {
 
   self.popoverClicked = false;
 
-  self.enablePopovers($(targetTable));
+  self.enablePopovers(self.$table);
 
   self.$spreadsheet.on("focus", '[data-toggle="popover"]', function(event) {
     if (self.suppressPopover) {
@@ -1462,7 +1455,7 @@ GradebookSpreadsheet.prototype.setupMenusAndPopovers = function(targetTable) {
     }, 500));
   });
 
-  $(targetTable).on("click", ".popover", function(event) {
+  self.$spreadsheet.on("click", ".popover", function(event) {
     self.popoverClicked = true;
   }).on("click", ":not(.popover)", function(event) {
     setTimeout(function() {

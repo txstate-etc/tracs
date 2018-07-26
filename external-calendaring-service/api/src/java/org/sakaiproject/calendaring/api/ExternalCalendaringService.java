@@ -66,7 +66,8 @@ public interface ExternalCalendaringService {
 	 * @return the VEvent for the given event or null if there was an error
 	 */
 	public VEvent createEvent(CalendarEvent event, Set<User> attendees);
-	
+
+	public VEvent createEvent(CalendarEvent event, Set<User> attendees, String timeZoneString);
 	/**
 	 * Adds a list of attendees to an existing VEvent.
 	 * This must then be turned into a Calendar before it can be turned into an ICS file. 

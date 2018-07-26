@@ -151,7 +151,7 @@ public class SignupCalendarHelperImpl implements SignupCalendarHelper {
 				mEvent.getProperties().addProperty(ResourceProperties.PROP_CREATOR, meeting.getCreatorUserId());
 
 				//generate VEvent for timeslot
-				v = externalCalendaringService.createEvent(mEvent);
+				v = externalCalendaringService.createEvent(mEvent, null, "America/Chicago");
 				externalCalendaringService.addChairAttendeesToEvent(v, getCoordinators(meeting));
 				
 			} finally {

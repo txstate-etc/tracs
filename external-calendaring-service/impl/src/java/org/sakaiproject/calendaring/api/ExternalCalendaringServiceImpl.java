@@ -68,22 +68,29 @@ public class ExternalCalendaringServiceImpl implements ExternalCalendaringServic
 	 * {@inheritDoc}
 	 */
 	public VEvent createEvent(CalendarEvent event) {
-		return createEvent(event, null);
+		return createEvent(event, null, null);
+	}
+
+	public VEvent createEvent(CalendarEvent event, Set<User> attendees) {
+		return createEvent(event, attendees, null);
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public VEvent createEvent(CalendarEvent event, Set<User> attendees) {
+	public VEvent createEvent(CalendarEvent event, Set<User> attendees, String timeZoneString) {
 		
 		if(!isIcsEnabled()) {
 			log.debug("ExternalCalendaringService is disabled. Enable via calendar.ics.generation.enabled=true in sakai.properties");
 			return null;
 		}
 		
-		//timezone. All dates are in GMT so we need to explicitly set that
+		//timezone. All dates are in GMT unless otherwise specified
+		if (timeZoneString == null) {
+			timeZoneString = "GMT";
+		}
 		TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-		TimeZone timezone = registry.getTimeZone("GMT");
+		TimeZone timezone = registry.getTimeZone(timeZoneString);
 		VTimeZone tz = timezone.getVTimeZone();
 
 		//start and end date

@@ -197,15 +197,15 @@
   cursor: pointer;
 }
 #gradebookGrades tbody .btn.dropdown-toggle {
-  opacity: 0.3;
-  border-color: #EEE;
+  opacity: 0.7;
+  border-color: #BBB;
 }
 #gradebookGrades tbody .btn.dropdown-toggle:focus,
 #gradebookGrades tbody .btn.dropdown-toggle:active,
 #gradebookGrades tbody .btn.dropdown-toggle:hover,
 #gradebookGrades tbody .open .btn.dropdown-toggle {
     opacity: 1;
-    border-color: #DDD;
+    border-color: #AAA;
 }
 #gradebookGrades thead th .btn-group {
   position: absolute;
@@ -218,7 +218,7 @@
   border-radius: 4px;
 }
 #gradebookGrades .btn.dropdown-toggle:focus {
-  border: 1px solid #DDD;
+  border: 1px solid #AAA;
 }
 #gradebookGrades #gradebookGradesTable caption {
   /* hide the caption from users, but retain for screen readers */

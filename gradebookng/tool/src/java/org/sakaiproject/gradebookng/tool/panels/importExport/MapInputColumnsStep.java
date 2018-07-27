@@ -228,7 +228,6 @@ public class MapInputColumnsStep extends Panel {
 							return true;
 						}
 					};
-        			pointsTextField.setStep(10L);
         			pointsTextField.setOutputMarkupId(true);
         			pointsTextField.setOutputMarkupPlaceholderTag(true);
          			item.add(pointsTextField);

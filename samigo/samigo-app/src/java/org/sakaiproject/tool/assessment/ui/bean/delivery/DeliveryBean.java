@@ -3592,6 +3592,22 @@ public class DeliveryBean
 		return site;
 	}
 	
+	public String getAudioQuestionLink() {
+		Site currentSite = getCurrentSite(getSiteId());
+		String placement = null;
+
+		if (currentSite != null) {
+			placement = ToolManager.getCurrentPlacement().getId();
+		}
+
+		if (placement != null) {
+			return "/portal/tool/" + placement + "/jsf/author/audioRecordingPopup.faces";
+		}
+		else {
+			return "/samigo-app/jsf/author/audioRecordingPopup.faces";
+		}
+	}
+
 	private String getCurrentPageId(String id) {
 		Site currentSite = getCurrentSite(id);
 		if (currentSite == null) {

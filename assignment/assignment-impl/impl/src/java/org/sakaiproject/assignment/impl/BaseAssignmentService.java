@@ -14414,6 +14414,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 
 	public Assignment findEportfolioAssignment(String assignmentReference) {
 
+		if (assignmentReference == null) return null;
 		String[] split = assignmentReference.split("/");
 
 		//An eportfolio assignment reference has the form <context>/<id>

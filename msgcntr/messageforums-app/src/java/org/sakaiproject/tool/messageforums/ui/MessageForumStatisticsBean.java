@@ -2710,19 +2710,24 @@ public class MessageForumStatisticsBean {
 	public String proccessActionSubmitGrades(){
 		GradebookService gradebookService = getGradebookService();
 		if (gradebookService == null) {
+			LOG.error("Null when attempting to load gradebook service");
 			return null;
 		}
 		
 		if(gradeStatistics != null){
 	  	
 			if(selectedAssign == null || selectedAssign.trim().length()==0 || DEFAULT_GB_ITEM.equalsIgnoreCase(selectedAssign)) 
-			{ 
-				setErrorMessage(getResourceBundleString(NO_ASSGN)); 
+			{
+				LOG.error("Assignment provided was null or empty");
+				setErrorMessage(getResourceBundleString(NO_ASSGN));
 				return null; 
 			}     
 
-			if(!validateGradeInput())
+			if(!validateGradeInput()) {
+				LOG.error("validateGradeInput returned FALSE");
 				return null;
+			}
+
 
 			try 
 			{   
@@ -2817,27 +2822,29 @@ public class MessageForumStatisticsBean {
 		    // just use the generic error message
 		    if (gradebookService.getGradeEntryType(gradebookUid) == GradebookService.GRADE_TYPE_LETTER) {
 		        setErrorMessage(getResourceBundleString(GRADE_INVALID_GENERIC));
+		        LOG.error("Invalid grade provided");
 		        return false;
 		    }
 		    
 		    for (String studentId : studentsWithInvalidGrades) {
 		        String grade = studentIdToGradeMap.get(studentId);
 		        
-		        if(!isNumber(grade))
-	                {
-	                        setErrorMessage(getResourceBundleString(GRADE_GREATER_ZERO));
-	                        return false;
-	                }
-	                else if(!isFewerDigit(grade))
-	                {
-	                        setErrorMessage(getResourceBundleString(GRADE_DECIMAL_WARN));
-	                        return false;
-	                }
+		        if(!isNumber(grade)) {
+					LOG.error("Grade provided not a valid number for student {0} with grade {1}", studentId, grade);
+					setErrorMessage(getResourceBundleString(GRADE_GREATER_ZERO));
+					return false;
+				}
+				else if(!isFewerDigit(grade)) {
+		        	LOG.error("Too many digits after the decimal for student {0} and grade {1}", studentId, grade);
+					setErrorMessage(getResourceBundleString(GRADE_DECIMAL_WARN));
+					return false;
+				}
 		    }
 		    
 		    // if we made it this far, just use the generic message
+			LOG.error("Invalid grade for student {0}", studentsWithInvalidGrades.get(0));
 		    setErrorMessage(getResourceBundleString(GRADE_INVALID_GENERIC));
-                    return false;
+			return false;
 		}
 		
 		return validated;

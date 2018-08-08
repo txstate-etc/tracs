@@ -1743,6 +1743,8 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
         leftblock.scrollTop(top);
     });
     leftblock.on('mousewheel', false);
+    //Because Firefox pays attention to a different event
+    leftblock.on('DOMMouseScroll', false);
 };
 
 GradebookSpreadsheet.prototype.refreshCourseGradeForStudent = function(studentUuid) {

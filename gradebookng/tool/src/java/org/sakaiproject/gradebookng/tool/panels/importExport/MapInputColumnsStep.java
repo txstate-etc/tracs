@@ -216,13 +216,13 @@ public class MapInputColumnsStep extends Panel {
 					item.add(ddcNewAssignmentIndex);
 
 					//Text field to enter the Assignment's max points. Visible only for Columns containing Grades.
-					Long longModel;
+					Double dModel;
 					try {
-						longModel = Long.parseLong(newItem.getPoints());
+						dModel = Double.parseDouble(newItem.getPoints());
 					} catch (Exception ex) {
-						longModel = 0L;
+						dModel = 0D;
 					}
-					NumberTextField<Long> pointsTextField = new NumberTextField<Long>("columnPoints", Model.of(longModel), Long.class) {
+					NumberTextField<Double> pointsTextField = new NumberTextField<Double>("columnPoints", Model.of(dModel), Double.class) {
 						@Override
 						public boolean isInputNullable() {
 							return true;
@@ -266,8 +266,8 @@ public class MapInputColumnsStep extends Panel {
                 		switch(columnType.getValue())
                 		{
                 			case "Grades":                				
-                				Long pointValue = Long.parseLong(columnPoints.getValue());
-                				pointValue = pointValue == null ? 0L : pointValue;
+                				Double pointValue = Double.parseDouble(columnPoints.getValue());
+                				pointValue = pointValue == null ? 0D : pointValue;
                 				if (pointValue > 0) {
                 					columnName += " [" + pointValue.toString() + "]";
                 				}

@@ -1735,10 +1735,15 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
         //headblock.css('transform', 'translate(' + (-1 * left) + 'px, 0)');
         leftblock.scrollTop(top);
     });
+    //Ignoring the following events to ensure that the leftblock does not scroll independently of the main grid
+    //across various browsers, mouse types, and track/touchpads
     leftblock.on('mousewheel', false);
     leftblock.on('keypress', false);
     leftblock.on('keydown', false);
-    //Because Firefox pays attention to a different event
+    leftblock.on('touchstart', false);
+    leftblock.on('touchmove', false);
+    leftblock.on('wheel', false);
+    leftblock.on('scroll', false);
     leftblock.on('DOMMouseScroll', false);
 };
 

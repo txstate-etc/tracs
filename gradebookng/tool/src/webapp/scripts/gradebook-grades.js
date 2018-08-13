@@ -1736,6 +1736,8 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
         leftblock.scrollTop(top);
     });
     leftblock.on('mousewheel', false);
+    leftblock.on('keypress', false);
+    leftblock.on('keydown', false);
     //Because Firefox pays attention to a different event
     leftblock.on('DOMMouseScroll', false);
 };

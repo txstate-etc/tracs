@@ -3370,8 +3370,9 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		List<CourseGradeRecord> courseGradeOverrides = getHibernateTemplate().execute(session -> getCourseGradeOverrides(gradebook, session));
 			courseGradeOverrides.forEach(cgr -> {
 				if(!bottomPercents.containsKey(cgr.getEnteredGrade())) {
-					throw new UnmappableCourseGradeOverrideException("The grading schema could not be updated as it would leave some course grade overrides in an unmappable state.");
-				}
+//					throw new UnmappableCourseGradeOverrideException("The grading schema could not be updated as it would leave some course grade overrides in an unmappable state.");
+					throw new UnmappableCourseGradeOverrideException(cgr.getEnteredGrade());
+}
 			});
 
 		//iterate all available grademappings for this gradebook and set the one that we have the ID and bottomPercents for

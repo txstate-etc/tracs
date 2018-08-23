@@ -159,6 +159,11 @@ public class SaveAssessmentSettings
     	if ("1".equals(nav)) {
     		assessmentSettings.setAssessmentFormat("1");
     	}
+    	//We disabled linear nav which lead nav value to be empty string when import from old linear test Taiga #54
+    	if(nav.isEmpty()) {
+    		//set to be default(random)
+    		nav = "2";
+    	}
     	control.setItemNavigation(Integer.valueOf(nav));
     }
     if (StringUtils.isNotBlank(assessmentSettings.getItemNumbering())) {

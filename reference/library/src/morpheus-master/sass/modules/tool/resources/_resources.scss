@@ -182,7 +182,7 @@
 			@extend .fa-close;
 			float:right;
 			padding: 4px 8px 0px 0px;
-			display: none;
+			text-decoration: none;
 			&:hover {
 				opacity: 0.8;
 			}

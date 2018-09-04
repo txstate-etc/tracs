@@ -52,7 +52,7 @@ function GradebookSpreadsheet($spreadsheet) {
   });
 
   this.onReady(function() {
-    self.setupScrollHandling();
+    //self.setupScrollHandling();
     self.setupConnectionPoll();
   })
 
@@ -1718,7 +1718,7 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
         return w + 1;
     }());
     wrapper.css('height', scrollHeight);
-    scroller.css('max-height', scrollHeight);// - headblock.height());
+    scroller.css('max-height', scrollHeight - 9);// - headblock.height());
     //headblock.width(this.$table.width()).css('padding-right', scrollbarWidth);
     leftblock.add(leftblock.parent()).height(scrollHeight - scrollbarWidth);// - headerHeight);
     leftblock.width(leftWidth + scrollbarWidth);

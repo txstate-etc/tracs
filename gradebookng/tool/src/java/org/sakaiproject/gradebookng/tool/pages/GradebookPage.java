@@ -549,6 +549,13 @@ public class GradebookPage extends BasePage {
 		modelData.put("categoryType", this.businessService.getGradebookCategoryType());
 		modelData.put("categoriesEnabled", categoriesEnabled);
 
+		table.addTopToolbar(new NavigationToolbar(table) {
+			@Override
+			protected WebComponent newNavigatorLabel(final String navigatorId, final DataTable<?, ?> table) {
+				return constructTablePaginationLabel(navigatorId, table);
+			}
+		});
+
 		table.addTopToolbar(new GbHeadersToolbar(table, null, Model.ofMap(modelData)));
 		table.add(new AttributeModifier("data-siteid", this.businessService.getCurrentSiteId()));
 		table.add(new AttributeModifier("data-gradestimestamp", gradesTimestamp.getTime()));

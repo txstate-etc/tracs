@@ -1704,6 +1704,7 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
     leftblock.append(this.$cloneLeft);
 
     //remove the duplicate footer from the original table by emptying the divs, adding br's to maintain alignment
+    this.$table.find('thead tr:first').find('td').empty().append("<br><br>");
     this.$table.find('tfoot').find('div').empty().append("<br>").next().empty().append("<br>");
 
     //sizing

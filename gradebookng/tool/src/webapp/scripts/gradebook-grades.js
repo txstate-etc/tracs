@@ -1748,6 +1748,12 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
     leftblock.on('DOMMouseScroll', false);
 };
 
+GradebookSpreadsheet.prototype.updateNavigatorLabel = function(newText) {
+  alert("Success! New label = " + newText);
+  this.$cloneLeft.find('thead tr:first').find('div.navigatorLabel').find('div').text(newText);
+}
+
+
 GradebookSpreadsheet.prototype.refreshCourseGradeForStudent = function(studentUuid) {
   // cell has been updated, so need to refresh the course grade in the fixed column
   // on the off chance the grade has changed

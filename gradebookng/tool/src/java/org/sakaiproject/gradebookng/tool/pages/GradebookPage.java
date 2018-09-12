@@ -69,6 +69,10 @@ import org.sakaiproject.service.gradebook.shared.PermissionDefinition;
 import org.sakaiproject.service.gradebook.shared.SortType;
 import org.sakaiproject.tool.gradebook.Gradebook;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 /**
  * Grades page. Instructors and TAs see this one. Students see the {@link StudentPage}.
  *
@@ -531,6 +535,22 @@ public class GradebookPage extends BasePage {
 				};
 			}
 
+			@Override
+			protected void onPageChanged() {
+				super.onPageChanged();
+				String newNavMessage = constructLabelString(this, true);
+				System.out.println("Made it into onPageChanged! " + newNavMessage);
+
+				try {
+					ScriptEngineManager manager = new ScriptEngineManager();
+					ScriptEngine engine = manager.getEngineByName("JavaScript");
+					//engine.eval(String.format("sakai.gradebookng.spreadsheet.updateNavigatorLabel('%s')", newNavMessage));
+					engine.eval(String.format("$(\"table.table-freeze-left\").find('thead tr:first').find('div.navigatorLabel').find('div').text('%s');", newNavMessage));
+				} catch(ScriptException ex) {
+					System.out.println(ex.getMessage());
+				}
+			}
+
 //			@Override
 //			protected IModel<String> getCaptionModel() {
 //				return Model.of(MessageHelper.getString("gradespage.caption"));
@@ -893,6 +913,14 @@ public class GradebookPage extends BasePage {
 	 * "Showing 100{to} students"
 	 */
 	private Label constructTableLabel(final String componentId, final DataTable table, final boolean verbose) {
+		String labelText = constructLabelString(table, verbose);
+		final Label label = new Label(componentId, labelText);
+		label.setEscapeModelStrings(false); // to allow embedded HTML
+
+		return label;
+	}
+
+	private String constructLabelString(final DataTable table, final boolean verbose) {
 		final long of = table.getItemCount();
 		final long from = (of == 0 ? 0 : table.getCurrentPage() * table.getItemsPerPage() + 1);
 		final long to = (of == 0 ? 0 : Math.min(of, from + table.getItemsPerPage() - 1));
@@ -905,10 +933,7 @@ public class GradebookPage extends BasePage {
 			labelText = new StringResourceModel("label.toolbar.studentsummary", null, to);
 		}
 
-		final Label label = new Label(componentId, labelText);
-		label.setEscapeModelStrings(false); // to allow embedded HTML
-
-		return label;
+		return labelText.getString();
 	}
 
 	/**

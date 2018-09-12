@@ -21,6 +21,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColu
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigatorLabel;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -885,7 +886,7 @@ public class GradebookPage extends BasePage {
 	 * Build a table pagination summary for the table
 	 */
 	private Label constructTablePaginationLabel(final String componentId, final DataTable table) {
-		return constructTableLabel(componentId, table, true);
+		return new NavigatorLabel(componentId, table);
 	}
 
 	/**

@@ -90,7 +90,7 @@ public class ExcuseGradePanel extends Panel {
 
                 boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, checkBoxValue, oldComment);
                 if (success) {
-                    businessService.saveGrade(assignmentId, studentUuid, oldGrade, newGrade, oldComment);
+                    businessService.saveGrade(assignmentId, studentUuid, null, newGrade, oldComment);
                     ExcuseGradePanel.this.window.close(target);
                     setResponsePage(GradebookPage.class);
                 }

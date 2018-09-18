@@ -2002,11 +2002,21 @@ public abstract class BaseUserDirectoryService implements UserDirectoryService, 
 
 	public void updateUsersProperty(Map<String,Boolean> userConfidentialMap, String property) {
 		for(Map.Entry<String, Boolean> entry : userConfidentialMap.entrySet() ) {
+			User user = null;
 			try {
-				User user = getUserByEid(entry.getKey());
+				user = getUserByEid(entry.getKey());
 				user.getProperties().addProperty(property, entry.getValue().toString());
 			} catch (UserNotDefinedException e) {
 				M_log.info("User " + entry.getKey() + "doesn't exists");
+			} catch (NullPointerException e) {
+				if (null == entry.getValue()) {
+					M_log.info("User " + entry.getKey() + " has a null " + property + " value");
+					//set to be true if null found from warehouse for confidential property
+					user.getProperties().addProperty(property, "true");
+				}
+				else {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

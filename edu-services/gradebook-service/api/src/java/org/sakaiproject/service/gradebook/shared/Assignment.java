@@ -199,10 +199,6 @@ public class Assignment implements Serializable, Comparable<Assignment> {
 	public boolean isExtraCredit() {
 		return extraCredit;
 	}
-
-	public boolean getExtraCredit() {
-		return isExtraCredit();
-	}
 	
 	//Needed for cateogry transfer
 	public void setCategoryExtraCredit(boolean categoryExtraCredit) {

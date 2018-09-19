@@ -154,7 +154,7 @@ public class AssignmentColumnHeaderPanel extends Panel {
 		add(externalAppFlag);
 
 		add(gradebookPage.buildFlagWithPopover("extraCreditFlag", generateFlagPopover(HeaderFlagPopoverPanel.Flag.GRADE_ITEM_EXTRA_CREDIT))
-				.setVisible(assignment.isExtraCredit()));
+				.setVisible(assignment.isExtraCredit() || assignment.isCategoryExtraCredit()));
 		add(gradebookPage.buildFlagWithPopover("isCountedFlag", generateFlagPopover(HeaderFlagPopoverPanel.Flag.GRADE_ITEM_COUNTED))
 				.setVisible(assignment.isCounted()));
 		add(gradebookPage.buildFlagWithPopover("notCountedFlag", generateFlagPopover(HeaderFlagPopoverPanel.Flag.GRADE_ITEM_NOT_COUNTED))

@@ -91,6 +91,9 @@
         <property name="siteService">
             <ref bean="org.sakaiproject.site.api.SiteService" />
         </property>
+        <property name="configService">
+            <ref bean="org.sakaiproject.component.api.ServerConfigurationService"/>
+        </property>
 	</bean>
 	<bean id="org_sakaiproject_service_gradebook_GradebookPermissionServiceTarget"
           class="org.sakaiproject.component.gradebook.GradebookPermissionServiceImpl"

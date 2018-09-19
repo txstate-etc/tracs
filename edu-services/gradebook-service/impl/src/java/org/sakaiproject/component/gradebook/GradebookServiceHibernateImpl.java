@@ -28,6 +28,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,6 +52,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.StaleObjectStateException;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.section.api.coursemanagement.CourseSection;
 import org.sakaiproject.section.api.coursemanagement.EnrollmentRecord;
 import org.sakaiproject.section.api.coursemanagement.User;
@@ -101,7 +103,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
     private Authz authz;
     private GradebookPermissionService gradebookPermissionService;
     protected SiteService siteService;
-	
+	private ServerConfigurationService configService;
+
     @Override
 	public boolean isAssignmentDefined(final String gradebookUid, final String assignmentName)
         throws GradebookNotFoundException {
@@ -3369,9 +3372,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		//Before we do any work, check if any existing course grade overrides might be left in an unmappable state
 		List<CourseGradeRecord> courseGradeOverrides = getHibernateTemplate().execute(session -> getCourseGradeOverrides(gradebook, session));
 			courseGradeOverrides.forEach(cgr -> {
-				if(!bottomPercents.containsKey(cgr.getEnteredGrade())) {
-//					throw new UnmappableCourseGradeOverrideException("The grading schema could not be updated as it would leave some course grade overrides in an unmappable state.");
-					throw new UnmappableCourseGradeOverrideException(cgr.getEnteredGrade());
+				if(!bottomPercents.containsKey(cgr.getEnteredGrade()) && !isValidOfficialGrade(cgr.getEnteredGrade())) {
+					throw new UnmappableCourseGradeOverrideException("The grading schema could not be updated as it would leave some course grade overrides in an unmappable state.");
 }
 			});
 
@@ -3512,6 +3514,14 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 
 	public SiteService getSiteService() {
 		return siteService;
+	}
+
+	public ServerConfigurationService getConfigService() {
+		return configService;
+	}
+
+	public void setConfigService(ServerConfigurationService configService) {
+		this.configService = configService;
 	}
 
 	@Override
@@ -3832,7 +3842,16 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		} 
 		return isFromGroup;
 	}
-	
+
+	private boolean isValidOfficialGrade(String grade) {
+
+		//allow override if they meet registar's final grade types
+		if (new HashSet<String>(Arrays.asList(configService.getStrings("gradebook.official.final.grades"))).contains(grade))
+			return true;
+
+		return false;
+	}
+
 	/**
 	 * Updates all uncategorised items to exclude them from the course grade calcs
 	 * @param gradebook

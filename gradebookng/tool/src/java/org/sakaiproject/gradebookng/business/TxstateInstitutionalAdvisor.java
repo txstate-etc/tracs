@@ -144,10 +144,10 @@ public class TxstateInstitutionalAdvisor {
 		return false;
 	}
 
-	public boolean isValidOverrideGrade(String grade) {
+	public boolean isValidOfficialGrade(String grade) {
 
 		//allow override if they meet registar's final grade types
-		if (new HashSet<String>(Arrays.asList(validFinalGrades )).contains(grade))
+		if (new HashSet<String>(Arrays.asList(configService.getStrings("gradebook.official.final.grades"))).contains(grade))
 			return true;
 
 		return false;

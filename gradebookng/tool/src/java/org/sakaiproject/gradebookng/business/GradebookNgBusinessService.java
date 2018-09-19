@@ -72,7 +72,6 @@ import org.sakaiproject.service.gradebook.shared.GraderPermission;
 import org.sakaiproject.service.gradebook.shared.InvalidGradeException;
 import org.sakaiproject.service.gradebook.shared.PermissionDefinition;
 import org.sakaiproject.service.gradebook.shared.SortType;
-import org.sakaiproject.service.gradebook.shared.exception.UnmappableCourseGradeOverrideException;
 import org.sakaiproject.site.api.Group;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
@@ -711,7 +710,7 @@ public class GradebookNgBusinessService {
 	}
 
 	public boolean isValidOverrideGrade(Map<String, Double> schema, String grade) {
-		if(schema.containsKey(grade) || advisor.isValidOverrideGrade(grade))
+		if(schema.containsKey(grade) || advisor.isValidOfficialGrade(grade))
 			return true;
 		return false;
 	}
@@ -2077,13 +2076,7 @@ public class GradebookNgBusinessService {
 		final String siteId = getCurrentSiteId();
 		final Gradebook gradebook = getGradebook(siteId);
 
-		try {
-			this.gradebookService.updateGradebookSettings(gradebook.getUid(), settings);
-		} catch (UnmappableCourseGradeOverrideException e) {
-			//if match our local override grades, it is ok, else, throw exception
-			if(!advisor.isValidOverrideGrade(e.getMessage()))
-				throw new UnmappableCourseGradeOverrideException("The grading schema could not be updated as it would leave some course grade overrides in an unmappable state.");
-		}
+		this.gradebookService.updateGradebookSettings(gradebook.getUid(), settings);
 	}
 
 	/**

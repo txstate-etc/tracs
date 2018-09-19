@@ -83,8 +83,6 @@ public class TxstateInstitutionalAdvisor {
 	private final String SUBMIT_SIG = "sig";
 	private String SUBMIT_APPKEY;
 	private String SUBMIT_SIGKEY;
-	//official final grades from Registar
-	private String[] validFinalGrades = {"A","AU","AUX","AX","AY","B","BX","BY","C","CPT","CR","CRX","CRY","CX","CY","D","DL","DX","DY","F","FX","FY","I","IF","IX","IY","N","NC","P","PR","PRX","PRY","PX","PY","RF","RI","RN","RP","RU","U","UX","UY","W","WX","WY","Z"};
 
 	// Final Grade Submission Status (FGSS)
 	private final String FGSS_BANNER_MESSAGE = "The final grade process has begun";

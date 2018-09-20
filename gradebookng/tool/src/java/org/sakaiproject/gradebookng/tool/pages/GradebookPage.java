@@ -232,7 +232,7 @@ public class GradebookPage extends BasePage {
 
 		totalPoints = 0.0;
 		for (Assignment assignment : assignments) {
-			if (assignment.isCounted()) {
+			if (assignment.isCounted() && !assignment.isExtraCredit() && !assignment.isCategoryExtraCredit()) {
 				totalPoints += assignment.getPoints();
 			}
 		}

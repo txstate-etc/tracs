@@ -58,7 +58,7 @@ index eb7dad7..db05acf 100644
 +                redirect to https://<server-name>:80/blah which clearly won't work. -->
 +
 +    <Connector port="8081" address="0.0.0.0" maxHttpHeaderSize="8192"
-+               maxThreads="100" minSpareThreads="25" maxSpareThreads="50"
++               maxThreads="250" minSpareThreads="25" maxSpareThreads="50"
 +               enableLookups="false" redirectPort="443" acceptCount="100"
 +               connectionTimeout="10000" disableUploadTimeout="true"
 +                          URIEncoding="UTF-8" scheme="https" proxyPort="443" />
@@ -67,7 +67,8 @@ index eb7dad7..db05acf 100644
           every request.  The Engine implementation for Tomcat stand alone
 @@ -136,6 +150,8 @@
                 prefix="localhost_access_log" suffix=".txt"
-                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+-               pattern="%h %l %u %t &quot;%r&quot; %s %b" />
++               pattern="%h %l %u [%{begin:dd/MMM/yyyy:hh:mm:ss.SSS Z}t] &quot;%r&quot; %s %b &quot;%{Referer}i&quot; &quot;%{User-Agent}i&quot; %D %I" />
  
 +        <Valve className="org.apache.catalina.valves.RemoteIpValve" remoteIpHeader="X-ClientIP" />
 +

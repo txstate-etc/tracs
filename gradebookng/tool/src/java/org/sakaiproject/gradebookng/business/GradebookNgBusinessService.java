@@ -546,9 +546,12 @@ public class GradebookNgBusinessService {
 
 		if (gradingType == GbGradingType.PERCENTAGE) {
 			// the passed in grades represents a percentage so the number needs to be adjusted back to points
-			final Double newGradePercentage = NumberUtils.toDouble(newGrade);
-			final Double newGradePointsFromPercentage = (newGradePercentage / 100) * maxPoints;
-			newGradeAdjusted = FormatHelper.formatDoubleToDecimal(newGradePointsFromPercentage);
+			// only convert if the new grade is not blank, otherwise the blank will be treated as a zero
+			if (StringUtils.isNotBlank(newGradeAdjusted)) {
+				final Double newGradePercentage = NumberUtils.toDouble(newGrade);
+				final Double newGradePointsFromPercentage = (newGradePercentage / 100) * maxPoints;
+				newGradeAdjusted = FormatHelper.formatDoubleToDecimal(newGradePointsFromPercentage);
+			}
 
 			// only convert if we had a previous value otherwise it will be out of sync
 			if (StringUtils.isNotBlank(oldGradeAdjusted)) {
@@ -560,7 +563,6 @@ public class GradebookNgBusinessService {
 
 				final Double oldGradePercentage = NumberUtils.toDouble(oldGrade);
 				final Double oldGradePointsFromPercentage = (oldGradePercentage / 100) * maxPoints;
-
 				oldGradeAdjusted = FormatHelper.formatDoubleToMatch(oldGradePointsFromPercentage, storedGradeAdjusted);
 			}
 

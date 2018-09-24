@@ -46,6 +46,7 @@ import net.fortuna.ical4j.model.parameter.Cn;
 import net.fortuna.ical4j.model.parameter.PartStat;
 import net.fortuna.ical4j.model.parameter.Role;
 import net.fortuna.ical4j.model.parameter.Rsvp;
+import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.property.*;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -118,6 +119,11 @@ public class ExternalCalendaringServiceImpl implements ExternalCalendaringServic
 		
 		//create event incl title/summary
 		VEvent vevent = new VEvent(start, end, event.getDisplayName());
+
+		//add local timezone support for VEvent in the export file
+		TzId tzParam = new TzId(tz.getProperties().getProperty(Property.TZID).getValue());
+		vevent.getProperty(Property.DTSTART).getParameters().add(tzParam);
+		vevent.getProperty(Property.DTEND).getParameters().add(tzParam);
 			
 		//add timezone
 		vevent.getProperties().add(tz.getTimeZoneId());

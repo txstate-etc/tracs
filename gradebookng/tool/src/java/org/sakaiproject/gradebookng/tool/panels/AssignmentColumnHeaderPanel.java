@@ -305,6 +305,9 @@ public class AssignmentColumnHeaderPanel extends Panel {
 
 			@Override
 			public boolean isVisible() {
+				if (assignment.isExternallyMaintained()) {
+					return false;
+				}
 				return role == GbRole.INSTRUCTOR;
 			}
 		});

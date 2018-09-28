@@ -561,9 +561,20 @@ public class GradebookNgBusinessService {
 				// comparing apples with apples, we first determine the number of decimal places
 				// on the score, so the converted points-as-percentage is in the expected format.
 
+				final Double storedGradePointsFromPercentage = NumberUtils.toDouble(storedGradeAdjusted);
 				final Double oldGradePercentage = NumberUtils.toDouble(oldGrade);
 				final Double oldGradePointsFromPercentage = (oldGradePercentage / 100) * maxPoints;
-				oldGradeAdjusted = FormatHelper.formatDoubleToMatch(oldGradePointsFromPercentage, storedGradeAdjusted);
+
+				// If the difference between the old value and the stored database value is less than 3 decimal places
+				// (which is what the Hibernate layer rounds point values to before storage), then set the two values
+				// equal in order to bypass the concurrency check. This prevents erroneous concurrency errors
+				// due to rounding differences in gradebooks that use a combination of 1) percentage data entry and
+				// 2) ridiculously small decimal numbers for assignment max point values
+				if (Math.abs(storedGradePointsFromPercentage - oldGradePointsFromPercentage) < 0.001) {
+					oldGradeAdjusted = storedGradeAdjusted;
+				} else {
+					oldGradeAdjusted = FormatHelper.formatDoubleToMatch(oldGradePointsFromPercentage, storedGradeAdjusted);
+				}
 			}
 
 			// we dont need processing of the stored grade as the service does that when persisting.

@@ -270,7 +270,8 @@ public class ExternalCalendaringServiceImpl implements ExternalCalendaringServic
 	 * {@inheritDoc}
 	 */
 	public Calendar createCalendar(List<VEvent> events) {
-		return createCalendar(events, null, true);
+		//default to GMT
+		return createCalendar(events, null, false);
 	}
 	
 	/**

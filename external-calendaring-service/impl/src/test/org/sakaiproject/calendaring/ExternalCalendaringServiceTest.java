@@ -60,6 +60,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import lombok.Setter;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -83,7 +85,7 @@ public class ExternalCalendaringServiceTest {
 
 	@Mock
 	private TimeService timeService;
-	
+
 	//for the test classes we can still use annotation based injection
 	@Resource(name="org.sakaiproject.calendaring.api.ExternalCalendaringService")
 	@InjectMocks

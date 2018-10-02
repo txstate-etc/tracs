@@ -7,13 +7,18 @@
 	<bean id="org.sakaiproject.calendaring.api.ExternalCalendaringService"
     	class="org.sakaiproject.calendaring.api.ExternalCalendaringServiceImpl"
     	init-method="init">
-    	
+
     	<property name="sakaiProxy" ref="org.sakaiproject.calendaring.logic.SakaiProxy" />
+    	<property name="timeService" ref="org.sakaiproject.time.api.TimeService" />
       
     </bean>
-    	
+
 	<!--  Mock of SakaiProxy -->
- 	<bean id="org.sakaiproject.calendaring.logic.SakaiProxy"
-    	class="org.sakaiproject.calendaring.mocks.MockSakaiProxy" />
-    
+	<bean id="org.sakaiproject.calendaring.logic.SakaiProxy"
+	class="org.sakaiproject.calendaring.mocks.MockSakaiProxy" />
+
+		<!--  Mock of TimeService -->
+	<bean id="org.sakaiproject.time.api.TimeService"
+	class="org.sakaiproject.calendaring.mocks.MockTimeService" />
+
 </beans>

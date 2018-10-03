@@ -1638,18 +1638,38 @@ public class GradebookNgBusinessService {
 	public int addScalePoints(final Long assignmentId, final double assignmentMaxPoints, final double pointValue)
 	{
 		int returnVal = 0;
+
 		final String siteId = getCurrentSiteId();
 		final Gradebook gradebook = getGradebook(siteId);
+		final GbGradingType gradingType = GbGradingType.valueOf(gradebook.getGrade_type());
 		final List<String> studentUuids = this.getGradeableUsers();
 		final List<GradeDefinition> defs = this.gradebookService.getGradesForStudentsForItem(gradebook.getUid(), assignmentId, studentUuids);
 		List<GradeDefinition> saveList = new ArrayList<GradeDefinition>();
-		final double maxGradePoints = assignmentMaxPoints * 1.5;
-		final double maxPercentage = 150.0;
+
+		double maxAllowed;
+		switch (gradingType) {
+			case POINTS:
+				maxAllowed = assignmentMaxPoints * 1.5;
+				break;
+
+			case PERCENTAGE:
+				maxAllowed = 150.0;
+				break;
+
+			default:
+				log.error("Unrecognized Grading Type");
+				return -1;
+		}
 		
 		try
 		{
 			for (final GradeDefinition def : defs)
 			{
+				if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_LETTER) {
+					log.warn("Skipping unsupported Gradebook Entry type of LETTER");
+					continue;
+				}
+
 				if (def.getExcludedFromGrade()) {
 					log.info("Ignored one Grade Definition because grade has been excused");
 					continue;
@@ -1667,30 +1687,14 @@ public class GradebookNgBusinessService {
 					continue;
 				}
 
-				if(def.getGradeEntryType() == GradebookService.GRADE_TYPE_POINTS) {			
-					double newGrade = dblGrade + pointValue;
-					newGrade = Math.max(newGrade, 0.0);
-					if (newGrade > maxGradePoints) {
-						returnVal++;
-						continue;
-					}
-					def.setGrade(String.valueOf(newGrade));
-					saveList.add(def);
+				double newGrade = dblGrade + pointValue;
+				newGrade = Math.max(newGrade, 0.0);
+				if (newGrade > maxAllowed) {
+					returnVal++;
+					break;
 				}
-				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_PERCENTAGE) {
-					double newGrade = dblGrade + ((pointValue / 100.0) * assignmentMaxPoints);
-					newGrade = Math.max(newGrade, 0.0);
-					if (newGrade > maxPercentage) {
-						returnVal++;
-						continue;
-					}
-					def.setGrade(String.valueOf(newGrade));
-					saveList.add(def);
-				}
-				else if (def.getGradeEntryType() == GradebookService.GRADE_TYPE_LETTER) {
-					log.warn("Skipping unsupported Gradebook type of LETTER");
-					continue;
-				}							
+				def.setGrade(String.valueOf(newGrade));
+				saveList.add(def);
 			}
 
 			if (returnVal == 0) {
@@ -1698,7 +1702,7 @@ public class GradebookNgBusinessService {
 					this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
 							assignmentId,
 							def.getStudentUid(),
-							def.getGrade(), null);	
+							def.getGrade(), def.getGradeComment());
 				}
 
 			}

@@ -3,6 +3,8 @@
 @import "tracs-skins/tracs-all";
 
 /* Color palette */
+$dark-chocolate:#0b0203;
+$chocolate:     #26090a;
 $maroon:        #501214;
 $sandstone:     #eae3db;
 $dust-storm:    #ddd2c6;
@@ -73,13 +75,13 @@ $sites-nav-menu-item-border-top:            1px solid $khaki;
 $sites-nav-menu-item-border-right:          1px solid $khaki;
 $sites-nav-menu-item-border-bottom:         1px solid $khaki;
 $sites-nav-menu-item-border-left:           1px solid $khaki;
-$sites-nav-menu-item-selected-background:   $white;
-$sites-nav-menu-item-selected-color:        $maroon;
-$sites-nav-menu-item-selected-color-hover:  $maroon;
-$sites-nav-menu-item-selected-border-top:   1px solid $platinum; 
-$sites-nav-menu-item-selected-border-right: 1px solid $platinum;
-$sites-nav-menu-item-selected-border-bottom:1px solid $platinum;
-$sites-nav-menu-item-selected-border-left:  1px solid $platinum;
+$sites-nav-menu-item-selected-background:   $chocolate;
+$sites-nav-menu-item-selected-color:        $white;
+$sites-nav-menu-item-selected-color-hover:  $white;
+$sites-nav-menu-item-selected-border-top:   1px solid $dark-chocolate;
+$sites-nav-menu-item-selected-border-right: 1px solid $dark-chocolate;
+$sites-nav-menu-item-selected-border-bottom:1px solid $dark-chocolate;
+$sites-nav-menu-item-selected-border-left:  1px solid $dark-chocolate;
 
 $sites-nav-submenu-selected-background:     $sandstone-orig;
 $sites-nav-submenu-item-selected-background:$sandstone-orig;

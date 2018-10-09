@@ -608,7 +608,7 @@ body.is-logged-out{
 				box-shadow: 0 0 10px 10px rgba(255, 255, 255, 0.1) inset;
 				color: $sites-nav-menu-item-color-hover;
 			}
-			
+
 			span
 			{
 				line-height: 1;
@@ -696,6 +696,11 @@ body.is-logged-out{
 					border-right: $sites-nav-menu-item-selected-border-right;
 					border-bottom: $sites-nav-menu-item-selected-border-bottom; /* to pre-allocate space for dropdown top border needed for illusion */
 					border-left: $sites-nav-menu-item-selected-border-left;
+					&:hover, &:active
+					{
+						color: $sites-nav-menu-item-selected-color-hover; /* to override default link hover color */
+					}
+
 				}
 				ul{
 					background: $sites-nav-menu-item-selected-background;

@@ -63,6 +63,7 @@ public class GradeItemCellPanel extends Panel {
 	boolean gradeable;
 	boolean showMenu;
 	boolean excludedFromGrade;
+	boolean isExternal;
 
 	GradeCellStyle baseGradeStyle = GradeCellStyle.NORMAL;
 	GradeCellSaveStyle gradeSaveStyle;
@@ -109,7 +110,7 @@ public class GradeItemCellPanel extends Panel {
 		final Double assignmentPoints = (Double) this.modelData.get("assignmentPoints");
 		final String studentUuid = (String) this.modelData.get("studentUuid");
 		final Long categoryId = (Long) this.modelData.get("categoryId");
-		final boolean isExternal = (boolean) this.modelData.get("isExternal");
+		this.isExternal = (boolean) this.modelData.get("isExternal");
 		final GbGradeInfo gradeInfo = (GbGradeInfo) this.modelData.get("gradeInfo");
 		final GbRole role = (GbRole) this.modelData.get("role");
 		this.gradingType = (GbGradingType) this.modelData.get("gradingType");
@@ -126,10 +127,6 @@ public class GradeItemCellPanel extends Panel {
 		this.gradeable = (gradeInfo != null) ? gradeInfo.isGradeable() : false; 
 		this.excludedFromGrade = (gradeInfo != null) ? gradeInfo.isExcludedFromGrade() : false;
 
-		// if (this.excludedFromGrade) {
-		// 	this.add(new AttributeAppender("class", new Model("gb-excluded-item-cell"), " "));
-		// }
-
 		if (role == GbRole.INSTRUCTOR) {
 			this.gradeable = true;
 		}
@@ -140,7 +137,7 @@ public class GradeItemCellPanel extends Panel {
 		this.displayGrade = formatDisplayGrade(this.formattedGrade);
 
 		// RENDER
-		if (isExternal || !this.gradeable) {
+		if (!this.gradeable) {
 
 			add(new Label("readonlyGrade", Model.of(this.displayGrade)));
 			add(new Label("editableGrade") {
@@ -163,7 +160,10 @@ public class GradeItemCellPanel extends Panel {
 			}
 
 		} else {
-			add(new Label("readonlyGrade") {
+			if (isExternal) {
+				this.notifications.add(GradeCellNotification.IS_EXTERNAL);
+			}
+			add(new Label("readonlyGrade", Model.of(this.displayGrade)) {
 				private static final long serialVersionUID = 1L;
 
 				@Override
@@ -186,12 +186,15 @@ public class GradeItemCellPanel extends Panel {
 					parentCell.add(new AttributeModifier("class", GradeCellStyle.NORMAL.getCss()));
 					parentCell.setOutputMarkupId(true);
 
-					//Hide the text box if the grade is excused
-					//this.setVisible(!excludedFromGrade);
-					//this.setEnabled(!excludedFromGrade);
-					if (excludedFromGrade) this.add(new AttributeModifier("readonly", new Model("readonly")));
+					//Hide the text box if the grade is excused or external
+					if (excludedFromGrade || isExternal) this.add(new AttributeModifier("readonly", new Model("readonly")));
 
 					GradeItemCellPanel.this.showMenu = true;
+				}
+
+				@Override
+				public boolean isVisible() {
+					return true;
 				}
 			};
 
@@ -207,7 +210,7 @@ public class GradeItemCellPanel extends Panel {
 
 				@Override
 				protected void onUpdate(final AjaxRequestTarget target) {
-					if (excludedFromGrade) {
+					if (excludedFromGrade || isExternal) {
 						return;
 					}
 					final String rawGrade = GradeItemCellPanel.this.gradeCell.getValue();
@@ -542,6 +545,10 @@ public class GradeItemCellPanel extends Panel {
 			cssClasses.add(GradeCellStyle.EXCLUDED.getCss());
 		}
 
+		if (this.isExternal) {
+			cssClasses.add(GradeCellStyle.EXTERNAL.getCss());
+		}
+
 		cssClasses.add(baseGradeStyle.getCss()); // always
 		if (this.gradeSaveStyle != null) {
 			cssClasses.add(this.gradeSaveStyle.getCss()); // the particular style for this cell that has been computed previously
@@ -554,8 +561,6 @@ public class GradeItemCellPanel extends Panel {
 	/**
 	 * Get the parent container for the grade cell so we can style it
 	 *
-	 * @param gradeCell
-	 * @return
 	 */
 	private Component getParentCellFor(final Component component) {
 		if (StringUtils.equals(component.getMarkupAttributes().getString("wicket:id"), "cells")) {

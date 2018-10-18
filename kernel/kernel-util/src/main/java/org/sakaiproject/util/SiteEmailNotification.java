@@ -135,7 +135,7 @@ public class SiteEmailNotification extends EmailNotification
 			addSpecialRecipients(users, ref);
 
 			//only use direct site members for the base list of users
-			refineToSiteMembers(users, site);
+			refineToSiteActiveMembers(users, site);
 
 			return users;
 		}
@@ -274,6 +274,34 @@ public class SiteEmailNotification extends EmailNotification
 	protected void refineToSiteMembers(List<User> users, Site site) {
 		Set<Member> members = site.getMembers();
 		Set<String> memberUserIds = getUserIds(members);
+
+		for (Iterator<User> i = users.listIterator(); i.hasNext();) {
+			User user = i.next();
+
+			if (!memberUserIds.contains(user.getId())) {
+				i.remove();
+			}
+		}
+	}
+
+	/**
+	 * Refine the recipients list to only users that are actually active members
+	 * of the given site.
+	 *
+	 * @param users
+	 * 		The list of users to refine
+	 * @param site
+	 * 		The site whose membership the users will be refined to
+	 */
+	protected void refineToSiteActiveMembers(List<User> users, Site site) {
+		Set<Member> members = site.getMembers();
+
+		Set<String> memberUserIds = new HashSet<String>();
+
+		for(Member member:members){
+			if(member.isActive())
+				memberUserIds.add(member.getUserId());
+		}
 
 		for (Iterator<User> i = users.listIterator(); i.hasNext();) {
 			User user = i.next();

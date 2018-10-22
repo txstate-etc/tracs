@@ -245,8 +245,8 @@ public class MapInputColumnsStep extends Panel {
            			if (!validateForm(listItems)) {
 						return;
 					}
-           			int studentIdIndex = 0;
-					int studentNameIndex = 1;
+           			int studentIdIndex = -1;
+					int studentNameIndex = -1;
 					
                 	for(int i = 0; i < listItems.size(); i ++) {
                 		

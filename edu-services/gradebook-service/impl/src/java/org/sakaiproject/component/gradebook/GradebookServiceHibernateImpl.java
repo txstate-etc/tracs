@@ -314,6 +314,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 						gradeDef.setDateRecorded(gradeRecord.getDateRecorded());
 						gradeDef.setGraderUid(gradeRecord.getGraderId());
 						gradeDef.setGradeComment(commentText);
+						gradeDef.setExcludedFromGrade(gradeRecord.isExcludedFromGrade() == null ? false : gradeRecord.isExcludedFromGrade());
 						
 						if (gradebook.getGrade_type() == GradebookService.GRADE_TYPE_LETTER) {
 							List<AssignmentGradeRecord> gradeList = new ArrayList<AssignmentGradeRecord>();

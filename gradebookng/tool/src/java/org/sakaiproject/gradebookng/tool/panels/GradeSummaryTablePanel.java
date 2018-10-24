@@ -167,13 +167,16 @@ public class GradeSummaryTablePanel extends Panel {
 						final GbGradeInfo gradeInfo = grades.get(assignment.getId());
 
 						final String rawGrade;
+						final boolean isExcused;
 						String comment;
 						if (gradeInfo != null) {
 							rawGrade = gradeInfo.getGrade();
 							comment = gradeInfo.getGradeComment();
+							isExcused = gradeInfo.isExcludedFromGrade();
 						} else {
 							rawGrade = "";
 							comment = "";
+							isExcused = false;
 						}
 
 						final Label title = new Label("title", assignment.getName());
@@ -205,17 +208,21 @@ public class GradeSummaryTablePanel extends Panel {
 						assignmentItem.add(dueDate);
 
 						if (GbGradingType.PERCENTAGE.equals(gradingType)) {
-							assignmentItem.add(new Label("grade",
-								new StringResourceModel("label.percentage.valued", null,
-									new Object[]{FormatHelper.formatGrade(rawGrade)})) {
-								@Override
-								public boolean isVisible() {
-									return StringUtils.isNotBlank(rawGrade);
-								}
-							});
+							if (isExcused) {
+								assignmentItem.add(new Label("grade", getGradeDisplayText(gradeInfo)));
+							} else {
+								assignmentItem.add(new Label("grade",
+										new StringResourceModel("label.percentage.valued", null,
+												new Object[]{getGradeDisplayText(gradeInfo)})) {
+									@Override
+									public boolean isVisible() {
+										return StringUtils.isNotBlank(rawGrade);
+									}
+								});
+							}
 							assignmentItem.add(new Label("outOf").setVisible(false));
 						} else {
-							assignmentItem.add(new Label("grade", FormatHelper.formatGrade(rawGrade)));
+							assignmentItem.add(new Label("grade", getGradeDisplayText(gradeInfo)));
 							assignmentItem.add(new Label("outOf",
 								new StringResourceModel("label.studentsummary.outof", null, new Object[]{assignment.getPoints()})) {
 								@Override
@@ -234,5 +241,17 @@ public class GradeSummaryTablePanel extends Panel {
 			}
 		});
 
+	}
+
+	private String getGradeDisplayText(GbGradeInfo gradeInfo) {
+		if (gradeInfo == null) {
+			return "";
+		}
+
+		if (gradeInfo.isExcludedFromGrade()) {
+			return "Excused";
+		}
+
+		return FormatHelper.formatGrade(gradeInfo.getGrade());
 	}
 }

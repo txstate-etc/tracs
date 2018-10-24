@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This is the externally exposed API of the gradebook application.
@@ -600,7 +601,14 @@ public interface GradebookService {
 	 */
 	public boolean isGradeValid(String gradebookUuid, String grade)
 		throws GradebookNotFoundException;
-	
+
+	/**
+	 * Determines if the given string contains a valid numeric grade.
+	 * @param grade the grade as a string, expected to contain a numeric value
+	 * @return true if the string contains a valid numeric grade
+	 */
+	public boolean isValidNumericGrade(String grade);
+
 	/**
 	 * 
 	 * @param gradebookUid
@@ -792,7 +800,7 @@ public interface GradebookService {
      * @return percentage or null if no calculations were made
      * 
      */
-	Double calculateCategoryScore(Long gradebookId, String studentUuid, Long categoryId);
+	Optional<CategoryScoreData> calculateCategoryScore(Long gradebookId, String studentUuid, Long categoryId);
 	
 	/**
      * Calculate the category score for the given gradebook, category, assignments in the category and grade map.
@@ -806,7 +814,7 @@ public interface GradebookService {
      * @param gradeMap map of assignmentId to grade, to use for the calculations
      * @return percentage or null if no calculations were made
      */
-	Double calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category, final List<Assignment> categoryAssignments, Map<Long,String> gradeMap);
+	Optional<CategoryScoreData> calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category, final List<Assignment> categoryAssignments, Map<Long,String> gradeMap);
 
     /**
      * Get the course grade for a student

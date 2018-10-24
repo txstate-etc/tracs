@@ -1587,6 +1587,12 @@ GradebookSpreadsheet.prototype.setupCell = function(cellId, assignmentId, studen
   cellModel.handleSaveComplete(cellId)
 };
 
+GradebookSpreadsheet.prototype.refreshCellForCategoryDropUpdate = function(cellId, assignmentId, studentUuid) {
+  var cellModel = this.getCellModelForStudentAndAssignment(studentUuid, assignmentId);
+  if (cellModel.isEditable()) {
+    cellModel.handleWicketCellReplacementForCategoryDropUpdate(cellId);
+  }
+};
 
 GradebookSpreadsheet.prototype.findVisibleStudentBefore = function(studentUuid) {
   var $cell = this.$spreadsheet.find(".gb-student-cell[data-studentuuid='"+studentUuid+"']");
@@ -2055,6 +2061,22 @@ GradebookEditableCell.prototype.handleWicketCellReplacement = function(cellId) {
   if (this._focusAfterSaveComplete) {
     this.$cell.focus();
     this._focusAfterSaveComplete = false;
+  }
+};
+
+// this method is called after a cell is redrawn by Wicket due to a drop from category update
+// the cell itself may or may not have visibly changed
+GradebookEditableCell.prototype.handleWicketCellReplacementForCategoryDropUpdate = function(cellId)
+{
+  // set the cell up (attach event handlers, etc.) if required
+  if (!this.$cell.data("wicket_input_initialized"))
+  {
+      this.setupEditableCell($("#" + cellId));
+  }
+
+  //re-enable popover?
+  if (this.$cell.has('[data-toggle="popover"]')) {
+    this.gradebookSpreadsheet.enablePopovers(this.$cell);
   }
 };
 

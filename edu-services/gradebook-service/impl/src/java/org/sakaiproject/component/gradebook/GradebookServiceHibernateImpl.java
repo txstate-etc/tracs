@@ -40,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,7 @@ import org.sakaiproject.section.api.facade.Role;
 import org.sakaiproject.service.gradebook.shared.AssessmentNotFoundException;
 import org.sakaiproject.service.gradebook.shared.AssignmentHasIllegalPointsException;
 import org.sakaiproject.service.gradebook.shared.CategoryDefinition;
+import org.sakaiproject.service.gradebook.shared.CategoryScoreData;
 import org.sakaiproject.service.gradebook.shared.CommentDefinition;
 import org.sakaiproject.service.gradebook.shared.ConflictingAssignmentNameException;
 import org.sakaiproject.service.gradebook.shared.ConflictingCategoryNameException;
@@ -1975,7 +1977,41 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	  
 	  return isGradeValid(grade, gradeEntryType, mapping);
   }
-  
+
+	@Override
+	public boolean isValidNumericGrade(String grade)
+	{
+		boolean gradeIsValid = false;
+
+		try
+		{
+			NumberFormat nbFormat = NumberFormat.getInstance(new ResourceLoader().getLocale());
+			Double gradeAsDouble = nbFormat.parse(grade).doubleValue();
+			String decSeparator =((DecimalFormat)nbFormat).getDecimalFormatSymbols().getDecimalSeparator() + "";
+
+			// grade must be greater than or equal to 0
+			if (gradeAsDouble >= 0) {
+				String[] splitOnDecimal = grade.split("\\" + decSeparator);
+				// check that there are no more than 2 decimal places
+				if (splitOnDecimal == null) {
+					gradeIsValid = true;
+
+				// check for a valid score matching ##########.##
+				// where integer is maximum of 10 integers in length
+				// and maximum of 2 decimal places
+				} else if (grade.matches("[0-9]{0,10}(\\"+decSeparator+"[0-9]{0,2})?")) {
+					gradeIsValid = true;
+				}
+			}
+		}
+		catch (NumberFormatException | ParseException nfe)
+		{
+			log.debug("Passed grade is not a numeric value");
+		}
+
+		return gradeIsValid;
+	}
+
   private boolean isGradeValid(String grade, int gradeEntryType, LetterGradePercentMapping gradeMapping) {
 
 	  boolean gradeIsValid = false;
@@ -2823,7 +2859,6 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
             Integer dropHighest = cat.getDropHighest();
             Integer dropLowest = cat.getDrop_lowest();
             Integer keepHighest = cat.getKeepHighest();
-            Long catId = cat.getId();
             
             if((dropHighest != null && dropHighest > 0) || (dropLowest != null && dropLowest > 0) || (keepHighest != null && keepHighest > 0)) {
                 
@@ -3112,7 +3147,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
     }
 	
 	@Override
-	public Double calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category, final List<org.sakaiproject.service.gradebook.shared.Assignment> categoryAssignments, Map<Long,String> gradeMap) {
+	public Optional<CategoryScoreData> calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category,
+			final List<org.sakaiproject.service.gradebook.shared.Assignment> categoryAssignments, Map<Long,String> gradeMap) {
 		
 		Gradebook gb = (Gradebook) gradebook;
 		
@@ -3156,6 +3192,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			a.setRemoved(false); //shared.Assignment doesn't include removed so this will always be false
 			a.setGradebook(gb);
 			a.setCategory(c);
+			a.setId(assignment.getId());  // store the id so we can find out later which grades were dropped, if any
 			
 			//create the AGR
 			AssignmentGradeRecord gradeRecord = new AssignmentGradeRecord(a, studentUuid, grade);
@@ -3163,11 +3200,11 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			gradeRecords.add(gradeRecord);
 		}
 		
-		return calculateCategoryScore(studentUuid, category.getId(), gradeRecords);
+		return getCategoryScoreResult(studentUuid, category.getId(), gradeRecords);
 	}
 	
 	@Override
-	public Double calculateCategoryScore(Long gradebookId, String studentUuid, Long categoryId) {
+	public Optional<CategoryScoreData> calculateCategoryScore(Long gradebookId, String studentUuid, Long categoryId) {
 			
 		//get all grade records for the student
 		@SuppressWarnings({ "unchecked", "rawtypes"})
@@ -3181,18 +3218,38 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		//apply the settings
 		List<AssignmentGradeRecord> gradeRecords = gradeRecMap.get(studentUuid);
 		
-		return calculateCategoryScore(studentUuid, categoryId, gradeRecords);
+		return getCategoryScoreResult(studentUuid, categoryId, gradeRecords);
+	}
+
+	private Optional<CategoryScoreData> getCategoryScoreResult(String studentUuid, Long categoryId, List<AssignmentGradeRecord> gradeRecords)
+	{
+		List<AssignmentGradeRecord> dropList = new ArrayList<>();
+		Double score = calculateCategoryScore(studentUuid, categoryId, gradeRecords, dropList);
+		if (score == null)
+		{
+			return Optional.empty();
+		}
+
+		// the call to calculateCategoryScore modifies gradeRecords so that it only contains items included in the category score
+		List<Long> includedItems = gradeRecords.stream().map(agr -> agr.getAssignment().getId()).collect(Collectors.toList());
+
+		// the call to calculateCategoryScore populates dropList with the items that were dropped (and are no longer in gradeRecords)
+		List<Long> droppedItems = dropList.stream().map(agr -> agr.getAssignment().getId()).collect(Collectors.toList());
+
+		return Optional.of(new CategoryScoreData(score, includedItems, droppedItems));
 	}
 	
 	/**
 	 * Does the heavy lifting for the category calculations.
 	 * Requires the List of AssignmentGradeRecord so that we can applyDropScores.
-	 * @param studentUuid the studnet uuid
+	 * @param studentUuid the student uuid
 	 * @param categoryId the cateogry id we are interested in
 	 * @param gradeRecords all grade records for the student
+	 * @param dropList a list that will be populated with the dropped grade records due to drop highest/lowest settings
 	 * @return
 	 */
-	private Double calculateCategoryScore(String studentUuid, Long categoryId, List<AssignmentGradeRecord> gradeRecords) {
+	private Double calculateCategoryScore(String studentUuid, Long categoryId,
+			List<AssignmentGradeRecord> gradeRecords, List<AssignmentGradeRecord> dropList) {
 				
 		//validate
 		if(gradeRecords == null) {
@@ -3226,17 +3283,18 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		// Rule 7. extra credit items have their grade value counted only. Their total points possible does not apply to the calculations
 		log.debug("categoryId: " + categoryId);
 
+		// keep a list of the records that were dropped from this category
+		List<AssignmentGradeRecord> drops = gradeRecords.stream().filter(r -> isInCategory(r.getAssignment(), categoryId) && r.getDroppedFromGrade())
+				.collect(Collectors.toList());
+
 		gradeRecords.removeIf(gradeRecord -> {
 			Assignment assignment = gradeRecord.getAssignment();
 						
 			// remove if not for this category (rule 1)
-			if(assignment.getCategory() == null){
+			if(!isInCategory(assignment, categoryId)) {
 				return true;
 			}
-			if(categoryId.longValue() != assignment.getCategory().getId().longValue()){
-				return true;
-			}
-			
+
 			//remove if the assignment/graderecord doesn't meet the criteria for the calculation (rule 2-6)
 			if(assignment.getPointsPossible() == null || gradeRecord.getPointsEarned() == null || !assignment.isCounted() || !assignment.isReleased() || gradeRecord.getDroppedFromGrade()) {
 				return true;
@@ -3276,11 +3334,19 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		if (numScored == 0 || numOfAssignments == 0 || totalPossible.doubleValue() == 0) {
     		return null;
     	}
-	
+
+		// populate the drop list before returning the category score
+		dropList.addAll(drops);
+
     	BigDecimal mean = totalEarned.divide(new BigDecimal(numScored), GradebookService.MATH_CONTEXT).divide((totalPossible.divide(new BigDecimal(numOfAssignments), GradebookService.MATH_CONTEXT)), GradebookService.MATH_CONTEXT).multiply(new BigDecimal("100"));    	
     	return Double.valueOf(mean.doubleValue());
 	}
-	
+
+	private boolean isInCategory(Assignment asn, Long categoryId)
+	{
+		return asn != null && asn.getCategory() != null && asn.getCategory().getId().longValue() == categoryId.longValue();
+	}
+
 	@Override
 	public org.sakaiproject.service.gradebook.shared.CourseGrade getCourseGradeForStudent(String gradebookUid, String userUuid) {
 		return this.getCourseGradeForStudents(gradebookUid, Collections.singletonList(userUuid)).get(userUuid);

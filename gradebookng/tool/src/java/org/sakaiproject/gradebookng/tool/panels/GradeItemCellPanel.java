@@ -14,6 +14,7 @@ import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.core.util.string.ComponentRenderer;
 import org.apache.wicket.event.Broadcast;
+import org.apache.wicket.event.IEvent;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -31,9 +32,11 @@ import org.sakaiproject.gradebookng.business.GradeSaveResponse;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.business.model.GbGradeInfo;
 import org.sakaiproject.gradebookng.business.util.FormatHelper;
+import org.sakaiproject.gradebookng.tool.model.CategoryScoreChangedEvent;
 import org.sakaiproject.gradebookng.tool.model.GbModalWindow;
 import org.sakaiproject.gradebookng.tool.model.ScoreChangedEvent;
 import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
+import org.sakaiproject.gradebookng.tool.util.GbUtils;
 import org.apache.wicket.behavior.AttributeAppender;
 
 /**
@@ -45,6 +48,7 @@ import org.apache.wicket.behavior.AttributeAppender;
 public class GradeItemCellPanel extends Panel {
 
 	private static final long serialVersionUID = 1L;
+	private static final String PARENT_ID = "cells";
 
 	@SpringBean(name = "org.sakaiproject.gradebookng.business.GradebookNgBusinessService")
 	protected GradebookNgBusinessService businessService;
@@ -54,6 +58,7 @@ public class GradeItemCellPanel extends Panel {
 
 	TextField<String> gradeCell;
 	private String originalGrade;
+	private Label displayGradeLabel;
 	
 	String rawGrade;
 	String formattedGrade;
@@ -67,12 +72,18 @@ public class GradeItemCellPanel extends Panel {
 
 	GradeCellStyle baseGradeStyle = GradeCellStyle.NORMAL;
 	GradeCellSaveStyle gradeSaveStyle;
+	GradeCellDropStyle gradeDropStyle;
 	
 	GbGradingType gradingType;
 
 	double pointsLimit = 0;
 
-	final List<GradeCellNotification> notifications = new ArrayList<GradeCellNotification>();
+	final List<GradeCellNotification> notifications = new ArrayList<>();
+
+	private boolean dropped;
+	private String studentUuid;
+	private Long categoryId;
+	private Long assignmentId;
 
 	public enum GradeCellNotification {
 		IS_EXTERNAL("grade.notifications.isexternal"),
@@ -106,10 +117,10 @@ public class GradeItemCellPanel extends Panel {
 
 		// unpack model
 		this.modelData = this.model.getObject();
-		final Long assignmentId = (Long) this.modelData.get("assignmentId");
+		assignmentId = (Long) this.modelData.get("assignmentId");
 		final Double assignmentPoints = (Double) this.modelData.get("assignmentPoints");
-		final String studentUuid = (String) this.modelData.get("studentUuid");
-		final Long categoryId = (Long) this.modelData.get("categoryId");
+		studentUuid = StringUtils.defaultIfBlank((String) this.modelData.get("studentUuid"), "");
+		categoryId = (Long) modelData.get("categoryId");
 		this.isExternal = (boolean) this.modelData.get("isExternal");
 		final GbGradeInfo gradeInfo = (GbGradeInfo) this.modelData.get("gradeInfo");
 		final GbRole role = (GbRole) this.modelData.get("role");
@@ -127,6 +138,14 @@ public class GradeItemCellPanel extends Panel {
 		this.gradeable = (gradeInfo != null) ? gradeInfo.isGradeable() : false; 
 		this.excludedFromGrade = (gradeInfo != null) ? gradeInfo.isExcludedFromGrade() : false;
 
+		gradeDropStyle = GradeCellDropStyle.INCLUDED;
+		dropped = (gradeInfo != null) ?
+				StringUtils.isNotBlank(gradeInfo.getGrade()) && gradeInfo.isDroppedFromCategoryScore() : false;
+		if (dropped)
+		{
+			gradeDropStyle = GradeCellDropStyle.DROPPED;
+		}
+
 		if (role == GbRole.INSTRUCTOR) {
 			this.gradeable = true;
 		}
@@ -139,7 +158,12 @@ public class GradeItemCellPanel extends Panel {
 		// RENDER
 		if (!this.gradeable) {
 
-			add(new Label("readonlyGrade", Model.of(this.displayGrade)));
+			displayGradeLabel = new Label("readonlyGrade", Model.of(this.displayGrade));
+			if (categoryId != null)
+			{
+				displayGradeLabel.setOutputMarkupId(true);
+			}
+			add(displayGradeLabel);
 			add(new Label("editableGrade") {
 				private static final long serialVersionUID = 1L;
 
@@ -197,7 +221,6 @@ public class GradeItemCellPanel extends Panel {
 					return true;
 				}
 			};
-
 			this.gradeCell.add(new AjaxFormComponentUpdatingBehavior("scorechange.sakai") {
 				private static final long serialVersionUID = 1L;
 
@@ -483,6 +506,45 @@ public class GradeItemCellPanel extends Panel {
 		styleGradeCell(this);
 	}
 
+	@Override
+	public void onEvent(IEvent<?> event)
+	{
+		super.onEvent(event);
+		if (event.getPayload() instanceof CategoryScoreChangedEvent)
+		{
+			final CategoryScoreChangedEvent payload = (CategoryScoreChangedEvent) event.getPayload();
+			if (categoryId != null && categoryId.equals(payload.categoryId)
+					&& studentUuid.equals(payload.studentUuid))
+			{
+				dropped = payload.droppedItems.contains(assignmentId)
+						&& gradeCell != null && businessService.isValidNumericGrade(gradeCell.getModelObject());
+				gradeDropStyle = dropped ? GradeCellDropStyle.DROPPED : GradeCellDropStyle.INCLUDED;
+
+				String js = String.format("sakai.gradebookng.spreadsheet.refreshCellForCategoryDropUpdate('%s', '%s', '%s')",
+						GbUtils.getParentCellFor(gradeCell, PARENT_ID).map(p -> p.getMarkupId()).orElse(""),
+						assignmentId, studentUuid);
+				payload.target.appendJavaScript(js);
+
+				// only one of these will have a parent cell and be added to the target
+				GbUtils.getParentCellFor(GradeItemCellPanel.this.gradeCell, PARENT_ID).ifPresent(payload.target::add);
+				GbUtils.getParentCellFor(displayGradeLabel, PARENT_ID).ifPresent(payload.target::add);
+
+				// clear the save style unless there was an error
+				if (!GradeCellSaveStyle.ERROR.equals(gradeSaveStyle) && !GradeCellSaveStyle.WARNING.equals(gradeSaveStyle))
+				{
+					gradeSaveStyle = null;
+				}
+
+				// apply any applicable flags
+				refreshExtraCreditFlag();
+				refreshCommentFlag();
+				refreshNotifications();
+
+				styleGradeCell(this);
+			}
+		}
+	}
+
 	/**
 	 * Set the enum value so we can use it when we style. TODO collapse these into one
 	 *
@@ -539,7 +601,7 @@ public class GradeItemCellPanel extends Panel {
 	 */
 	private void styleGradeCell(final Component gradeCell) {
 
-		final ArrayList<String> cssClasses = new ArrayList<>();
+		final ArrayList<String> cssClasses = new ArrayList<>(3);
 
 		if (this.excludedFromGrade) {
 			cssClasses.add(GradeCellStyle.EXCLUDED.getCss());
@@ -552,6 +614,11 @@ public class GradeItemCellPanel extends Panel {
 		cssClasses.add(baseGradeStyle.getCss()); // always
 		if (this.gradeSaveStyle != null) {
 			cssClasses.add(this.gradeSaveStyle.getCss()); // the particular style for this cell that has been computed previously
+		}
+
+		if (gradeDropStyle == GradeCellDropStyle.DROPPED)
+		{
+			cssClasses.add(gradeDropStyle.css);
 		}
 
 		// replace the cell styles with the new set
@@ -616,9 +683,22 @@ public class GradeItemCellPanel extends Panel {
 		}
 	}
 
+	enum GradeCellDropStyle
+	{
+		DROPPED("gb-dropped-grade-cell"),
+		INCLUDED("");
+
+		final String css;
+
+		GradeCellDropStyle(final String css)
+		{
+			this.css = css;
+		}
+	}
+
 	private void refreshExtraCreditFlag() {
 		// check if grade is over limit and mark the cell with the warning class
-		if (NumberUtils.toDouble(this.formattedGrade) > this.pointsLimit) {
+		if (NumberUtils.toDouble(displayGrade) > pointsLimit) {
 			markOverLimit(this, false);
 			this.notifications.add(GradeCellNotification.OVER_LIMIT);
 		}

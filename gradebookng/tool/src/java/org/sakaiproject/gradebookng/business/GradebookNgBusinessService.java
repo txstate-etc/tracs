@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -34,6 +35,8 @@ import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
 import org.sakaiproject.authz.api.Member;
+import org.sakaiproject.authz.api.SecurityAdvisor;
+import org.sakaiproject.authz.api.SecurityAdvisor.SecurityAdvice;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.coursemanagement.api.CourseManagementService;
@@ -59,6 +62,7 @@ import org.sakaiproject.gradebookng.tool.model.GradebookUiSettings;
 import org.sakaiproject.service.gradebook.shared.AssessmentNotFoundException;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.CategoryDefinition;
+import org.sakaiproject.service.gradebook.shared.CategoryScoreData;
 import org.sakaiproject.service.gradebook.shared.CommentDefinition;
 import org.sakaiproject.service.gradebook.shared.CourseGrade;
 import org.sakaiproject.service.gradebook.shared.GradeDefinition;
@@ -440,6 +444,41 @@ public class GradebookNgBusinessService {
 		Collections.sort(rval, CategoryDefinition.orderComparator);
 
 		return rval;
+	}
+
+	/**
+	 * Retrieve the categories visible to the given student.
+	 *
+	 * This should only be called if you are wanting to view the assignments that a student would see (ie if you ARE a student, or if you
+	 * are an instructor using the student review mode)
+	 *
+	 * @param studentUuid
+	 * @return
+	 */
+	public List<CategoryDefinition> getGradebookCategoriesForStudent(String studentUuid)
+	{
+		// find the categories that this student's visible assignments belong to
+		List<Assignment> viewableAssignments = getGradebookAssignmentsForStudent(studentUuid);
+		final List<Long> catIds = new ArrayList<>();
+		for (Assignment a : viewableAssignments)
+		{
+			Long catId = a.getCategoryId();
+			if (catId != null && !catIds.contains(catId))
+			{
+				catIds.add(a.getCategoryId());
+			}
+		}
+
+		// get all the categories in the gradebook, use a security advisor in case the current user is the student
+		SecurityAdvisor gbAdvisor = (String userId, String function, String reference)
+				-> "gradebook.gradeAll".equals(function) ? SecurityAdvice.ALLOWED : SecurityAdvice.PASS;
+		securityService.pushAdvisor(gbAdvisor);
+		List<CategoryDefinition> catDefs = gradebookService.getCategoryDefinitions(getGradebook().getUid());
+		securityService.popAdvisor(gbAdvisor);
+
+		// filter out the categories that don't match the categories of the viewable assignments
+		return catDefs.stream().filter(def -> catIds.contains(def.getId())).collect(Collectors.toList());
+
 	}
 
 	/**
@@ -1024,11 +1063,27 @@ public class GradebookNgBusinessService {
 						}
 					}
 
-					final Double categoryScore = this.gradebookService.calculateCategoryScore(gradebook,
+					Double score = null;
+					final Optional<CategoryScoreData> categoryScore = gradebookService.calculateCategoryScore(gradebook,
 							student.getId(), category, category.getAssignmentList(), gradeMap);
+					if (categoryScore.isPresent())
+					{
+						CategoryScoreData data = categoryScore.get();
+						for (Long item : gradeMap.keySet())
+						{
+							if (data.droppedItems.contains(item))
+							{
+								grades.get(item).setDroppedFromCategoryScore(true);
+							}
+						}
+						score = data.score;
+					}
 
 					// add to GbStudentGradeInfo
-					sg.addCategoryAverage(category.getId(), categoryScore);
+					// OWLTODO: allowing score to be null to preserve original logic
+					// however, this just gets put into a map as a null so probably could
+					// just omit it
+					sg.addCategoryAverage(category.getId(), score);
 
 					// TODO the TA permission check could reuse this iteration... check performance.
 
@@ -2057,14 +2112,14 @@ public class GradebookNgBusinessService {
 	 * @param studentUuid uuid of student
 	 * @return
 	 */
-	public Double getCategoryScoreForStudent(final Long categoryId, final String studentUuid) {
+	public Optional<CategoryScoreData> getCategoryScoreForStudent(final Long categoryId, final String studentUuid) {
 
 		final Gradebook gradebook = getGradebook();
 
-		final Double score = this.gradebookService.calculateCategoryScore(gradebook.getId(), studentUuid, categoryId);
-		log.info("Category score for category: " + categoryId + ", student: " + studentUuid + ":" + score);
+		final Optional<CategoryScoreData> result = gradebookService.calculateCategoryScore(gradebook.getId(), studentUuid, categoryId);
+		log.info("Category score for category: {}, student: {}:{}", categoryId, studentUuid, result.map(r -> r.score).orElse(null));
 
-		return score;
+		return result;
 	}
 
 	/**
@@ -2338,6 +2393,15 @@ public class GradebookNgBusinessService {
 	}
 
 
+	/**
+	 * Returns true if the given grade is numeric and meets the gradebook requirements (10 digits/2 decimal places max)
+	 * @param grade the grade to be validated, expected to be numeric
+	 * @return true if the grade is numeric and meets the gradebook requirements
+	 */
+	public boolean isValidNumericGrade(String grade)
+	{
+		return gradebookService.isValidNumericGrade(grade);
+	}
 
 	/**
 	 * Comparator class for sorting an assignment by the grades.

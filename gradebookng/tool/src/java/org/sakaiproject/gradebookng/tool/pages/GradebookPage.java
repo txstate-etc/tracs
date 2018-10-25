@@ -17,6 +17,7 @@ import org.apache.wicket.Session;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.behavior.AttributeAppender;
+import org.apache.wicket.event.Broadcast;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -51,6 +52,7 @@ import org.sakaiproject.gradebookng.business.util.GbStopWatch;
 import org.sakaiproject.gradebookng.business.util.MessageHelper;
 import org.sakaiproject.gradebookng.tool.component.GbAjaxButton;
 import org.sakaiproject.gradebookng.tool.component.GbHeadersToolbar;
+import org.sakaiproject.gradebookng.tool.model.CategoryScoreChangedEvent;
 import org.sakaiproject.gradebookng.tool.model.GbModalWindow;
 import org.sakaiproject.gradebookng.tool.model.GradebookUiSettings;
 import org.sakaiproject.gradebookng.tool.panels.AddOrEditGradeItemPanel;
@@ -103,6 +105,7 @@ public class GradebookPage extends BasePage {
 	boolean hasAssignmentsAndGrades;
 
 	Form<Void> form;
+	DataTable table;
 
 	List<PermissionDefinition> permissions = new ArrayList<>();
 	boolean showGroupFilter = true;
@@ -494,7 +497,7 @@ public class GradebookPage extends BasePage {
 		stopwatch.time("all Columns added", stopwatch.getTime());
 
 		// TODO make this AjaxFallbackDefaultDataTable
-		final DataTable table = new DataTable("table", cols, studentGradeMatrix, 50) {
+			table = new DataTable("table", cols, studentGradeMatrix, 50) {
 			@Override
 			protected Item newCellItem(final String id, final int index, final IModel model) {
 				return new Item(id, index, model) {
@@ -974,5 +977,10 @@ public class GradebookPage extends BasePage {
 		this.liveGradingFeedback.setDefaultModel(Model.of(message));
 
 		return this.liveGradingFeedback;
+	}
+
+	public void broadcastToTableCells(CategoryScoreChangedEvent event)
+	{
+		send(table.getBody(), Broadcast.BREADTH, event);
 	}
 }

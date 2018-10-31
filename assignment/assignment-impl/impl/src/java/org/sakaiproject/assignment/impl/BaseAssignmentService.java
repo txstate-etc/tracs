@@ -3578,16 +3578,19 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 			{
 				AssignmentSubmission submission = null;
 				Collection<Group> groups = (Collection<Group>) _site.getGroupsWithMember(user.getId());
-				if (groups != null)
-				{
-					for (Group _g : groups)
-					{
-						M_log.debug("Checking submission for group: " + _g.getTitle());
-						submission = getSubmission(a.getReference(), _g.getId());
-						if (submission != null && allowGetSubmission(submission.getReference()))
-						{
-							userSubmissionMap.put(user, submission);
-							break;
+				Collection<String> assignedGroupIds = a.getGroups();
+
+				if (groups != null) {
+					for (String assignedGroupId : assignedGroupIds) {
+						for (Group _g: groups) {
+							if (_g.getId().equals(getGroupId(assignedGroupId))){
+								M_log.debug("Checking submission for group: " + _g.getTitle());
+								submission = getSubmission(a.getReference(), _g.getId());
+								if (submission != null && allowGetSubmission(submission.getReference())) {
+									userSubmissionMap.put(user, submission);
+									break;
+								}
+							}
 						}
 					}
 				}
@@ -3605,6 +3608,17 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		return userSubmissionMap;
 	}
 
+	/*
+	 * @param assignmentGroupId
+	 *          format of /site/71f6f600-fe05-4924-955f-f195a1a000bc/group/a592e848-75be-4a3b-9717-2b9db49381e5
+	 * @return groupId
+	 *         a592e848-75be-4a3b-9717-2b9db49381e5
+	 */
+	private String getGroupId (String assignmentGroupId) {
+		List<String> ids = Arrays.asList(assignmentGroupId.split("/"));
+		String groupId = ids.get(ids.size()-1);
+		return groupId;
+	}
 	/**
          * 
 	 * Access a Group or User's AssignmentSubmission to a particular Assignment.

@@ -3515,11 +3515,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		
 		if ((assignmentReference != null) && (person != null))
 		{
-			//First check their personal submission
-			submission = m_submissionStorage.get(assignmentId, person.getId());
-			if (submission != null && allowGetSubmission(submission.getReference())) {
-				return submission;
-			}
+			//Should check group submission if it is a group assignment
 			try {
 				Assignment a = getAssignment(assignmentReference);
 				if (a.isGroup()) {
@@ -3527,6 +3523,11 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 				}
 			} catch (IdUnusedException | PermissionException e) {
 				M_log.debug(e.getMessage());
+			}
+			//If not group assignment, then check their personal submission
+			submission = m_submissionStorage.get(assignmentId, person.getId());
+			if (submission != null && allowGetSubmission(submission.getReference())) {
+				return submission;
 			}
 		}
 		

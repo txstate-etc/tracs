@@ -1688,7 +1688,7 @@ public class GradebookNgBusinessService {
 	* @param pointValue
 	* @return -1 if unsuccessful due to unforseen error, 
 	* 		  0 if completely successful, 
-	*		  N if unsuccessful due to exceeding the 150% grade point limit (where N = the number of grades exceeding said limit)
+	*		  1 if unsuccessful due to a grade exceeding the 150% grade point limit
 	**/
 	public int addScalePoints(final Long assignmentId, final double assignmentMaxPoints, final double pointValue)
 	{
@@ -1737,12 +1737,13 @@ public class GradebookNgBusinessService {
 				}
 
 				Double dblGrade = Double.parseDouble(grade);
+
 				if (Double.compare(dblGrade, 0.0) == 0) {
 					log.info("Ignored one Grade Definition due to a Grade of zero");
 					continue;
 				}
 
-				double newGrade = dblGrade + pointValue;
+				double newGrade = Double.parseDouble(String.format("%.2f", dblGrade + pointValue));
 				newGrade = Math.max(newGrade, 0.0);
 				if (newGrade > maxAllowed) {
 					returnVal++;

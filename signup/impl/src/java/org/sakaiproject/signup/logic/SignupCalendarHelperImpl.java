@@ -182,7 +182,7 @@ public class SignupCalendarHelperImpl implements SignupCalendarHelper {
 	@Override
 	public String createCalendarFile(List<VEvent> vevents) {
 		//create calendar
-		net.fortuna.ical4j.model.Calendar cal = externalCalendaringService.createCalendar(vevents);
+		net.fortuna.ical4j.model.Calendar cal = externalCalendaringService.createCalendar(vevents, null, true);
 				
 		//get path to file
 		return externalCalendaringService.toFile(cal);

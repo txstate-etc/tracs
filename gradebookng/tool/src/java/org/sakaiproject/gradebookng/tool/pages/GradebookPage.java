@@ -233,12 +233,11 @@ public class GradebookPage extends BasePage {
 		final List<Assignment> assignments = this.businessService.getGradebookAssignments(sortBy);
 		stopwatch.time("getGradebookAssignments", stopwatch.getTime());
 
-		totalPoints = 0.0;
-		for (Assignment assignment : assignments) {
-			if (assignment.isCounted() && !assignment.isExtraCredit() && !assignment.isCategoryExtraCredit()) {
-				totalPoints += assignment.getPoints();
-			}
-		}
+		// categories enabled?
+		final boolean categoriesEnabled = this.businessService.categoriesAreEnabled();
+		List<CategoryDefinition> categories = categoriesEnabled ? this.businessService.getGradebookCategories() : new ArrayList<>();
+
+		totalPoints = calculateTotalPoints(assignments, categoriesEnabled, categories);
 
 		// get the grade matrix. It should be sorted if we have that info
 		final List<GbStudentGradeInfo> grades = this.businessService.buildGradeMatrix(assignments, settings);
@@ -249,9 +248,6 @@ public class GradebookPage extends BasePage {
 		final Date gradesTimestamp = new Date();
 
 		stopwatch.time("buildGradeMatrix", stopwatch.getTime());
-
-		// categories enabled?
-		final boolean categoriesEnabled = this.businessService.categoriesAreEnabled();
 
 		// grading type?
 		final GbGradingType gradingType = GbGradingType.valueOf(gradebook.getGrade_type());
@@ -427,12 +423,11 @@ public class GradebookPage extends BasePage {
 		// TODO may be able to pass this list into the matrix to save another
 		// lookup in there)
 
-		List<CategoryDefinition> categories = new ArrayList<>();
-
 		if (categoriesEnabled) {
 
 			// only work with categories if enabled
-			categories = this.businessService.getGradebookCategories();
+			// No longer need to populate this list here. We created it above to calculate Total Points
+			//categories = this.businessService.getGradebookCategories();
 
 			// remove those that have no assignments
 			categories.removeIf(cat -> cat.getAssignmentList().isEmpty());
@@ -982,5 +977,31 @@ public class GradebookPage extends BasePage {
 	public void broadcastToTableCells(CategoryScoreChangedEvent event)
 	{
 		send(table.getBody(), Broadcast.BREADTH, event);
+	}
+
+	private Double calculateTotalPoints(List<Assignment> assignments, Boolean categoriesEnabled, List<CategoryDefinition> categories) {
+		Double returnVal = 0.0;
+
+		for (Assignment assignment : assignments) {
+			if (assignment.isCounted() && !assignment.isExtraCredit() && !assignment.isCategoryExtraCredit()) {
+				returnVal += assignment.getPoints();
+			}
+		}
+
+		if (categories == null)
+			return returnVal;
+
+		Integer totalDrops;
+		for (CategoryDefinition catDef : categories) {
+			if (!catDef.isExtraCredit() && catDef.getAssignmentList() != null && !catDef.getAssignmentList().isEmpty()) {
+				// Only using points of the first assignment, since in order to drop lowest/highest,
+				// all assignments in a category must have equal value
+				Double catAssPoints = catDef.getAssignmentList().get(0).getPoints();
+				totalDrops = catDef.getTotalDrops() < catDef.getAssignmentList().size() ? catDef.getTotalDrops() : 0;
+				returnVal -= catAssPoints * totalDrops;
+			}
+		}
+
+		return Double.parseDouble(String.format("%.2f", returnVal));
 	}
 }

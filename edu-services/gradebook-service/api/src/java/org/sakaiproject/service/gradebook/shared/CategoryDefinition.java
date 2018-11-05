@@ -144,6 +144,8 @@ public class CategoryDefinition implements Serializable {
 		return dropHighest;
 	}
 
+	public Integer getTotalDrops() { return dropHighest + drop_lowest; }
+
 	public void setDropHighest(Integer dropHighest) {
 		this.dropHighest = dropHighest;
 	}

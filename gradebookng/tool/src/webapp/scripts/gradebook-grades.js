@@ -104,7 +104,11 @@ GradebookSpreadsheet.prototype.setupGradeItemCellModels = function() {
     self.getCellModel($cell);
 
     // append menu
-    $cell.find("> div:first").append($("#gradeItemCellDropdownMenu").html());
+    if ($cell.hasClass("gb-external-item-cell")) {
+        $cell.find("> div:first").append($("#gradeExternalItemCellDropdownMenu").html());
+    } else {
+        $cell.find("> div:first").append($("#gradeItemCellDropdownMenu").html());
+    }
 
     // setup tooltip
     var $dropdown = $cell.find(".dropdown-toggle");

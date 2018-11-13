@@ -80,8 +80,8 @@ public class ExternalCalendaringServiceImpl implements ExternalCalendaringServic
 	 * {@inheritDoc}
 	 */
 	public VEvent createEvent(CalendarEvent event, Set<User> attendees) {
-		//Default to time in GMT
-		return createEvent(event, null, false);
+		//Default to time local
+		return createEvent(event, null, true);
 	}
 
 	public VTimeZone getTimeZone(boolean timeIsLocal) {

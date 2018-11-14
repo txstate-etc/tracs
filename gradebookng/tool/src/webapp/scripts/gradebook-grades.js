@@ -1596,12 +1596,14 @@ GradebookSpreadsheet.prototype.refreshCellForCategoryDropUpdate = function(cellI
 	var $cell = $(this.$table.find('#' + cellId));
 	var cellIndex = $cell.index();
 	var cellDisplayStyle = $(this.$table.find("thead .gb-headers th")[cellIndex]).attr("style");
-	$cell.attr("style",cellDisplayStyle);
 
   var cellModel = this.getCellModelForStudentAndAssignment(studentUuid, assignmentId);
   if (cellModel.isEditable()) {
     cellModel.handleWicketCellReplacementForCategoryDropUpdate(cellId);
   }
+
+	var $updatedcell = $(this.$table.find('#' + cellId));
+	$updatedcell.attr("style",cellDisplayStyle);
 };
 
 GradebookSpreadsheet.prototype.findVisibleStudentBefore = function(studentUuid) {

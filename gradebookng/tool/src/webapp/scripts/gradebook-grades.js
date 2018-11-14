@@ -1592,6 +1592,12 @@ GradebookSpreadsheet.prototype.setupCell = function(cellId, assignmentId, studen
 };
 
 GradebookSpreadsheet.prototype.refreshCellForCategoryDropUpdate = function(cellId, assignmentId, studentUuid) {
+	//Keep original cell display style
+	var $cell = $(this.$table.find('#' + cellId));
+	var cellIndex = $cell.index();
+	var cellDisplayStyle = $(this.$table.find("thead .gb-headers th")[cellIndex]).attr("style");
+	$cell.attr("style",cellDisplayStyle);
+
   var cellModel = this.getCellModelForStudentAndAssignment(studentUuid, assignmentId);
   if (cellModel.isEditable()) {
     cellModel.handleWicketCellReplacementForCategoryDropUpdate(cellId);

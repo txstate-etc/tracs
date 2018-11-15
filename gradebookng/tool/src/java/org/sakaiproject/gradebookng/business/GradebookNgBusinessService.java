@@ -2401,6 +2401,9 @@ public class GradebookNgBusinessService {
 	 */
 	public boolean isValidNumericGrade(String grade)
 	{
+		if (grade != null) {
+			grade = StringUtils.strip(grade, "%");
+		}
 		return gradebookService.isValidNumericGrade(grade);
 	}
 

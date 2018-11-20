@@ -372,7 +372,7 @@ public class FCKConnectorServlet extends HttpServlet {
 		  popPrivateAdvisor(currentFolder,collectionBase);
      }
      
-
+     private static final int MAX_SAVE_RETRIES = 100;
      /**
       * Manage the Post requests (FileUpload).<br>
       *
@@ -478,8 +478,9 @@ public class FCKConnectorServlet extends HttpServlet {
 
                     int counter = 1;
                     boolean done = false;
+                    Throwable lastException = null;
 
-                    while(!done) {
+                    for (int retry = 0; !done && retry < MAX_SAVE_RETRIES; retry++) {
                          try {
                              ResourcePropertiesEdit resourceProperties = contentHostingService.newResourceProperties();
                              resourceProperties.addProperty (ResourceProperties.PROP_DISPLAY_NAME, fileName);
@@ -508,6 +509,7 @@ public class FCKConnectorServlet extends HttpServlet {
                          }
                          catch (IdUsedException iue) {
                               //the name is already used, so we do a slight rename to prevent the colision
+                              lastException = iue;
                               fileName = nameWithoutExt + "(" + counter + ")" + ext;
                               status = "201";
                               counter++;
@@ -516,9 +518,16 @@ public class FCKConnectorServlet extends HttpServlet {
                          catch (Exception ex) {
                               //this user can't write where they are trying to write.
                               done = true;
+                              lastException = ex;
                               ex.printStackTrace();
                               status = "203";
                          }
+                    }
+                    if (!done) {
+                         // Hit our limit on retries.  This shouldn't happen
+                         // unless the state of things is strange (see SAK-32346
+                         // for an example of that)
+                         throw new RuntimeException("Retry limit exceeded", lastException);    
                     }
                }
                catch (Exception ex) {

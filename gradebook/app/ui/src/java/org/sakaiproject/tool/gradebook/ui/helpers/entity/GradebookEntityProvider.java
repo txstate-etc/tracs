@@ -248,10 +248,12 @@ public class GradebookEntityProvider extends AbstractEntityProvider implements
 
 			//Gradebooks can opt to not release course grades to students, requires null check
 			String calculatedGrade = courseGrade == null ? null : courseGrade.getCalculatedGrade();
+			String overrideGrade = courseGrade == null ? null : courseGrade.getEnteredGrade();
 			String mappedGrade = courseGrade == null ? null : courseGrade.getMappedGrade();
 
 			course.setMappedGrade(mappedGrade);
 			course.setCalculatedGrade(calculatedGrade);
+			course.setOverrideGrade(overrideGrade);
 			r.add(course);
 		}
 

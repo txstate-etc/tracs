@@ -16,6 +16,7 @@ public class GradeCourse {
 	protected List<GradeAssignmentItem> assignments;
 	protected String calculatedGrade;
 	protected String mappedGrade;
+	protected String overrideGrade;
 	
 	public GradeCourse (Site site)
 	{

@@ -1787,36 +1787,42 @@ public class HistogramListener
 			// the right order on Statistics page , see Bug SAM-440
 			i = answer.getSequence().intValue() - 1;
 
-			numarray[i] = num;
-			bars[i] = new HistogramBarBean();
-			if (qbean.getQuestionType().equals("4")) { // true-false
-				String origText = answer.getText();
-				String text = "";
-				if ("true".equals(origText)) {
-					text = rb.getString("true_msg");
+			try {
+				numarray[i] = num;
+				bars[i] = new HistogramBarBean();
+				if (qbean.getQuestionType().equals("4")) { // true-false
+					String origText = answer.getText();
+					String text = "";
+					if ("true".equals(origText)) {
+						text = rb.getString("true_msg");
+					} else {
+						text = rb.getString("false_msg");
+					}
+					bars[i].setLabel(text);
 				} else {
-					text = rb.getString("false_msg");
+					bars[i].setLabel(answer.getText());
 				}
-				bars[i].setLabel(text);
-			} else {
-				bars[i].setLabel(answer.getText());
-			}
-			bars[i].setIsCorrect(answer.getIsCorrect());
-			if ((num > 1) || (num == 0)) {
-				bars[i].setNumStudentsText(num + " "
-						+ rb.getString("responses"));
-			} else {
-				bars[i]
-						.setNumStudentsText(num + " "
-								+ rb.getString("response"));
+				bars[i].setIsCorrect(answer.getIsCorrect());
+				if ((num > 1) || (num == 0)) {
+					bars[i].setNumStudentsText(num + " "
+							+ rb.getString("responses"));
+				} else {
+					bars[i]
+							.setNumStudentsText(num + " "
+									+ rb.getString("response"));
 
+				}
+				bars[i].setNumStudents(num);
+				if (answer.getIsCorrect() != null
+						&& answer.getIsCorrect().booleanValue()) {
+					correctresponses += num;
+				}
+				// i++;
+			} catch (ArrayIndexOutOfBoundsException e) {
+				log.error("Question No. " + qbean.getQuestionNumber() + " with Question type = " + qbean.getQuestionType() + "  Qestion text = "+ qbean.getQuestionText()
+				+ " has anwer sequence number " + answer.getSequence().intValue());
+				log.error("There are only " + i + " answers in the multiple selections.");
 			}
-			bars[i].setNumStudents(num);
-			if (answer.getIsCorrect() != null
-					&& answer.getIsCorrect().booleanValue()) {
-				correctresponses += num;
-			}
-			// i++;
 		}
 		// NEW
 		int[] heights = calColumnHeight(numarray, qbean.getNumResponses());

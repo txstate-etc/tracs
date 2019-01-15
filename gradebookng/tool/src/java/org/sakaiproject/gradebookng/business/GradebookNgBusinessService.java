@@ -1803,7 +1803,7 @@ public class GradebookNgBusinessService {
 				this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(),
 							assignmentId,
 							def.getStudentUid(),
-							def.getGrade(), null);
+							def.getGrade(), def.getGradeComment());
 			}
 
 			return true;

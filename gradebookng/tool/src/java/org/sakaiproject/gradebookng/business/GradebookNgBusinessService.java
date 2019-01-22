@@ -44,6 +44,7 @@ import org.sakaiproject.event.api.Event;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
+import org.sakaiproject.gradebookng.business.TxstateInstitutionalAdvisor;
 import org.sakaiproject.gradebookng.business.exception.GbException;
 import org.sakaiproject.gradebookng.business.model.GbCourseGrade;
 import org.sakaiproject.gradebookng.business.model.GbGradeCell;
@@ -146,6 +147,8 @@ public class GradebookNgBusinessService {
 	private EventTrackingService eventTrackingService;
 
 	public static final String ASSIGNMENT_ORDER_PROP = "gbng_assignment_order";
+
+	public static final String S_ITEM = "item";
 
 	/**
 	 * Get a list of all users in the current site that can have grades
@@ -1351,6 +1354,8 @@ public class GradebookNgBusinessService {
 
 			final Long assignmentId = this.gradebookService.addAssignment(gradebookId, assignment);
 
+			postEvent("gradebookng.newItem", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentId), getAssignment(assignmentId).getName());
+
 			// Force the assignment to sit at the end of the list
 			if (assignment.getSortOrder() == null) {
 				final List<Assignment> allAssignments = this.gradebookService.getAssignments(gradebookId);
@@ -1638,6 +1643,9 @@ public class GradebookNgBusinessService {
 
 		try {
 			this.gradebookService.updateAssignment(gradebook.getUid(), original.getId(), assignment);
+
+			postEvent("gradebookng.updateItem", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignment.getId()));
+
 			if (original.getCategoryId() != null && assignment.getCategoryId() != null
 					&& original.getCategoryId().longValue() != assignment.getCategoryId().longValue()) {
 				updateAssignmentCategorizedOrder(gradebook.getUid(), assignment.getCategoryId(), assignment.getId(),
@@ -1657,9 +1665,11 @@ public class GradebookNgBusinessService {
 
         try {
             this.gradebookService.updateIsExcludedFromGradeForStudent(gradebook.getUid(), studentUuid, assignmentId, excludeFromGrade);
+            if (excludeFromGrade)
+                postEvent("gradebookng.excuseGrade", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentId), getAssignment(assignmentId).getName(), "studentUuid", studentUuid);
             return true;
         } catch (AssessmentNotFoundException a) {
-        	return saveBlankGradeGradeThenExcuseIt(gradebook, assignmentId, studentUuid, excludeFromGrade, oldComment);
+            return saveBlankGradeThenExcuseIt(gradebook, assignmentId, studentUuid, excludeFromGrade, oldComment);
         } catch (final Exception e) {
 			log.error("An unexpected error occurred updating isExcludedFromGrade flag", e);
 		}
@@ -1667,10 +1677,12 @@ public class GradebookNgBusinessService {
 		return false;
 	}
 
-	private boolean saveBlankGradeGradeThenExcuseIt(final Gradebook gradebook, final Long assignmentId, final String studentUuid, final boolean excludeFromGrade, String oldComment) {
+	private boolean saveBlankGradeThenExcuseIt(final Gradebook gradebook, final Long assignmentId, final String studentUuid, final boolean excludeFromGrade, String oldComment) {
 		try {
 			this.gradebookService.saveGradeAndCommentForStudent(gradebook.getUid(), assignmentId, studentUuid, "", oldComment);
 			this.gradebookService.updateIsExcludedFromGradeForStudent(gradebook.getUid(), studentUuid, assignmentId, excludeFromGrade);
+			if (excludeFromGrade)
+				postEvent("gradebookng.saveBlankThenExcuseGrade", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentId), getAssignment(assignmentId).getName(), "studentUuid", studentUuid);
 			return true;
 		} catch (final Exception e) {
 			log.error("An error occurred saving a blank and updating isExcludedFromGrade flag", e);
@@ -1760,7 +1772,7 @@ public class GradebookNgBusinessService {
 							def.getStudentUid(),
 							def.getGrade(), def.getGradeComment());
 				}
-
+				postEvent("gradebookng.addScalePoints", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentId), getAssignment(assignmentId).getName(), "points added to each student grade", String.valueOf(pointValue));
 			}
 
 			return returnVal;
@@ -1805,7 +1817,7 @@ public class GradebookNgBusinessService {
 							def.getStudentUid(),
 							def.getGrade(), def.getGradeComment());
 			}
-
+			postEvent("gradebookng.rescaleGrades", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentId), getAssignment(assignmentId).getName(), "points from", String.valueOf(oldPointValue), "points to", String.valueOf(newPointValue));
 			return true;
 		}
 
@@ -2015,7 +2027,9 @@ public class GradebookNgBusinessService {
 		try {
 			// could do a check here to ensure we aren't overwriting someone
 			// else's comment that has been updated in the interim...
+			String currentComment = getAssignmentGradeComment(assignmentId, studentUuid);
 			this.gradebookService.setAssignmentScoreComment(gradebook.getUid(), assignmentId, studentUuid, comment);
+			postEvent("gradebookng.updateComment", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentId), getAssignment(assignmentId).getName(), "student", studentUuid, "commentFrom",currentComment, "commentTo",comment);
 			return true;
 		} catch (GradebookNotFoundException | AssessmentNotFoundException | IllegalArgumentException e) {
 			log.error("An error occurred saving the comment. " + e.getClass() + ": " + e.getMessage());
@@ -2150,6 +2164,8 @@ public class GradebookNgBusinessService {
 		final Gradebook gradebook = getGradebook(siteId);
 
 		this.gradebookService.updateGradebookSettings(gradebook.getUid(), settings);
+		postEvent("gradebookng.updateGbSettings", gradebook.getUid(), String.valueOf(gradebook.getId()));
+
 	}
 
 	/**
@@ -2158,7 +2174,13 @@ public class GradebookNgBusinessService {
 	 * @param assignmentId the id of the assignment to remove
 	 */
 	public void removeAssignment(final Long assignmentId) {
+		String assignmentName = getAssignment(assignmentId).getName();
 		this.gradebookService.removeAssignment(assignmentId);
+
+		final String siteId = getCurrentSiteId();
+		final Gradebook gradebook = getGradebook(siteId);
+
+		postEvent("gradebookng.deleteItem", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentId), assignmentName);
 	}
 
 	/**
@@ -2405,6 +2427,20 @@ public class GradebookNgBusinessService {
 			grade = StringUtils.strip(grade, "%");
 		}
 		return gradebookService.isValidNumericGrade(grade);
+	}
+
+	public void postEvent(String message, String gradebookUid, String... args) {
+		if (eventTrackingService == null)
+			return;
+
+		StringBuilder objectReference = new StringBuilder("/gradebook/").append(gradebookUid);
+
+		for (String arg : args) {
+			objectReference.append("/").append(arg);
+		}
+
+		Event event = eventTrackingService.newEvent(message, objectReference.toString(), true);
+		eventTrackingService.post(event);
 	}
 
 	/**

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import org.sakaiproject.entity.api.ContextObserver;
 import org.sakaiproject.entity.api.EntityTransferrer;
+import org.sakaiproject.event.api.Event;
 import org.sakaiproject.importer.api.HandlesImportable;
 import org.sakaiproject.importer.api.Importable;
 import org.sakaiproject.service.gradebook.shared.Assignment;
@@ -39,6 +40,7 @@ import org.sakaiproject.service.gradebook.shared.GradebookNotFoundException;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.tool.gradebook.Category;
 import org.sakaiproject.tool.gradebook.Gradebook;
+import org.sakaiproject.tool.gradebook.facades.EventTrackingService;
 
 /**
  * Implements the Sakai EntityProducer approach to integration of tool-specific
@@ -53,6 +55,7 @@ public class GradebookEntityProducer extends BaseEntityProducer implements Conte
     private String[] toolIdArray;
     private GradebookFrameworkService gradebookFrameworkService;
     private GradebookService gradebookService;
+    private EventTrackingService eventTrackingService;
 
 	public void setToolIds(List toolIds) {
 		if (log.isDebugEnabled()) log.debug("setToolIds(" + toolIds + ")");
@@ -118,6 +121,11 @@ public class GradebookEntityProducer extends BaseEntityProducer implements Conte
 	public void setGradebookService(GradebookService gradebookService) {
 		this.gradebookService = gradebookService;
 	}
+
+	public void setEventTrackingService(EventTrackingService eventTrackingService) {
+		this.eventTrackingService = eventTrackingService;
+	}
+
 		
 	////////////////////////////////////////////////////////////////
 	// TODO Speculative support for future migration / import / export starts here.
@@ -156,6 +164,7 @@ public class GradebookEntityProducer extends BaseEntityProducer implements Conte
 					{
 						Assignment assign = (Assignment) iter.next(); 				
 						gradebookService.removeAssignment(assign.getId());
+						postEvent("gradebook.deleteItem", toSiteId, String.valueOf(((Gradebook)gradebookService.getGradebook(toSiteId)).getId()), "item", String.valueOf(assign.getId()), assign.getName());
 					}
 				}
 				// remove the gradebook categories
@@ -169,6 +178,7 @@ public class GradebookEntityProducer extends BaseEntityProducer implements Conte
 					{
 						Category category = (Category) iter.next(); 
 						gradebookService.removeCategory(category.getId());
+						postEvent("gradebook.deleteCategory", toSiteId, String.valueOf(((Gradebook)gradebookService.getGradebook(toSiteId)).getId()), "category", String.valueOf(category.getId()), category.getName());
 					}
 				}
 				 				
@@ -177,4 +187,18 @@ public class GradebookEntityProducer extends BaseEntityProducer implements Conte
 			transferCopyEntities(fromContext, toContext, ids);
 	
 	}
+
+	public void postEvent(String message, String gradebookUid, String... args) {
+		if (eventTrackingService == null)
+			return;
+
+		StringBuilder objectReference = new StringBuilder("/gradebook/").append(gradebookUid);
+
+		for (String arg : args) {
+			objectReference.append("/").append(arg);
+		}
+
+		eventTrackingService.postEvent(message, objectReference.toString());
+	}
+
 }

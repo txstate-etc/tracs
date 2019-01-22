@@ -54,6 +54,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.StaleObjectStateException;
 import org.sakaiproject.component.api.ServerConfigurationService;
+import org.sakaiproject.event.api.Event;
 import org.sakaiproject.section.api.coursemanagement.CourseSection;
 import org.sakaiproject.section.api.coursemanagement.EnrollmentRecord;
 import org.sakaiproject.section.api.coursemanagement.User;
@@ -106,6 +107,9 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
     private GradebookPermissionService gradebookPermissionService;
     protected SiteService siteService;
 	private ServerConfigurationService configService;
+
+	public static final String S_CATEGORY="category";
+	public static final String S_ITEM="item";
 
     @Override
 	public boolean isAssignmentDefined(final String gradebookUid, final String assignmentName)
@@ -462,14 +466,18 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 						if(!newCategory) {}
 						else if(newCategory && categoryCount == 1) {
 							catId = createCategory(gradebook.getId(), assignmentDef.getCategoryName(), assignmentDef.getWeight(), 0, 0, 0, assignmentDef.isCategoryExtraCredit());
+							postEvent("gradebook.newCategory", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(catId), assignmentDef.getCategoryName());
+
 							Category catTempt = getCategory(catId);
 							
 							catList_tempt.add(catTempt);
 							createAssignmentForCategory(gradebook.getId(), catId, assignmentDef.getName(), assignmentDef.getPoints(), assignmentDef.getDueDate(), true, false, assignmentDef.isExtraCredit());
+							postEvent("gradebook.newItem4Cat", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(catId), catTempt.getName(), S_ITEM, String.valueOf(assignmentDef.getId()), assignmentDef.getName());
 							assignmentsAddedCount++;
 						}
 						else{
-							createAssignmentForCategory(gradebook.getId(), catId, assignmentDef.getName(), assignmentDef.getPoints(), assignmentDef.getDueDate(), true, false, assignmentDef.isExtraCredit());
+							Long assignmentId = createAssignmentForCategory(gradebook.getId(), catId, assignmentDef.getName(), assignmentDef.getPoints(), assignmentDef.getDueDate(), true, false, assignmentDef.isExtraCredit());
+							postEvent("gradebook.newItem4Cat", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(catId), getCategory(catId).getName(), S_ITEM, String.valueOf(assignmentId), assignmentDef.getName());
 							assignmentsAddedCount++;
 						}
 					
@@ -478,6 +486,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 					else {
 						if (undefined_nb == 0) {
 							createAssignment(gradebook.getId(), assignmentDef.getName(), assignmentDef.getPoints(), assignmentDef.getDueDate(), true, false, assignmentDef.isExtraCredit());
+							postEvent("gradebook.newItem", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentDef.getId()), assignmentDef.getName());
 							assignmentsAddedCount++;
 							
 						}
@@ -508,7 +517,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			Iterator itUpdate = catList.iterator();
 			while(itUpdate.hasNext()){
 				Category catObj = (Category)itUpdate.next();
-				createCategory(gradebook.getId(), catObj.getName(), catObj.getWeight(), catObj.getDrop_lowest(), catObj.getDropHighest(), catObj.getKeepHighest(), catObj.isExtraCredit());				
+				Long categoryId = createCategory(gradebook.getId(), catObj.getName(), catObj.getWeight(), catObj.getDrop_lowest(), catObj.getDropHighest(), catObj.getKeepHighest(), catObj.isExtraCredit());
+				postEvent("gradebook.newCategory", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(categoryId));
 			}
 		}
 		//deal with no categories
@@ -524,6 +534,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				// All assignments should be unreleased even if they were released in the original.
 			
 				createAssignment(gradebook.getId(), assignmentDef.getName(), assignmentDef.getPoints(), assignmentDef.getDueDate(), true, false, assignmentDef.isExtraCredit());
+				postEvent("gradebook.newItem", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentDef.getId()), assignmentDef.getName());
 				assignmentsAddedCount++;
 			}	
 			
@@ -595,6 +606,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 							Long categoryId = null;
 							try {
 								categoryId = createCategory(gradebook.getId(), c.getName(), a.getWeight(), 0, 0, 0, a.isCategoryExtraCredit());
+								postEvent("gradebook.newCategory", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(categoryId));
 							} catch (ConflictingCategoryNameException e) {
 								//category already exists. Could be from a merge.
 								log.info("Category: " + c.getName() + " already exists in target site. Skipping creation.");
@@ -613,6 +625,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 						//create the assignment for the current category
 						try {
 							createAssignmentForCategory(gradebook.getId(), categoriesCreated.get(c.getName()), a.getName(), a.getPoints(), a.getDueDate(), true, false, a.isExtraCredit());
+							postEvent("gradebook.newItem4Cat", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(c.getId()), c.getName(), S_ITEM, String.valueOf(a.getId()), a.getName());
 						} catch (ConflictingAssignmentNameException e) {
 							//assignment already exists. Could be from a merge.
 							log.info("Assignment: " + a.getName() + " already exists in target site. Skipping creation.");
@@ -628,7 +641,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			categories.removeIf(c -> categoriesCreated.containsKey(c.getName()));			
 			categories.forEach(c -> {
 				try {
-					createCategory(gradebook.getId(), c.getName(), c.getWeight(), c.getDrop_lowest(), c.getDropHighest(), c.getKeepHighest(), c.isExtraCredit());
+					Long categoryId = createCategory(gradebook.getId(), c.getName(), c.getWeight(), c.getDrop_lowest(), c.getDropHighest(), c.getKeepHighest(), c.isExtraCredit());
+					postEvent("gradebook.newCategory", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY,String.valueOf(categoryId));
 				} catch (ConflictingCategoryNameException e) {
 					//category already exists. Could be from a merge.
 					log.info("Category: " + c.getName() + " already exists in target site. Skipping creation.");
@@ -641,6 +655,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		assignments.forEach(a -> {
 			try {
 				createAssignment(gradebook.getId(), a.getName(), a.getPoints(), a.getDueDate(), true, false, a.isExtraCredit());
+				postEvent("gradebook.newItem", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(a.getId()), a.getName());
 			} catch (ConflictingAssignmentNameException e) {
 				//assignment already exists. Could be from a merge.
 				log.info("Assignment: " + a.getName() + " already exists in target site. Skipping creation.");
@@ -711,6 +726,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			
 			// All assignments should be unreleased even if they were released in the original.
 			createAssignment(gradebook.getId(), assignmentDef.getName(), assignmentDef.getPoints(), assignmentDef.getDueDate(), true, false, assignmentDef.isExtraCredit());
+			postEvent("gradebook.newItem", gradebook.getUid(), String.valueOf(gradebook.getId()), S_ITEM, String.valueOf(assignmentDef.getId()), assignmentDef.getName());
 			assignmentsAddedCount++;
 		}
 		if (log.isInfoEnabled()) log.info("Merge to gradebook " + toGradebookUid + " added " + assignmentsAddedCount + " assignments");
@@ -779,7 +795,10 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		
 		//if attaching to category
 		if(assignmentDefinition.getCategoryId() != null) {
-			return createAssignmentForCategory(gradebook.getId(), assignmentDefinition.getCategoryId(), assignmentDefinition.getName(), points, assignmentDefinition.getDueDate(), !assignmentDefinition.isCounted(), assignmentDefinition.isReleased(), assignmentDefinition.isExtraCredit());
+			Long categoryId = assignmentDefinition.getCategoryId();
+			Long assignmentId = createAssignmentForCategory(gradebook.getId(), categoryId, assignmentDefinition.getName(), points, assignmentDefinition.getDueDate(), !assignmentDefinition.isCounted(), assignmentDefinition.isReleased(), assignmentDefinition.isExtraCredit());
+			postEvent("gradebook.newItem4Cat", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(categoryId), getCategory(categoryId).getName(), S_ITEM, String.valueOf(assignmentId), assignmentDefinition.getName());
+			return assignmentId;
 		}
 		
 		return createAssignment(gradebook.getId(), assignmentDefinition.getName(), points, assignmentDefinition.getDueDate(), !assignmentDefinition.isCounted(), assignmentDefinition.isReleased(), assignmentDefinition.isExtraCredit());
@@ -2324,10 +2343,27 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		  // now let's save them
 		  try {
 			for (AssignmentGradeRecord assignmentGradeRecord : agrToUpdate) {
+				String studentUuid = assignmentGradeRecord.getStudentId();
+
+				Double oldGrade = null;
+				try {
+					oldGrade = studentIdToAgrMap.get(studentUuid).getPointsEarned();
+				}
+				catch (Exception e) {
+					log.debug("Student " + studentUuid + " doesn't have a grade yet.");
+				}
 				getHibernateTemplate().saveOrUpdate(assignmentGradeRecord);
+				postEvent("gradebook.saveGrade", gradebookUid, String.valueOf(gradebook.getId()), S_ITEM,
+						String.valueOf(assignment.getId()), assignment.getName(), "student", studentUuid, "gradeFrom",
+						String.valueOf(oldGrade), "gradeTo",
+						String.valueOf(assignmentGradeRecord.getPointsEarned()));
 			}
 			for (Comment comment : commentsToUpdate) {
 				getHibernateTemplate().saveOrUpdate(comment);
+				String studentUuid = comment.getStudentId();
+				postEvent("gradebook.saveComment", gradebookUid, String.valueOf(gradebook.getId()), S_ITEM,
+						String.valueOf(assignment.getId()), assignment.getName(), "student", studentUuid, "commentFrom",
+						studentIdCommentMap.get(studentUuid).getCommentText(), "commentTo",comment.getCommentText());
 			}
 			for (GradingEvent gradingEvent : eventsToAdd) {
 				getHibernateTemplate().saveOrUpdate(gradingEvent);
@@ -3516,7 +3552,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			
 			//new
 			if(newDef.getId() == null) {
-				this.createCategory(gradebook.getId(), newDef.getName(), newDef.getWeight(), newDef.getDrop_lowest(), newDef.getDropHighest(), newDef.getKeepHighest(), newDef.isExtraCredit(), Integer.valueOf(categoryIndex));
+				Long categoryId = this.createCategory(gradebook.getId(), newDef.getName(), newDef.getWeight(), newDef.getDrop_lowest(), newDef.getDropHighest(), newDef.getKeepHighest(), newDef.isExtraCredit(), Integer.valueOf(categoryIndex));
+				postEvent("gradebook.newCategory", gradebook.getUid(), String.valueOf(gradebook.getId()),S_CATEGORY, String.valueOf(categoryId), newDef.getName());
 				categoryIndex++;
 				continue;
 			} 
@@ -3533,6 +3570,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				existing.setCategoryOrder(categoryIndex);
 				this.updateCategory(existing);
 				
+				postEvent("gradebook.updateCategory", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(newDef.getId()), newDef.getName());
+
 				//remove from currentCategoryMap so we know not to delete it
 				currentCategoryMap.remove(newDef.getId());
 
@@ -3546,6 +3585,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		//anything left in currentCategoryMap was not included in the new list, delete them
 		for(Entry<Long, Category> cat: currentCategoryMap.entrySet()) {
 			this.removeCategory(cat.getKey());
+			postEvent("gradebook.deleteCategory", gradebook.getUid(), String.valueOf(gradebook.getId()), "category", String.valueOf(cat.getKey()), cat.getValue().getName());
 		}
 		
 		//if weighted categories, all uncategorised assignments are to be removed from course grade calcs
@@ -3917,6 +3957,19 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			return true;
 
 		return false;
+	}
+
+	public void postEvent(String message, String gradebookUid, String... args) {
+		if (eventTrackingService == null)
+			return;
+
+		StringBuilder objectReference = new StringBuilder("/gradebook/").append(gradebookUid);
+
+		for (String arg : args) {
+			objectReference.append("/").append(arg);
+		}
+
+		eventTrackingService.postEvent(message, objectReference.toString());
 	}
 
 	/**

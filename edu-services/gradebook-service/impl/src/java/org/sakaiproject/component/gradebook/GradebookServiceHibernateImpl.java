@@ -3561,16 +3561,48 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			//update
 			else {
 				Category existing = currentCategoryMap.get(newDef.getId());
-				existing.setName(newDef.getName());
-				existing.setWeight(newDef.getWeight());
-				existing.setDrop_lowest(newDef.getDrop_lowest());
-				existing.setDropHighest(newDef.getDropHighest());
-				existing.setKeepHighest(newDef.getKeepHighest());
-				existing.setExtraCredit(newDef.isExtraCredit());
-				existing.setCategoryOrder(categoryIndex);
-				this.updateCategory(existing);
-				
-				postEvent("gradebook.updateCategory", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(newDef.getId()), newDef.getName());
+				StringBuffer categoryUpdatedInfo = new StringBuffer("");
+				boolean changed = false;
+				if (!existing.getName().equals(newDef.getName())) {
+					changed = true;
+					categoryUpdatedInfo.append("/NameFrom/" + existing.getName() + "/NameTo/" + newDef.getName());
+					existing.setName(newDef.getName());
+				}
+				if (!existing.getWeight().equals(newDef.getWeight()) ) {
+					changed = true;
+					categoryUpdatedInfo.append("/WeightFrom/" + existing.getWeight().toString() + "/WeightTo/" + newDef.getWeight().toString());
+					existing.setWeight(newDef.getWeight());
+				}
+				if (!existing.getDrop_lowest().equals(newDef.getDrop_lowest())) {
+					changed = true;
+					categoryUpdatedInfo.append("/DropLowestFrom/" + existing.getDrop_lowest().toString() + "/DropLowestTo/" + newDef.getDrop_lowest().toString());
+					existing.setDrop_lowest(newDef.getDrop_lowest());
+				}
+				if (!existing.getDropHighest().equals(newDef.getDropHighest())) {
+					changed = true;
+					categoryUpdatedInfo.append("/DropHighestFrom/" + existing.getDropHighest().toString() + "/DropHighestTo/" + newDef.getDropHighest().toString());
+					existing.setDropHighest(newDef.getDropHighest());
+				}
+				if (!existing.getKeepHighest().equals(newDef.getKeepHighest())) {
+					changed = true;
+					categoryUpdatedInfo.append("/KeepHighestFrom/" + existing.getKeepHighest().toString() + "/KeepHighestTo/" + newDef.getKeepHighest());
+					existing.setKeepHighest(newDef.getKeepHighest());
+				}
+				if (!existing.isExtraCredit().equals(newDef.isExtraCredit())) {
+					changed = true;
+					categoryUpdatedInfo.append("/ExtraCreditFrom/" + existing.isExtraCredit().toString() + "/ExtraCreditTo/" + newDef.isExtraCredit().toString());
+					existing.setExtraCredit(newDef.isExtraCredit());
+				}
+				if (!existing.getCategoryOrder().equals(newDef.getCategoryOrder())) {
+					changed = true;
+					categoryUpdatedInfo.append("/OrderFrom/" + existing.getCategoryOrder().toString() + "/OrderTo/" + newDef.getCategoryOrder().toString());
+					existing.setCategoryOrder(categoryIndex);
+				}
+
+				if(changed) {
+					this.updateCategory(existing);
+					postEvent("gradebook.updateCategory", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(newDef.getId()), categoryUpdatedInfo.toString());
+				}
 
 				//remove from currentCategoryMap so we know not to delete it
 				currentCategoryMap.remove(newDef.getId());

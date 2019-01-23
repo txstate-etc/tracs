@@ -40,4 +40,9 @@ public class EventTrackingServiceStandaloneImpl implements EventTrackingService 
     public void postEvent(String message, String referenceObject) {
         if(log.isDebugEnabled()) log.debug("action: "+message + "  object reference:"+referenceObject);
     }
+
+	@Override
+	public void postEvent(String message, String referenceObject, String... args) {
+		// TODO Auto-generated method stub
+	}
 }

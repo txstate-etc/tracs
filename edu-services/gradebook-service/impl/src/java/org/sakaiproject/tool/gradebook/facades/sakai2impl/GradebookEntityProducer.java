@@ -164,7 +164,7 @@ public class GradebookEntityProducer extends BaseEntityProducer implements Conte
 					{
 						Assignment assign = (Assignment) iter.next(); 				
 						gradebookService.removeAssignment(assign.getId());
-						postEvent("gradebook.deleteItem", toSiteId, String.valueOf(((Gradebook)gradebookService.getGradebook(toSiteId)).getId()), "item", String.valueOf(assign.getId()), assign.getName());
+						eventTrackingService.postEvent("gradebook.deleteItem", toSiteId, String.valueOf(((Gradebook)gradebookService.getGradebook(toSiteId)).getId()), "item", String.valueOf(assign.getId()), assign.getName());
 					}
 				}
 				// remove the gradebook categories
@@ -178,7 +178,7 @@ public class GradebookEntityProducer extends BaseEntityProducer implements Conte
 					{
 						Category category = (Category) iter.next(); 
 						gradebookService.removeCategory(category.getId());
-						postEvent("gradebook.deleteCategory", toSiteId, String.valueOf(((Gradebook)gradebookService.getGradebook(toSiteId)).getId()), "category", String.valueOf(category.getId()), category.getName());
+						eventTrackingService.postEvent("gradebook.deleteCategory", toSiteId, String.valueOf(((Gradebook)gradebookService.getGradebook(toSiteId)).getId()), "category", String.valueOf(category.getId()), category.getName());
 					}
 				}
 				 				
@@ -186,19 +186,6 @@ public class GradebookEntityProducer extends BaseEntityProducer implements Conte
 			
 			transferCopyEntities(fromContext, toContext, ids);
 	
-	}
-
-	public void postEvent(String message, String gradebookUid, String... args) {
-		if (eventTrackingService == null)
-			return;
-
-		StringBuilder objectReference = new StringBuilder("/gradebook/").append(gradebookUid);
-
-		for (String arg : args) {
-			objectReference.append("/").append(arg);
-		}
-
-		eventTrackingService.postEvent(message, objectReference.toString());
 	}
 
 }

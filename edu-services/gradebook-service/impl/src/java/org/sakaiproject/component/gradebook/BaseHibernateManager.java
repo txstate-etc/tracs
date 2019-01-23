@@ -467,10 +467,13 @@ public abstract class BaseHibernateManager extends HibernateDaoSupport {
         this.externalAssessmentService = externalAssessmentService;
     }
 
-    public void postEvent(String message,String objectReference){        
+    public void postEvent(String message,String objectReference){
        eventTrackingService.postEvent(message,objectReference);
     }
 
+    public void postEvent(String message,String objectReference, String... args ){
+        eventTrackingService.postEvent(message,objectReference,args);
+     }
 
     public Long createCategory(final Long gradebookId, final String name, final Double weight, final Integer drop_lowest, final Integer dropHighest, final Integer keepHighest, final Boolean is_extra_credit) {
         return createCategory(gradebookId, name, weight, drop_lowest, dropHighest, keepHighest, is_extra_credit, null);

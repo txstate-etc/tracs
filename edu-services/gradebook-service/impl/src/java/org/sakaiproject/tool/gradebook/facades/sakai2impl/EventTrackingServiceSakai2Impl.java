@@ -31,6 +31,17 @@ public class EventTrackingServiceSakai2Impl implements EventTrackingService {
 
     private org.sakaiproject.event.api.EventTrackingService eventTrackingService;
 
+	public void postEvent(String message, String gradebookUid, String... args) {
+
+		StringBuilder objectReference = new StringBuilder("/gradebook/").append(gradebookUid);
+
+		for (String arg : args) {
+			objectReference.append("/").append(arg);
+		}
+
+		postEvent(message, objectReference.toString());
+	}
+
     /**
      *
      * @param message

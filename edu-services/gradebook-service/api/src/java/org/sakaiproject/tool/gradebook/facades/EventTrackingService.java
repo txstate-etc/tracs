@@ -26,4 +26,5 @@ package org.sakaiproject.tool.gradebook.facades;
  */
 public interface EventTrackingService {
     public void postEvent(String message, String referenceObject);
+    public void postEvent(String message, String referenceObject, String... args);
 }

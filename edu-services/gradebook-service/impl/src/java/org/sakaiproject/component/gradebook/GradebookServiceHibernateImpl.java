@@ -3030,7 +3030,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	 */
 	private void postUpdateGradeEvent(String gradebookUid, String assignmentName, String studentUid, Double pointsEarned) {
 	    if (eventTrackingService != null) {
-            eventTrackingService.postEvent("gradebook.updateItemScore","/gradebook/"+gradebookUid+"/"+assignmentName+"/"+studentUid+"/"+pointsEarned+"/student");
+            postEvent("gradebook.updateItemScore","/gradebook/"+gradebookUid+"/"+assignmentName+"/"+studentUid+"/"+pointsEarned+"/student");
         }
     }
 	
@@ -3989,19 +3989,6 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			return true;
 
 		return false;
-	}
-
-	public void postEvent(String message, String gradebookUid, String... args) {
-		if (eventTrackingService == null)
-			return;
-
-		StringBuilder objectReference = new StringBuilder("/gradebook/").append(gradebookUid);
-
-		for (String arg : args) {
-			objectReference.append("/").append(arg);
-		}
-
-		eventTrackingService.postEvent(message, objectReference.toString());
 	}
 
 	/**

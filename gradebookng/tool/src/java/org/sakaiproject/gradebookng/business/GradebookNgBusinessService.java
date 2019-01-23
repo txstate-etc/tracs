@@ -41,7 +41,6 @@ import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.coursemanagement.api.CourseManagementService;
 import org.sakaiproject.event.api.Event;
-import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.gradebookng.business.TxstateInstitutionalAdvisor;
@@ -83,6 +82,7 @@ import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.tool.gradebook.Gradebook;
 import org.sakaiproject.tool.gradebook.GradingEvent;
+import org.sakaiproject.tool.gradebook.facades.EventTrackingService;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
@@ -729,12 +729,10 @@ public class GradebookNgBusinessService {
 		}
 
 		if (gradeSubmitType.equalsIgnoreCase("finalgrade")){
-			Event event = eventTrackingService.newEvent("gradebookng.submitFinalGrades", "gradebookUid=" + gradebookUid + ", studentGrades count: " + studentsGrades.size(), true);
-			eventTrackingService.post(event);
+			postEvent("gradebookng.submitFinalGrades", gradebookUid, String.valueOf(getGradebook(gradebookUid).getId()), "studentGrades count",String.valueOf(studentsGrades.size()));
 		}
 		else if (gradeSubmitType.equalsIgnoreCase("midterm")) {
-			Event event = eventTrackingService.newEvent("gradebookng.submitMidTermGrades", "gradebookUid=" + gradebookUid + ", studentGrades count: " + studentsGrades.size(), true);
-			eventTrackingService.post(event);
+			postEvent("gradebookng.submitMidTermGrades", gradebookUid, String.valueOf(getGradebook(gradebookUid).getId()), "studentGrades count",String.valueOf(studentsGrades.size()));
 		}
 
 		return gradeSubmissionResult;
@@ -2429,18 +2427,8 @@ public class GradebookNgBusinessService {
 		return gradebookService.isValidNumericGrade(grade);
 	}
 
-	public void postEvent(String message, String gradebookUid, String... args) {
-		if (eventTrackingService == null)
-			return;
-
-		StringBuilder objectReference = new StringBuilder("/gradebook/").append(gradebookUid);
-
-		for (String arg : args) {
-			objectReference.append("/").append(arg);
-		}
-
-		Event event = eventTrackingService.newEvent(message, objectReference.toString(), true);
-		eventTrackingService.post(event);
+	public void postEvent(String message,String objectReference, String... args ){
+		eventTrackingService.postEvent(message,objectReference,args);
 	}
 
 	/**

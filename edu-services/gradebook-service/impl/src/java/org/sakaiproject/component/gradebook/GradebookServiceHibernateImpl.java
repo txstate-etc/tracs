@@ -2607,14 +2607,16 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 
 				Date now = new Date();
 				String graderId = getAuthn().getUserUid();
+				Double pointsEarned = convertStringToDouble(score);
 				AssignmentGradeRecord gradeRecord = getAssignmentGradeRecord(assignment, studentUid, session);
+				Double oldPointsEarned = gradeRecord.getPercentEarned();
 				if (gradeRecord == null) {
 					// Creating a new grade record.
 					gradeRecord = new AssignmentGradeRecord(assignment, studentUid, convertStringToDouble(score));
 					//TODO: test if it's ungraded item or not. if yes, set ungraded grade for this record. if not, need validation??
 				} else {
 					//TODO: test if it's ungraded item or not. if yes, set ungraded grade for this record. if not, need validation??
-					gradeRecord.setPointsEarned(convertStringToDouble(score));
+					gradeRecord.setPointsEarned(pointsEarned);
 				}
 				gradeRecord.setGraderId(graderId);
 				gradeRecord.setDateRecorded(now);
@@ -2626,8 +2628,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				session.flush();
 				session.clear();
 
-           		// Post an event in SAKAI_EVENT table
-           		postUpdateGradeEvent(gradebookUid, assignment.getName(), studentUid, convertStringToDouble(score));
+				// Post an event in SAKAI_EVENT table
+				postEvent("gradebook.updateItemScore",gradebookUid, String.valueOf(getGradebook(gradebookUid).getId()), S_ITEM, String.valueOf(assignmentId),assignment.getName(),"student", studentUid, "pointsEarnedFrom", String.valueOf(oldPointsEarned), "pointsEarnedTo", String.valueOf(pointsEarned));
 				return null;
 			}
 		});
@@ -3018,22 +3020,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		}
 		return matchingAssignments;
 	}
-	
-	/**
-	 * Post an event to Sakai's event table
-	 * 
-	 * @param gradebookUid
-	 * @param assignmentName
-	 * @param studentUid
-	 * @param pointsEarned
-	 * @return
-	 */
-	private void postUpdateGradeEvent(String gradebookUid, String assignmentName, String studentUid, Double pointsEarned) {
-	    if (eventTrackingService != null) {
-            postEvent("gradebook.updateItemScore","/gradebook/"+gradebookUid+"/"+assignmentName+"/"+studentUid+"/"+pointsEarned+"/student");
-        }
-    }
-	
+
 	/**
 	 * Retrieves the calculated average course grade.
 	 */

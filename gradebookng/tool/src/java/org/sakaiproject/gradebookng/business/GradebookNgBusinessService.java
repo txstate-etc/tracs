@@ -295,6 +295,15 @@ public class GradebookNgBusinessService {
 	 *
 	 * @return a list of assignments or null if no gradebook
 	 */
+	public List<Assignment> getGradebookAllAssignments() {
+		return getGradebookAllAssignments(getCurrentSiteId(), SortType.SORT_BY_SORTING);
+	}
+
+	/**
+	 * Get a list of assignments in the gradebook in the current site that the current user is allowed to access
+	 *
+	 * @return a list of assignments or null if no gradebook
+	 */
 	public List<Assignment> getGradebookAssignments(final String siteId) {
 		return getGradebookAssignments(siteId, SortType.SORT_BY_SORTING);
 	}
@@ -386,6 +395,24 @@ public class GradebookNgBusinessService {
 			// applies permissions (both student and TA) and default sort is
 			// SORT_BY_SORTING
 			assignments.addAll(this.gradebookService.getViewableAssignmentsForCurrentUser(gradebook.getUid(), sortBy));
+		}
+		return assignments;
+	}
+
+	/**
+	 * Get a list of assignments in the gradebook in the specified site that the current user is allowed to access, sorted by sort order
+	 *
+	 * @param siteId the siteId
+	 * @return a list of assignments or empty list if none/no gradebook
+	 */
+	public List<Assignment> getGradebookAllAssignments(final String siteId, final SortType sortBy) {
+
+		final List<Assignment> assignments = new ArrayList<>();
+		final Gradebook gradebook = getGradebook(siteId);
+		if (gradebook != null) {
+			// applies permissions (both student and TA) and default sort is
+			// SORT_BY_SORTING
+			assignments.addAll(this.gradebookService.getViewableAllAssignmentsForCurrentUser(gradebook.getUid(), sortBy));
 		}
 		return assignments;
 	}
@@ -1926,7 +1953,7 @@ public class GradebookNgBusinessService {
 
 		final List<GbHistoryLog> rval = new ArrayList<>();
 
-		List<Assignment> assignments = this.getGradebookAssignments();
+		List<Assignment> assignments = this.getGradebookAllAssignments();
 		if (assignments == null || assignments.isEmpty()) {
 			return rval;
 		}

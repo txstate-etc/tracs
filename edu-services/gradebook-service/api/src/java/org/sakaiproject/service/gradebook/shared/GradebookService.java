@@ -183,7 +183,7 @@ public interface GradebookService {
 	 */
 	public List<Assignment> getAssignments(String gradebookUid)
 			throws GradebookNotFoundException;
-	
+
 	/**
 	 * @return Returns a list of Assignment objects describing the assignments
 	 *         that are currently defined in the given gradebook, sorted by the given sort type.
@@ -420,7 +420,21 @@ public interface GradebookService {
 	 * will return all released gb items.
 	 */
 	public List<Assignment> getViewableAssignmentsForCurrentUser(String gradebookUid);
-	
+
+	/**
+	 *
+	 * @param gradebookUid
+	 * @return list of gb items that the current user is authorized to view.
+	 * If user has gradeAll permission, returns all gb items.
+	 * If user has gradeSection perm with no grader permissions,
+	 * returns all gb items. 
+	 * If user has gradeSection with grader perms, returns only the items that
+	 * the current user is authorized to view or grade.
+	 * If user does not have grading privileges but does have viewOwnGrades perm,
+	 * will return all released gb items including deleted ones.
+	 */
+	public List<Assignment> getViewableAllAssignmentsForCurrentUser(String gradebookUid);
+
 	/**
 	 *
 	 * @param gradebookUid
@@ -435,6 +449,22 @@ public interface GradebookService {
 	 * will return all released gb items.
 	 */
 	public List<Assignment> getViewableAssignmentsForCurrentUser(String gradebookUid, SortType sortBy);
+
+
+	/**
+	 *
+	 * @param gradebookUid
+	 * @return list of gb items that the current user is authorized to view
+	 * sorted by the provided SortType.
+	 * If user has gradeAll permission, returns all gb items.
+	 * If user has gradeSection perm with no grader permissions,
+	 * returns all gb items.
+	 * If user has gradeSection with grader perms, returns only the items that
+	 * the current user is authorized to view or grade.
+	 * If user does not have grading privileges but does have viewOwnGrades perm,
+	 * will return all released gb items included deleted items.
+	 */
+	public List<Assignment> getViewableAllAssignmentsForCurrentUser(String gradebookUid, SortType sortBy);
 
 	/**
 	 * 

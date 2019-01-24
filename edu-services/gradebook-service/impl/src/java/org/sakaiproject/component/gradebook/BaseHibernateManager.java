@@ -115,6 +115,21 @@ public abstract class BaseHibernateManager extends HibernateDaoSupport {
         	list();
         return assignments;
     }
+   
+    /**
+     *
+     * @param gradebookId
+     * @param session
+     * @return all the assignments including deleted ones
+     * @throws HibernateException
+     */
+    protected List getAllAssignments(Long gradebookId, Session session) throws HibernateException {
+        List assignments = session.createQuery(
+            "from Assignment as asn where asn.gradebook.id=?").
+            setLong(0, gradebookId.longValue()).
+            list();
+        return assignments;
+    }
 
     protected List getCountedStudentGradeRecords(Long gradebookId, String studentId, Session session) throws HibernateException {
         return session.createQuery(

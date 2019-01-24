@@ -152,7 +152,11 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	public List<org.sakaiproject.service.gradebook.shared.Assignment> getAssignments(String gradebookUid) throws GradebookNotFoundException {
 		return getAssignments(gradebookUid, SortType.SORT_BY_NONE);
 	}
-	
+
+	public List<org.sakaiproject.service.gradebook.shared.Assignment> getAllAssignments(String gradebookUid) throws GradebookNotFoundException {
+		return getAllAssignments(gradebookUid, SortType.SORT_BY_NONE);
+	}
+
 	@Override
 	public List<org.sakaiproject.service.gradebook.shared.Assignment> getAssignments(String gradebookUid, SortType sortBy) throws GradebookNotFoundException {
 			if (!isUserAbleToViewAssignments(gradebookUid)) {
@@ -179,7 +183,33 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			}
 			return assignments;
 		}
-	
+
+	public List<org.sakaiproject.service.gradebook.shared.Assignment> getAllAssignments(String gradebookUid, SortType sortBy) throws GradebookNotFoundException {
+		if (!isUserAbleToViewAssignments(gradebookUid)) {
+			log.warn("AUTHORIZATION FAILURE: User " + getUserUid() + " in gradebook " + gradebookUid + " attempted to get assignments list");
+			throw new SecurityException("You do not have permission to perform this operation");
+		}
+
+		final Long gradebookId = getGradebook(gradebookUid).getId();
+
+		@SuppressWarnings({ "unchecked", "rawtypes"})
+		List<Assignment> internalAssignments = (List<Assignment>)getHibernateTemplate().execute(new HibernateCallback() {
+			@Override
+			public Object doInHibernate(Session session) throws HibernateException {
+				return getAllAssignments(gradebookId, session);
+			}
+		});
+
+		sortAssignments(internalAssignments, sortBy, true);
+
+		List<org.sakaiproject.service.gradebook.shared.Assignment> assignments = new ArrayList<org.sakaiproject.service.gradebook.shared.Assignment>();
+		for (Iterator<Assignment> iter = internalAssignments.iterator(); iter.hasNext(); ) {
+			Assignment assignment = (Assignment)iter.next();
+			assignments.add(getAssignmentDefinition(assignment));
+		}
+		return assignments;
+	}
+
 	@Override
 	public org.sakaiproject.service.gradebook.shared.Assignment getAssignment(final String gradebookUid, final Long assignmentId) throws AssessmentNotFoundException {
 		if (assignmentId == null || gradebookUid == null) {
@@ -1520,6 +1550,29 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
   }
   
   /**
+   * Get a list of assignments, sorted
+   * @param gradebookId
+   * @param sortBy
+   * @param ascending
+   * @return all the assignments including deleted ones
+   * 
+   * NOTE: When the UI changes, this needs to go back to private
+   */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public List getAllAssignments(final Long gradebookId, final SortType sortBy, final boolean ascending) {
+  	return (List)getHibernateTemplate().execute(new HibernateCallback() {
+  		@Override
+		public Object doInHibernate(Session session) throws HibernateException {
+  			List assignments = getAllAssignments(gradebookId, session);
+
+  			sortAssignments(assignments, sortBy, ascending);
+  			return assignments;
+  		}
+  	});
+  }
+
+  
+  /**
    * Sort the list of (internal) assignments by the given criteria
    * @param assignments
    * @param sortBy
@@ -1596,6 +1649,17 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		return getViewableAssignmentsForCurrentUser(gradebookUid, SortType.SORT_BY_SORTING);
 	}
 
+/*
+ * (non-Javadoc)
+ * @see org.sakaiproject.service.gradebook.shared.GradebookService#getViewableAssignmentsForCurrentUser(java.lang.String)
+ */
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<org.sakaiproject.service.gradebook.shared.Assignment> getViewableAllAssignmentsForCurrentUser(String gradebookUid)
+			throws GradebookNotFoundException {
+		return getViewableAllAssignmentsForCurrentUser(gradebookUid, SortType.SORT_BY_SORTING);
+	}
+
   /*
    * (non-Javadoc)
    * @see org.sakaiproject.service.gradebook.shared.GradebookService#getViewableAssignmentsForCurrentUser(java.lang.String, java.)
@@ -1629,6 +1693,78 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 					  assignmentsToReturn.addAll(getAssignments(gradebookUid, sortBy));
 				  } else {
 					  List<org.sakaiproject.service.gradebook.shared.Assignment> assignments = getAssignments(gradebookUid, sortBy);
+					  List<Long> categoryIds = ((List<Category>)getCategories(gradebook.getId())).stream().map(Category::getId).collect(Collectors.toList());
+					  // categories are enabled, so we need to check the category restrictions
+					  if (!categoryIds.isEmpty()) {
+						  List<Long> viewableCategoryIds = getGradebookPermissionService().getCategoriesForUser(gradebook.getId(), userUid, categoryIds);
+						  for (org.sakaiproject.service.gradebook.shared.Assignment assignment : assignments) {
+							  if (assignment.getCategoryId() != null && viewableCategoryIds.contains(assignment.getCategoryId())) {
+								  assignmentsToReturn.add(assignment);
+							  }
+						  }
+					  }
+				  }
+			  }
+		  }
+	  } else if (getAuthz().isUserAbleToViewOwnGrades(gradebookUid)) {
+		  // if user is just a student, we need to filter out unreleased items
+		  List allAssigns = getAssignments(gradebook.getId(), null, true);
+		  if (allAssigns != null) {
+			  for (Iterator aIter = allAssigns.iterator(); aIter.hasNext();) {
+				  Assignment assign = (Assignment) aIter.next();
+				  if (assign != null && assign.isReleased()) {
+					  viewableAssignments.add(assign);
+				  }
+			  }
+		  }
+	  }
+
+	  // Now we need to convert these to the assignment template objects
+	  if (viewableAssignments != null && !viewableAssignments.isEmpty()) {
+		  for (Iterator assignIter = viewableAssignments.iterator(); assignIter.hasNext();) {
+			  Assignment assignment = (Assignment) assignIter.next();
+			  assignmentsToReturn.add(getAssignmentDefinition(assignment));
+		  }
+	  }
+
+	  return new ArrayList<>(assignmentsToReturn);
+
+  }
+
+	  /*
+	   * (non-Javadoc)
+	   * @see org.sakaiproject.service.gradebook.shared.GradebookService#getViewableAllAssignmentsForCurrentUser(java.lang.String)
+	   */
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<org.sakaiproject.service.gradebook.shared.Assignment> getViewableAllAssignmentsForCurrentUser(String gradebookUid, SortType sortBy)
+			throws GradebookNotFoundException {
+
+	  List<Assignment> viewableAssignments = new ArrayList<>();
+		LinkedHashSet<org.sakaiproject.service.gradebook.shared.Assignment> assignmentsToReturn = new LinkedHashSet<>();
+
+	  Gradebook gradebook = getGradebook(gradebookUid);
+
+	  // will send back all assignments if user can grade all
+	  if (getAuthz().isUserAbleToGradeAll(gradebookUid)) {
+		  viewableAssignments = getAllAssignments(gradebook.getId(), sortBy, true);
+	  } else if (getAuthz().isUserAbleToGrade(gradebookUid)) {
+		  // if user can grade and doesn't have grader perm restrictions, they
+		  // may view all assigns
+		  if (!getAuthz().isUserHasGraderPermissions(gradebookUid)) {
+			  viewableAssignments = getAllAssignments(gradebook.getId(), sortBy, true);
+		  } else {
+			  // this user has grader perms, so we need to filter the items returned
+			  // if this gradebook has categories enabled, we need to check for category-specific restrictions
+			  if (gradebook.getCategory_type() == GradebookService.CATEGORY_TYPE_NO_CATEGORY) {
+					assignmentsToReturn.addAll(getAllAssignments(gradebookUid, sortBy));
+			  } else {
+				  String userUid = getUserUid();
+				  if (getGradebookPermissionService().getPermissionForUserForAllAssignment(gradebook.getId(), userUid)) {
+						assignmentsToReturn.addAll(getAllAssignments(gradebookUid, sortBy));
+				  } else {
+					  List<org.sakaiproject.service.gradebook.shared.Assignment> assignments;
+						assignments = getAllAssignments(gradebookUid, sortBy);
 					  List<Long> categoryIds = ((List<Category>)getCategories(gradebook.getId())).stream().map(Category::getId).collect(Collectors.toList());
 					  // categories are enabled, so we need to check the category restrictions
 					  if (!categoryIds.isEmpty()) {

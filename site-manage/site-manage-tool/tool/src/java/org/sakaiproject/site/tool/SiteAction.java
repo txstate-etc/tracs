@@ -9775,12 +9775,24 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 								try 
 								{
 									AuthzGroup realmEdit = authzGroupService.getAuthzGroup(realm);
+									String providerId = realmEdit.getProviderGroupId();
 									// also remove the provider id attribute if any
 									realmEdit.setProviderGroupId(null);
 									// add current user as the maintainer
 									realmEdit.addMember(UserDirectoryService.getCurrentUser().getId(), site.getMaintainRole(), true, false);
 									
 									authzGroupService.save(realmEdit);
+									
+									//We need to remove provider group realms
+									if(providerId != null) {
+										String[] providerIds = providerId.split("\\+");
+										for (String id : providerIds) {
+											List<AuthzGroup> realms = authzGroupService.getAuthzGroups(id, null);
+											for (AuthzGroup groupRealm : realms ) {
+												authzGroupService.removeAuthzGroup(groupRealm);
+											}
+										}
+									}
 								} catch (GroupNotDefinedException e) {
 									M_log.error(this + ".actionForTemplate chef_siteinfo-duplicate: IdUnusedException, not found, or not an AuthzGroup object "+ realm, e);
 									addAlert(state, rb.getString("java.realm"));

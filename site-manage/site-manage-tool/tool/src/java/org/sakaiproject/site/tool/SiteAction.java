@@ -9766,9 +9766,6 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 										}
 									}
 								}
-								
-								// save again
-								SiteService.save(site);
 								state.setAttribute(STATE_DUPE_SITE_STATUS_ID, site.getId());
 								state.setAttribute(STATE_DUPE_SITE_URL, site.getUrl());
 								String realm = SiteService.siteReference(site.getId());
@@ -9780,19 +9777,31 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 									realmEdit.setProviderGroupId(null);
 									// add current user as the maintainer
 									realmEdit.addMember(UserDirectoryService.getCurrentUser().getId(), site.getMaintainRole(), true, false);
-									
 									authzGroupService.save(realmEdit);
-									
-									//We need to remove provider group realms
+
+									//We need to remove provider group
+									List<String> groupToRemove = new ArrayList<>();
 									if(providerId != null) {
 										String[] providerIds = providerId.split("\\+");
 										for (String id : providerIds) {
-											List<AuthzGroup> realms = authzGroupService.getAuthzGroups(id, null);
+											List<AuthzGroup> realms = authzGroupService.getAuthzGroups(site.getId(), null);
 											for (AuthzGroup groupRealm : realms ) {
-												authzGroupService.removeAuthzGroup(groupRealm);
+												if(groupRealm.getProviderGroupId() != null && groupRealm.getProviderGroupId().equals(id)) {
+													String groupId = groupRealm.getId().split("/")[4];
+													groupToRemove.add(groupId);
+												}
 											}
 										}
 									}
+
+									for(String id : groupToRemove) {
+										site.removeGroup(site.getGroup(id));
+									}
+
+									site.setProviderGroupId(null);
+
+									SiteService.save(site);
+
 								} catch (GroupNotDefinedException e) {
 									M_log.error(this + ".actionForTemplate chef_siteinfo-duplicate: IdUnusedException, not found, or not an AuthzGroup object "+ realm, e);
 									addAlert(state, rb.getString("java.realm"));

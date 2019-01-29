@@ -9800,6 +9800,11 @@ private Map<String,List> getTools(SessionState state, String type, Site site) {
 
 									site.setProviderGroupId(null);
 
+									List<Group> groups = (List<Group>) site.getGroups();
+									for (Group g : groups) {
+										g.unlockGroup();
+									}
+
 									SiteService.save(site);
 
 								} catch (GroupNotDefinedException e) {

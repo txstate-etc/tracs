@@ -131,7 +131,7 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
         // Control-Right-Click (Windows/Linux) or Command-Right-Click (Mac) on highlighted words
         // will cause the CKEditor menu to be suppressed and display the browser's standard context
         // menu. In some cases (Firefox and Safari, at least), this supplies corrections, suggestions, etc.
-        scayt_autoStartup: true,
+        // scayt_autoStartup: true,
 
         disableNativeSpellChecker: false,
         browserContextMenuOnCtrl: true,
@@ -145,8 +145,8 @@ sakai.editor.editors.ckeditor.launch = function(targetId, config, w, h) {
             ['Source','-','Templates'],
             // Uncomment the next line and comment the following to enable the default spell checker.
             // Note that it uses spellchecker.net, displays ads and sends content to remote servers without additional setup.
-            ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print', 'SpellChecker', 'Scayt'],
-            //['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print'],
+            // ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print', 'SpellChecker', 'Scayt'],
+            ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print'],
             ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
             ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
             '/',

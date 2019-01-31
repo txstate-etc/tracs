@@ -5285,7 +5285,7 @@ public class AssignmentAction extends PagedResourceActionII
 								else if (isExternalAssignmentDefined)
 								{
 									gExternal.updateExternalAssessmentScoresString(gradebookUid, assignmentRef, sm);
-									gExternal.updateExternalAssessmentComments(gradebookUid, associateGradebookAssignment, cm);
+									gExternal.updateExternalAssessmentComments(gradebookUid, assignmentRef, cm);
 								}
 							}
 						}

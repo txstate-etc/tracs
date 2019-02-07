@@ -2745,13 +2745,14 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				String graderId = getAuthn().getUserUid();
 				Double pointsEarned = convertStringToDouble(score);
 				AssignmentGradeRecord gradeRecord = getAssignmentGradeRecord(assignment, studentUid, session);
-				Double oldPointsEarned = gradeRecord.getPercentEarned();
+				Double oldPointsEarned = null;
 				if (gradeRecord == null) {
 					// Creating a new grade record.
 					gradeRecord = new AssignmentGradeRecord(assignment, studentUid, convertStringToDouble(score));
 					//TODO: test if it's ungraded item or not. if yes, set ungraded grade for this record. if not, need validation??
 				} else {
 					//TODO: test if it's ungraded item or not. if yes, set ungraded grade for this record. if not, need validation??
+					oldPointsEarned = gradeRecord.getPercentEarned();
 					gradeRecord.setPointsEarned(pointsEarned);
 				}
 				gradeRecord.setGraderId(graderId);

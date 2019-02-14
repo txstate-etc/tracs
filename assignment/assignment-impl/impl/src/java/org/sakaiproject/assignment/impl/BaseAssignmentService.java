@@ -11900,10 +11900,7 @@ public abstract class BaseAssignmentService implements AssignmentService, Entity
 		 */
 		public String getGrade()
 		{
-			//We never allow grade to be overwritten from gradebook item
-			//grade source always come from the tool itsself
-			boolean overrideWithGradebookValue = false;
-			return getGrade(overrideWithGradebookValue);
+			return getGrade(true);
 		}
 		
 		/**

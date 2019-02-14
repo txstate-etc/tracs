@@ -7624,7 +7624,8 @@ public class AssignmentAction extends PagedResourceActionII
 			    }
 			}
 		}
-		else if (!Integer.valueOf(Assignment.NON_ELECTRONIC_ASSIGNMENT_SUBMISSION).equals(state.getAttribute(NEW_ASSIGNMENT_SUBMISSION_TYPE)))
+		else
+//		else if (!Integer.valueOf(Assignment.NON_ELECTRONIC_ASSIGNMENT_SUBMISSION).equals(state.getAttribute(NEW_ASSIGNMENT_SUBMISSION_TYPE)))
 		{
 			/* 
 			 * SAK-26640: If the instructor switches to non-electronic by mistake, the resubmissions settings should persist so they can be easily retrieved.
@@ -8889,9 +8890,9 @@ public class AssignmentAction extends PagedResourceActionII
 	private boolean propertyValueChanged(SessionState state, Entity entity, String propertyName) {
 		String o_property_value = entity.getProperties().getProperty(propertyName);
 		String n_property_value = state.getAttribute(propertyName) != null? (String) state.getAttribute(propertyName):null;
-		if (o_property_value == null && n_property_value != null
-			|| o_property_value != null && n_property_value == null
-			|| o_property_value != null && n_property_value != null && !o_property_value.equals(n_property_value))
+		if ((o_property_value == null && n_property_value != null)
+			|| (o_property_value != null && n_property_value == null)
+			|| (o_property_value != null && n_property_value != null && !o_property_value.equals(n_property_value)))
 		{
 			// there is a change
 			return true;

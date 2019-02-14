@@ -1985,9 +1985,13 @@ public class GradebookNgBusinessService {
 
 
 			// Shouldn't be happening, but is on Staging...
-			if (eventAssignment == null) {
-				eventAssignment = this.getAssignment(event.getGradableObject().getId());
-				assignments.add(eventAssignment);
+			try {
+				if (eventAssignment == null) {
+					eventAssignment = this.gradebookService.getAnyAssignment(getCurrentSiteId(), event.getGradableObject().getId());
+					assignments.add(eventAssignment);
+				}
+			} catch (Exception e){
+				log.error("Couldn't find assignment with id= " + event.getGradableObject().getId()  + " in gradebook " + getCurrentSiteId());
 			}
 
 			rval.add(new GbHistoryLog(event, student, grader, eventAssignment));

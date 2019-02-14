@@ -201,7 +201,18 @@ public interface GradebookService {
 	 */
 	public Assignment getAssignment(String gradebookUid, Long assignmentId)
 		throws AssessmentNotFoundException;
-	
+
+	/**
+	 * Get an assignment based on its id including deleted one
+	 *
+	 * @param gradebookUid
+	 * @param assignmentId
+	 * @return the associated Assignment with the given assignmentId
+	 * @throws AssessmentNotFoundException
+	 */
+	public Assignment getAnyAssignment(String gradebookUid, Long assignmentId)
+		throws AssessmentNotFoundException;
+
 	/**
 	 * Get an assignment based on its name.
 	 * This is provided for backward compatibility only.

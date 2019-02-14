@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -2140,7 +2141,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 
 		try
 		{
-			NumberFormat nbFormat = NumberFormat.getInstance(new ResourceLoader().getLocale());
+			NumberFormat nbFormat = NumberFormat.getInstance(Locale.US);
 			Double gradeAsDouble = nbFormat.parse(grade).doubleValue();
 			String decSeparator =((DecimalFormat)nbFormat).getDecimalFormatSymbols().getDecimalSeparator() + "";
 
@@ -2180,7 +2181,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 		  if (gradeEntryType == GradebookService.GRADE_TYPE_POINTS ||
 				  gradeEntryType == GradebookService.GRADE_TYPE_PERCENTAGE) {
 			  try {
-				  NumberFormat nbFormat = NumberFormat.getInstance(new ResourceLoader().getLocale());
+				  NumberFormat nbFormat = NumberFormat.getInstance(Locale.US);
 				  Double gradeAsDouble = new Double (nbFormat.parse(grade).doubleValue());
 				  String decSeparator =((DecimalFormat)nbFormat).getDecimalFormatSymbols().getDecimalSeparator()+"";
 				  // grade must be greater than or equal to 0
@@ -2530,7 +2531,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	  if (grade != null && !"".equals(grade)) {
 		  if (gradeEntryType == GradebookService.GRADE_TYPE_POINTS) {
 			  try {
-				  NumberFormat nbFormat = NumberFormat.getInstance(new ResourceLoader().getLocale());				
+				  NumberFormat nbFormat = NumberFormat.getInstance(Locale.US);
 				  Double pointValue = new Double (nbFormat.parse(grade).doubleValue());
 				  convertedValue = pointValue;
 			  } catch (NumberFormatException | ParseException nfe) {
@@ -3124,7 +3125,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	    Double scoreAsDouble = null;
 	    if (doubleAsString != null && !"".equals(doubleAsString)) {
 	        try {
-	        	NumberFormat numberFormat = NumberFormat.getInstance(new ResourceLoader().getLocale());
+	        	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 				Number numericScore = numberFormat.parse(doubleAsString.trim());
 				scoreAsDouble = numericScore.doubleValue();
 			} catch (ParseException e) {

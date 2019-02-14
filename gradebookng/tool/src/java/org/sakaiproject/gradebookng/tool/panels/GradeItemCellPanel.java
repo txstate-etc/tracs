@@ -1,5 +1,7 @@
 package org.sakaiproject.gradebookng.tool.panels;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -244,8 +246,19 @@ public class GradeItemCellPanel extends Panel {
 
 					// perform validation here so we can bypass the backend
 					final DoubleValidator validator = new DoubleValidator();
+					boolean isNotBlank = StringUtils.isNotBlank(rawGrade);
+					boolean isValidGrade = validator.isValid(rawGrade, Locale.US);
+					boolean isInRange;
+					try {
+						NumberFormat nbFormat = NumberFormat.getInstance(Locale.US);
+						Double gradeAsDouble = new Double (nbFormat.parse(rawGrade).doubleValue());
+						isInRange = isNotBlank && validator.isInRange(gradeAsDouble, 0, pointsLimit * 1.5);
+					} catch(ParseException ex) {
+						isInRange = isNotBlank;
+					}
 
-					if (StringUtils.isNotBlank(rawGrade) && (!validator.isValid(rawGrade) || !validator.isInRange(Double.parseDouble(rawGrade), 0, pointsLimit * 1.5))) {
+
+					if (isNotBlank && (!isValidGrade || !isInRange)) {
 						// show warning and revert button
 						markWarning(getComponent());
 						target.add(page.updateLiveGradingMessage(getString("feedback.error")));

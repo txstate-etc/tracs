@@ -2525,9 +2525,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			for (Comment comment : commentsToUpdate) {
 				getHibernateTemplate().saveOrUpdate(comment);
 				String studentUuid = comment.getStudentId();
-				String commentFrom = null;
-				if(studentIdCommentMap.get(studentUuid) != null)
-					commentFrom = studentIdCommentMap.get(studentUuid).getCommentText();
+				String commentFrom = studentIdCommentMap.get(studentUuid) == null? null : studentIdCommentMap.get(studentUuid).getCommentText();
 				postEvent("gradebook.saveComment", gradebookUid, String.valueOf(gradebook.getId()), S_ITEM,
 						String.valueOf(assignment.getId()), assignment.getName(), "student", studentUuid, "commentFrom",
 						commentFrom, "commentTo",comment.getCommentText());

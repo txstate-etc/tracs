@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -3717,42 +3718,41 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				Category existing = currentCategoryMap.get(newDef.getId());
 				StringBuffer categoryUpdatedInfo = new StringBuffer("");
 				boolean changed = false;
-				if (!existing.getName().equals(newDef.getName())) {
+				if (!Objects.equals(existing.getName(),newDef.getName())) {
 					changed = true;
 					categoryUpdatedInfo.append("/NameFrom/" + existing.getName() + "/NameTo/" + newDef.getName());
 					existing.setName(newDef.getName());
 				}
-				if (!existing.getWeight().equals(newDef.getWeight()) ) {
+				if (!Objects.equals(existing.getWeight(),newDef.getWeight())) {
 					changed = true;
-					categoryUpdatedInfo.append("/WeightFrom/" + existing.getWeight().toString() + "/WeightTo/" + newDef.getWeight().toString());
+					categoryUpdatedInfo.append("/WeightFrom/" + String.valueOf(existing.getWeight()) + "/WeightTo/" + String.valueOf(newDef.getWeight()));
 					existing.setWeight(newDef.getWeight());
 				}
-				if (!existing.getDrop_lowest().equals(newDef.getDrop_lowest())) {
+				if (!Objects.equals(existing.getDrop_lowest(),newDef.getDrop_lowest())) {
 					changed = true;
-					categoryUpdatedInfo.append("/DropLowestFrom/" + existing.getDrop_lowest().toString() + "/DropLowestTo/" + newDef.getDrop_lowest().toString());
+					categoryUpdatedInfo.append("/DropLowestFrom/" + String.valueOf(existing.getDrop_lowest()) + "/DropLowestTo/" + String.valueOf(newDef.getDrop_lowest()));
 					existing.setDrop_lowest(newDef.getDrop_lowest());
 				}
-				if (!existing.getDropHighest().equals(newDef.getDropHighest())) {
+				if (!Objects.equals(existing.getDropHighest(),newDef.getDropHighest())) {
 					changed = true;
-					categoryUpdatedInfo.append("/DropHighestFrom/" + existing.getDropHighest().toString() + "/DropHighestTo/" + newDef.getDropHighest().toString());
+					categoryUpdatedInfo.append("/DropHighestFrom/" + String.valueOf(existing.getDropHighest()) + "/DropHighestTo/" + String.valueOf(newDef.getDropHighest()));
 					existing.setDropHighest(newDef.getDropHighest());
 				}
-				if (!existing.getKeepHighest().equals(newDef.getKeepHighest())) {
+				if (!Objects.equals(existing.getKeepHighest(),newDef.getKeepHighest())) {
 					changed = true;
-					categoryUpdatedInfo.append("/KeepHighestFrom/" + existing.getKeepHighest().toString() + "/KeepHighestTo/" + newDef.getKeepHighest());
+					categoryUpdatedInfo.append("/KeepHighestFrom/" + String.valueOf(existing.getKeepHighest()) + "/KeepHighestTo/" + String.valueOf(newDef.getKeepHighest()));
 					existing.setKeepHighest(newDef.getKeepHighest());
 				}
-				if (!existing.isExtraCredit().equals(newDef.isExtraCredit())) {
+				if (!Objects.equals(existing.isExtraCredit(), newDef.isExtraCredit())) {
 					changed = true;
-					categoryUpdatedInfo.append("/ExtraCreditFrom/" + existing.isExtraCredit().toString() + "/ExtraCreditTo/" + newDef.isExtraCredit().toString());
+					categoryUpdatedInfo.append("/ExtraCreditFrom/" + String.valueOf(existing.isExtraCredit()) + "/ExtraCreditTo/" + String.valueOf(newDef.isExtraCredit()));
 					existing.setExtraCredit(newDef.isExtraCredit());
 				}
-				if (!existing.getCategoryOrder().equals(newDef.getCategoryOrder())) {
+				if (!Objects.equals(existing.getCategoryOrder(), newDef.getCategoryOrder())) {
 					changed = true;
-					categoryUpdatedInfo.append("/OrderFrom/" + existing.getCategoryOrder().toString() + "/OrderTo/" + newDef.getCategoryOrder().toString());
+					categoryUpdatedInfo.append("/OrderFrom/" + String.valueOf(existing.getCategoryOrder())+ "/OrderTo/" + String.valueOf(newDef.getCategoryOrder()));
 					existing.setCategoryOrder(categoryIndex);
 				}
-
 				if(changed) {
 					this.updateCategory(existing);
 					postEvent("gradebook.updateCategory", gradebook.getUid(), String.valueOf(gradebook.getId()), S_CATEGORY, String.valueOf(newDef.getId()), categoryUpdatedInfo.toString());

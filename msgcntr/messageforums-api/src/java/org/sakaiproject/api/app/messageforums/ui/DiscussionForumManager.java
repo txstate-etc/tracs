@@ -597,6 +597,17 @@ public interface DiscussionForumManager
   */
   public Set<String> getUsersAllowedForTopic(Long topicId, boolean checkReadPermission, boolean checkModeratePermission);
 
+  /**
+  *
+  * @param topicId, siteId
+  * @param checkReadPermission - user must have read permission for topic
+  * @param checkModeratePermission - user must have moderate permission for topic
+  * @return a set of userIds for the site members who have "read" and/or "moderate" permission
+  * for the given topic. Uses the role and group permission settings for the topic
+  * to determine permission
+  */
+  public Set<String> getUsersAllowedForTopic(String siteId, Long topicId, boolean checkReadPermission, boolean checkModeratePermission);
+
   /** gets all topics within a site */
   public List<Topic> getTopicsInSite(final String contextId);
 

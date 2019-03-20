@@ -340,7 +340,7 @@ public class ForumsNotifier implements Observer {
     public List<String> getNotifyList(String siteid, long topicId, String author) throws Exception {
         // get list of users to notify: a set of userIds for the site members who have
         // "read" permission for the given topic
-        Set allowedUsers = discussionForumManager.getUsersAllowedForTopic(topicId, true, false);
+        Set allowedUsers = discussionForumManager.getUsersAllowedForTopic(siteid, topicId, true, false);
         Iterator<String> uit = allowedUsers.iterator();
         //put the allowed users in a list, exclude the author of the post because they don't
         //need to be notified

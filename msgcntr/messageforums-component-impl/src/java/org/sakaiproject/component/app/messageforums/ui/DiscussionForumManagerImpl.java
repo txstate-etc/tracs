@@ -2447,6 +2447,17 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     
 
     public Set<String> getUsersAllowedForTopic(Long topicId, boolean checkReadPermission, boolean checkModeratePermission) {
+
+		String siteId = ToolManager.getCurrentPlacement().getContext();
+		if (siteId != null) {
+			return getUsersAllowedForTopic(siteId, topicId, checkReadPermission, checkModeratePermission);
+		}
+		else {
+			return null;
+		}
+	}
+
+    public Set<String> getUsersAllowedForTopic(String siteId, Long topicId, boolean checkReadPermission, boolean checkModeratePermission) {
   	 LOG.debug("getUsersAllowedForTopic(" + topicId + ", " + checkReadPermission + ", " + checkModeratePermission + ")"); 
   	 
      if (topicId == null) {
@@ -2469,8 +2480,8 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   	  Set<Group> groupsInSite = new HashSet<Group>();
 
   	  Site currentSite;
-  	  String siteId = ToolManager.getCurrentPlacement().getContext();
   	  try {
+
   		  currentSite = siteService.getSite(siteId);
 
   		  // get all of the roles in this site

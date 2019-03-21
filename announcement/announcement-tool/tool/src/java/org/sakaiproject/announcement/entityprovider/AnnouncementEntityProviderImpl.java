@@ -490,10 +490,12 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 					rawAnnouncements.forEach(announcementMessage -> {
 						try {
 							AnnouncementMessage a = (AnnouncementMessage)announcementMessage;
+							if(announcementService.isMessageViewable(a)) {
 								DecoratedAnnouncement announcement = createDecoratedAnnouncement((AnnouncementMessage) a, siteService.getSite(siteId).getTitle());
 								if (announcement != null) {
 									announcements.add(announcement);
 								}
+							}
 						} catch (IdUnusedException e) {
 							log.debug(e.getMessage());
 						} catch (Exception e) {

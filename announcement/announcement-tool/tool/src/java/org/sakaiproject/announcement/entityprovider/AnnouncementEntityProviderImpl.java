@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import lombok.Getter;
@@ -284,10 +285,16 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 		List<DecoratedAttachment> attachments = new ArrayList<DecoratedAttachment>();
 		for (Reference attachment : (List<Reference>) a.getHeader().getAttachments()) {
 			String url = attachment.getUrl();
-			String name = attachment.getProperties().getPropertyFormatted(attachment.getProperties().getNamePropDisplayName());
+			String name = Optional.ofNullable(attachment.getProperties())
+							.map(properties -> properties.getNamePropDisplayName())
+							.map(displayName -> attachment.getProperties().getPropertyFormatted(displayName))
+							.orElse("NO FORMATTED DISPLAYNAME");
 			String attachId = attachment.getId();
-			String type = attachment.getProperties().getProperty(attachment.getProperties().getNamePropContentType());
-			String attachRef = attachment.getReference();								
+			String type = Optional.ofNullable(attachment.getProperties())
+									.map(properties -> properties.getNamePropContentType())
+									.map(contentType -> attachment.getProperties().getProperty(contentType))
+									.orElse("NO CONTENT TYPE");
+			String attachRef = attachment.getReference();
 			DecoratedAttachment decoratedAttachment = new DecoratedAttachment(attachId,name,type,url,attachRef);
 			attachments.add(decoratedAttachment);
 		}
@@ -462,6 +469,7 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 
 	@EntityCustomAction(action="all",viewKey=EntityView.VIEW_LIST)
 	public List<?> getAllUserAnnouncements(EntityView view, Map<String, Object> params) {
+		String currentUserId = sessionManager.getCurrentSessionUserId();
 		List<Site> sites = siteService.getUserSites();
 		List<DecoratedAnnouncement> announcements = new ArrayList<>();
 
@@ -481,12 +489,15 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 
 					rawAnnouncements.forEach(announcementMessage -> {
 						try {
-							DecoratedAnnouncement announcement = createDecoratedAnnouncement((AnnouncementMessage) announcementMessage, siteService.getSite(siteId).getTitle());
-							if (announcement != null) {
-								announcements.add(announcement);
-							}
+							AnnouncementMessage a = (AnnouncementMessage)announcementMessage;
+								DecoratedAnnouncement announcement = createDecoratedAnnouncement((AnnouncementMessage) a, siteService.getSite(siteId).getTitle());
+								if (announcement != null) {
+									announcements.add(announcement);
+								}
 						} catch (IdUnusedException e) {
 							log.debug(e.getMessage());
+						} catch (Exception e) {
+							log.info("Exception caught processing announcement: " + announcementMessage.getId() + " for user: " + currentUserId + ". Skipping...");
 						}
 					});
 				} catch (IdUnusedException | PermissionException e) {

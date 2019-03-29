@@ -1763,7 +1763,7 @@ GradebookSpreadsheet.prototype.setupCloneTables = function() {
         event.preventDefault();
       }
     });
-    leftblock.on('touchstart', false);
+    //leftblock.on('touchstart', false);
     leftblock.on('touchmove', false);
     leftblock.on('wheel', false);
     leftblock.on('scroll', false);

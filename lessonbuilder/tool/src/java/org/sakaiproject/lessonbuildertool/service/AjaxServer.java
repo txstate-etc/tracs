@@ -53,6 +53,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.sakaiproject.authz.api.AuthzGroupService;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.cover.SecurityService;
@@ -100,6 +103,7 @@ import org.sakaiproject.lessonbuildertool.service.LessonBuilderAccessService;
 public class AjaxServer extends HttpServlet
 {
    private static final String UTF8 = "UTF-8";
+   private static final String HTTPS = "https://";
 
    private static MessageSource messageSource;
    private static SiteService siteService;
@@ -326,7 +330,7 @@ public class AjaxServer extends HttpServlet
 	    filter = FILTER_HIGH;
 	else if (filterSpec.equalsIgnoreCase("low")) 
 	    filter = FILTER_LOW;
-	else if (filterSpec.equalsIgnoreCase("none")) 
+	else if (filterSpec.equalsIgnoreCase("none") || isFromTrustedSource(html))
 	    filter = FILTER_NONE;
 	// unspecified
 	else
@@ -770,6 +774,22 @@ public class AjaxServer extends HttpServlet
 		return item;
 	}
 
+	private static boolean isFromTrustedSource(String html) {
+		Document doc = Jsoup.parse(html);
+		boolean trusted = false;
+		String[] trustedSources = ServerConfigurationService.getString("lessonbuilder.trustedSources", "").split(",");
+		for (String ts : trustedSources) {
+			String SRC = HTTPS + ts;
+			Elements mediafloEmbed = doc.select("iframe[src^=" + SRC + "]");
+			if (mediafloEmbed.size()==1 && html.trim().startsWith("<div")) {
+				trusted = true;
+			} else {
+				trusted = false;
+			}
+		}
+		return trusted;
+	}
+
     public static String deleteItem(String itemId, String csrfToken) {
 	if (itemId == null) {
 	    log.error("Ajax deleteBreak passed null itemid");
@@ -966,5 +986,4 @@ public class AjaxServer extends HttpServlet
     public void setLessonBuilderAccessService(LessonBuilderAccessService s) {
         lessonBuilderAccessService = s;
     }
-
 }

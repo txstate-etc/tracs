@@ -30,6 +30,9 @@ import java.math.BigDecimal;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.SecurityAdvisor;
@@ -126,6 +129,7 @@ public class SimplePageBean {
 	public static final int CACHE_TIME_TO_LIVE_SECONDS = 600;
 	public static final int CACHE_TIME_TO_IDLE_SECONDS = 360;
 	private static Logger log = LoggerFactory.getLogger(SimplePageBean.class);
+	private static final String HTTPS = "https://";
 
 	public enum Status {
 	    NOT_REQUIRED, REQUIRED, DISABLED, COMPLETED, FAILED, NEEDSGRADING
@@ -1113,6 +1117,9 @@ public class SimplePageBean {
 
 			// figure out how to filter
 			Integer filter = getFilterLevel(placement);
+			if(isFromTrustedSource(html)) {
+				filter = FILTER_NONE;
+			}
 			if (filter.equals(FILTER_NONE)) {
 			    html = FormattedText.processHtmlDocument(contents, error);
 			} else if (filter.equals(FILTER_DEFAULT)) {
@@ -1394,6 +1401,23 @@ public class SimplePageBean {
 
 		return returnMesssage;
         }
+
+	private static boolean isFromTrustedSource(String html) {
+		Document doc = Jsoup.parse(html);
+		boolean trusted = false;
+		String[] trustedSources = ServerConfigurationService.getString("lessonbuilder.trustedSources", "").split(",");
+		for (String ts : trustedSources) {
+			String SRC = HTTPS + ts;
+			Elements mediafloEmbed = doc.select("iframe[src^=" + SRC + "]");
+			if (mediafloEmbed.size()==1 && html.trim().startsWith("<div")) {
+				trusted = true;
+			} else {
+				trusted = false;
+			}
+		}
+		return trusted;
+	}
+
 
 	//This method is written to enable user to select multiple Resources from the tool
 	private String processSingleResource(Reference reference,int type, boolean isWebSite, boolean isCaption, Long itemId){

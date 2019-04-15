@@ -27,11 +27,6 @@ public class ExcuseGradePanel extends Panel {
 
     private final ModalWindow window;
 
-    private String newGrade = "";
-    public String getNewGrade() {
-        return newGrade;
-    }
-
     @SpringBean(name = "org.sakaiproject.gradebookng.business.GradebookNgBusinessService")
     protected GradebookNgBusinessService businessService;
 
@@ -51,8 +46,6 @@ public class ExcuseGradePanel extends Panel {
         final Assignment assignment = businessService.getAssignment(assignmentId);
         final String assignmentName = assignment.getName();
         final boolean excludedFromGrade = (boolean) modelData.get("isExcusedGrade");
-        final String oldGrade = (String) modelData.get("grade");
-        newGrade = oldGrade;
         final String oldComment = (String) modelData.get("gradeComment");
         final Form form = new Form("form");
 
@@ -75,22 +68,8 @@ public class ExcuseGradePanel extends Panel {
                     return;
                 }
 
-                // The new grade will be blank unless checkBoxValue is FALSE
-                newGrade = "";
-                if (!checkBoxValue) {
-                    // The flag was changed from TRUE to FALSE, so we set the grade to the last non-empty value from grade log
-                    List<GbGradeLog> gradeLog = businessService.getGradeLog(studentUuid, assignmentId);
-                    for (GbGradeLog logItem : gradeLog) {
-                        newGrade = logItem.getGrade().equals(null) ? "" : logItem.getGrade().trim();
-                        if (!newGrade.equals("")) {
-                            break;
-                        }
-                    }
-                }
-
                 boolean success = businessService.saveExcusedGrade(assignmentId, studentUuid, checkBoxValue, oldComment);
                 if (success) {
-                    businessService.saveGrade(assignmentId, studentUuid, null, newGrade, oldComment);
                     ExcuseGradePanel.this.window.close(target);
                     setResponsePage(GradebookPage.class);
                 }

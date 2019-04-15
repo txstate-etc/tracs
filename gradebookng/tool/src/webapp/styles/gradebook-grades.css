@@ -323,6 +323,7 @@
 
 #gradebookGrades .gb-excluded-item-cell {
   background-color: #FD0;
+  text-decoration: line-through;
 }
 #gradebookGrades .gb-readonly-grade {
   line-height: 1em;

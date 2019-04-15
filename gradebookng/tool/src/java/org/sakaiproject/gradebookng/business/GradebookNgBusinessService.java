@@ -1092,8 +1092,9 @@ public class GradebookNgBusinessService {
 					}
 
 					Double score = null;
-					final Optional<CategoryScoreData> categoryScore = gradebookService.calculateCategoryScore(gradebook,
-							student.getId(), category, category.getAssignmentList(), gradeMap);
+//					final Optional<CategoryScoreData> categoryScore = gradebookService.calculateCategoryScore(gradebook,
+//							student.getId(), category, category.getAssignmentList(), gradeMap);
+					final Optional<CategoryScoreData> categoryScore = gradebookService.calculateCategoryScore(gradebook.getId(), student.getId(), category.getId());
 					if (categoryScore.isPresent())
 					{
 						CategoryScoreData data = categoryScore.get();

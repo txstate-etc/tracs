@@ -45,6 +45,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -1142,8 +1143,9 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
                 if(gradebook.getCategory_type() != GradebookService.CATEGORY_TYPE_NO_CATEGORY && assign.getCategory() != null && assign.getCategory().isExtraCredit())
                     extraCredit = true;
 
+				boolean gradeRecIsExcused = gradeRec.isExcludedFromGrade() == null ? false : gradeRec.isExcludedFromGrade();
                 if (assign.isCounted() && !assign.getUngraded() && !assign.isRemoved() && countedSet.contains(assign) &&
-                        assign.getPointsPossible() != null && assign.getPointsPossible() > 0 && !gradeRec.getDroppedFromGrade() && !extraCredit) {
+                        assign.getPointsPossible() != null && assign.getPointsPossible() > 0 && !gradeRec.getDroppedFromGrade() && !extraCredit && !gradeRecIsExcused) {
                     countedGradeRecs.add(gradeRec);
                 }
             }
@@ -1259,7 +1261,8 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 	    Set assignmentsTaken = new HashSet();
 	    for (AssignmentGradeRecord gradeRec : gradeRecs)
 	    {
-	        if(gradeRec.getPointsEarned() != null && !gradeRec.getPointsEarned().equals("") && !gradeRec.getDroppedFromGrade())
+	    	boolean gradeRecIsExcused = gradeRec.isExcludedFromGrade() == null ? false : gradeRec.isExcludedFromGrade();
+	        if(gradeRec.getPointsEarned() != null && !gradeRec.getPointsEarned().equals("") && !gradeRec.getDroppedFromGrade() && !gradeRecIsExcused)
 	        {
 	            Assignment go = gradeRec.getAssignment();
 	            if (go.isIncludedInCalculations() && countedAssigns.contains(go))
@@ -3019,10 +3022,14 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
         Map<String, List<AssignmentGradeRecord>> gradeRecordMap = new HashMap<String, List<AssignmentGradeRecord>>();
         for(AssignmentGradeRecord gradeRecord : gradeRecords) {
             
-            if(gradeRecord == null 
-                    || gradeRecord.getPointsEarned() == null) { // don't consider grades that have null pointsEarned (this occurs when a previously entered score for an assignment is removed; record stays in database) 
+            if(gradeRecord == null || gradeRecord.getPointsEarned() == null) {
+            	// don't consider grades that have null pointsEarned (this occurs when a previously entered score for an assignment is removed; record stays in database)
                 continue;
             }
+
+            if (gradeRecord.isExcludedFromGrade() == null ? false : gradeRecord.isExcludedFromGrade() == true) {
+            	continue;
+			}
             
             // reset
             gradeRecord.setDroppedFromGrade(false);
@@ -3334,27 +3341,27 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
         rval = (List)getHibernateTemplate().execute(hc);
         return rval;
     }
-	
+
 	@Override
 	public Optional<CategoryScoreData> calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category,
 			final List<org.sakaiproject.service.gradebook.shared.Assignment> categoryAssignments, Map<Long,String> gradeMap) {
-		
+
 		Gradebook gb = (Gradebook) gradebook;
-		
+
 		// used for translating letter grades
 		final Map<String, Double> gradingSchema = gb.getSelectedGradeMapping().getGradeMap();
-		
+
 		//collect the data and turn it into a list of AssignmentGradeRecords
 		//this is the info that is compatible with both applyDropScores and the calculateCategoryScore method
 		List<AssignmentGradeRecord> gradeRecords = new ArrayList<>();
 		for(org.sakaiproject.service.gradebook.shared.Assignment assignment: categoryAssignments) {
-			
+
 			Long assignmentId = assignment.getId();
-			
+
 			String rawGrade = gradeMap.get(assignmentId);
 			Double pointsPossible = assignment.getPoints();
 			Double grade = null;
-			
+
 			//determine the grade we should be using depending on the grading type
 			if (gb.getGrade_type() == GradebookService.GRADE_TYPE_PERCENTAGE) {
 				grade = calculateEquivalentPointValueForPercent(pointsPossible, NumberUtils.createDouble(rawGrade));
@@ -3363,14 +3370,14 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			} else {
 				grade = NumberUtils.createDouble(rawGrade);
 			}
-									
+
 			//recreate the category (required fields only)
 			Category c = new Category();
 			c.setId(category.getId());
 			c.setDropHighest(category.getDropHighest());
 			c.setDrop_lowest(category.getDrop_lowest());
 			c.setKeepHighest(category.getKeepHighest());
-			
+
 			//recreate the assignment (required fields only)
 			Assignment a = new Assignment();
 			a.setPointsPossible(assignment.getPoints());
@@ -3382,13 +3389,13 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			a.setGradebook(gb);
 			a.setCategory(c);
 			a.setId(assignment.getId());  // store the id so we can find out later which grades were dropped, if any
-			
+
 			//create the AGR
 			AssignmentGradeRecord gradeRecord = new AssignmentGradeRecord(a, studentUuid, grade);
-			
+
 			gradeRecords.add(gradeRecord);
 		}
-		
+
 		return getCategoryScoreResult(studentUuid, category.getId(), gradeRecords);
 	}
 	
@@ -3406,8 +3413,13 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			
 		//apply the settings
 		List<AssignmentGradeRecord> gradeRecords = gradeRecMap.get(studentUuid);
+
+
+		Predicate<AssignmentGradeRecord> nonExcused = agr -> (agr.isExcludedFromGrade() == null ? false : agr.isExcludedFromGrade()) == false;
+
+		List<AssignmentGradeRecord> nonExcusedGradeRecords = gradeRecords == null ? null : gradeRecords.stream().filter(nonExcused).collect(Collectors.<AssignmentGradeRecord> toList());
 		
-		return getCategoryScoreResult(studentUuid, categoryId, gradeRecords);
+		return getCategoryScoreResult(studentUuid, categoryId, nonExcusedGradeRecords);
 	}
 
 	private Optional<CategoryScoreData> getCategoryScoreResult(String studentUuid, Long categoryId, List<AssignmentGradeRecord> gradeRecords)

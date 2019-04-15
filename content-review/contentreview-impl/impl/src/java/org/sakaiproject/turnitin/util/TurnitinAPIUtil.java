@@ -387,22 +387,22 @@ public class TurnitinAPIUtil {
 			}
 			else {
 				writeBytesToOutputStream(outStream, sortedkeys.get(0),"=",
-						parameters.get(sortedkeys.get(0)).toString());
+						String.valueOf(parameters.get(sortedkeys.get(0))));
 				if (apiTraceLog.isDebugEnabled()) {
 					apiDebugSB.append("Starting TII CALL:\n");
 					apiDebugSB.append(sortedkeys.get(0));
 					apiDebugSB.append(" = ");
-					apiDebugSB.append(parameters.get(sortedkeys.get(0)).toString());
+					apiDebugSB.append(String.valueOf(parameters.get(sortedkeys.get(0))));
 					apiDebugSB.append("\n");
 				}
 
 				for (int i = 1; i < sortedkeys.size(); i++) {
 					writeBytesToOutputStream(outStream, "&", sortedkeys.get(i), "=", 
-							parameters.get(sortedkeys.get(i)).toString());
+							String.valueOf(parameters.get(sortedkeys.get(i))));
 					if (apiTraceLog.isDebugEnabled()) {
 						apiDebugSB.append(sortedkeys.get(i));
 						apiDebugSB.append(" = ");
-						apiDebugSB.append(parameters.get(sortedkeys.get(i)).toString());
+						apiDebugSB.append(String.valueOf(parameters.get(sortedkeys.get(i))));
 						apiDebugSB.append("\n");
 					}
 				}

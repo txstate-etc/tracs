@@ -1409,7 +1409,7 @@ public class SimplePageBean {
 		for (String ts : trustedSources) {
 			String SRC = HTTPS + ts;
 			Elements mediafloEmbed = doc.select("iframe[src^=" + SRC + "]");
-			if (mediafloEmbed.size()==1 && html.trim().startsWith("<div")) {
+			if (mediafloEmbed.size()==1) {
 				trusted = true;
 			} else {
 				trusted = false;

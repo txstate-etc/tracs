@@ -855,7 +855,7 @@ public interface GradebookService {
      * @param gradeMap map of assignmentId to grade, to use for the calculations
      * @return percentage or null if no calculations were made
      */
-	Optional<CategoryScoreData> calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category, final List<Assignment> categoryAssignments, Map<Long,String> gradeMap);
+	Optional<CategoryScoreData> calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category, final List<Assignment> categoryAssignments, Map<Long,String> gradeMap, Map<Long,Boolean> excusalMap);
 
     /**
      * Get the course grade for a student

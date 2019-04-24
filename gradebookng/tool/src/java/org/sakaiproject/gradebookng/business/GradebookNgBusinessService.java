@@ -1083,18 +1083,22 @@ public class GradebookNgBusinessService {
 					final Map<Long, GbGradeInfo> grades = sg.getGrades();
 
 					// build map of just the grades we want
+					// also build a map of excuse grade flags
 					final Map<Long, String> gradeMap = new HashMap<>();
+					final Map<Long, Boolean> excusalMap = new HashMap<>();
 					for (final Long assignmentId : categoryAssignmentIds) {
 						final GbGradeInfo gradeInfo = grades.get(assignmentId);
 						if (gradeInfo != null) {
 							gradeMap.put(assignmentId, gradeInfo.getGrade());
+							excusalMap.put(assignmentId, gradeInfo.isExcludedFromGrade());
 						}
 					}
 
 					Double score = null;
-//					final Optional<CategoryScoreData> categoryScore = gradebookService.calculateCategoryScore(gradebook,
-//							student.getId(), category, category.getAssignmentList(), gradeMap);
-					final Optional<CategoryScoreData> categoryScore = gradebookService.calculateCategoryScore(gradebook.getId(), student.getId(), category.getId());
+
+					final Optional<CategoryScoreData> categoryScore = gradebookService.calculateCategoryScore(gradebook,
+							student.getId(), category, category.getAssignmentList(), gradeMap, excusalMap);
+
 					if (categoryScore.isPresent())
 					{
 						CategoryScoreData data = categoryScore.get();

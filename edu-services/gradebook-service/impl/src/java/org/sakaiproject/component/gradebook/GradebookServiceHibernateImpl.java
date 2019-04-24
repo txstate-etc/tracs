@@ -3344,7 +3344,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 
 	@Override
 	public Optional<CategoryScoreData> calculateCategoryScore(Object gradebook, String studentUuid, CategoryDefinition category,
-			final List<org.sakaiproject.service.gradebook.shared.Assignment> categoryAssignments, Map<Long,String> gradeMap) {
+			final List<org.sakaiproject.service.gradebook.shared.Assignment> categoryAssignments, Map<Long,String> gradeMap, Map<Long,Boolean> excusalMap) {
 
 		Gradebook gb = (Gradebook) gradebook;
 
@@ -3359,6 +3359,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 			Long assignmentId = assignment.getId();
 
 			String rawGrade = gradeMap.get(assignmentId);
+			Boolean isExcused = excusalMap.get(assignmentId) == null ? false : excusalMap.get(assignmentId);
 			Double pointsPossible = assignment.getPoints();
 			Double grade = null;
 
@@ -3392,6 +3393,7 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 
 			//create the AGR
 			AssignmentGradeRecord gradeRecord = new AssignmentGradeRecord(a, studentUuid, grade);
+			gradeRecord.setExcludedFromGrade(isExcused);
 
 			gradeRecords.add(gradeRecord);
 		}
@@ -3496,8 +3498,15 @@ public class GradebookServiceHibernateImpl extends BaseHibernateManager implemen
 				return true;
 			}
 
+			Boolean isExcluded = gradeRecord.isExcludedFromGrade() == null ? false : gradeRecord.isExcludedFromGrade();
+
 			//remove if the assignment/graderecord doesn't meet the criteria for the calculation (rule 2-6)
-			if(assignment.getPointsPossible() == null || gradeRecord.getPointsEarned() == null || !assignment.isCounted() || !assignment.isReleased() || gradeRecord.getDroppedFromGrade()) {
+			if(assignment.getPointsPossible() == null ||
+					gradeRecord.getPointsEarned() == null ||
+					!assignment.isCounted() ||
+					!assignment.isReleased() ||
+					gradeRecord.getDroppedFromGrade() ||
+					isExcluded) {
 				return true;
 			}
 

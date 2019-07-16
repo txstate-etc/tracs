@@ -5,4 +5,12 @@ public class AssessmentQtiData {
 
 	public AssessmentQtiData() {
 	}
+
+	public AssessmentQtiData(String xmlString) {
+		this.qtiXmlData = xmlString;
+	}
+
+	public void setQtiXmlData (String xmlString) {
+		this.qtiXmlData = xmlString;
+	}
 }

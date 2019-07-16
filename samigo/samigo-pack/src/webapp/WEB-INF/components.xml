@@ -314,8 +314,8 @@
   <bean id ="PublishedEntityProvider"
       class="org.sakaiproject.tool.assessment.entity.impl.PublishedAssessmentEntityProviderImpl" parent="AbstractAssessmentEntityProvider" />
 
-  <bean id ="ExportQTIAssessment"
-      class="org.sakaiproject.tool.assessment.entity.impl.ExportQTIAssessmentEntityProviderImpl" parent="AbstractAssessmentEntityProvider">
+  <bean id ="ExportQtiAssessment"
+      class="org.sakaiproject.tool.assessment.entity.impl.ExportQtiAssessmentEntityProviderImpl" parent="AbstractAssessmentEntityProvider">
     <property name="qtiService" ref="QTIService" />
   </bean>
 

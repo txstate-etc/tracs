@@ -21,7 +21,7 @@ import java.lang.IllegalArgumentException;
  * @author yuanhua@txstate.edu
  *
  */
-public class ExportQTIAssessmentEntityProviderImpl extends AbstractAssessmentEntityProvider {
+public class ExportQtiAssessmentEntityProviderImpl extends AbstractAssessmentEntityProvider {
 
 	public final static String ENTITY_PREFIX = "sam_export_qti";
 	private static final int QTI_VERSION = 1;
@@ -29,7 +29,7 @@ public class ExportQTIAssessmentEntityProviderImpl extends AbstractAssessmentEnt
 	@Setter
 	private QTIServiceAPI qtiService;
 
-	private static final Logger LOG = LoggerFactory.getLogger(ExportQTIAssessmentEntityProviderImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ExportQtiAssessmentEntityProviderImpl.class);
 
 	public String getEntityPrefix() {
 		return ENTITY_PREFIX;
@@ -70,12 +70,12 @@ public class ExportQTIAssessmentEntityProviderImpl extends AbstractAssessmentEnt
 
 			exportXmlString = qtiService.getExportedAssessmentAsString(ref.getId(), QTI_VERSION);
 			if (exportXmlString != null) {
-				return exportXmlString;
+				return new AssessmentQtiData(exportXmlString);
 			}
 		} catch (Exception e) {
 			LOG.error("Error trying to export for " + ref.getId());
 		}
-		return exportXmlString;
+		return new AssessmentQtiData(exportXmlString);
 	}
 
 	@Override

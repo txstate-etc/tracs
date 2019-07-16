@@ -161,6 +161,30 @@ public class PublishedAssessmentData
     this.lastModifiedBy = lastModifiedBy;
   }
   
+  /**
+   * "Convenient Constructor"
+   * This is a simple object created for holding infos that interested to display.
+   * It is not used for persistence.
+   */
+  public PublishedAssessmentData(Long id, String title, Long assessmentId, String description, String comments, Long typeId, String createdBy, Date createdDate, String releaseTo,
+                                 Date startDate, Date dueDate, Date retractDate, Date lastModifiedDate, String lastModifiedBy, Integer lateHandling) {
+	this.assessmentId = assessmentId;
+    this.assessmentBaseId = id;
+    this.title = title;
+    this.description = description;
+    this.comments = comments;
+    this.typeId = typeId;
+    this.createdBy = createdBy;
+    this.createdDate = createdDate;
+    this.releaseTo = releaseTo;
+    this.startDate = startDate;
+    this.dueDate = dueDate;
+    this.retractDate = retractDate;
+    this.lastModifiedDate = lastModifiedDate;
+    this.lastModifiedBy = lastModifiedBy;
+    this.lateHandling = lateHandling;
+  }
+
   public PublishedAssessmentData(Long id, String title, String releaseTo,
           Date startDate, Date dueDate, Date retractDate, Integer status) {
 	  this.assessmentBaseId = id;

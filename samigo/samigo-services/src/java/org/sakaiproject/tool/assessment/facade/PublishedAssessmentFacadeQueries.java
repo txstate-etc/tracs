@@ -1226,8 +1226,8 @@ public class PublishedAssessmentFacadeQueries extends HibernateDaoSupport
 		Date currentDate = new Date();
 		String orderBy = getOrderBy(sortString);
 		
-		String query = "select new PublishedAssessmentData(p.publishedAssessmentId, p.title, "
-				+ " c.releaseTo, c.startDate, c.dueDate, c.retractDate, p.lastModifiedDate, p.lastModifiedBy) "
+		String query = "select new PublishedAssessmentData(p.publishedAssessmentId, p.title, p.assessmentId, p.description, p.comments, p.typeId, p.createdBy, p.createdDate,"
+				+ " c.releaseTo, c.startDate, c.dueDate, c.retractDate, p.lastModifiedDate, p.lastModifiedBy, c.lateHandling) "
 				+ " from PublishedAssessmentData p, PublishedAccessControl c, AuthorizationData z  "
 				+ " where c.assessment.publishedAssessmentId = p.publishedAssessmentId and p.status=:status and "
 				+ " p.publishedAssessmentId=z.qualifierId and z.functionId=:functionId "
@@ -1263,8 +1263,7 @@ public class PublishedAssessmentFacadeQueries extends HibernateDaoSupport
 		for (int j = 0; j < l.size(); j++) {
 			PublishedAssessmentData p = (PublishedAssessmentData) l.get(j);
 			if ((p.getDueDate() == null || (p.getDueDate()).after(currentDate))
-					&& (p.getRetractDate() == null || (p.getRetractDate())
-							.after(currentDate))) {
+					&& (p.getRetractDate() == null ||p.getLateHandling()==2 ||(p.getLateHandling()==1 && (p.getRetractDate()).after(currentDate)))) {
 				list.add(p);
 			}
 		}
@@ -1292,9 +1291,7 @@ public class PublishedAssessmentFacadeQueries extends HibernateDaoSupport
 				lastModifiedBy = agent.getDisplayName();
 			}
 
-			PublishedAssessmentFacade f = new PublishedAssessmentFacade(p
-					.getPublishedAssessmentId(), p.getTitle(),
-					p.getReleaseTo(), p.getStartDate(), p.getDueDate(), releaseToGroups, p.getLastModifiedDate(), lastModifiedBy);
+			PublishedAssessmentFacade f = new PublishedAssessmentFacade(p);
 			pubList.add(f);
 		}
 		return pubList;
@@ -1311,11 +1308,12 @@ public class PublishedAssessmentFacadeQueries extends HibernateDaoSupport
 			String sortString, final String siteAgentId, boolean ascending) {
 		
 		String orderBy = getOrderBy(sortString);
-		String query = "select new PublishedAssessmentData(p.publishedAssessmentId, p.title,"
-				+ " c.releaseTo, c.startDate, c.dueDate, c.retractDate, p.status, p.lastModifiedDate, p.lastModifiedBy) from PublishedAssessmentData p,"
+		String query = "select new PublishedAssessmentData(p.publishedAssessmentId, p.title, p.assessmentId, p.description, p.comments, p.typeId, p.createdBy, p.createdDate,"
+				+ " c.releaseTo, c.startDate, c.dueDate, c.retractDate, p.lastModifiedDate, p.lastModifiedBy, c.lateHandling) "
+				+ "from PublishedAssessmentData p,"
 				+ " PublishedAccessControl c, AuthorizationData z  "
 				+ " where c.assessment.publishedAssessmentId=p.publishedAssessmentId "
-				+ " and ((p.status=:activeStatus and (c.dueDate<=:today or c.retractDate<=:today)) or p.status=:editStatus)"
+				+ " and ((p.status=:activeStatus and (c.dueDate<=:today or (c.lateHandling=1 and c.retractDate<=:today))) or p.status=:editStatus)"
 				+ " and p.publishedAssessmentId=z.qualifierId and z.functionId=:functionId "
 				//+ " and (z.agentIdString=:siteId or z.agentIdString in (:groupIds)) "
 				+ " and z.agentIdString=:siteId "
@@ -1370,9 +1368,7 @@ public class PublishedAssessmentFacadeQueries extends HibernateDaoSupport
 			if (agent != null) {
 				lastModifiedBy = agent.getDisplayName();
 			}
-			PublishedAssessmentFacade f = new PublishedAssessmentFacade(p
-					.getPublishedAssessmentId(), p.getTitle(),
-					p.getReleaseTo(), p.getStartDate(), p.getDueDate(), p.getStatus(), releaseToGroups, p.getLastModifiedDate(), lastModifiedBy);
+			PublishedAssessmentFacade f = new PublishedAssessmentFacade(p);
 			pubList.add(f);
 		}
 		return pubList;

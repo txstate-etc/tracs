@@ -33,6 +33,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sakaiproject.tool.assessment.data.dao.assessment.AssessmentData;
+import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedAssessmentData;
 import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedMetaData;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.AssessmentAccessControlIfc;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.AssessmentAttachmentIfc;
@@ -277,6 +278,14 @@ public class PublishedAssessmentFacade
         this.publishedMetaDataSet);
     this.publishedSecuredIPAddressSet = data.getSecuredIPAddressSet();
     this.publishedAssessmentAttachmentSet = data.getAssessmentAttachmentSet();
+	this.releaseTo = ((PublishedAssessmentData)data).getReleaseTo();
+	this.startDate = ((PublishedAssessmentData)data).getStartDate();
+	this.dueDate = ((PublishedAssessmentData)data).getDueDate();
+	this.retractDate = ((PublishedAssessmentData)data).getRetractDate();
+	this.lateHandling = ((PublishedAssessmentData)data).getLateHandling();
+	this.typeId = data.getTypeId();
+    this.publishedSectionSet = data.getSectionSet();
+
   }
 
   public Long getPublishedAssessmentId(){

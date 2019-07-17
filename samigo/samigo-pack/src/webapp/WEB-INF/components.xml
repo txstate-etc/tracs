@@ -303,6 +303,7 @@
   <bean id ="AbstractAssessmentEntityProvider"  abstract="true"
       class="org.sakaiproject.tool.assessment.entity.impl.AbstractAssessmentEntityProvider">
     <property name="assessmentFacadeQueries" ref="AssessmentFacadeQueries" />
+    <property name="publishedAssessmentFacadeQueries" ref="PublishedAssessmentFacadeQueries" />
     <property name="securityService" ref="org.sakaiproject.authz.api.SecurityService" />
     <property name="developerHelperService" ref="org.sakaiproject.entitybroker.DeveloperHelperService" />
     <property name="siteService" ref="org.sakaiproject.site.api.SiteService" />

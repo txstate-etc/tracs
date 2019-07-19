@@ -220,10 +220,18 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 		
 		//if numbers are still zero, use the defaults
 		if(numberOfAnnouncements == 0) {
-			numberOfAnnouncements = DEFAULT_NUM_ANNOUNCEMENTS;
+			if (showAll) {
+				numberOfAnnouncements = MAX_NUM_ANNOUNCEMENTS;
+			} else {
+				numberOfAnnouncements = DEFAULT_NUM_ANNOUNCEMENTS;
+			}
 		}
 		if(numberOfDaysInThePast == 0) {
-			numberOfDaysInThePast = DEFAULT_DAYS_IN_PAST;
+			if(showAll) {
+				numberOfDaysInThePast = MAX_DAYS_IN_PAST;
+			} else {
+				numberOfDaysInThePast = DEFAULT_DAYS_IN_PAST;
+			}
 		}
 
 		if(log.isDebugEnabled()) {

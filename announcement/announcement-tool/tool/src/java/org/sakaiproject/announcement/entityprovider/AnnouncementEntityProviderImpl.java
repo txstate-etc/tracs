@@ -93,6 +93,8 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 	private static final String MOTD_CHANNEL_SUFFIX = "motd";
 	public static int DEFAULT_NUM_ANNOUNCEMENTS = 3;
 	public static int DEFAULT_DAYS_IN_PAST = 10;
+	public static int MAX_NUM_ANNOUNCEMENTS = 500;
+	public static int MAX_DAYS_IN_PAST = 3650;
 	private static final Logger log = LoggerFactory.getLogger(AnnouncementEntityProviderImpl.class);
 	private static ResourceLoader rb = new ResourceLoader("announcement");
     
@@ -127,6 +129,7 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 		//we use this zero value to determine if we need to look up from the tool config, or use the defaults if still not set.
 		int numberOfAnnouncements = NumberUtils.toInt((String)params.get("n"), 0);
 		int numberOfDaysInThePast = NumberUtils.toInt((String)params.get("d"), 0);
+		boolean showAll = Boolean.parseBoolean((String) params.get("all")) ? true : false;
 		
 		//get currentUserId for permissions checks, although unused for motdView and onlyPublic
 		String currentUserId = sessionManager.getCurrentSessionUserId();
@@ -137,7 +140,14 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 			log.debug("currentUserId: " + currentUserId);
 			log.debug("onlyPublic: " + onlyPublic);
 		}
-		
+
+		if (showAll ) {
+			//check permission
+			if (!securityService.unlock(AnnouncementService.SECURE_ANNC_ADD, siteService.siteReference(siteId))) {
+				throw new SecurityException("You do not have enough access to site: " + siteId + " to view the full list.");
+			}
+		}
+
 		//check current user has annc.read permissions for this site, not for public or motd though
 		if(!onlyPublic && !motdView) {
 			if(!securityService.unlock(AnnouncementService.SECURE_ANNC_READ, siteService.siteReference(siteId))) {
@@ -184,10 +194,18 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 				
 				//only get these from the synoptic tool config if not already set in the URL params
 				if (numberOfAnnouncements == 0 && props.get("items") != null) {
-					numberOfAnnouncements = getIntegerParameter(props, "items", DEFAULT_NUM_ANNOUNCEMENTS);
+					if (showAll) {
+						numberOfAnnouncements = MAX_NUM_ANNOUNCEMENTS;
+					} else {
+						numberOfAnnouncements = getIntegerParameter(props, "items", DEFAULT_NUM_ANNOUNCEMENTS);
+					}
 				}
 				if (numberOfDaysInThePast == 0 && props.get("days") != null) {
-					numberOfDaysInThePast = getIntegerParameter(props, "days", DEFAULT_DAYS_IN_PAST);
+					if (showAll) {
+						numberOfDaysInThePast = MAX_DAYS_IN_PAST;
+					} else {
+						numberOfDaysInThePast = getIntegerParameter(props, "days", DEFAULT_DAYS_IN_PAST);
+					}
 				}
 			}
 		}
@@ -218,11 +236,15 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 		
 		//get the announcements for each channel
 		List<Message> announcements = new ArrayList<Message>();
+		boolean includeDrafts = false;
 		
 		//for each channel
 		for(String channel: channels) {
 			try {
-				announcements.addAll(announcementService.getMessages(channel, t, numberOfAnnouncements, true, false, onlyPublic));
+				if (showAll) {
+					includeDrafts = true;
+				}
+				announcements.addAll(announcementService.getMessages(channel, t, numberOfAnnouncements, true, includeDrafts, onlyPublic));
 			} catch (PermissionException e) {
 				log.warn("User: " + currentUserId + " does not have access to view the announcement channel: " + channel + ". Skipping...");
 			}
@@ -237,7 +259,7 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 	
 		for (Message m : announcements) {
 			AnnouncementMessage a = (AnnouncementMessage)m;
-			if(announcementService.isMessageViewable(a)) {
+			if (showAll || announcementService.isMessageViewable(a) ) {
 				try {
 					DecoratedAnnouncement da = createDecoratedAnnouncement(a, siteTitle);
 					decoratedAnnouncements.add(da);

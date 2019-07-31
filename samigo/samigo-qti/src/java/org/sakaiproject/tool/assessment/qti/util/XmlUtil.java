@@ -545,7 +545,7 @@ public final class XmlUtil
       // print the document element
       case Node.DOCUMENT_NODE:
       {
-        domStringbuf.append("<?xml version=\"1.0\" ?>\n");
+        domStringbuf.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
         domStringbuf.append(getDOMString(((Document)node).getDocumentElement()));
         break;
       }

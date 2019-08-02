@@ -301,6 +301,24 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 		Reference ref = entityManager.newReference(reference);
 		String siteId = ref.getContext();
 		String channel = ref.getContainer();
+		boolean draft = a.getHeader().getDraft();
+		boolean specified = false;
+		if (a.getProperties().getProperty("releaseDate") != null){
+			specified = true;
+		};
+		boolean show = !draft && !specified;
+		String releaseDate = null;
+		String retractDate = null;
+		if(specified) {
+			try {
+				releaseDate = a.getProperties().getTimeProperty("releaseDate").getDisplay();
+				if(a.getProperties().getProperty("retractDate") != null) {
+					retractDate = a.getProperties().getTimeProperty("retractDate").getDisplay();
+				}
+			} catch (Exception e) {
+				log.error("Getting releaseDate error");
+			}
+		}
 
 		DecoratedAnnouncement da = new DecoratedAnnouncement(siteId, channel, announcementId);
 
@@ -308,8 +326,14 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 		da.setBody(a.getBody());
 		da.setCreatedByDisplayName(a.getHeader().getFrom().getDisplayName());
 		da.setCreatedOn(new Date(a.getHeader().getDate().getTime()));
+		da.setCreatedDate(a.getHeader().getDate().getDisplay());
 		da.setSiteId(siteId);
 		da.setSiteTitle(siteTitle);
+		da.setIsShown(Boolean.toString(show));
+		da.setIsDraft(Boolean.toString(draft));
+		da.setIsSpecified(Boolean.toString(specified));
+		da.setReleaseDate(releaseDate);
+		da.setRetractDate(retractDate);
 		
 		//get attachments
 		List<DecoratedAttachment> attachments = new ArrayList<DecoratedAttachment>();
@@ -369,6 +393,26 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 				log.error("Error finding announcement: " + entityId + " in site: " + siteId + "." + e.getClass() + ":" + e.getStackTrace());
 	         }
 	      }
+
+	      boolean draft = tempMsg.getHeader().getDraft();
+	      boolean specified = false;
+	      if (tempMsg.getProperties().getProperty("releaseDate") != null){
+	              specified = true;
+	      };
+	      boolean show = !draft && !specified;
+	      String releaseDate = null;
+	      String retractDate = null;
+	      if(specified) {
+	              try {
+	                      releaseDate = tempMsg.getProperties().getTimeProperty("releaseDate").getDisplay();
+	                      if(tempMsg.getProperties().getProperty("retractDate") != null) {
+	                              retractDate = tempMsg.getProperties().getTimeProperty("retractDate").getDisplay();
+	                      }
+	              } catch (Exception e) {
+	                      log.error("Getting releaseDate error");
+	              }
+	      }
+
 	      decoratedAnnouncement.setSiteId(tempMsg.getId());
 	      decoratedAnnouncement.setBody(tempMsg.getBody());
 	      AnnouncementMessageHeader header = tempMsg.getAnnouncementHeader();
@@ -379,8 +423,15 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 	      
 	      decoratedAnnouncement.setAttachments(attachmentUrls);
 	      decoratedAnnouncement.setCreatedOn(new Date(header.getDate().getTime()));
+	      decoratedAnnouncement.setCreatedDate(header.getDate().getDisplay());
 	      decoratedAnnouncement.setCreatedByDisplayName(header.getFrom().getDisplayName());
 	      decoratedAnnouncement.setSiteId(siteId);
+	      decoratedAnnouncement.setIsShown(Boolean.toString(show));
+	      decoratedAnnouncement.setIsDraft(Boolean.toString(draft));
+	      decoratedAnnouncement.setIsSpecified(Boolean.toString(specified));
+	      decoratedAnnouncement.setReleaseDate(releaseDate);
+	      decoratedAnnouncement.setRetractDate(retractDate);
+
 
 	      return decoratedAnnouncement;
 	   }
@@ -777,6 +828,12 @@ public class AnnouncementEntityProviderImpl extends AbstractEntityProvider imple
 		@Getter @Setter private String announcementId;
 		@Getter @Setter private String siteTitle;
 		@Getter @Setter private String channel;
+		@Getter @Setter private String isShown;
+		@Getter @Setter private String isDraft;
+		@Getter @Setter private String isSpecified;
+		@Getter @Setter private String releaseDate;
+		@Getter @Setter private String retractDate;
+		@Getter @Setter private String createdDate;
 
 		/**
 		 * As we are packing these fields into the ID, we need all of them.

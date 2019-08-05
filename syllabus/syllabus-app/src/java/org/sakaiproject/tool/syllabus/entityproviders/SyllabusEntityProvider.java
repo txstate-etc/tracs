@@ -14,6 +14,7 @@ import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.component.cover.ServerConfigurationService;
@@ -180,7 +181,124 @@ public class SyllabusEntityProvider extends AbstractEntityProvider implements En
 		return result;
 	}
 
-	
+	/**
+	 * migrate/siteId
+	 * @param view
+	 * @return
+	 * Added support for migration to canvas
+	 * @author yuanhua@txstate.edu
+	 */
+	@EntityCustomAction(action = "migrate", viewKey = EntityView.VIEW_LIST)
+	public SyllabusContent getSyllabusForMigrate(EntityView view) {
+
+		// get siteId
+		String siteId = view.getPathSegment(2);
+
+		if(log.isDebugEnabled()) {
+			log.debug("news for site " + siteId);
+		}
+
+		// check siteId supplied
+		if (StringUtils.isBlank(siteId)) {
+			throw new IllegalArgumentException(
+					"siteId must be set in order to get the syllabus for a site, via the URL /syllabus/site/siteId");
+		}
+
+		//check user can access this site
+		Site site;
+		try {
+			site = siteService.getSiteVisit(siteId);
+		} catch (IdUnusedException e) {
+			throw new EntityNotFoundException("Invalid siteId: " + siteId, siteId);
+		} catch (PermissionException e) {
+			throw new EntityNotFoundException("No access to site: " + siteId, siteId);
+		}
+
+		//check user can access the tool, it might be hidden
+		ToolConfiguration toolConfig = site.getToolForCommonId("sakai.syllabus");
+		if(!toolManager.isVisible(site, toolConfig)) {
+			throw new EntityNotFoundException("No access to tool in site: " + siteId, siteId);
+		}
+
+		//get syllabus
+		SyllabusItem siteSyllabus = syllabusManager.getSyllabusItemByContextId(siteId);
+		if (siteSyllabus == null) {
+			throw new EntityNotFoundException("No syllabus for site: " + siteId, siteId);
+		}
+
+		//If its a redirect, return Syllabus with just the url set
+		Syllabus result = new Syllabus();
+
+		//setup for checking items
+		boolean isMaintain = syllabusService.checkAddOrEdit(siteService.siteReference(siteId));
+
+		long currentTime = Calendar.getInstance().getTimeInMillis();
+
+		//Get the data
+		Set syllabusData = syllabusManager.getSyllabiForSyllabusItem(siteSyllabus);
+		StringBuilder sb = new StringBuilder();
+		String SERVER_URL = ServerConfigurationService.getString("serverUrl", "");
+
+		List<Item> items = new ArrayList<>();
+		Iterator iter = syllabusData.iterator();
+		while(iter.hasNext()) {
+			SyllabusData sd = (SyllabusData)iter.next();
+
+			//Rule: if item is draft and not maintainer, skip it
+			if(StringUtils.equals(sd.getStatus(), SyllabusData.ITEM_DRAFT) && !isMaintain) {
+				continue;
+			}
+
+			//check dates are within range for normal users
+			long startDate = dateToLong(sd.getStartDate());
+			long endDate = dateToLong(sd.getEndDate());
+
+			//Rule: only check dates if not maintain
+			if(!isMaintain) {
+
+				//Rule: if we have a startDate and our currentTime is before it, then skip item
+				if(startDate > 0 && currentTime < startDate) {
+					continue;
+				}
+
+				//Rule: if we have an endDate and our currentTime is after it, then skip item
+				if(endDate > 0 && currentTime > endDate) {
+					continue;
+				}
+			}
+
+			sb.append("<p>" + sd.getTitle() + "</p>");
+			sb.append(sd.getAsset());
+
+			//get the attachments
+			List<Attachment> attachments = new ArrayList<>();
+			Set syllabusAttachments = syllabusManager.getSyllabusAttachmentsForSyllabusData(sd);
+			Iterator iter2 = syllabusAttachments.iterator();
+			while(iter2.hasNext()) {
+				SyllabusAttachment sa = (SyllabusAttachment)iter2.next();
+				sb.append("<p><a href=\"" + SERVER_URL + sa.getUrl() + "\">");
+				sb.append(sa.getName() + "</a></p>");
+			}
+		}
+
+		SyllabusContent sc = new SyllabusContent();
+		sc.setContent(sb.toString());
+		sc.setSiteId(siteId);
+		if(StringUtils.isNotBlank(siteSyllabus.getRedirectURL())) {
+			sc.setRedirectUrl(siteSyllabus.getRedirectURL());
+			return sc;
+		}
+
+		return sc;
+	}
+
+	@Data
+	public class SyllabusContent{
+		private String content;
+		private String siteId;
+		private String redirectUrl;
+	}
+
 	@Override
 	public String[] getHandledOutputFormats() {
 		return new String[] { Formats.XML, Formats.JSON};

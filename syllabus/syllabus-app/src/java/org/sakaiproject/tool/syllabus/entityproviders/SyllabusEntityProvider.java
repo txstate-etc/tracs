@@ -189,7 +189,7 @@ public class SyllabusEntityProvider extends AbstractEntityProvider implements En
 	 * @author yuanhua@txstate.edu
 	 */
 	@EntityCustomAction(action = "migrate", viewKey = EntityView.VIEW_LIST)
-	public SyllabusContent getSyllabusForMigrate(EntityView view) {
+	public SyllabusMigrate getSyllabusForMigrate(EntityView view) {
 
 		// get siteId
 		String siteId = view.getPathSegment(2);
@@ -283,20 +283,28 @@ public class SyllabusEntityProvider extends AbstractEntityProvider implements En
 
 		SyllabusContent sc = new SyllabusContent();
 		sc.setContent(sb.toString());
-		sc.setSiteId(siteId);
+
+		SyllabusMigrate sm = new SyllabusMigrate();
+		sm.setData(sc);
+		sm.setSiteId(siteId);
 		if(StringUtils.isNotBlank(siteSyllabus.getRedirectURL())) {
-			sc.setRedirectUrl(siteSyllabus.getRedirectURL());
-			return sc;
+			sm.setRedirectUrl(siteSyllabus.getRedirectURL());
+			return sm;
 		}
 
-		return sc;
+		return sm;
 	}
 
 	@Data
-	public class SyllabusContent{
-		private String content;
+	public class SyllabusMigrate{
+		private SyllabusContent data;
 		private String siteId;
 		private String redirectUrl;
+	}
+
+	@Data
+	public class SyllabusContent {
+		private String content;
 	}
 
 	@Override

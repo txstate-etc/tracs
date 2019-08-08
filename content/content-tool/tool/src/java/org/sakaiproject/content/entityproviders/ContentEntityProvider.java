@@ -240,6 +240,8 @@ public class ContentEntityProvider extends AbstractEntityProvider implements Ent
 						
 						ResourceProperties props = resource.getProperties();
 						item.setType(props.getProperty(ResourceProperties.PROP_CONTENT_TYPE));
+						item.setCopyrightStatus(props.getProperty(ResourceProperties.PROP_COPYRIGHT_CHOICE));
+						item.setCopyrightInfo(props.getProperty(ResourceProperties.PROP_COPYRIGHT));
 						try
 						{
 							item.setSize(Long.parseLong(props.getProperty(ResourceProperties.PROP_CONTENT_LENGTH)));
@@ -525,7 +527,13 @@ public class ContentEntityProvider extends AbstractEntityProvider implements Ent
   
 		@Getter @Setter
 		private String copyrightAlert;
-      
+
+		@Getter @Setter
+		private String copyrightStatus;
+
+		@Getter @Setter
+		private String copyrightInfo;
+
 		@Getter @Setter
 		private String quota;
 		

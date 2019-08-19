@@ -152,6 +152,11 @@ public void setTitle(String title)
     setFieldentry("SECTION_RUBRIC", section.getSectionMetaDataByLabel(SectionMetaDataIfc.RUBRICS));
     setFieldentry("ATTACHMENT", getAttachment(section));
     setFieldentry("QUESTIONS_ORDERING", section.getSectionMetaDataByLabel(SectionDataIfc.QUESTIONS_ORDERING));
+    setFieldentry("AUTHOR_TYPE", section.getSectionMetaDataByLabel(SectionDataIfc.AUTHOR_TYPE));
+    setFieldentry("POOLNAME_FOR_RANDOM_DRAW", section.getSectionMetaDataByLabel(SectionDataIfc.POOLNAME_FOR_RANDOM_DRAW));
+    setFieldentry("POOLID_FOR_RANDOM_DRAW", section.getSectionMetaDataByLabel(SectionDataIfc.POOLID_FOR_RANDOM_DRAW));
+    setFieldentry("NUM_QUESTIONS_DRAWN", section.getSectionMetaDataByLabel(SectionDataIfc.NUM_QUESTIONS_DRAWN));
+    setFieldentry("POINT_VALUE_FOR_QUESTION", section.getSectionMetaDataByLabel(SectionDataIfc.POINT_VALUE_FOR_QUESTION));
     
     // items
     addItems(section.getItemArray());

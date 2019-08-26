@@ -69,18 +69,15 @@ public class PublishedAssessmentEntityProviderImpl extends AbstractAssessmentEnt
 			throw new IllegalArgumentException("ref and id must be set for assessment");
 		}
 
-		validateUser();
-
 		PublishedAssessmentFacade pub = null;
-		try {
-			PublishedAssessmentService service = new PublishedAssessmentService();
+		PublishedAssessmentService service = new PublishedAssessmentService();
 
-			pub = service.getPublishedAssessment(ref.getId());
-			if (pub != null) {
-				return new PublishedAssessmentSimpleData(pub);
-			}
-		} catch (Exception e) {
-			LOG.error("Assessment " + ref.getId() + " doesn't exist");
+		String publishedAssessmentId = ref.getId();
+		pub = service.getPublishedAssessment(publishedAssessmentId);
+		String siteId = service.getPublishedAssessmentSiteId(publishedAssessmentId);
+		validateUser(siteId);
+		if (pub != null) {
+			return new PublishedAssessmentSimpleData(pub);
 		}
 		return pub;
 	}
@@ -108,45 +105,30 @@ public class PublishedAssessmentEntityProviderImpl extends AbstractAssessmentEnt
 		boolean canPublish = false;
 		Date currentDate = new Date();
 
-		// Check what the user can do
-		if (securityService.unlock(CAN_PUBLISH, "/site/" + siteId)) {
+		validateUser(siteId);
 
-			publishedActiveAssessments.addAll(publishedAssessmentFacadeQueries
-					.getBasicInfoOfAllActivePublishedAssessments(orderBy, siteId, true));
-			canPublish = true;
-		} else if (securityService.unlock(CAN_TAKE, "/site/" + siteId)) {
-			publishedActiveAssessments = publishedAssessmentFacadeQueries
-					.getBasicInfoOfAllActivePublishedAssessments(orderBy, siteId, true);
-		}
+		publishedActiveAssessments.addAll(publishedAssessmentFacadeQueries
+				.getBasicInfoOfAllActivePublishedAssessments(orderBy, siteId, true));
+
 		Iterator publishedActiveAssessmentIterator = publishedActiveAssessments.iterator();
 		while (publishedActiveAssessmentIterator.hasNext()) {
 			PublishedAssessmentFacade pub = (PublishedAssessmentFacade) publishedActiveAssessmentIterator.next();
-			if (canPublish) {
 				PublishedAssessmentSimpleData pubData = new PublishedAssessmentSimpleData(pub);
 				pubData.setPublishedStatus(PublishedAssessmentSimpleData.ACTIVE);
 				results.add(pubData);
-			}
 		}
 
 		// get Inactive ones
 		// Check what the user can do
-		if (securityService.unlock(CAN_PUBLISH, "/site/" + siteId)) {
 
-			publishedInactiveAssessments.addAll(publishedAssessmentFacadeQueries
+		publishedInactiveAssessments.addAll(publishedAssessmentFacadeQueries
 					.getBasicInfoOfAllInActivePublishedAssessments(orderBy, siteId, true));
-			canPublish = true;
-		} else if (securityService.unlock(CAN_TAKE, "/site/" + siteId)) {
-			publishedInactiveAssessments = publishedAssessmentFacadeQueries
-					.getBasicInfoOfAllInActivePublishedAssessments(orderBy, siteId, true);
-		}
 		Iterator publishedInactiveAssessmentIterator = publishedInactiveAssessments.iterator();
 		while (publishedInactiveAssessmentIterator.hasNext()) {
 			PublishedAssessmentFacade pub = (PublishedAssessmentFacade) publishedInactiveAssessmentIterator.next();
-			if (canPublish) {
 				PublishedAssessmentSimpleData pubData = new PublishedAssessmentSimpleData(pub);
 				pubData.setPublishedStatus(PublishedAssessmentSimpleData.INACTIVE);
 				results.add(pubData);
-			}
 		}
 
 		return results;

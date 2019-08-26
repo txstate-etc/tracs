@@ -34,8 +34,6 @@ import java.lang.IllegalArgumentException;
 
 public class UnpublishedAssessmentEntityProviderImpl extends AbstractAssessmentEntityProvider{
 
-	private static final String CAN_TAKE = "assessment.takeAssessment";
-	private static final String CAN_PUBLISH = "assessment.publishAssessment.any";
 	public final static String ENTITY_PREFIX = "sam_unpub";
 
 	private static final Logger LOG = LoggerFactory.getLogger(UnpublishedAssessmentEntityProviderImpl.class);
@@ -72,18 +70,15 @@ public class UnpublishedAssessmentEntityProviderImpl extends AbstractAssessmentE
 			throw new IllegalArgumentException("ref and id must be set for assessment");
 		}
 
-		validateUser();
-
 		AssessmentFacade unpub = null;
-		try {
-			AssessmentService service = new AssessmentService();
+		AssessmentService service = new AssessmentService();
 
-			unpub = service.getAssessment(ref.getId());
-			if (unpub != null) {
-				return new UnpublishedAssessmentSimpleData(unpub);
-			}
-		} catch (Exception e) {
-			LOG.error("Assessment " + ref.getId() + " doesn't exist");
+		String assessmentId = ref.getId();
+		unpub = service.getAssessment(assessmentId);
+		String siteId = service.getAssessmentSiteId(assessmentId);
+		validateUser(siteId);
+		if (unpub != null) {
+			return new UnpublishedAssessmentSimpleData(unpub);
 		}
 		return unpub;
 	}
@@ -107,21 +102,15 @@ public class UnpublishedAssessmentEntityProviderImpl extends AbstractAssessmentE
 
 		Vector<UnpublishedAssessmentSimpleData> results = new Vector<UnpublishedAssessmentSimpleData>();
 		List<AssessmentFacade> assessments = new ArrayList<AssessmentFacade>();
-		boolean canPublish = false;
 
-		// Check what the user can do
-		if (securityService.unlock(CAN_PUBLISH, "/site/" + siteId)) {
-			assessments.addAll(assessmentFacadeQueries.getAllActiveAssessmentsByAgent(siteId));
-			canPublish = true;
-		} else if (securityService.unlock(CAN_TAKE, "/site/" + siteId)) {
-			assessments = assessmentFacadeQueries.getAllActiveAssessmentsByAgent(siteId);
-		}
+		validateUser(siteId);
+
+		assessments.addAll(assessmentFacadeQueries.getAllActiveAssessmentsByAgent(siteId));
+
 		Iterator assessmentIterator = assessments.iterator();
 		while (assessmentIterator.hasNext()) {
 			AssessmentFacade unpub = new AssessmentFacade((AssessmentData) assessmentIterator.next(), false);
-			if (canPublish) {
-				results.add(new UnpublishedAssessmentSimpleData(unpub));
-			}
+			results.add(new UnpublishedAssessmentSimpleData(unpub));
 		}
 		return results;
 

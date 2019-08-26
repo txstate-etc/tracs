@@ -29,6 +29,7 @@ public class ExportQtiAssessmentEntityProviderImpl extends AbstractAssessmentEnt
 	@Setter
 	private QTIServiceAPI qtiService;
 
+
 	private static final Logger LOG = LoggerFactory.getLogger(ExportQtiAssessmentEntityProviderImpl.class);
 
 	public String getEntityPrefix() {
@@ -63,17 +64,17 @@ public class ExportQtiAssessmentEntityProviderImpl extends AbstractAssessmentEnt
 			throw new IllegalArgumentException("ref and id must be set for assessment");
 		}
 
-		validateUser();
+		String assessmentId = ref.getId();
+		AssessmentService service = new AssessmentService();
+		String siteId = service.getAssessmentSiteId(assessmentId);
+
+		validateUser(siteId);
 
 		String exportXmlString = null;
-		try {
 
-			exportXmlString = qtiService.getExportedAssessmentAsString(ref.getId(), QTI_VERSION);
-			if (exportXmlString != null) {
-				return new AssessmentQtiData(exportXmlString);
-			}
-		} catch (Exception e) {
-			LOG.error("Error trying to export for " + ref.getId());
+		exportXmlString = qtiService.getExportedAssessmentAsString(ref.getId(), QTI_VERSION);
+		if (exportXmlString != null) {
+			return new AssessmentQtiData(exportXmlString);
 		}
 		return new AssessmentQtiData(exportXmlString);
 	}

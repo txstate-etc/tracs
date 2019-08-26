@@ -9,6 +9,7 @@ import org.sakaiproject.entitybroker.entityprovider.CoreEntityProvider;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.AutoRegisterEntityProvider;
 import org.sakaiproject.tool.assessment.facade.AssessmentFacadeQueriesAPI;
 import org.sakaiproject.tool.assessment.facade.PublishedAssessmentFacadeQueriesAPI;
+import org.sakaiproject.tool.assessment.services.assessment.AssessmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,8 @@ import java.lang.SecurityException;
 
 public abstract class AbstractAssessmentEntityProvider implements CoreEntityProvider, AutoRegisterEntityProvider, RESTful, Outputable{
 
+	private static final String CAN_PUBLISH = "assessment.publishAssessment.any";
+
 	@Setter
 	protected SiteService siteService;
 
@@ -51,9 +54,10 @@ public abstract class AbstractAssessmentEntityProvider implements CoreEntityProv
 	private DeveloperHelperService developerHelperService;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractAssessmentEntityProvider.class);
-	
-	protected void validateUser() {
-		if (!developerHelperService.isUserAdmin(developerHelperService.getCurrentUserReference()))
+
+	//check user permission
+	protected void validateUser(String siteId) {
+		if (!developerHelperService.isUserAdmin(developerHelperService.getCurrentUserReference()) && !securityService.unlock(CAN_PUBLISH, "/site/" + siteId))
 			throw new SecurityException("Current user doesn't have permission to access this resource.");
 	}
 

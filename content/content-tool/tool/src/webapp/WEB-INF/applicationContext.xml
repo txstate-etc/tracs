@@ -22,6 +22,8 @@
         <property name="toolManager" ref="org.sakaiproject.tool.api.ToolManager"/>
         <property name="securityService" ref="org.sakaiproject.authz.api.SecurityService"/>
         <property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService"/>
+        <property name="serverConfigurationService"><ref bean="org.sakaiproject.component.api.ServerConfigurationService"/></property>
+        <property name="copyrightManager"><ref bean="org.sakaiproject.content.copyright.api.CopyrightManager"/></property>
     </bean>
     
 </beans>

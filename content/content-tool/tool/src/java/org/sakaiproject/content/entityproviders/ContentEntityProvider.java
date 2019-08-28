@@ -1,14 +1,18 @@
 package org.sakaiproject.content.entityproviders;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang.StringUtils;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.component.cover.ComponentManager;
@@ -17,6 +21,9 @@ import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.api.ResourceTypeRegistry;
+import org.sakaiproject.content.copyright.api.CopyrightInfo;
+import org.sakaiproject.content.copyright.api.CopyrightItem;
+import org.sakaiproject.content.copyright.api.CopyrightManager;
 import org.sakaiproject.content.tool.ListItem;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entitybroker.EntityView;
@@ -44,6 +51,8 @@ import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
+import org.sakaiproject.util.ResourceLoader;
+import org.sakaiproject.component.api.ServerConfigurationService;
 
 /**
  * Entity provider for the Content / Resources tool
@@ -240,7 +249,8 @@ public class ContentEntityProvider extends AbstractEntityProvider implements Ent
 						
 						ResourceProperties props = resource.getProperties();
 						item.setType(props.getProperty(ResourceProperties.PROP_CONTENT_TYPE));
-						item.setCopyrightStatus(props.getProperty(ResourceProperties.PROP_COPYRIGHT_CHOICE));
+//						item.setCopyrightStatus(props.getProperty(ResourceProperties.PROP_COPYRIGHT_CHOICE));
+						item.setCopyrightStatus(getCopyrightType(props));
 						item.setCopyrightInfo(props.getProperty(ResourceProperties.PROP_COPYRIGHT));
 						try
 						{
@@ -297,7 +307,22 @@ public class ContentEntityProvider extends AbstractEntityProvider implements Ent
         }
 		return rv;
 	}
-	
+
+	private String getCopyrightType(ResourceProperties props) {
+		String[] copyright_types = serverConfigurationService.getStrings("copyright.types");
+		String copyrightType = props.getProperty(ResourceProperties.PROP_COPYRIGHT_CHOICE);
+		ResourceLoader rrb = new ResourceLoader("right");
+		if(!Arrays.asList(copyright_types).contains(copyrightType)){
+			//might be text (before TRACS11.4.7, we only use text for copyright choices, need to find type from text
+			CopyrightInfo copyrightInfo = copyrightManager.getCopyrightInfo(new ResourceLoader().getLocale(),rrb.getStrings("copyrighttype"),ContentEntityProvider.class.getResource("ContentEntityProvider.class"));
+			List<CopyrightItem> items = copyrightInfo.getItems();
+			Map<String, String> copyrightTextTypeMap =
+					items.stream().collect(Collectors.toMap(CopyrightItem::getText, CopyrightItem::getType));
+			copyrightType = copyrightTextTypeMap.get(copyrightType);
+		}
+		return copyrightType;
+	}
+
 	/**
 	 * set various attributes of ContentItem object
 	 * @param entity
@@ -473,8 +498,12 @@ public class ContentEntityProvider extends AbstractEntityProvider implements Ent
 	
 	@Setter
 	private UserDirectoryService userDirectoryService;
-	
-	
+
+	@Setter
+	private ServerConfigurationService serverConfigurationService;
+
+	@Setter
+	private CopyrightManager copyrightManager;
 	
 
 	

@@ -31,6 +31,7 @@
         <property name="securityService" ref="org.sakaiproject.authz.api.SecurityService" />
         <property name="authzGroupService" ref="org.sakaiproject.authz.api.AuthzGroupService"/>
         <property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService" />
+        <property name="serverConfigurationService" ref="org.sakaiproject.component.api.ServerConfigurationService"/>
     </bean>
 
     <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider"

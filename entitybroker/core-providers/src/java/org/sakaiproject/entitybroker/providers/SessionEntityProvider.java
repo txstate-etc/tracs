@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sakaiproject.entitybroker.EntityReference;
 import org.sakaiproject.entitybroker.EntityView;
+import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.entitybroker.entityprovider.CoreEntityProvider;
 import org.sakaiproject.entitybroker.entityprovider.annotations.EntityCustomAction;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.ActionsExecutable;
@@ -59,7 +59,6 @@ import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
-import org.sakaiproject.component.api.ServerConfigurationService;
 
 /**
  * Entity provider for Sakai Sessions
@@ -114,10 +113,10 @@ public class SessionEntityProvider extends AbstractEntityProvider implements Cor
 	  this.eventTrackingService = eventTrackingService;
    }
 
-   public ServerConfigurationService serverConfigurationService;
-
-   public void setServerConfigurationService (ServerConfigurationService serverConfigurationService) {
-	   this.serverConfigurationService = serverConfigurationService;
+   private DeveloperHelperService developerHelperService;
+   public void setDeveloperHelperService(
+           DeveloperHelperService developerHelperService) {
+       this.developerHelperService = developerHelperService;
    }
 
    public static String PREFIX = "session";
@@ -427,7 +426,7 @@ public class SessionEntityProvider extends AbstractEntityProvider implements Cor
 	   
 	   Session sakaiSession = sessionManager.getCurrentSession();
 
-	   if (sakaiSession == null || (!securityService.isSuperUser(sakaiSession.getUserId()) && !isUserAdmin(sakaiSession.getUserEid())))
+	   if (sakaiSession == null || (!securityService.isSuperUser(sakaiSession.getUserId()) && !developerHelperService.isUserOnlyAdmin(sakaiSession.getUserEid())))
 	   {
 		   allowed = false;
 	   }
@@ -436,16 +435,4 @@ public class SessionEntityProvider extends AbstractEntityProvider implements Cor
 	   return allowed;
    }
 
-   private boolean isUserAdmin(String eid)
-   {
-	   boolean isUserAdmin = false;
-	   List<String> userAdmins = Arrays.asList(serverConfigurationService.getStrings("user.admin"));
-
-	   if (userAdmins.contains(eid))
-	   {
-		   isUserAdmin = true;
-	   }
-
-	   return isUserAdmin;
-   }
 }

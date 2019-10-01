@@ -296,7 +296,8 @@ public class UserEntityProvider extends AbstractEntityProvider implements CoreEn
             if (currentUserRef != null) {
                 String currentUserId = developerHelperService.getUserIdFromRef(currentUserRef);
                 if (developerHelperService.isUserAdmin(currentUserId) 
-                        || currentUserId.equals(user.getId())) {
+                        || currentUserId.equals(user.getId())
+                        || developerHelperService.isUserOnlyAdmin(getUserById(currentUserId).getEid())) {
                     // allowed to access the user data
                     allowed = true;
                 }

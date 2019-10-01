@@ -156,6 +156,13 @@ public class DeveloperHelperServiceMock extends AbstractDeveloperHelperService {
         return false;
     }
 
+    public boolean isUserOnlyAdmin(String userEid) {
+        if ("admin".equals(userEid)) {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isUserAllowedInEntityReference(String userReference, String permission,
             String reference) {
         if (defaultUserRef.equals(userReference)) {

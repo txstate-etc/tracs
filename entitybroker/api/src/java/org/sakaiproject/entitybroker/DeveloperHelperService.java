@@ -301,6 +301,14 @@ public interface DeveloperHelperService {
      */
     public boolean isUserAdmin(String userReference);
 
+
+    /**
+     * Check if this user is only admin for User Object
+     * @param userEid
+     * @return true if configured in property
+     */
+    public boolean isUserOnlyAdmin(String userEid);
+
     /**
      * Check if a user has a specified permission for the entity reference, 
      * primarily a convenience method for checking location permissions

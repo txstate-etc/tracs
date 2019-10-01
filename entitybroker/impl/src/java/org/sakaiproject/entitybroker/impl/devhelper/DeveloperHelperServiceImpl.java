@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Arrays;
 
 import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.FunctionManager;
@@ -441,6 +442,19 @@ public class DeveloperHelperServiceImpl extends AbstractDeveloperHelperService {
             admin = securityService.isSuperUser(userId);
         }
         return admin;
+    }
+
+    public boolean isUserOnlyAdmin(String eid)
+    {
+      boolean isUserOnlyAdmin = false;
+      List<String> userAdmins = Arrays.asList(serverConfigurationService.getStrings("user.admin"));
+
+      if (userAdmins.contains(eid))
+      {
+         isUserOnlyAdmin = true;
+      }
+
+      return isUserOnlyAdmin;
     }
 
     /* (non-Javadoc)

@@ -348,7 +348,13 @@ public class SessionEntityProvider extends AbstractEntityProvider implements Cor
 	   
       
       String requestedUserId = view.getPathSegment(2);
-      
+
+      if(developerHelperService.isUserOnlyAdmin(sakaiSession.getUserEid())) {
+         String[] append = requestedUserId.split("@",2);
+         if(append.length==2 && append[1].toLowerCase().matches("txstate.edu"))
+             requestedUserId = requestedUserId.split("@",2)[0];
+      }
+
       if (requestedUserId == null) {
     	  log.info("The BecomeUser id is not provided in the URL, try to give a valid UserID when making the become user API call" );
     	  return result;

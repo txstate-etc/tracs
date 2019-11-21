@@ -22,6 +22,10 @@ package org.sakaiproject.entitybroker.providers;
 
 import java.util.*;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Data;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.azeckoski.reflectutils.ReflectUtils;
@@ -38,6 +42,7 @@ import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
+import org.sakaiproject.entitybroker.DeveloperHelperService;
 import org.sakaiproject.entitybroker.EntityReference;
 import org.sakaiproject.entitybroker.EntityView;
 import org.sakaiproject.entitybroker.EntityView.Method;
@@ -123,6 +128,12 @@ RESTful, ActionsExecutable, Redirectable, RequestStorable, DepthLimitable {
     private SecurityService securityService;
     public void setSecurityService(SecurityService securityService) {
         this.securityService = securityService;
+    }
+
+    private DeveloperHelperService developerHelperService;
+    public void setDeveloperHelperService(
+            DeveloperHelperService developerHelperService) {
+        this.developerHelperService = developerHelperService;
     }
 
     public static String PREFIX = "site";
@@ -426,6 +437,46 @@ RESTful, ActionsExecutable, Redirectable, RequestStorable, DepthLimitable {
 
         eg = new EntityGroup(group);
         return eg;
+    }
+
+
+    @EntityCustomAction(action = "provider", viewKey = EntityView.VIEW_LIST)
+    public List<SiteInfo> getSiteInfoWithProviderId(EntityView view) {
+        // expects site/provider/providerid
+        String providerId = view.getPathSegment(2);
+
+        String currentUserReference = developerHelperService.getCurrentUserReference();
+        // check if the user is an admin
+        if (!developerHelperService.isUserAdmin(currentUserReference)) {
+            throw new SecurityException("Current user ("+currentUserReference+") cannot access information.");
+        }
+        List<SiteInfo> siteInfos = new ArrayList<SiteInfo>();
+        List<String> siteRelativeUrls = new ArrayList<String>();
+        if (EntityView.Method.GET.name().equals(view.getMethod())) {
+            // GET /direct/site/provider/providerid
+            if (providerId == null) {
+                throw new IllegalArgumentException("Invalid path provided: expected to receive the provderId");
+            }
+            siteRelativeUrls.addAll(authzGroupService.getAuthzGroupIds(providerId));
+            siteRelativeUrls.removeIf(l -> (l.contains("/group/")));
+            siteRelativeUrls.forEach(rUrl -> {
+               SiteInfo si = new SiteInfo();
+               String siteId = rUrl.replace("/site/","");
+               si.setSiteId(siteId);
+               si.setSiteRelativeUrl(rUrl);
+               try {
+                   si.setIsPublished(siteService.getSite(siteId).isPublished());
+               } catch (IdUnusedException e) {
+                  log.info("Site id " + siteId + "doesn't exist.");
+               }
+               siteInfos.add(si);
+            });
+
+        } else {
+            return null;
+        }
+
+        return siteInfos;
     }
 
     @EntityCustomAction(action = "userPerms", viewKey = EntityView.VIEW_SHOW)
@@ -1188,4 +1239,10 @@ RESTful, ActionsExecutable, Redirectable, RequestStorable, DepthLimitable {
         }
     }
 
+    @Data
+    public class SiteInfo {
+       private String siteId;
+       private String siteRelativeUrl;
+       private Boolean isPublished;
+    }
 }

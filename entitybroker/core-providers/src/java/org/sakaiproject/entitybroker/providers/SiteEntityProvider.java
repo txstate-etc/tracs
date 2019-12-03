@@ -466,6 +466,7 @@ RESTful, ActionsExecutable, Redirectable, RequestStorable, DepthLimitable {
                si.setSiteRelativeUrl(rUrl);
                try {
                    si.setIsPublished(siteService.getSite(siteId).isPublished());
+                   si.setSiteTitle(siteService.getSite(siteId).getTitle());
                } catch (IdUnusedException e) {
                   log.info("Site id " + siteId + "doesn't exist.");
                }
@@ -1244,5 +1245,6 @@ RESTful, ActionsExecutable, Redirectable, RequestStorable, DepthLimitable {
        private String siteId;
        private String siteRelativeUrl;
        private Boolean isPublished;
+       private String siteTitle;
     }
 }

@@ -2656,7 +2656,7 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 					}
 					else
 					{
-						if ((targetRole == null) || (!targetRole.equals(role)) || (!targetStatus.equalsIgnoreCase("true") == member.isActive()))
+						if (targetRole == null || !targetRole.equals(role) || targetStatus == null || !targetStatus.equalsIgnoreCase("true") == member.isActive())
 						{
 							toDelete.add(userId);
 						}

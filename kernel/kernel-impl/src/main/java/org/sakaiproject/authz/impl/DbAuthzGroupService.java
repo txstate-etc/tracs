@@ -2654,7 +2654,7 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 						// so we do nothing here except prevent the delete code in this loop
 						// from running
 					}
-					else
+					else if (member != null)
 					{
 						if (targetRole == null || !targetRole.equals(role) || targetStatus == null || !targetStatus.equalsIgnoreCase("true") == member.isActive())
 						{

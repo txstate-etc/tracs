@@ -1398,6 +1398,9 @@ public class PublishedAssessmentFacadeQueries extends HibernateDaoSupport
 			log.warn("Couldn't find published section data for PublishedAssessmentId " + assessment.getPublishedAssessmentId() );
 			return set;
 		}
+		catch (NullPointerException e) {
+			log.warn("Couldn't find PublishedAssessmentId. NPE error");
+		}
 		return set;
 	}
 

@@ -1400,6 +1400,7 @@ public class PublishedAssessmentFacadeQueries extends HibernateDaoSupport
 		}
 		catch (NullPointerException e) {
 			log.warn("Couldn't find PublishedAssessmentId. NPE error");
+			return set;
 		}
 		return set;
 	}

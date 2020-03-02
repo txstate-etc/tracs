@@ -134,8 +134,19 @@ public class SubmissionStatusBean
 		}
 		
 		agents = newAgents;
+		rowClasses = getRelativeRowClasses((ArrayList<AgentResults>) agents);
 	}
- 
+
+	//added for showing status correctly the searched result -Qu
+	private String getRelativeRowClasses(ArrayList<AgentResults> agents){
+		StringBuilder rowClasses = new StringBuilder();
+		for(AgentResults ar : agents){
+				if(rowClasses.length() > 0) rowClasses.append(",");
+				rowClasses.append(ar.getIsActive()?"activePar":"inactivePar");
+		}
+		return rowClasses.toString();
+	}
+
 	// Following three methods are for interface PhaseAware
 	public void endProcessValidators() {
 		log.debug("endProcessValidators");

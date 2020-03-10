@@ -149,6 +149,7 @@ public class AssignmentPeerAssessmentServiceImpl extends HibernateDaoSupport imp
 				}
 				if(removeItems.size() > 0){
 					getHibernateTemplate().deleteAll(removeItems);
+					getHibernateTemplate().flush();
 				}
 				//loop through the items and update the map values:
 				for(PeerAssessmentItem p : existingItems){
@@ -176,6 +177,7 @@ public class AssignmentPeerAssessmentServiceImpl extends HibernateDaoSupport imp
 						}else{
 							//this shoudln't happen since the code above removes all empty assessments, but just in case:
 							getHibernateTemplate().delete(p);
+							getHibernateTemplate().flush();
 						}
 					}else{
 						//this isn't realy possible since we looked up the peer assessments by submission id
@@ -228,6 +230,7 @@ public class AssignmentPeerAssessmentServiceImpl extends HibernateDaoSupport imp
 				if(newItems.size() > 0){
 					for (PeerAssessmentItem item : newItems) {
 						getHibernateTemplate().saveOrUpdate(item);
+						getHibernateTemplate().flush();
 					}
 				}
 			}

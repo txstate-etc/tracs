@@ -230,7 +230,6 @@ public class AssignmentPeerAssessmentServiceImpl extends HibernateDaoSupport imp
 				if(newItems.size() > 0){
 					for (PeerAssessmentItem item : newItems) {
 						getHibernateTemplate().saveOrUpdate(item);
-						getHibernateTemplate().flush();
 					}
 				}
 			}

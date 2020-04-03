@@ -7,6 +7,7 @@ STANDARD_OPTS="-XX:+UseConcMarkSweepGC -XX:+UseParNewGC \
 -server -Djava.awt.headless=true \
 -Dsakai.security=/etc/sakai \
 -Djava.util.Arrays.useLegacyMergeSort=true \
+-Dorg.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER=true \
 $GARBAGECOLLECTOR_OPTS $TIMEOUT_OPTS $COMPATABILITY_OPTS $JVM_OPTS $RUN_OPTS"
 
 SMALL_MEMORY_OPTS="-Xmx1024m -XX:MaxMetaspaceSize=512m -XX:NewSize=256m"

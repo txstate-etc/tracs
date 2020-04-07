@@ -201,7 +201,7 @@ public class TotalScoresBean
 		}
 		
 		agents = newAgents;	
-//		rowClasses = getRelativeRowClasses((ArrayList<AgentResults>) agents);
+		rowClasses = getRelativeRowClasses((ArrayList<AgentResults>) agents);
 	}
 
 	//added for showing status correctly the searched result -Qu

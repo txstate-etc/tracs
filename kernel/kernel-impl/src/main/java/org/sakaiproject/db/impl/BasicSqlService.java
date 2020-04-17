@@ -538,6 +538,7 @@ public abstract class BasicSqlService implements SqlService
                 conn = callerConn;
             } else {
                 conn = borrowConnection();
+                threadLocalManager().set(TRANSACTION_CONNECTION, conn);
             }
             if (m_showSql) {
                 connectionTime = System.currentTimeMillis() - start;
@@ -616,6 +617,7 @@ public abstract class BasicSqlService implements SqlService
                             LOG.warn("Sql.dbRead: sql: " + sql + debugFields(fields), e);
                         }
                     }
+                    threadLocalManager().set(TRANSACTION_CONNECTION, null);
                     returnConnection(conn);
                 }
             }

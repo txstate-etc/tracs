@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STANDARD_OPTS="-XX:+UseG1GC  \
+STANDARD_OPTS="-XX:+UseConcMarkSweepGC -XX:+UseParNewGC \
 -Dsun.net.client.defaultConnectTimeout=5000 -Dsun.net.client.defaultReadTimeout=20000 \
 -Dsun.lang.ClassLoader.allowArraySyntax=true -Dorg.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING=false -Dcom.sun.management.jmxremote \
 -Dfile.encoding=UTF-8 \

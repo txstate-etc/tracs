@@ -41,7 +41,7 @@ var refresh_session = function(){
         url: "/direct/session/" + sessionId + ".json",
         cache: false,
         dataType: "json",
-        success: function(data){
+        complete: function(data){
             clearTimeout(sessionTimeOut);
             sessionTimeOut = setTimeout(refresh_session, (60000));
         },

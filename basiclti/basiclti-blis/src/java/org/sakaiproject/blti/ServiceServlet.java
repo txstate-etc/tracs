@@ -783,6 +783,7 @@ public class ServiceServlet extends HttpServlet {
 		theMap.put("/message_response/statusinfo/severity", "Status");
 		theMap.put("/message_response/statusinfo/codeminor", "fullsuccess");
 		String theXml = XMLMap.getXML(theMap, true);
+		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
 		out.println(theXml);
 		M_log.debug(theXml);

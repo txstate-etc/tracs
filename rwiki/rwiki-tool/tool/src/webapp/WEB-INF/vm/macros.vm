@@ -149,8 +149,8 @@ LOG-LOG-LOG-LOG-LOG
 <li><span>
 <a href="${util.escapeHtml($viewBean.getInfoUrl())}"
 	id="infoLink"  
-	title="${resourceLoaderBean.getString("jsp_info")}" >${resourceLoaderBean.getString("jsp_info")}</a> 
-</span></li>	
+	title="Permissions" >${resourceLoaderBean.getString("jsp_info")}</a>
+</span></li>
 #end
 #if ($useHistoryLink) 
 <li><span>

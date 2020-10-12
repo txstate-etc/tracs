@@ -173,7 +173,7 @@
 				 
 				<h:panelGroup rendered="#{SignupPermissionsUpdateBean.showPermissionLink}"> 	
 					<f:verbatim><li role="menuitem" ><span></f:verbatim>	
-						<h:commandLink value="#{msgs.permission_feature_link}" action="#{SignupPermissionsUpdateBean.processPermission}" rendered="#{SignupPermissionsUpdateBean.showPermissionLink}"/>
+						<h:commandLink value="#{msgs.permission_feature_link}" title="Permissions" action="#{SignupPermissionsUpdateBean.processPermission}" rendered="#{SignupPermissionsUpdateBean.showPermissionLink}"/>
 					<f:verbatim></span></li></f:verbatim>
 				</h:panelGroup>
 				

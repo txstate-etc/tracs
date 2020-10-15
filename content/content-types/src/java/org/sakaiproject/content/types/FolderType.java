@@ -47,6 +47,7 @@ import java.util.Map;
 import org.sakaiproject.authz.api.PermissionsHelper;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.component.cover.ServerConfigurationService;
+import org.sakaiproject.authz.cover.SecurityService;
 import org.sakaiproject.content.api.ContentCollection;
 import org.sakaiproject.content.api.ContentEntity;
 import org.sakaiproject.content.api.ContentHostingService;
@@ -164,6 +165,9 @@ public class FolderType extends BaseResourceType implements ExpandableResourceTy
 		{
 			ToolSession toolSession = SessionManager.getCurrentToolSession();
 
+			if(!SecurityService.isSuperUser()) {
+				return reference.getReference();
+			}
 			toolSession.setAttribute(PermissionsHelper.TARGET_REF, reference.getReference());
 
 			// use the folder's context (as a site and as a resource) for roles

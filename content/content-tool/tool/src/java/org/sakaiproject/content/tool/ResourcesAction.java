@@ -1848,6 +1848,13 @@ protected static final String PARAM_PAGESIZE = "collections_per_page";
 		    {
 		    	actions.addAll(folderPermissionsActions);
 		    }
+
+			if (!permissions.contains(ContentPermissions.REVISE)) {
+				for (ResourceToolAction action:actions) {
+					if (action.getActionType() == ResourceToolAction.ActionType.REVISE_PERMISSIONS)
+						actions.remove(action);
+				}
+			}
 	    }
 	    
 	    // filter -- remove actions that are not available to the current user in the context of this item

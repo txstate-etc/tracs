@@ -14,11 +14,18 @@
  */
 package org.sakaiproject.adminsiteperms.service;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -158,6 +165,8 @@ public class SitePermsService {
         String permsString = makeStringFromArray(perms);
         String typesString = makeStringFromArray(types);
         String rolesString = makeStringFromArray(roles);
+        String permChangedLog = "/var/sakai/permChangedSites.log";
+        String failureLog = "/var/sakai/permChangeFailure.log";
         // exit if we are locked for updates
         if (isLockedForUpdates()) {
             throw new IllegalStateException("Cannot start new perms update, one is already in progress");
@@ -180,6 +189,26 @@ public class SitePermsService {
             int sitesCounter = 0;
             int updatesCount = 0;
             int successCount = 0;
+
+
+            File file = new File(permChangedLog);
+            if(file.createNewFile())
+                 log.info("A new file :" + permChangedLog + " is created.");
+            Scanner sc = new Scanner(file);
+            sc.useDelimiter("\n");
+
+            while (sc.hasNext()) {
+                 siteIds.remove(sc.next());
+            }
+
+            FileWriter fwSuccess = new FileWriter(permChangedLog, true);
+            BufferedWriter bwSuccess = new BufferedWriter(fwSuccess);
+            PrintWriter outSuccess = new PrintWriter(bwSuccess);
+
+            FileWriter fwFailure = new FileWriter(failureLog, true);
+            BufferedWriter bwFailure = new BufferedWriter(fwFailure);
+            PrintWriter outFailure = new PrintWriter(bwFailure);
+
             for (String siteId : siteIds) {
                 String siteRef = siteService.siteReference(siteId);
                 try {
@@ -231,13 +260,19 @@ public class SitePermsService {
                         }
                     } else {
                         log.warn("Cannot update authz group: " + siteRef + ", unable to apply any perms change");
+                        outFailure.println(siteId);
                     }
                 } catch (GroupNotDefinedException e) {
                     log.error("Could not find authz group: " + siteRef + ", unable to apply any perms change");
+                    outFailure.println(siteId);
                 } catch (AuthzPermissionException e) {
                     log.error("Could not save authz group: " + siteRef + ", unable to apply any perms change");
+                    outFailure.println(siteId);
                 }
                 sitesCounter++;
+
+                outSuccess.println(siteId);
+
                 if (!isLockedForUpdates()) {
                     // if we are no longer locked for updates then we have a timeout failure
                     throw new RuntimeException("Timeout occurred while running site permissions update");
@@ -249,6 +284,10 @@ public class SitePermsService {
                     updateMessage = msg;
                 }
             }
+
+            outSuccess.close();
+            outFailure.close();
+
             int failureCount = siteIds.size() - successCount;
             long totalTime = System.currentTimeMillis() - updateStarted;
             int totalSecs = totalTime > 0 ? (int)(totalTime/1000) : 0;
@@ -257,7 +296,11 @@ public class SitePermsService {
                     new Object[] {permsString, typesString, rolesString, siteIds.size(), updatesCount, successCount, failureCount, totalSecs, pauseSecs});
             log.info(msg);
             updateMessage = msg;
-        } finally {
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+            } finally {
             // reset the update status
             updateStatus = STATUS_COMPLETE;
             updateStarted = 0;

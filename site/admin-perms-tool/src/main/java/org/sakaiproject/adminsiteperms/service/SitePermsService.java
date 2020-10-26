@@ -68,6 +68,11 @@ public class SitePermsService {
     private long maxUpdateTimeMS = DEFAULT_MAX_UPDATE_TIME_SECS * 1000l;
     private int sitesUntilPause = DEFAULT_SITES_BEFORE_PAUSE;
 
+    private static String sakaiLogDir = "/var/sakai";
+    String permChangedLog = sakaiLogDir + "/permChangedSites.log";
+    String failureLog = sakaiLogDir + "/permChangeFailure.log";
+
+
     public static String[] templates = {
         "!site.template",
         "!site.template.course",
@@ -129,6 +134,17 @@ public class SitePermsService {
         bgThread.start();
     }
 
+    public boolean resetPermsLog() {
+       return removeFile(permChangedLog) && removeFile(failureLog);
+    }
+
+    private boolean removeFile(String fileName) {
+        File file = new File (fileName);
+        if (!file.exists() || (file.exists() && file.delete()))
+            return true;
+        else
+            return false;
+    }
     /**
      * Returns a current status message from the session if there is one to display for a running admin perms process,
      * is the status is complete then the session data will be removed
@@ -165,8 +181,6 @@ public class SitePermsService {
         String permsString = makeStringFromArray(perms);
         String typesString = makeStringFromArray(types);
         String rolesString = makeStringFromArray(roles);
-        String permChangedLog = "/var/sakai/permChangedSites.log";
-        String failureLog = "/var/sakai/permChangeFailure.log";
         // exit if we are locked for updates
         if (isLockedForUpdates()) {
             throw new IllegalStateException("Cannot start new perms update, one is already in progress");

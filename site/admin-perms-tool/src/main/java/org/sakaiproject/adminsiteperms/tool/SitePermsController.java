@@ -77,40 +77,49 @@ public class SitePermsController extends AbstractController {
                 types = request.getParameterValues("site-type");
                 roles = request.getParameterValues("site-role");
                 try {
-                    if (ArrayUtils.isEmpty(perms)) {
-                        // missing a setting so we can't actually process anything
-                        throw new IllegalArgumentException("Invalid perms POST - no perms to add or remove");
-                    } else if (ArrayUtils.isEmpty(types)) {
-                        // missing a setting so we can't actually process anything
-                        throw new IllegalArgumentException("Invalid perms POST - no site types to apply permissions to");
-                    } else if (ArrayUtils.isEmpty(roles)) {
-                        // missing a setting so we can't actually process anything
-                        throw new IllegalArgumentException("Invalid perms POST - no roles to apply permissions to");
+                    String msg;
+                    if (request.getParameter("resetLog") != null) {
+                        if (sitePermsService.resetPermsLog())
+                            msg = addMessage(model, false, "siterole.resetlog.ok",null);
+                        else
+                            msg = addMessage(model, false, "siterole.resetlog.failed",null);
                     } else {
-                        // OK, we have the data we need to process the update
-                        boolean add;
-                        if (request.getParameter("addPerms") != null) {
-                            add = true;
-                        } else if (request.getParameter("removePerms") != null) {
-                            add = false;
-                        } else {
-                            throw new RuntimeException("Invalid perms POST - no addPerms or removePerms");
-                        }
-                        // triggers the permissions update
-                        sitePermsService.setSiteRolePerms(perms, types, roles, add);
-                        // add the frontend message and log
-                        String msg = addMessage(model, false, "siterole.message.processing."+(add?"add":"remove"), 
-                                new Object[] {a2es(perms), a2es(types), a2es(roles), 0});
-                        log.info(msg);
+                                 if (ArrayUtils.isEmpty(perms)) {
+                                     // missing a setting so we can't actually process anything
+                                     throw new IllegalArgumentException("Invalid perms POST - no perms to add or remove");
+                                 } else if (ArrayUtils.isEmpty(types)) {
+                                     // missing a setting so we can't actually process anything
+                                     throw new IllegalArgumentException("Invalid perms POST - no site types to apply permissions to");
+                                 } else if (ArrayUtils.isEmpty(roles)) {
+                                     // missing a setting so we can't actually process anything
+                                     throw new IllegalArgumentException("Invalid perms POST - no roles to apply permissions to");
+                                 } else {
+                                     // OK, we have the data we need to process the update
+                                     boolean add;
+                                     if (request.getParameter("addPerms") != null) {
+                                         add = true;
+                                     } else if (request.getParameter("removePerms") != null) {
+                                         add = false;
+                                     } else {
+                                         throw new RuntimeException("Invalid perms POST - no addPerms or removePerms");
+                                     }
+             
+                                     // triggers the permissions update
+                                     sitePermsService.setSiteRolePerms(perms, types, roles, add);
+                                     // add the frontend message and log
+                                     msg = addMessage(model, false, "siterole.message.processing."+(add?"add":"remove"), 
+                                             new Object[] {a2es(perms), a2es(types), a2es(roles), 0});
+                                     log.info(msg);
+                                 } 
                     }
                 } catch (IllegalArgumentException e) {
-                    // translate and pass the message to the frontend
-                    String msg = addMessage(model, true, "siterole.message.illegal.submission", null);
-                    log.warn(msg);
+                                 // translate and pass the message to the frontend
+                      String msg = addMessage(model, true, "siterole.message.illegal.submission", null);
+                      log.warn(msg);
                 } catch (IllegalStateException e) {
-                    // translate and pass the message to the frontend
-                    String msg = addMessage(model, true, "siterole.message.cannot.update", null);
-                    log.warn(msg);
+                      // translate and pass the message to the frontend
+                      String msg = addMessage(model, true, "siterole.message.cannot.update", null);
+                      log.warn(msg);
                 }
             } else {
                 throw new RuntimeException("Invalid POST - action is not set to a valid value");

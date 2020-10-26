@@ -54,6 +54,7 @@
         <div style="padding: 5px;">
             <input name="addPerms" type="submit" value="<spring:message code="siterole.add.command" />" />
             <input name="removePerms" type="submit" value="<spring:message code="siterole.remove.command" />" />
+            <input name="resetLog" title="Reset permission changed log" type="submit" value="<spring:message code="siterole.resetlog.command" />" />
         </div>
 
         <div style="width:99%" class="permsControls">
@@ -118,6 +119,7 @@
         <div style="padding: 5px;">
             <input name="addPerms" type="submit" value="<spring:message code="siterole.add.command" />" />
             <input name="removePerms" type="submit" value="<spring:message code="siterole.remove.command" />" />
+            <input name="resetLog" title="Reset permission changed log" type="submit" value="<spring:message code="siterole.resetlog.command" />" />
         </div>
 
         <input name="action" type="hidden" value="perms" />

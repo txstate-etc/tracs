@@ -196,6 +196,7 @@ public class PageHandler extends BasePortalHandler
 			String toolContextPath, String wrapperClass) throws IOException
 	{
 		int toolCount = 0;
+		boolean TRACS_READONLY = ServerConfigurationService.getBoolean("tracs.readonly", false);
 
 		if ( page == null ) return;
 		if (rcontext.uses(INCLUDE_PAGE))
@@ -349,6 +350,7 @@ public class PageHandler extends BasePortalHandler
 				rcontext.put("bottomNavServiceVersion", serviceVersion);
 				rcontext.put("bottomNavSakaiVersion", sakaiVersion);
 				rcontext.put("bottomNavServer", server);
+				rcontext.put("tracsReadOnly", TRACS_READONLY);
 			}
 
 		}

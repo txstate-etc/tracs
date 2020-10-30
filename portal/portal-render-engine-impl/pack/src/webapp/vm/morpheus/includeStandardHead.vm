@@ -58,13 +58,16 @@
         </script>
         <script src="/library/js/moment/2.17.1/moment.min.js"></script>
         <script src="/library/js/headscripts.js"></script>
-        <script src="/library/js/removePermissions.js"></script>
         <script>
             includeLatestJQuery("portal- sessionhistory")
         </script>
         <script src="/library/sessionhistory/js/sessionhistory.js"></script>
         <link type="text/css" rel="stylesheet" href="/library/sessionhistory/css/sessionhistory.css">
-        
+
+        #if($tracsReadOnly)
+         <script src="/library/js/removePermissions.js"></script>
+        #end
+
         <!-- inlined tool header contribution -->
         ## if any of the tools requested an inline render, their header content gets aggregated here
         #foreach ( $tool in $pageColumn0Tools )

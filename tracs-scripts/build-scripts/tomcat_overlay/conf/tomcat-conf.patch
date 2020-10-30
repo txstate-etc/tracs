@@ -1,11 +1,11 @@
 diff --git a/conf/catalina.properties b/conf/catalina.properties
-index 830b29a..7157e8e 100644
+index 0448d74..96a65aa 100644
 --- a/conf/catalina.properties
 +++ b/conf/catalina.properties
-@@ -129,7 +129,8 @@ xercesImpl.jar,xmlParserAPIs.jar,xml-apis.jar,\
- junit.jar,junit-*.jar,ant-launcher.jar,\
- cobertura-*.jar,asm-*.jar,dom4j-*.jar,icu4j-*.jar,jaxen-*.jar,jdom-*.jar,\
- jetty-*.jar,oro-*.jar,servlet-api-*.jar,tagsoup-*.jar,xmlParserAPIs-*.jar,\
+@@ -191,7 +191,8 @@ xercesImpl.jar,\
+ xml-apis.jar,\
+ xmlParserAPIs-*.jar,\
+ xmlParserAPIs.jar,\
 -xom-*.jar
 +xom-*.jar,\
 +xerces-J_1.4.0.jar,jdbc-se2.0.jar,jndi_1.2.1.jar,jta1.0.1.jar,cglib-full-2.0.2.jar,commons-logging.jar

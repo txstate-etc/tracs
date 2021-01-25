@@ -878,6 +878,9 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 			
 		simplePageBean = makeSimplePageBean(simplePageBean, siteId, item);
 
+		boolean hasReadPermission = checkReadPermission(siteId);
+		boolean hasSiteOwnerRole = hasSiteOwnerRole(siteId, sessionManager.getCurrentSessionUserId());
+
 		// skip if don't have permission
 		if (!hasUpdatePermission && !(hasReadPermission && hasSiteOwnerRole) && !lessonsAccess.isItemAccessible(item.getId(), siteId, currentUserId, simplePageBean))
 		    continue;
@@ -921,6 +924,9 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 	    for (SimplePageItem item: items) {
 			
 		simplePageBean = makeSimplePageBean(simplePageBean, site.getId(), item);
+
+		boolean hasReadPermission = checkReadPermission(site.getId());
+		boolean hasSiteOwnerRole = hasSiteOwnerRole(site.getId(), sessionManager.getCurrentSessionUserId());
 
 		// skip if don't have permission
 		if (!hasUpdatePermission && ! (hasReadPermission && hasSiteOwnerRole) && !lessonsAccess.isItemAccessible(item.getId(), site.getId(), currentUserId, simplePageBean))

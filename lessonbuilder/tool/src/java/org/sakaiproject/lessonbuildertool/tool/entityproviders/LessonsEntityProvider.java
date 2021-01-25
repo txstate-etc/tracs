@@ -59,7 +59,7 @@ import org.sakaiproject.entitybroker.DeveloperHelperService;
 
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
-
+import org.sakaiproject.authz.api.AuthzGroupService;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
@@ -173,9 +173,12 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 			
 			setToolSession(site);
 
+			boolean hasReadPermission = checkReadPermission(siteId);
+			boolean hasSiteOwnerRole = hasSiteOwnerRole(siteId,sessionManager.getCurrentSessionUserId());
+
 			//check if current user has permission to access to the lessonbuilder tool
 			// checks tool read and item perm
-			if (!checkUpdatePermission(siteId))
+			if (!checkUpdatePermission(siteId) && !(hasReadPermission && hasSiteOwnerRole))
 			    checkItemPermission(siteId, item.getId());
 			
 			if (item.getType() == SimplePageItem.PAGE) {
@@ -224,7 +227,7 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 		setToolSession(site);
 		
 		//check if current user has permission to access to the lessonbuilder tool
-		checkReadPermission(siteId);
+		boolean hasReadPermission = checkReadPermission(siteId);
 		
 		List<DecoratedSiteItem> ret = new ArrayList<DecoratedSiteItem>();
 		
@@ -236,12 +239,13 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 		String baseURL = developerHelperService.getEntityURL(REFERENCE_ROOT, EntityView.VIEW_LIST, null);   //   /direct/lessons
 		baseURL = baseURL + "/lesson/";
 
+		boolean hasSiteOwnerRole = hasSiteOwnerRole(siteId, currentUserId);
 		boolean hasUpdatePermission = checkUpdatePermission(siteId);
 		
 		for(SimplePageItem item : list)
 		{
 		    simplePageBean = makeSimplePageBean(simplePageBean, siteId, item);
-		    if (hasUpdatePermission || lessonsAccess.isItemAccessible(item.getId(), siteId, currentUserId, simplePageBean)) {
+		    if (hasUpdatePermission || (hasReadPermission && hasSiteOwnerRole) || lessonsAccess.isItemAccessible(item.getId(), siteId, currentUserId, simplePageBean)) {
 			SimplePage currentSimplePage = simplePageBean.getCurrentPage();
 				if (currentSimplePage != null){
 					ret.add(new DecoratedSiteItem(item.getId(), item.getName(), baseURL + item.getId(), currentSimplePage.isHidden(), currentSimplePage.getReleaseDate(), currentSimplePage.getGradebookPoints()));
@@ -279,16 +283,17 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 				setToolSession(s);
 
 				//check if current user has permission to access to the lessonbuilder tool
-				checkReadPermission(s.getId());
+				boolean hasReadPermission = checkReadPermission(s.getId());
 				
 				List<SimplePageItem> list = simplePageToolDao.findItemsInSite(s.getId());
 							
 				boolean hasUpdatePermission = checkUpdatePermission(s.getId());
+				boolean hasSiteOwnerRole = hasSiteOwnerRole(s.getId(), currentUserId);
 
 				for(SimplePageItem item : list)
 				{
 				    simplePageBean = makeSimplePageBean(simplePageBean, s.getId(), item);
-				    if (hasUpdatePermission || lessonsAccess.isItemAccessible(item.getId(), s.getId(), currentUserId, simplePageBean))
+				    if (hasUpdatePermission ||  (hasReadPermission && hasSiteOwnerRole) || lessonsAccess.isItemAccessible(item.getId(), s.getId(), currentUserId, simplePageBean))
 					ret.add(new DecoratedUserItem(item.getId(), item.getName(), s.getId(), s.getTitle(), baseURL + item.getId()));
 				}
 
@@ -367,17 +372,20 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 			
 			setToolSession(site);
 
+			String currentUserId = sessionManager.getCurrentSessionUserId();
+
 			//check if current user has permission to access to the lessonbuilder tool
 			//checks tool read and item permission
+			boolean hasReadPermission = checkReadPermission(siteId);
 			boolean hasUpdatePermission = checkUpdatePermission(siteId);
+			boolean hasSiteOwnerRole = hasSiteOwnerRole(siteId, currentUserId);
 
-			if (!hasUpdatePermission)
+			if (!hasUpdatePermission && !(hasReadPermission && hasSiteOwnerRole))
 			    checkItemPermission(siteId, item.getId());
 
 			// remove after testing
 			// hasUpdatePermission = false;
 
-			String currentUserId = sessionManager.getCurrentSessionUserId();
 			
 			//if required item is not a page or we just want a single item
 			if (item.getType() != SimplePageItem.PAGE || !fullTree)
@@ -758,8 +766,8 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 	    }
 
 	}
-	private void checkReadPermission(String siteId) {
-		checkReadPermission(siteId, sessionManager.getCurrentSessionUserId());
+	private boolean checkReadPermission(String siteId) {
+		return checkReadPermission(siteId, sessionManager.getCurrentSessionUserId());
 	}
 	
 	private void checkItemPermission(String siteId, long itemId) {
@@ -770,10 +778,11 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 	    }
 	}
 
-	private void checkReadPermission(String siteId, String userId) {
+	private boolean checkReadPermission(String siteId, String userId) {
 		if(!securityService.unlock(userId, SimplePage.PERMISSION_LESSONBUILDER_READ, siteService.siteReference(siteId))) {
 			throw new SecurityException("User "+userId+" does not have permission to read lessons on site " + siteId);
 		}
+		return true;
 	}
 	
 	private boolean checkUpdatePermission(String siteId) {
@@ -784,6 +793,15 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 		return securityService.unlock(userId, SimplePage.PERMISSION_LESSONBUILDER_UPDATE, siteService.siteReference(siteId));
 	}
 	
+	private boolean hasSiteOwnerRole(String siteId, String userId) {
+		String azGroupId = "/site/"+ siteId;
+		ArrayList<String> ownerRoles = new ArrayList<String>();
+		ownerRoles.add("instructor");
+		ownerRoles.add("maintain");
+		String currentUserRole = authzGroupService.getUserRole(userId, azGroupId);
+		return ownerRoles.contains(currentUserRole.toLowerCase());
+	}
+
 	private SimplePage getPage(SimplePageBean simplePageBean, Long pageId) {
 	    // use cached version if we have the bean
 	    if (simplePageBean != null)
@@ -861,10 +879,10 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 		simplePageBean = makeSimplePageBean(simplePageBean, siteId, item);
 
 		// skip if don't have permission
-		if (!hasUpdatePermission && !lessonsAccess.isItemAccessible(item.getId(), siteId, currentUserId, simplePageBean))
+		if (!hasUpdatePermission && !(hasReadPermission && hasSiteOwnerRole) && !lessonsAccess.isItemAccessible(item.getId(), siteId, currentUserId, simplePageBean))
 		    continue;
 
-	    	if (item.getType() == SimplePageItem.PAGE)
+	    if (item.getType() == SimplePageItem.PAGE)
 		    findAllPages(item, entries, pageMap, hasUpdatePermission, siteId, currentUserId );
 		else
 		    addItem(item, entries, hasUpdatePermission, simplePageBean.getCurrentPage());
@@ -905,10 +923,10 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 		simplePageBean = makeSimplePageBean(simplePageBean, site.getId(), item);
 
 		// skip if don't have permission
-		if (!hasUpdatePermission && !lessonsAccess.isItemAccessible(item.getId(), site.getId(), currentUserId, simplePageBean))
+		if (!hasUpdatePermission && ! (hasReadPermission && hasSiteOwnerRole) && !lessonsAccess.isItemAccessible(item.getId(), site.getId(), currentUserId, simplePageBean))
 		    continue;
 
-	    	if (item.getType() == SimplePageItem.PAGE)
+	    if (item.getType() == SimplePageItem.PAGE)
 		    findAllSimplePages(item, entries, pageMap, hasUpdatePermission, site, currentUserId);
 		else
 		    entries.add(new DecoratedItem(item.getId(), item.getName(), item.getType(), site.getId(), site.getTitle()));
@@ -1017,6 +1035,9 @@ public class LessonsEntityProvider extends AbstractEntityProvider implements Ent
 
 	@Setter
 	private LessonsAccess lessonsAccess;
+
+	@Setter
+	private AuthzGroupService authzGroupService;
 
         @Setter
         private DeveloperHelperService developerHelperService;

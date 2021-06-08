@@ -241,7 +241,7 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 			for (int i = 0; i < newPages.size(); i++) {
 				if (newPages.get(i) instanceof SitePage) {
 					SitePage page = (SitePage) newPages.get(i);
-					if ("Site Stats".equals(page.getTitle())) {
+					if ("Site Stats".equals(page.getTitle()) || "Rubric Manager".equals(page.getTitle())) {
 						newPages.remove(i);
 						break;
 					}

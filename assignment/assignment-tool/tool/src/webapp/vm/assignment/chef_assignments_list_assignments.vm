@@ -262,6 +262,7 @@
 												<img alt="$reviewIndicator" title="$reviewIndicator" src="/library/image/silk/rosette.png" />
 											#end
 											</a>
+<!-- commenting out irubric icon link in associated assignment
 											&nbsp
 
 											#set($allowGradeAssignment=$!service.allowGradeSubmission($assignment.getReference()))
@@ -281,7 +282,7 @@
 															#end
 													#end
 											#end
-
+-->
 										</strong>
 										<div class="itemAction">
 											#set($prevAction=false)

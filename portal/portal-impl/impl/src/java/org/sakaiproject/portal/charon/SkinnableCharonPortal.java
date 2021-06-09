@@ -255,7 +255,7 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 		{
 			for (int i = 0; i < l.size(); i++) {
 				Map m = l.get(i);
-				if ("Site Stats".equals(m.get("pageTitle"))) {
+				if ("Site Stats".equals(m.get("pageTitle")) || "Rubric Manager".equals(m.get("pageTitle")) ) {
 					l.remove(i);
 					break;
 				}
